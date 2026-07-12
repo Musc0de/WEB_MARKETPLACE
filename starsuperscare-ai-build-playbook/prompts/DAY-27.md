@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 27/50 — CART MERGE, REVALIDATION, VOUCHER, DAN SAVE-FOR-LATER
 PHASE: Cart, Checkout, Payment
 
@@ -69,7 +69,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-27-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

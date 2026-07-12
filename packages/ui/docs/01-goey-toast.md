@@ -29,4 +29,5 @@ promise -> submit form, checkout validation, download generation
 
 ## Persistent notification
 
-Order/payment notification tetap dibuat pada `notifications` table. SSE hanya memberi sinyal realtime, lalu client memperbarui list dan menampilkan toast bila sesuai preference.
+Order/payment notification tetap dibuat pada `notifications` table. SSE hanya memberi sinyal
+realtime, lalu client memperbarui list dan menampilkan toast bila sesuai preference.

@@ -3,7 +3,8 @@
 ## Arsitektur yang tidak boleh diubah
 
 - `starsuperscare.net`: landing dan halaman informasi publik.
-- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest wishlist.
+- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest
+  wishlist.
 - `auth.starsuperscare.net`: login, signup, verifikasi, aktivasi, forgot/reset, dan logout.
 - `dashboard.starsuperscare.net`: area client setelah login.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
@@ -12,7 +13,8 @@
 - `assets.starsuperscare.net`: target aset publik/CDN bila dipakai.
 - `apps/worker`: proses internal; tidak mempunyai subdomain publik.
 
-Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan `apps/worker` melalui `packages/database`.
+Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan
+`apps/worker` melalui `packages/database`.
 
 ## Hari 26 — Cart API untuk guest dan account
 
@@ -26,10 +28,14 @@ Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses o
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement guest cart token issuance dengan random opaque token, server-side digest, expiry/rotation, serta one-active-cart invariant.
-- **10:15–12:15:** Implement GET cart dan add/update/remove/clear item transactionally untuk guest atau session user.
-- **13:15–15:15:** Hitung line totals/discount/subtotal di server, return item status available/out_of_stock/price_changed/inactive/quantity_adjusted.
-- **15:30–17:30:** Tulis authorization, token, validation, concurrent update, purchase limit, and total calculation tests.
+- **08:00–10:00:** Implement guest cart token issuance dengan random opaque token, server-side
+  digest, expiry/rotation, serta one-active-cart invariant.
+- **10:15–12:15:** Implement GET cart dan add/update/remove/clear item transactionally untuk guest
+  atau session user.
+- **13:15–15:15:** Hitung line totals/discount/subtotal di server, return item status
+  available/out_of_stock/price_changed/inactive/quantity_adjusted.
+- **15:30–17:30:** Tulis authorization, token, validation, concurrent update, purchase limit, and
+  total calculation tests.
 
 **Deliverables:**
 
@@ -74,10 +80,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement POST /cart/merge transaction: merge variant sama, clamp stock/purchase limit, latest price, merged marker, dan idempotency.
-- **10:15–12:15:** Implement revalidation saat cart dibaca/diubah, warning changes, inactive cleanup policy, dan race-safe versioning.
-- **13:15–15:15:** Implement save-for-later dan voucher validation/application dasar dengan explicit rule engine serta integer amounts.
-- **15:30–17:30:** Tulis merge matrix tests, price/stock changes, duplicate retry, voucher edge cases, dan rollback behavior.
+- **08:00–10:00:** Implement POST /cart/merge transaction: merge variant sama, clamp stock/purchase
+  limit, latest price, merged marker, dan idempotency.
+- **10:15–12:15:** Implement revalidation saat cart dibaca/diubah, warning changes, inactive cleanup
+  policy, dan race-safe versioning.
+- **13:15–15:15:** Implement save-for-later dan voucher validation/application dasar dengan explicit
+  rule engine serta integer amounts.
+- **15:30–17:30:** Tulis merge matrix tests, price/stock changes, duplicate retry, voucher edge
+  cases, dan rollback behavior.
 
 **Deliverables:**
 
@@ -122,10 +132,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Bangun /cart loader dan cart summary untuk guest/session dengan states loading/empty/error/expired token.
-- **10:15–12:15:** Bangun item table/card responsive, select checkout, increment/decrement, remove, clear, save-for-later, voucher, dan order note.
-- **13:15–15:15:** Tampilkan server totals, price/stock warnings, shipping estimate placeholder yang jelas, and checkout eligibility.
-- **15:30–17:30:** Tulis UI/integration tests, keyboard/focus, optimistic mutation rollback, goey-toast, and build storefront.
+- **08:00–10:00:** Bangun /cart loader dan cart summary untuk guest/session dengan states
+  loading/empty/error/expired token.
+- **10:15–12:15:** Bangun item table/card responsive, select checkout, increment/decrement, remove,
+  clear, save-for-later, voucher, dan order note.
+- **13:15–15:15:** Tampilkan server totals, price/stock warnings, shipping estimate placeholder yang
+  jelas, and checkout eligibility.
+- **15:30–17:30:** Tulis UI/integration tests, keyboard/focus, optimistic mutation rollback,
+  goey-toast, and build storefront.
 
 **Deliverables:**
 
@@ -170,10 +184,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement address validation/persistence and guest address input, shipping option adapter dengan deterministic mock, serta digital-only no-shipping branch.
-- **10:15–12:15:** Implement checkout validate/shipping-options endpoints dan server recomputation untuk product, stock, price, voucher, shipping, tax, total.
-- **13:15–15:15:** Implement POST /checkout/orders dengan idempotency key, immutable order/address/item snapshot, dan inventory reservation expiry.
-- **15:30–17:30:** Bangun address/shipping/review UI state machine, recovery after refresh, tests untuk mixed cart, stale price/stock, duplicate submit, and reservation release schedule.
+- **08:00–10:00:** Implement address validation/persistence and guest address input, shipping option
+  adapter dengan deterministic mock, serta digital-only no-shipping branch.
+- **10:15–12:15:** Implement checkout validate/shipping-options endpoints dan server recomputation
+  untuk product, stock, price, voucher, shipping, tax, total.
+- **13:15–15:15:** Implement POST /checkout/orders dengan idempotency key, immutable
+  order/address/item snapshot, dan inventory reservation expiry.
+- **15:30–17:30:** Bangun address/shipping/review UI state machine, recovery after refresh, tests
+  untuk mixed cart, stale price/stock, duplicate submit, and reservation release schedule.
 
 **Deliverables:**
 
@@ -206,7 +224,8 @@ deno task quality
 
 **External gate:**
 
-- Real shipping provider dapat ditambahkan nanti melalui adapter. Mock harus jelas hanya untuk development/test.
+- Real shipping provider dapat ditambahkan nanti melalui adapter. Mock harus jelas hanya untuk
+  development/test.
 
 **Prompt siap-tempel:** `../prompts/DAY-29.md`
 
@@ -224,10 +243,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Definisikan PaymentProvider interface dan implement deterministic sandbox/mock provider tanpa menyimpan raw card data.
-- **10:15–12:15:** Implement create payment intent/session, payment page handoff, pending/success/failed UI, dan provider reference persistence.
-- **13:15–15:15:** Implement webhook signature verification contract, unique provider event, state transition validation, transaction order paid + reservation commit + outbox.
-- **15:30–17:30:** Tulis duplicate/out-of-order/invalid-signature tests, browser-success-not-source-of-truth test, quality gate, dan Checkout Gate report.
+- **08:00–10:00:** Definisikan PaymentProvider interface dan implement deterministic sandbox/mock
+  provider tanpa menyimpan raw card data.
+- **10:15–12:15:** Implement create payment intent/session, payment page handoff,
+  pending/success/failed UI, dan provider reference persistence.
+- **13:15–15:15:** Implement webhook signature verification contract, unique provider event, state
+  transition validation, transaction order paid + reservation commit + outbox.
+- **15:30–17:30:** Tulis duplicate/out-of-order/invalid-signature tests,
+  browser-success-not-source-of-truth test, quality gate, dan Checkout Gate report.
 
 **Deliverables:**
 
@@ -259,7 +282,8 @@ deno task quality
 
 **External gate:**
 
-- Pilih dan siapkan payment gateway sandbox untuk integrasi nyata. Sampai tersedia, mock provider harus mencakup success, pending, failed, duplicate, dan invalid webhook.
+- Pilih dan siapkan payment gateway sandbox untuk integrasi nyata. Sampai tersedia, mock provider
+  harus mencakup success, pending, failed, duplicate, dan invalid webhook.
 
 **Prompt siap-tempel:** `../prompts/DAY-30.md`
 

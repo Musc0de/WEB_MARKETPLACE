@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 15/50 — BANGUN APLIKASI AUTH DAN SELESAIKAN AUTH GATE
 PHASE: API dan Auth
 
@@ -74,7 +74,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-15-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

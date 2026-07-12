@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 33/50 — AKUN OTOMATIS SETELAH GUEST PAYMENT DAN CLAIM ORDER AMAN
 PHASE: Worker, Invoice, Notification
 
@@ -70,7 +70,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-33-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 43/50 — ADMIN ORDERS, PAYMENTS, INVOICES, DAN CUSTOMERS
 PHASE: Operasional dan purnajual
 
@@ -72,7 +72,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-43-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

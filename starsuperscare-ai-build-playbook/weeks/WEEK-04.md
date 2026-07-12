@@ -3,7 +3,8 @@
 ## Arsitektur yang tidak boleh diubah
 
 - `starsuperscare.net`: landing dan halaman informasi publik.
-- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest wishlist.
+- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest
+  wishlist.
 - `auth.starsuperscare.net`: login, signup, verifikasi, aktivasi, forgot/reset, dan logout.
 - `dashboard.starsuperscare.net`: area client setelah login.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
@@ -12,7 +13,8 @@
 - `assets.starsuperscare.net`: target aset publik/CDN bila dipakai.
 - `apps/worker`: proses internal; tidak mempunyai subdomain publik.
 
-Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan `apps/worker` melalui `packages/database`.
+Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan
+`apps/worker` melalui `packages/database`.
 
 ## Hari 16 — Public catalog API: list, detail, category, brand, search
 
@@ -26,10 +28,14 @@ Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses o
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement repository/service query untuk active products, variant summary, effective price, available stock, rating, review count, dan net_sold.
-- **10:15–12:15:** Implement GET /products dengan page/per_page, search, category, brand, price range, stock, badges, dan sort allowlist.
-- **13:15–15:15:** Implement GET /products/{slug}, categories, brands, reviews; gunakan typed contracts dan stable response envelope.
-- **15:30–17:30:** Tulis query/integration tests, EXPLAIN critical queries bila tersedia, perbaiki index/N+1, dan seed data yang cukup untuk pagination.
+- **08:00–10:00:** Implement repository/service query untuk active products, variant summary,
+  effective price, available stock, rating, review count, dan net_sold.
+- **10:15–12:15:** Implement GET /products dengan page/per_page, search, category, brand, price
+  range, stock, badges, dan sort allowlist.
+- **13:15–15:15:** Implement GET /products/{slug}, categories, brands, reviews; gunakan typed
+  contracts dan stable response envelope.
+- **15:30–17:30:** Tulis query/integration tests, EXPLAIN critical queries bila tersedia, perbaiki
+  index/N+1, dan seed data yang cukup untuk pagination.
 
 **Deliverables:**
 
@@ -75,10 +81,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Definisikan permissions granular catalog.read/write/publish, inventory.adjust, order.manage, refund.manage, support.manage, dan admin role seed.
-- **10:15–12:15:** Implement admin endpoints category, brand, product, variant, price, publish/unpublish/archive dengan Zod dan optimistic concurrency.
-- **13:15–15:15:** Implement audit trail before/after yang aman, soft-delete policy, slug/SKU conflict handling, dan transaction boundaries.
-- **15:30–17:30:** Tulis authorization matrix tests: unauthenticated, customer, staff terbatas, admin; pastikan default-deny.
+- **08:00–10:00:** Definisikan permissions granular catalog.read/write/publish, inventory.adjust,
+  order.manage, refund.manage, support.manage, dan admin role seed.
+- **10:15–12:15:** Implement admin endpoints category, brand, product, variant, price,
+  publish/unpublish/archive dengan Zod dan optimistic concurrency.
+- **13:15–15:15:** Implement audit trail before/after yang aman, soft-delete policy, slug/SKU
+  conflict handling, dan transaction boundaries.
+- **15:30–17:30:** Tulis authorization matrix tests: unauthenticated, customer, staff terbatas,
+  admin; pastikan default-deny.
 
 **Deliverables:**
 
@@ -123,10 +133,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Bangun admin shell, auth guard, permission-aware navigation, product list, filters, empty/loading/error states.
-- **10:15–12:15:** Bangun create/edit product, category, brand, variant, price, digital/physical fields, validation, dan unsaved-change guard.
-- **13:15–15:15:** Implement object storage adapter/presigned upload flow untuk product image; validate MIME/size/ownership dan simpan metadata saja di Neon.
-- **15:30–17:30:** Integrasikan goey-toast, optimistic UI yang aman, upload progress, build/test, dan dokumentasikan provider storage env.
+- **08:00–10:00:** Bangun admin shell, auth guard, permission-aware navigation, product list,
+  filters, empty/loading/error states.
+- **10:15–12:15:** Bangun create/edit product, category, brand, variant, price, digital/physical
+  fields, validation, dan unsaved-change guard.
+- **13:15–15:15:** Implement object storage adapter/presigned upload flow untuk product image;
+  validate MIME/size/ownership dan simpan metadata saja di Neon.
+- **15:30–17:30:** Integrasikan goey-toast, optimistic UI yang aman, upload progress, build/test,
+  dan dokumentasikan provider storage env.
 
 **Deliverables:**
 
@@ -158,7 +172,8 @@ deno task quality
 
 **External gate:**
 
-- Object storage S3-compatible diperlukan untuk upload nyata. Bila belum ada, gunakan in-memory/local development adapter dan jangan memalsukan URL production.
+- Object storage S3-compatible diperlukan untuk upload nyata. Bila belum ada, gunakan
+  in-memory/local development adapter dan jangan memalsukan URL production.
 
 **Prompt siap-tempel:** `../prompts/DAY-18.md`
 
@@ -176,10 +191,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement inventory query dan movement service dengan transaction/locking, reason codes, actor, source reference, serta invariant available/reserved/sold.
-- **10:15–12:15:** Implement stock adjustment, transfer-ready abstraction, low-stock query, and reservation primitive create/commit/release/expire.
-- **13:15–15:15:** Bangun admin inventory list/detail/adjustment history dan form adjustment dengan permission plus confirmation.
-- **15:30–17:30:** Tulis concurrency/invariant tests dan audit reconciliation report untuk sample data.
+- **08:00–10:00:** Implement inventory query dan movement service dengan transaction/locking, reason
+  codes, actor, source reference, serta invariant available/reserved/sold.
+- **10:15–12:15:** Implement stock adjustment, transfer-ready abstraction, low-stock query, and
+  reservation primitive create/commit/release/expire.
+- **13:15–15:15:** Bangun admin inventory list/detail/adjustment history dan form adjustment dengan
+  permission plus confirmation.
+- **15:30–17:30:** Tulis concurrency/invariant tests dan audit reconciliation report untuk sample
+  data.
 
 **Deliverables:**
 
@@ -224,10 +243,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement pure functions dan database operations untuk gross_sold, refunded_sold, net_sold, average rating, review count, dan Indonesian sold label.
-- **10:15–12:15:** Implement review public read API dengan moderation/verified flags dan aggregate recalculation/reconciliation command.
-- **13:15–15:15:** Tambahkan sample paid/refunded/reviewed orders untuk test, lalu verifikasi card projection dan product detail response.
-- **15:30–17:30:** Jalankan catalog/admin test suite, query review, quality gate, dan tulis Catalog Gate report.
+- **08:00–10:00:** Implement pure functions dan database operations untuk gross_sold, refunded_sold,
+  net_sold, average rating, review count, dan Indonesian sold label.
+- **10:15–12:15:** Implement review public read API dengan moderation/verified flags dan aggregate
+  recalculation/reconciliation command.
+- **13:15–15:15:** Tambahkan sample paid/refunded/reviewed orders untuk test, lalu verifikasi card
+  projection dan product detail response.
+- **15:30–17:30:** Jalankan catalog/admin test suite, query review, quality gate, dan tulis Catalog
+  Gate report.
 
 **Deliverables:**
 

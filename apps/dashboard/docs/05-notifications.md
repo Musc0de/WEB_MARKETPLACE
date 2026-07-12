@@ -43,8 +43,10 @@ REST tetap dipakai untuk list, mark read, mark all read, dan pagination.
 
 ## Gooey Toast
 
-SSE event baru dapat memunculkan toast, tetapi toast bukan penyimpanan notifikasi. Notification center tetap mengambil data dari database.
+SSE event baru dapat memunculkan toast, tetapi toast bukan penyimpanan notifikasi. Notification
+center tetap mengambil data dari database.
 
 ## Scale-up
 
-Tambahkan broker seperti Kafka hanya ketika event volume, banyak consumer, retention, replay, dan pemisahan service benar-benar membutuhkannya.
+Tambahkan broker seperti Kafka hanya ketika event volume, banyak consumer, retention, replay, dan
+pemisahan service benar-benar membutuhkannya.

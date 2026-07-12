@@ -12,7 +12,8 @@ Memberikan status pengiriman terbatas tanpa membuka dashboard penuh.
 /{tracking_token}
 ```
 
-Gunakan token opaque dengan entropy tinggi, bukan order number atau shipment ID sebagai satu-satunya authorization.
+Gunakan token opaque dengan entropy tinggi, bukan order number atau shipment ID sebagai satu-satunya
+authorization.
 
 ## Informasi yang boleh tampil
 
@@ -30,4 +31,5 @@ Jangan tampilkan full email, telepon, alamat, payment, invoice, atau data order 
 GET /v1/public/tracking/{tracking_token}
 ```
 
-Endpoint diberi rate limit, expiry/revocation policy, dan tidak boleh mengungkap apakah order privat tertentu ada melalui identifier yang mudah ditebak.
+Endpoint diberi rate limit, expiry/revocation policy, dan tidak boleh mengungkap apakah order privat
+tertentu ada melalui identifier yang mudah ditebak.

@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 47/50 — E2E BROWSER, ACCESSIBILITY, RESPONSIVE, DAN FAILURE JOURNEYS
 PHASE: Hardening dan rilis
 
@@ -70,7 +70,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-47-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

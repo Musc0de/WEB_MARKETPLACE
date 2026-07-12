@@ -3,7 +3,8 @@
 ## Arsitektur yang tidak boleh diubah
 
 - `starsuperscare.net`: landing dan halaman informasi publik.
-- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest wishlist.
+- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest
+  wishlist.
 - `auth.starsuperscare.net`: login, signup, verifikasi, aktivasi, forgot/reset, dan logout.
 - `dashboard.starsuperscare.net`: area client setelah login.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
@@ -12,7 +13,8 @@
 - `assets.starsuperscare.net`: target aset publik/CDN bila dipakai.
 - `apps/worker`: proses internal; tidak mempunyai subdomain publik.
 
-Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan `apps/worker` melalui `packages/database`.
+Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan
+`apps/worker` melalui `packages/database`.
 
 ## Hari 11 — Lengkapi API conventions, validation, CORS, CSRF, rate limit, dan RBAC context
 
@@ -27,10 +29,14 @@ Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses o
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Buat route modules, dependency injection/context, typed success/error response, request parsing, pagination envelope, dan request ID propagation.
-- **10:15–12:15:** Implement Zod validation middleware, sanitized errors, security headers, explicit CORS origin allowlist, dan credential handling.
-- **13:15–15:15:** Implement CSRF strategy untuk state-changing cookie-auth requests, rate limiter interface/storage, dan trusted proxy configuration.
-- **15:30–17:30:** Implement session loader dan RBAC/permission guard skeleton; tulis middleware tests termasuk origin, CSRF, dan error cases.
+- **08:00–10:00:** Buat route modules, dependency injection/context, typed success/error response,
+  request parsing, pagination envelope, dan request ID propagation.
+- **10:15–12:15:** Implement Zod validation middleware, sanitized errors, security headers, explicit
+  CORS origin allowlist, dan credential handling.
+- **13:15–15:15:** Implement CSRF strategy untuk state-changing cookie-auth requests, rate limiter
+  interface/storage, dan trusted proxy configuration.
+- **15:30–17:30:** Implement session loader dan RBAC/permission guard skeleton; tulis middleware
+  tests termasuk origin, CSRF, dan error cases.
 
 **Deliverables:**
 
@@ -76,10 +82,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement password policy dan Argon2id wrapper yang dapat diuji, constant-time comparison semantics, serta secure random token helpers.
-- **10:15–12:15:** Implement POST /v1/auth/signup dengan transaction user/profile/credential, normalized identity, status pending_verification, dan audit event.
-- **13:15–15:15:** Implement verification token issuance, resend throttling, POST /verify-email, token rotation/revocation, dan outbox email event.
-- **15:30–17:30:** Tulis unit/integration tests untuk duplicate username/email, invalid input, token expiry/reuse, rollback, dan generic responses.
+- **08:00–10:00:** Implement password policy dan Argon2id wrapper yang dapat diuji, constant-time
+  comparison semantics, serta secure random token helpers.
+- **10:15–12:15:** Implement POST /v1/auth/signup dengan transaction user/profile/credential,
+  normalized identity, status pending_verification, dan audit event.
+- **13:15–15:15:** Implement verification token issuance, resend throttling, POST /verify-email,
+  token rotation/revocation, dan outbox email event.
+- **15:30–17:30:** Tulis unit/integration tests untuk duplicate username/email, invalid input, token
+  expiry/reuse, rollback, dan generic responses.
 
 **Deliverables:**
 
@@ -126,10 +136,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement POST /auth/login dengan username normalized, generic credential error, throttling, account-status checks, dan audit login.
-- **10:15–12:15:** Implement opaque session ID, database digest, expiry/idle timeout, rotation, Secure HttpOnly host-only cookie pada API, dan GET /session.
-- **13:15–15:15:** Implement logout current, logout-all, session listing/revocation primitives, serta cleanup query untuk worker.
-- **15:30–17:30:** Tulis tests untuk valid/invalid login, lock/rate limit, cookie flags, session rotation, revoked/expired session, dan cross-origin credential flow.
+- **08:00–10:00:** Implement POST /auth/login dengan username normalized, generic credential error,
+  throttling, account-status checks, dan audit login.
+- **10:15–12:15:** Implement opaque session ID, database digest, expiry/idle timeout, rotation,
+  Secure HttpOnly host-only cookie pada API, dan GET /session.
+- **13:15–15:15:** Implement logout current, logout-all, session listing/revocation primitives,
+  serta cleanup query untuk worker.
+- **15:30–17:30:** Tulis tests untuk valid/invalid login, lock/rate limit, cookie flags, session
+  rotation, revoked/expired session, dan cross-origin credential flow.
 
 **Deliverables:**
 
@@ -176,10 +190,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement forgot-password generic response, reset token issuance, expiry/reuse prevention, password replacement, dan optional revoke-all sessions.
-- **10:15–12:15:** Implement account activation endpoint untuk pending guest account: token verification, username final, password creation, email verification, dan activation audit.
-- **13:15–15:15:** Implement return_to parser dengan allowlist host/path, anti-open-redirect, dan safe default dashboard home.
-- **15:30–17:30:** Tulis integration tests untuk expired/reused token, reset unknown email, activation conflict, session revocation, dan malicious return_to.
+- **08:00–10:00:** Implement forgot-password generic response, reset token issuance, expiry/reuse
+  prevention, password replacement, dan optional revoke-all sessions.
+- **10:15–12:15:** Implement account activation endpoint untuk pending guest account: token
+  verification, username final, password creation, email verification, dan activation audit.
+- **13:15–15:15:** Implement return_to parser dengan allowlist host/path, anti-open-redirect, dan
+  safe default dashboard home.
+- **15:30–17:30:** Tulis integration tests untuk expired/reused token, reset unknown email,
+  activation conflict, session revocation, dan malicious return_to.
 
 **Deliverables:**
 
@@ -227,10 +245,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Bangun API client dengan credentials, CSRF bootstrap, typed errors, loading/cancellation, dan return_to handling.
-- **10:15–12:15:** Bangun halaman login dan signup dengan accessible forms, client validation yang sama kontraknya, password visibility, dan goey-toast.
-- **13:15–15:15:** Bangun verify-email, resend, forgot-password, reset-password, activation, logout result, dan invalid/expired token states.
-- **15:30–17:30:** Jalankan integration/E2E auth lokal, perbaiki responsive/accessibility, dan tulis Auth Gate report.
+- **08:00–10:00:** Bangun API client dengan credentials, CSRF bootstrap, typed errors,
+  loading/cancellation, dan return_to handling.
+- **10:15–12:15:** Bangun halaman login dan signup dengan accessible forms, client validation yang
+  sama kontraknya, password visibility, dan goey-toast.
+- **13:15–15:15:** Bangun verify-email, resend, forgot-password, reset-password, activation, logout
+  result, dan invalid/expired token states.
+- **15:30–17:30:** Jalankan integration/E2E auth lokal, perbaiki responsive/accessibility, dan tulis
+  Auth Gate report.
 
 **Deliverables:**
 

@@ -3,7 +3,8 @@
 ## Arsitektur yang tidak boleh diubah
 
 - `starsuperscare.net`: landing dan halaman informasi publik.
-- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest wishlist.
+- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest
+  wishlist.
 - `auth.starsuperscare.net`: login, signup, verifikasi, aktivasi, forgot/reset, dan logout.
 - `dashboard.starsuperscare.net`: area client setelah login.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
@@ -12,7 +13,8 @@
 - `assets.starsuperscare.net`: target aset publik/CDN bila dipakai.
 - `apps/worker`: proses internal; tidak mempunyai subdomain publik.
 
-Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan `apps/worker` melalui `packages/database`.
+Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan
+`apps/worker` melalui `packages/database`.
 
 ## Hari 21 — Storefront shell, design system, API client, dan goey-toast wrapper
 
@@ -27,10 +29,14 @@ Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses o
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Bangun design tokens, typography, spacing, buttons, forms, cards, skeleton, dialog, pagination, badge, dan responsive containers di packages/ui.
-- **10:15–12:15:** Buat wrapper goey-toast terstandar untuk success/error/warning/info/promise, reduced-motion support, dan pesan Indonesia yang konsisten.
-- **13:15–15:15:** Bangun storefront header/nav/search/cart/account shell, API client typed, currency/date/sold formatter, dan error boundary.
-- **15:30–17:30:** Buat component tests/smoke page, audit keyboard/focus, dan build storefront baseline.
+- **08:00–10:00:** Bangun design tokens, typography, spacing, buttons, forms, cards, skeleton,
+  dialog, pagination, badge, dan responsive containers di packages/ui.
+- **10:15–12:15:** Buat wrapper goey-toast terstandar untuk success/error/warning/info/promise,
+  reduced-motion support, dan pesan Indonesia yang konsisten.
+- **13:15–15:15:** Bangun storefront header/nav/search/cart/account shell, API client typed,
+  currency/date/sold formatter, dan error boundary.
+- **15:30–17:30:** Buat component tests/smoke page, audit keyboard/focus, dan build storefront
+  baseline.
 
 **Deliverables:**
 
@@ -76,10 +82,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Bangun /products data loader/query state dan URL pagination per_page=12 dengan cancellation serta cache policy sederhana.
-- **10:15–12:15:** Bangun ProductCard berisi image, name, brand, category, regular/selling price, discount, rating, review count, net sold, stock, badges, dan wishlist state.
-- **13:15–15:15:** Implement add-to-cart/buy-now/wishlist action stubs yang terhubung kontrak, responsive grid, skeleton, empty/error/out-of-stock states.
-- **15:30–17:30:** Tulis component/integration tests untuk sold label, price discount, stock, new badge, action accessibility, dan mobile layout.
+- **08:00–10:00:** Bangun /products data loader/query state dan URL pagination per_page=12 dengan
+  cancellation serta cache policy sederhana.
+- **10:15–12:15:** Bangun ProductCard berisi image, name, brand, category, regular/selling price,
+  discount, rating, review count, net sold, stock, badges, dan wishlist state.
+- **13:15–15:15:** Implement add-to-cart/buy-now/wishlist action stubs yang terhubung kontrak,
+  responsive grid, skeleton, empty/error/out-of-stock states.
+- **15:30–17:30:** Tulis component/integration tests untuk sold label, price discount, stock, new
+  badge, action accessibility, dan mobile layout.
 
 **Deliverables:**
 
@@ -123,10 +133,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Bangun /products/{slug} loader dengan not-found/inactive states dan metadata dasar.
-- **10:15–12:15:** Bangun gallery, product summary, variant selector, effective price, stock, quantity limits, add-cart, buy-now, wishlist, dan shipping/digital indicator.
-- **13:15–15:15:** Bangun tabs/accordion description, benefits, composition, usage, warning, shipping, reviews, serta related products.
-- **15:30–17:30:** Tulis tests untuk variant URL/state, sold/stock display, quantity clamping, image alt, and out-of-stock behavior.
+- **08:00–10:00:** Bangun /products/{slug} loader dengan not-found/inactive states dan metadata
+  dasar.
+- **10:15–12:15:** Bangun gallery, product summary, variant selector, effective price, stock,
+  quantity limits, add-cart, buy-now, wishlist, dan shipping/digital indicator.
+- **13:15–15:15:** Bangun tabs/accordion description, benefits, composition, usage, warning,
+  shipping, reviews, serta related products.
+- **15:30–17:30:** Tulis tests untuk variant URL/state, sold/stock display, quantity clamping, image
+  alt, and out-of-stock behavior.
 
 **Deliverables:**
 
@@ -170,9 +184,12 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Bangun /search, /categories/{slug}, dan /brands/{slug} menggunakan endpoint yang sama dan URL query sebagai source of truth.
-- **10:15–12:15:** Implement keyword debounce, filter category/brand/price/stock/rating/promo, sort allowlist, reset filter, dan mobile filter drawer.
-- **13:15–15:15:** Jaga browser back/forward, shareable URLs, page reset saat filter berubah, serta empty suggestions/popular products.
+- **08:00–10:00:** Bangun /search, /categories/{slug}, dan /brands/{slug} menggunakan endpoint yang
+  sama dan URL query sebagai source of truth.
+- **10:15–12:15:** Implement keyword debounce, filter category/brand/price/stock/rating/promo, sort
+  allowlist, reset filter, dan mobile filter drawer.
+- **13:15–15:15:** Jaga browser back/forward, shareable URLs, page reset saat filter berubah, serta
+  empty suggestions/popular products.
 - **15:30–17:30:** Tulis query-state tests, accessibility, and API error recovery; build storefront.
 
 **Deliverables:**
@@ -218,10 +235,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement guest wishlist local storage dengan versioned schema, graceful corruption handling, dan no-sensitive-data rule.
-- **10:15–12:15:** Implement account wishlist API list/add/remove, ownership, duplicate prevention, stock/price projection, dan optional merge after login.
-- **13:15–15:15:** Integrasikan heart state pada list/detail, optimistic update rollback, goey-toast, dan dashboard deep link.
-- **15:30–17:30:** Jalankan storefront tests, accessibility smoke, performance baseline, dan tulis Storefront Gate report.
+- **08:00–10:00:** Implement guest wishlist local storage dengan versioned schema, graceful
+  corruption handling, dan no-sensitive-data rule.
+- **10:15–12:15:** Implement account wishlist API list/add/remove, ownership, duplicate prevention,
+  stock/price projection, dan optional merge after login.
+- **13:15–15:15:** Integrasikan heart state pada list/detail, optimistic update rollback,
+  goey-toast, dan dashboard deep link.
+- **15:30–17:30:** Jalankan storefront tests, accessibility smoke, performance baseline, dan tulis
+  Storefront Gate report.
 
 **Deliverables:**
 

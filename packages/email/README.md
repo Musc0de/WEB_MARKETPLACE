@@ -28,7 +28,8 @@
 
 ## Template variables
 
-Gunakan typed contract. Escape user-provided values. Jangan memasukkan raw token ke log. Activation/reset link wajib HTTPS dan expiry jelas.
+Gunakan typed contract. Escape user-provided values. Jangan memasukkan raw token ke log.
+Activation/reset link wajib HTTPS dan expiry jelas.
 
 ## Provider abstraction
 

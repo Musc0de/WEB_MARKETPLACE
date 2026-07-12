@@ -1,6 +1,8 @@
 # External Service Gates
 
-Coding AI dapat membangun adapter dan fake, tetapi layanan berikut memerlukan tindakan manusia/credential. Jangan memasukkan secret ke prompt, chat, commit, screenshot, atau file Markdown.
+Coding AI dapat membangun adapter dan fake, tetapi layanan berikut memerlukan tindakan
+manusia/credential. Jangan memasukkan secret ke prompt, chat, commit, screenshot, atau file
+Markdown.
 
 ## Day 06 — Neon
 
@@ -15,7 +17,8 @@ Verifikasi: connection smoke test, migration development, dan query `select 1`.
 
 ## Day 18/32 — Object storage
 
-Dibutuhkan S3-compatible storage atau provider setara untuk product images, bukti retur, attachments, digital files, dan private invoices.
+Dibutuhkan S3-compatible storage atau provider setara untuk product images, bukti retur,
+attachments, digital files, dan private invoices.
 
 Env generik:
 
@@ -33,7 +36,8 @@ Gunakan presigned upload/download. Secret hanya pada API/worker.
 
 ## Day 29/45 — Shipping/courier
 
-Sebelum provider dipilih, gunakan `MockShippingProvider` yang deterministic. Untuk provider nyata dibutuhkan base URL, client/key, webhook secret, dan mapping status.
+Sebelum provider dipilih, gunakan `MockShippingProvider` yang deterministic. Untuk provider nyata
+dibutuhkan base URL, client/key, webhook secret, dan mapping status.
 
 ## Day 30 — Payment gateway
 
@@ -61,8 +65,11 @@ EMAIL_FROM_ADDRESS
 EMAIL_REPLY_TO
 ```
 
-Test/dev memakai fake inbox atau provider sandbox; jangan mengklaim delivery nyata tanpa provider response.
+Test/dev memakai fake inbox atau provider sandbox; jangan mengklaim delivery nyata tanpa provider
+response.
 
 ## Day 49 — Deployment dan DNS
 
-Dibutuhkan akses deployment platform dan DNS untuk host yang sudah ada pada blueprint. `apps/worker` tidak mendapat DNS publik. Pastikan staging dan production memakai secret, DB branch, provider mode, bucket, dan webhook yang terpisah.
+Dibutuhkan akses deployment platform dan DNS untuk host yang sudah ada pada blueprint. `apps/worker`
+tidak mendapat DNS publik. Pastikan staging dan production memakai secret, DB branch, provider mode,
+bucket, dan webhook yang terpisah.

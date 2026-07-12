@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 18/50 — ADMIN CATALOG UI DAN UPLOAD ASSETS
 PHASE: Catalog dan Admin
 
@@ -71,7 +71,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-18-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

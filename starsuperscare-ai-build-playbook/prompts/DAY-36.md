@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 36/50 — DASHBOARD SHELL, ROUTE GUARDS, NAVIGATION, DAN HOME SUMMARY
 PHASE: Dashboard client
 
@@ -71,7 +71,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-36-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

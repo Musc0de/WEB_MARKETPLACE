@@ -50,7 +50,8 @@
 
 ## Fase 6 — Dashboard
 
-Implementasikan home, profile, orders, tracking, history, invoice, downloads, address, wishlist, notifications, return/refund, review, support, dan settings.
+Implementasikan home, profile, orders, tracking, history, invoice, downloads, address, wishlist,
+notifications, return/refund, review, support, dan settings.
 
 ## Fase 7 — Worker dan realtime
 

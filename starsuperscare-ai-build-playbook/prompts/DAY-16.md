@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 16/50 — PUBLIC CATALOG API: LIST, DETAIL, CATEGORY, BRAND, SEARCH
 PHASE: Catalog dan Admin
 
@@ -71,7 +71,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-16-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

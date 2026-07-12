@@ -7,7 +7,8 @@
 /dashboard/addresses/{address_id}
 ```
 
-Fitur: list, tambah, edit, hapus, set default shipping, set billing. Address yang sudah dipakai order lama tidak mengubah snapshot order.
+Fitur: list, tambah, edit, hapus, set default shipping, set billing. Address yang sudah dipakai
+order lama tidak mengubah snapshot order.
 
 Validasi minimal:
 
@@ -29,4 +30,5 @@ Fitur:
 - Price drop/restock opt-in.
 - Tampilkan status inactive/out-of-stock.
 
-Wishlist guest dari storefront digabung setelah login dengan deduplication berdasarkan product/variant.
+Wishlist guest dari storefront digabung setelah login dengan deduplication berdasarkan
+product/variant.

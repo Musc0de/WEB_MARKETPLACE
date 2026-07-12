@@ -42,7 +42,8 @@ refunded_sold = quantity refund yang sudah finalized
 net_sold = gross_sold - refunded_sold
 ```
 
-Jangan menambah sold saat item hanya berada di cart. Source of truth tetap `order_items` dan refund; tabel statistik hanya cache.
+Jangan menambah sold saat item hanya berada di cart. Source of truth tetap `order_items` dan refund;
+tabel statistik hanya cache.
 
 Format tampilan:
 
@@ -52,7 +53,8 @@ Format tampilan:
 10.000+    -> Terjual 10 rb+
 ```
 
-Bila `net_sold = 0`, tampilkan badge `Baru` bila produk memenuhi aturan produk baru; jangan wajib menampilkan `Terjual 0`.
+Bila `net_sold = 0`, tampilkan badge `Baru` bila produk memenuhi aturan produk baru; jangan wajib
+menampilkan `Terjual 0`.
 
 ## Interaksi
 

@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 35/50 — COMMERCE E2E, FAILURE RECOVERY, DAN INTEGRATION GATE
 PHASE: Worker, Invoice, Notification
 
@@ -70,7 +70,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-35-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

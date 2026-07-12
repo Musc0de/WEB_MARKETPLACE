@@ -1,15 +1,19 @@
 # StarSuperScare Marketplace — Blueprint Deno + Neon
 
-Paket ini memecah rencana marketplace StarSuperScare menjadi dokumen Markdown per aplikasi, fitur, database, infrastruktur, dan tahap implementasi.
+Paket ini memecah rencana marketplace StarSuperScare menjadi dokumen Markdown per aplikasi, fitur,
+database, infrastruktur, dan tahap implementasi.
 
 ## Keputusan arsitektur final
 
 - `starsuperscare.net`: landing page dan halaman informasi publik.
-- `shop.starsuperscare.net`: katalog produk, detail produk, cart, checkout, pencarian, dan wishlist sementara.
+- `shop.starsuperscare.net`: katalog produk, detail produk, cart, checkout, pencarian, dan wishlist
+  sementara.
 - `auth.starsuperscare.net`: login, signup, aktivasi akun, lupa password, dan reset password.
-- `dashboard.starsuperscare.net`: akun client, order, history, invoice, download digital, alamat, notifikasi, retur, ulasan, support, dan settings.
+- `dashboard.starsuperscare.net`: akun client, order, history, invoice, download digital, alamat,
+  notifikasi, retur, ulasan, support, dan settings.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
-- `admin.starsuperscare.net`: pengelolaan produk, stok, order, pembayaran, client, refund, dan konten.
+- `admin.starsuperscare.net`: pengelolaan produk, stok, order, pembayaran, client, refund, dan
+  konten.
 - `assets.starsuperscare.net`: gambar produk, bukti retur, dan file publik.
 - `tracking.starsuperscare.net`: tracking publik menggunakan token aman.
 
@@ -37,8 +41,10 @@ Paket ini memecah rencana marketplace StarSuperScare menjadi dokumen Markdown pe
 
 - Cart dan checkout berada di `shop`, bukan dashboard.
 - Dashboard hanya menampilkan aktivitas dan kepemilikan client.
-- Login memakai **username + password**; email dipakai untuk invoice, aktivasi, recovery, dan notifikasi.
-- Akun guest dapat dibuat otomatis setelah pembayaran sukses, tetapi password tidak pernah dikirim melalui email. Client menerima tautan aktivasi untuk membuat password sendiri.
+- Login memakai **username + password**; email dipakai untuk invoice, aktivasi, recovery, dan
+  notifikasi.
+- Akun guest dapat dibuat otomatis setelah pembayaran sukses, tetapi password tidak pernah dikirim
+  melalui email. Client menerima tautan aktivasi untuk membuat password sendiri.
 - Semua nilai uang disimpan sebagai integer rupiah.
 - Semua waktu disimpan sebagai UTC dan ditampilkan dengan locale `id-ID`, zona `Asia/Jakarta`.
 - Informasi `Terjual` berasal dari transaksi berbayar dikurangi refund, bukan dari cart.

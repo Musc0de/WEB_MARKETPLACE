@@ -23,8 +23,10 @@ POST /v1/webhooks/email/{provider}
 
 ## State transition
 
-Jangan menerima transisi mundur yang tidak valid. Contoh: event `pending` yang terlambat tidak boleh menimpa `paid`.
+Jangan menerima transisi mundur yang tidak valid. Contoh: event `pending` yang terlambat tidak boleh
+menimpa `paid`.
 
 ## Retry
 
-Provider dapat mengirim ulang webhook. Handler harus aman dijalankan berkali-kali. Side effect email dan invoice memakai dedupe key.
+Provider dapat mengirim ulang webhook. Handler harus aman dijalankan berkali-kali. Side effect email
+dan invoice memakai dedupe key.

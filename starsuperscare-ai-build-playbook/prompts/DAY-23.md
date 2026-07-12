@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 23/50 — PRODUCT DETAIL, VARIANTS, GALLERY, REVIEWS, DAN RELATED PRODUCTS
 PHASE: Storefront
 
@@ -69,7 +69,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-23-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

@@ -3,7 +3,8 @@
 ## Arsitektur yang tidak boleh diubah
 
 - `starsuperscare.net`: landing dan halaman informasi publik.
-- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest wishlist.
+- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest
+  wishlist.
 - `auth.starsuperscare.net`: login, signup, verifikasi, aktivasi, forgot/reset, dan logout.
 - `dashboard.starsuperscare.net`: area client setelah login.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
@@ -12,7 +13,8 @@
 - `assets.starsuperscare.net`: target aset publik/CDN bila dipakai.
 - `apps/worker`: proses internal; tidak mempunyai subdomain publik.
 
-Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan `apps/worker` melalui `packages/database`.
+Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan
+`apps/worker` melalui `packages/database`.
 
 ## Hari 41 — Returns dan refunds end-to-end
 
@@ -26,10 +28,14 @@ Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses o
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement return eligibility policy by order item/status/window, create request, reason, quantity, evidence metadata, communication history.
-- **10:15–12:15:** Implement dashboard returns/refunds list/detail/form/upload flow dan user ownership.
-- **13:15–15:15:** Implement admin review/approve/reject/receive/refund actions dengan permission, provider refund adapter, audit, and idempotency.
-- **15:30–17:30:** Update finalized refund to refunded_sold/net_sold and optional restock decision; test partial/full/duplicate/refund-failure cases.
+- **08:00–10:00:** Implement return eligibility policy by order item/status/window, create request,
+  reason, quantity, evidence metadata, communication history.
+- **10:15–12:15:** Implement dashboard returns/refunds list/detail/form/upload flow dan user
+  ownership.
+- **13:15–15:15:** Implement admin review/approve/reject/receive/refund actions dengan permission,
+  provider refund adapter, audit, and idempotency.
+- **15:30–17:30:** Update finalized refund to refunded_sold/net_sold and optional restock decision;
+  test partial/full/duplicate/refund-failure cases.
 
 **Deliverables:**
 
@@ -75,9 +81,12 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement public/account FAQ read model and support ticket create/list/detail with category, order link validation, priority/status, and ownership.
-- **10:15–12:15:** Implement ticket message thread and private attachment upload/download with MIME/size/authorization rules.
-- **13:15–15:15:** Bangun dashboard support UI dan admin queue/detail/reply/assign/status workflow dengan notifications/outbox.
+- **08:00–10:00:** Implement public/account FAQ read model and support ticket create/list/detail
+  with category, order link validation, priority/status, and ownership.
+- **10:15–12:15:** Implement ticket message thread and private attachment upload/download with
+  MIME/size/authorization rules.
+- **13:15–15:15:** Bangun dashboard support UI dan admin queue/detail/reply/assign/status workflow
+  dengan notifications/outbox.
 - **15:30–17:30:** Tulis IDOR, attachment, spam/rate-limit, closed-ticket, and notification tests.
 
 **Deliverables:**
@@ -125,10 +134,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement admin order list/detail filters, status timeline, customer snapshot, items, totals, payment, shipment, invoice, and support links.
-- **10:15–12:15:** Implement permitted operations: mark processing, attach shipment, cancel rules, resend invoice, retry job, without editing immutable financial snapshot arbitrarily.
-- **13:15–15:15:** Implement payment events/invoice/customer list/detail with least-privilege data masking and no password/session secret exposure.
-- **15:30–17:30:** Bangun admin UI, audit all state changes, and authorization/status-transition tests.
+- **08:00–10:00:** Implement admin order list/detail filters, status timeline, customer snapshot,
+  items, totals, payment, shipment, invoice, and support links.
+- **10:15–12:15:** Implement permitted operations: mark processing, attach shipment, cancel rules,
+  resend invoice, retry job, without editing immutable financial snapshot arbitrarily.
+- **13:15–15:15:** Implement payment events/invoice/customer list/detail with least-privilege data
+  masking and no password/session secret exposure.
+- **15:30–17:30:** Bangun admin UI, audit all state changes, and authorization/status-transition
+  tests.
 
 **Deliverables:**
 
@@ -174,10 +187,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement review moderation queue with publish/reject policy, reason, audit, and aggregate recalculation.
-- **10:15–12:15:** Complete admin catalog/inventory operations including low stock, movement history, product status, and bulk action safeguards.
-- **13:15–15:15:** Build operational dashboard cards for orders/payments/outbox/email/low-stock using bounded queries and permission-aware metrics.
-- **15:30–17:30:** Build audit log viewer with filters/redaction, test admin boundaries, and responsive admin build.
+- **08:00–10:00:** Implement review moderation queue with publish/reject policy, reason, audit, and
+  aggregate recalculation.
+- **10:15–12:15:** Complete admin catalog/inventory operations including low stock, movement
+  history, product status, and bulk action safeguards.
+- **13:15–15:15:** Build operational dashboard cards for orders/payments/outbox/email/low-stock
+  using bounded queries and permission-aware metrics.
+- **15:30–17:30:** Build audit log viewer with filters/redaction, test admin boundaries, and
+  responsive admin build.
 
 **Deliverables:**
 
@@ -224,10 +241,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement opaque public tracking token issue/revoke/expiry and endpoint projection that exposes only safe shipment/order fields.
-- **10:15–12:15:** Implement shipment provider adapter/webhook or deterministic mock, unique event handling, timeline ordering, and order notification outbox.
-- **13:15–15:15:** Bangun tracking app with token route, invalid/expired/not-found states, timeline, estimated delivery, and no account PII.
-- **15:30–17:30:** Run operations integration tests, security review tracking enumeration, build admin/dashboard/tracking, and write Operations Gate report.
+- **08:00–10:00:** Implement opaque public tracking token issue/revoke/expiry and endpoint
+  projection that exposes only safe shipment/order fields.
+- **10:15–12:15:** Implement shipment provider adapter/webhook or deterministic mock, unique event
+  handling, timeline ordering, and order notification outbox.
+- **13:15–15:15:** Bangun tracking app with token route, invalid/expired/not-found states, timeline,
+  estimated delivery, and no account PII.
+- **15:30–17:30:** Run operations integration tests, security review tracking enumeration, build
+  admin/dashboard/tracking, and write Operations Gate report.
 
 **Deliverables:**
 
@@ -259,7 +280,8 @@ deno task quality
 
 **External gate:**
 
-- Real courier integration dapat mengganti mock adapter setelah akun provider dan webhook secret tersedia.
+- Real courier integration dapat mengganti mock adapter setelah akun provider dan webhook secret
+  tersedia.
 
 **Prompt siap-tempel:** `../prompts/DAY-45.md`
 

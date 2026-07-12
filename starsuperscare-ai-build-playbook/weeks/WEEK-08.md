@@ -3,7 +3,8 @@
 ## Arsitektur yang tidak boleh diubah
 
 - `starsuperscare.net`: landing dan halaman informasi publik.
-- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest wishlist.
+- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest
+  wishlist.
 - `auth.starsuperscare.net`: login, signup, verifikasi, aktivasi, forgot/reset, dan logout.
 - `dashboard.starsuperscare.net`: area client setelah login.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
@@ -12,7 +13,8 @@
 - `assets.starsuperscare.net`: target aset publik/CDN bila dipakai.
 - `apps/worker`: proses internal; tidak mempunyai subdomain publik.
 
-Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan `apps/worker` melalui `packages/database`.
+Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan
+`apps/worker` melalui `packages/database`.
 
 ## Hari 36 — Dashboard shell, route guards, navigation, dan home summary
 
@@ -26,10 +28,14 @@ Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses o
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Bangun dashboard API client/session bootstrap, protected route guard, unauthorized/expired flow, error boundary, dan app layout.
-- **10:15–12:15:** Bangun desktop sidebar sesuai blueprint dan mobile nav Home/Orders/Cart/Notifications/Account; Cart link kembali ke shop.
-- **13:15–15:15:** Implement home summary endpoint dan UI: active orders, latest, shipping, total purchases, unread notification, unpaid status, recommendation link.
-- **15:30–17:30:** Tulis dashboard shell/home tests, loading/empty/error states, accessibility, and responsive build.
+- **08:00–10:00:** Bangun dashboard API client/session bootstrap, protected route guard,
+  unauthorized/expired flow, error boundary, dan app layout.
+- **10:15–12:15:** Bangun desktop sidebar sesuai blueprint dan mobile nav
+  Home/Orders/Cart/Notifications/Account; Cart link kembali ke shop.
+- **13:15–15:15:** Implement home summary endpoint dan UI: active orders, latest, shipping, total
+  purchases, unread notification, unpaid status, recommendation link.
+- **15:30–17:30:** Tulis dashboard shell/home tests, loading/empty/error states, accessibility, and
+  responsive build.
 
 **Deliverables:**
 
@@ -75,10 +81,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement GET/PATCH /me dan profile UI untuk name, email display/policy, phone, avatar metadata, joined date, and validation.
-- **10:15–12:15:** Implement change password, sessions list, revoke one/all other sessions, login history summary, and security feedback.
-- **13:15–15:15:** Implement addresses CRUD/default shipping/billing with ownership and dashboard UI.
-- **15:30–17:30:** Implement tokenized payment-method metadata list/delete only if provider supports it; no raw card data; test ownership and responsive forms.
+- **08:00–10:00:** Implement GET/PATCH /me dan profile UI untuk name, email display/policy, phone,
+  avatar metadata, joined date, and validation.
+- **10:15–12:15:** Implement change password, sessions list, revoke one/all other sessions, login
+  history summary, and security feedback.
+- **13:15–15:15:** Implement addresses CRUD/default shipping/billing with ownership and dashboard
+  UI.
+- **15:30–17:30:** Implement tokenized payment-method metadata list/delete only if provider supports
+  it; no raw card data; test ownership and responsive forms.
 
 **Deliverables:**
 
@@ -124,10 +134,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement user-scoped orders list with tabs Semua/Aktif/Selesai/Dibatalkan/Refund, stable pagination, and summary fields.
-- **10:15–12:15:** Implement order detail endpoint/UI with snapshots, payment/shipping/status timeline, totals, invoice and product links.
-- **13:15–15:15:** Implement tracking endpoint/UI and buy-again service yang revalidasi product/variant/price/stock sebelum menambah cart.
-- **15:30–17:30:** Tulis ownership/IDOR tests, status display, mixed digital/physical tracking, buy-again warnings, and responsive detail tests.
+- **08:00–10:00:** Implement user-scoped orders list with tabs
+  Semua/Aktif/Selesai/Dibatalkan/Refund, stable pagination, and summary fields.
+- **10:15–12:15:** Implement order detail endpoint/UI with snapshots, payment/shipping/status
+  timeline, totals, invoice and product links.
+- **13:15–15:15:** Implement tracking endpoint/UI and buy-again service yang revalidasi
+  product/variant/price/stock sebelum menambah cart.
+- **15:30–17:30:** Tulis ownership/IDOR tests, status display, mixed digital/physical tracking,
+  buy-again warnings, and responsive detail tests.
 
 **Deliverables:**
 
@@ -171,10 +185,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement /history default per_page=5 dengan status/year/start_date/end_date, total transactions/nominal/completed/refund summary.
-- **10:15–12:15:** Bangun history UI, filter URL state, IDR/time formatting id-ID Asia/Jakarta, buy-again, review, and invoice actions.
-- **13:15–15:15:** Implement invoices list/detail/download authorization dan signed/streamed private file access.
-- **15:30–17:30:** Implement digital entitlements/download list, expiry/download-count checks, secure download, and tests for ownership/tampering.
+- **08:00–10:00:** Implement /history default per_page=5 dengan status/year/start_date/end_date,
+  total transactions/nominal/completed/refund summary.
+- **10:15–12:15:** Bangun history UI, filter URL state, IDR/time formatting id-ID Asia/Jakarta,
+  buy-again, review, and invoice actions.
+- **13:15–15:15:** Implement invoices list/detail/download authorization dan signed/streamed private
+  file access.
+- **15:30–17:30:** Implement digital entitlements/download list, expiry/download-count checks,
+  secure download, and tests for ownership/tampering.
 
 **Deliverables:**
 
@@ -222,10 +240,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Bangun notification center list/read/read-all/unread badge dan SSE listener dengan reconnect, REST refresh, and goey-toast for live events.
-- **10:15–12:15:** Bangun account wishlist page dengan stock/price projection, remove/add-cart/product links.
-- **13:15–15:15:** Implement eligible verified-purchase reviews list/create/edit/delete policy dan settings profile/security/notification/privacy shells.
-- **15:30–17:30:** Jalankan dashboard tests, accessibility/mobile audit, build, dan tulis Dashboard Gate report.
+- **08:00–10:00:** Bangun notification center list/read/read-all/unread badge dan SSE listener
+  dengan reconnect, REST refresh, and goey-toast for live events.
+- **10:15–12:15:** Bangun account wishlist page dengan stock/price projection,
+  remove/add-cart/product links.
+- **13:15–15:15:** Implement eligible verified-purchase reviews list/create/edit/delete policy dan
+  settings profile/security/notification/privacy shells.
+- **15:30–17:30:** Jalankan dashboard tests, accessibility/mobile audit, build, dan tulis Dashboard
+  Gate report.
 
 **Deliverables:**
 

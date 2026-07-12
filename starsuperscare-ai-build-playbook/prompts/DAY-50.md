@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 50/50 — PRODUCTION RELEASE, SMOKE TEST, ROLLBACK READINESS, DAN HANDOVER
 PHASE: Hardening dan rilis
 
@@ -71,7 +71,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-50-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

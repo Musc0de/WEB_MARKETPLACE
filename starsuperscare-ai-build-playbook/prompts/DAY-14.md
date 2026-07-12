@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 14/50 — FORGOT/RESET PASSWORD, ACTIVATION, DAN RETURN_TO ALLOWLIST
 PHASE: API dan Auth
 
@@ -71,7 +71,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-14-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

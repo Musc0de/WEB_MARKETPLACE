@@ -1,18 +1,22 @@
 # StarSuperScare — AI Build Playbook
 
-Playbook ini mengubah blueprint menjadi **50 hari kerja, 8 jam per hari**, untuk satu developer yang dibantu coding AI. Empat blok kerja harian memakai zona waktu Asia/Jakarta:
+Playbook ini mengubah blueprint menjadi **50 hari kerja, 8 jam per hari**, untuk satu developer yang
+dibantu coding AI. Empat blok kerja harian memakai zona waktu Asia/Jakarta:
 
 - 08:00–10:00
 - 10:15–12:15
 - 13:15–15:15
 - 15:30–17:30
 
-Targetnya bukan menjanjikan semua pekerjaan pasti selesai persis dalam 50 hari. Ini adalah urutan dependency yang aman. Bila satu acceptance gate belum lulus, lanjutkan hari tersebut sebelum masuk hari berikutnya.
+Targetnya bukan menjanjikan semua pekerjaan pasti selesai persis dalam 50 hari. Ini adalah urutan
+dependency yang aman. Bila satu acceptance gate belum lulus, lanjutkan hari tersebut sebelum masuk
+hari berikutnya.
 
 ## Arsitektur yang tidak boleh diubah
 
 - `starsuperscare.net`: landing dan halaman informasi publik.
-- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest wishlist.
+- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest
+  wishlist.
 - `auth.starsuperscare.net`: login, signup, verifikasi, aktivasi, forgot/reset, dan logout.
 - `dashboard.starsuperscare.net`: area client setelah login.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
@@ -21,7 +25,8 @@ Targetnya bukan menjanjikan semua pekerjaan pasti selesai persis dalam 50 hari. 
 - `assets.starsuperscare.net`: target aset publik/CDN bila dipakai.
 - `apps/worker`: proses internal; tidak mempunyai subdomain publik.
 
-Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan `apps/worker` melalui `packages/database`.
+Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan
+`apps/worker` melalui `packages/database`.
 
 ## Cara memakai
 
@@ -45,15 +50,15 @@ Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses o
 
 ## Checkpoint utama
 
-| Hari | Gate | Hasil minimum |
-|---:|---|---|
-| 5 | Foundation | Workspace, app scaffold, shared packages, CI |
-| 10 | Database | Migration dari DB kosong dan seed berhasil |
-| 15 | Auth | Signup/verify/login/session/recovery/activation bekerja |
-| 20 | Catalog | Public catalog dan admin catalog/inventory bekerja |
-| 25 | Storefront | Product list/detail/search/wishlist selesai |
-| 30 | Checkout | Guest/user cart, order, reservation, payment mock/webhook selesai |
-| 35 | Integration | Payment → invoice/email/account/notification teruji |
-| 40 | Dashboard | Lifecycle client dapat dilihat dan dikelola |
-| 45 | Operations | Return/support/admin/tracking selesai |
-| 50 | Launch | Test, security, staging, production, handover |
+| Hari | Gate        | Hasil minimum                                                     |
+| ---: | ----------- | ----------------------------------------------------------------- |
+|    5 | Foundation  | Workspace, app scaffold, shared packages, CI                      |
+|   10 | Database    | Migration dari DB kosong dan seed berhasil                        |
+|   15 | Auth        | Signup/verify/login/session/recovery/activation bekerja           |
+|   20 | Catalog     | Public catalog dan admin catalog/inventory bekerja                |
+|   25 | Storefront  | Product list/detail/search/wishlist selesai                       |
+|   30 | Checkout    | Guest/user cart, order, reservation, payment mock/webhook selesai |
+|   35 | Integration | Payment → invoice/email/account/notification teruji               |
+|   40 | Dashboard   | Lifecycle client dapat dilihat dan dikelola                       |
+|   45 | Operations  | Return/support/admin/tracking selesai                             |
+|   50 | Launch      | Test, security, staging, production, handover                     |

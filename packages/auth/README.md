@@ -13,7 +13,8 @@
 
 ## Password
 
-Gunakan Argon2id bila tersedia dan kompatibel dengan target deployment; simpan full encoded hash yang memuat salt/parameter. Jangan memakai SHA-256 langsung untuk password.
+Gunakan Argon2id bila tersedia dan kompatibel dengan target deployment; simpan full encoded hash
+yang memuat salt/parameter. Jangan memakai SHA-256 langsung untuk password.
 
 ## Token
 

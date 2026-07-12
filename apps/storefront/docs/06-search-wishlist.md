@@ -4,7 +4,8 @@
 
 `shop.starsuperscare.net/search?q={keyword}`
 
-Filter: kategori, brand, tipe produk, harga, rating, stok, promo. Sorting: terbaru, harga naik/turun, terlaris, rating, dan paling relevan.
+Filter: kategori, brand, tipe produk, harga, rating, stok, promo. Sorting: terbaru, harga
+naik/turun, terlaris, rating, dan paling relevan.
 
 ## Wishlist guest
 

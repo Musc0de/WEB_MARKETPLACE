@@ -24,7 +24,8 @@ draft | active | inactive | archived | discontinued
 
 ## Stock
 
-Stock tidak boleh hanya berupa satu angka yang diubah tanpa ledger. Mutation penting membuat `inventory_movement` dengan reference order/return/admin adjustment.
+Stock tidak boleh hanya berupa satu angka yang diubah tanpa ledger. Mutation penting membuat
+`inventory_movement` dengan reference order/return/admin adjustment.
 
 ## Slug
 

@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 34/50 — PERSISTENT NOTIFICATIONS, READ/UNREAD API, DAN SSE
 PHASE: Worker, Invoice, Notification
 
@@ -70,7 +70,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-34-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

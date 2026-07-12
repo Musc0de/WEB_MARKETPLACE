@@ -28,8 +28,10 @@
 
 ## Produk digital
 
-Kebijakan refund harus jelas. Bila refund finalized, entitlement dapat direvoke dan net sold dikurangi sesuai aturan akuntansi sistem.
+Kebijakan refund harus jelas. Bila refund finalized, entitlement dapat direvoke dan net sold
+dikurangi sesuai aturan akuntansi sistem.
 
 ## Idempotency
 
-Refund provider call dan webhook harus idempotent. Jangan mengubah sold hanya dari request return; lakukan setelah refund finalized.
+Refund provider call dan webhook harus idempotent. Jangan mengubah sold hanya dari request return;
+lakukan setelah refund finalized.

@@ -29,4 +29,5 @@ Fitur: buat tiket, kategori, kaitkan order, pesan, attachment, status, SLA label
 /settings/privacy
 ```
 
-Notification preferences memisahkan transaksional wajib dan pemasaran opsional. Privacy page menyediakan export/request deletion workflow sesuai kebijakan hukum yang berlaku.
+Notification preferences memisahkan transaksional wajib dan pemasaran opsional. Privacy page
+menyediakan export/request deletion workflow sesuai kebijakan hukum yang berlaku.

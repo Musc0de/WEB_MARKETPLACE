@@ -28,4 +28,5 @@ POST  /v1/me/notifications/read-all
 GET   /v1/notifications/stream
 ```
 
-Returns, reviews, dan tickets mengikuti pola ownership yang sama. Download endpoint tidak mengembalikan permanent asset URL.
+Returns, reviews, dan tickets mengikuti pola ownership yang sama. Download endpoint tidak
+mengembalikan permanent asset URL.

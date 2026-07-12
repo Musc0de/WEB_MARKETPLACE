@@ -7,8 +7,10 @@
 - Neon connection pooling: https://neon.com/docs/connect/connection-pooling
 - Neon branching: https://neon.com/docs/introduction/branching
 - Drizzle with Neon: https://orm.drizzle.team/docs/connect-neon
-- OWASP Password Storage Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
-- OWASP Session Management Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html
+- OWASP Password Storage Cheat Sheet:
+  https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+- OWASP Session Management Cheat Sheet:
+  https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html
 - goey-toast documentation: https://goey-toast.vercel.app/
 - goey-toast repository: https://github.com/anl331/goey-toast
 

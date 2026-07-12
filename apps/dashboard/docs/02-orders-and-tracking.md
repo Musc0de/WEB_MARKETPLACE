@@ -25,7 +25,8 @@ Semua | Aktif | Selesai | Dibatalkan | Refund
 
 `dashboard.starsuperscare.net/orders/{order_number}`
 
-Tampilkan snapshot order, timeline status, address, shipping, payment summary, invoice, item fisik/digital, refund, support link, buy again, dan review.
+Tampilkan snapshot order, timeline status, address, shipping, payment summary, invoice, item
+fisik/digital, refund, support link, buy again, dan review.
 
 ## Tracking
 
@@ -39,4 +40,5 @@ Jangan memakai order ID mudah ditebak sebagai satu-satunya authorization untuk t
 
 ## Buy again
 
-Server memeriksa produk aktif, varian, harga terbaru, dan stok; item ditambahkan ke cart baru. Order lama tidak pernah diubah.
+Server memeriksa produk aktif, varian, harga terbaru, dan stok; item ditambahkan ke cart baru. Order
+lama tidak pernah diubah.

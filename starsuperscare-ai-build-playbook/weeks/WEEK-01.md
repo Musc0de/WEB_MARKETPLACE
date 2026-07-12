@@ -3,7 +3,8 @@
 ## Arsitektur yang tidak boleh diubah
 
 - `starsuperscare.net`: landing dan halaman informasi publik.
-- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest wishlist.
+- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest
+  wishlist.
 - `auth.starsuperscare.net`: login, signup, verifikasi, aktivasi, forgot/reset, dan logout.
 - `dashboard.starsuperscare.net`: area client setelah login.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
@@ -12,7 +13,8 @@
 - `assets.starsuperscare.net`: target aset publik/CDN bila dipakai.
 - `apps/worker`: proses internal; tidak mempunyai subdomain publik.
 
-Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan `apps/worker` melalui `packages/database`.
+Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan
+`apps/worker` melalui `packages/database`.
 
 ## Hari 01 — Audit repository dan kunci arsitektur
 
@@ -29,10 +31,14 @@ Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses o
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Inventaris semua file, status Git, konfigurasi yang sudah ada, dokumen yang saling bertentangan, serta bagian yang masih kosong. Jangan menulis fitur.
-- **10:15–12:15:** Buat ADR-001 yang mengunci domain, batas aplikasi, alur request, aturan akses database, format uang, zona waktu, dan prinsip akun otomatis.
-- **13:15–15:15:** Buat baseline backlog, daftar risiko, non-goals MVP, konvensi branch/commit, dan aturan bahwa perubahan arsitektur wajib melalui ADR baru.
-- **15:30–17:30:** Validasi seluruh route terhadap dokumen sumber, buat laporan hari pertama, dan commit fondasi dokumentasi.
+- **08:00–10:00:** Inventaris semua file, status Git, konfigurasi yang sudah ada, dokumen yang
+  saling bertentangan, serta bagian yang masih kosong. Jangan menulis fitur.
+- **10:15–12:15:** Buat ADR-001 yang mengunci domain, batas aplikasi, alur request, aturan akses
+  database, format uang, zona waktu, dan prinsip akun otomatis.
+- **13:15–15:15:** Buat baseline backlog, daftar risiko, non-goals MVP, konvensi branch/commit, dan
+  aturan bahwa perubahan arsitektur wajib melalui ADR baru.
+- **15:30–17:30:** Validasi seluruh route terhadap dokumen sumber, buat laporan hari pertama, dan
+  commit fondasi dokumentasi.
 
 **Deliverables:**
 
@@ -78,10 +84,14 @@ git diff --check
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Buat root deno.jsonc, workspace globs, lockfile policy, import/catalog strategy, formatter, linter, dan strict TypeScript policy.
-- **10:15–12:15:** Buat konfigurasi minimal untuk setiap apps/* dan packages/* yang tercantum pada blueprint; jangan mengisi fitur bisnis.
-- **13:15–15:15:** Tambahkan root tasks untuk dev, format, lint, check, test, build, dan quality; tambahkan .editorconfig, .gitignore, serta VS Code settings.
-- **15:30–17:30:** Instal/cache dependency yang sudah dipilih, jalankan quality baseline, perbaiki error, dan dokumentasikan cara menjalankan workspace.
+- **08:00–10:00:** Buat root deno.jsonc, workspace globs, lockfile policy, import/catalog strategy,
+  formatter, linter, dan strict TypeScript policy.
+- **10:15–12:15:** Buat konfigurasi minimal untuk setiap apps/* dan packages/* yang tercantum pada
+  blueprint; jangan mengisi fitur bisnis.
+- **13:15–15:15:** Tambahkan root tasks untuk dev, format, lint, check, test, build, dan quality;
+  tambahkan .editorconfig, .gitignore, serta VS Code settings.
+- **15:30–17:30:** Instal/cache dependency yang sudah dipilih, jalankan quality baseline, perbaiki
+  error, dan dokumentasikan cara menjalankan workspace.
 
 **Deliverables:**
 
@@ -135,10 +145,14 @@ deno lint
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Scaffold storefront, auth, dashboard, admin, dan tracking sebagai React + Vite + TypeScript tanpa mengubah nama folder blueprint.
-- **10:15–12:15:** Tambahkan router, App shell minimal, not-found page, error boundary, loading state, dan konfigurasi base URL per aplikasi.
-- **13:15–15:15:** Hubungkan packages/ui dan packages/config secara minimal; tampilkan halaman identitas aplikasi agar setiap dev server mudah dibedakan.
-- **15:30–17:30:** Jalankan type-check dan build untuk kelima aplikasi, perbaiki masalah dependency/workspace, lalu tulis petunjuk dev.
+- **08:00–10:00:** Scaffold storefront, auth, dashboard, admin, dan tracking sebagai React + Vite +
+  TypeScript tanpa mengubah nama folder blueprint.
+- **10:15–12:15:** Tambahkan router, App shell minimal, not-found page, error boundary, loading
+  state, dan konfigurasi base URL per aplikasi.
+- **13:15–15:15:** Hubungkan packages/ui dan packages/config secara minimal; tampilkan halaman
+  identitas aplikasi agar setiap dev server mudah dibedakan.
+- **15:30–17:30:** Jalankan type-check dan build untuk kelima aplikasi, perbaiki masalah
+  dependency/workspace, lalu tulis petunjuk dev.
 
 **Deliverables:**
 
@@ -186,10 +200,14 @@ deno task check
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Buat composition root Hono, route /health dan /ready, version prefix /v1, serta server entrypoint untuk Deno.
-- **10:15–12:15:** Buat request ID, structured logger, error envelope, not-found handler, dan exception handler tanpa membocorkan stack production.
-- **13:15–15:15:** Buat worker entrypoint, lifecycle, graceful shutdown, polling interface kosong, dan health logging; worker bukan HTTP app publik.
-- **15:30–17:30:** Tambahkan unit smoke test API/worker, jalankan lokal, dan dokumentasikan permission Deno minimum.
+- **08:00–10:00:** Buat composition root Hono, route /health dan /ready, version prefix /v1, serta
+  server entrypoint untuk Deno.
+- **10:15–12:15:** Buat request ID, structured logger, error envelope, not-found handler, dan
+  exception handler tanpa membocorkan stack production.
+- **13:15–15:15:** Buat worker entrypoint, lifecycle, graceful shutdown, polling interface kosong,
+  dan health logging; worker bukan HTTP app publik.
+- **15:30–17:30:** Tambahkan unit smoke test API/worker, jalankan lokal, dan dokumentasikan
+  permission Deno minimum.
 
 **Deliverables:**
 
@@ -240,10 +258,14 @@ deno task check
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Buat export surface minimal untuk config, contracts, database, auth, ui, dan email; hindari circular dependency.
-- **10:15–12:15:** Buat parser env terpusat dengan schema berbeda untuk frontend, API, worker, dan migration; tambahkan .env.example lengkap tanpa nilai rahasia.
-- **13:15–15:15:** Buat CI yang menjalankan format, lint, type-check, unit test, build, dan dependency audit sesuai kemampuan repository.
-- **15:30–17:30:** Jalankan CI-equivalent lokal, bereskan semua error, dokumentasikan dependency graph, dan tandai Foundation Gate.
+- **08:00–10:00:** Buat export surface minimal untuk config, contracts, database, auth, ui, dan
+  email; hindari circular dependency.
+- **10:15–12:15:** Buat parser env terpusat dengan schema berbeda untuk frontend, API, worker, dan
+  migration; tambahkan .env.example lengkap tanpa nilai rahasia.
+- **13:15–15:15:** Buat CI yang menjalankan format, lint, type-check, unit test, build, dan
+  dependency audit sesuai kemampuan repository.
+- **15:30–17:30:** Jalankan CI-equivalent lokal, bereskan semua error, dokumentasikan dependency
+  graph, dan tandai Foundation Gate.
 
 **Deliverables:**
 

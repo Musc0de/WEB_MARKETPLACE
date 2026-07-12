@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 12/50 — SIGNUP, PASSWORD HASHING, DAN VERIFIKASI EMAIL
 PHASE: API dan Auth
 
@@ -72,7 +72,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-12-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

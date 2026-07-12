@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 30/50 — PAYMENT ADAPTER, VERIFIED WEBHOOK, DAN CHECKOUT GATE
 PHASE: Cart, Checkout, Payment
 
@@ -71,7 +71,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-30-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

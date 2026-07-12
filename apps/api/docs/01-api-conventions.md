@@ -2,7 +2,8 @@
 
 ## Versioning
 
-Semua route publik dimulai `/v1`. Breaking change memerlukan versi baru atau kompatibilitas transisi.
+Semua route publik dimulai `/v1`. Breaking change memerlukan versi baru atau kompatibilitas
+transisi.
 
 ## Identifier
 
@@ -34,4 +35,5 @@ Wajib untuk checkout submit, payment create, refund create, webhook, dan job del
 
 ## Authorization
 
-Setiap query resource privat harus memeriksa ownership atau role di server. Menebak ID tidak boleh memberi akses.
+Setiap query resource privat harus memeriksa ownership atau role di server. Menebak ID tidak boleh
+memberi akses.

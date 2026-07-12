@@ -19,7 +19,8 @@
 
 ## Varian
 
-Setiap varian mempunyai `variant_id`, SKU, harga, stok, berat, dimensi, gambar, dan status. Cart menyimpan `variant_id`, bukan hanya `product_id`.
+Setiap varian mempunyai `variant_id`, SKU, harga, stok, berat, dimensi, gambar, dan status. Cart
+menyimpan `variant_id`, bukan hanya `product_id`.
 
 ## Validasi
 
@@ -30,8 +31,10 @@ Setiap varian mempunyai `variant_id`, SKU, harga, stok, berat, dimensi, gambar, 
 
 ## Produk digital
 
-Tampilkan format file, ukuran, lisensi, kompatibilitas, jumlah download, dan kebijakan refund. Jangan tampilkan URL file asli sebelum entitlement valid.
+Tampilkan format file, ukuran, lisensi, kompatibilitas, jumlah download, dan kebijakan refund.
+Jangan tampilkan URL file asli sebelum entitlement valid.
 
 ## SEO
 
-Gunakan title, description, canonical URL, structured product data, alt text, Open Graph image, serta status `noindex` untuk draft/inactive.
+Gunakan title, description, canonical URL, structured product data, alt text, Open Graph image,
+serta status `noindex` untuk draft/inactive.

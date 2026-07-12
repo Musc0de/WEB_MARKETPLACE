@@ -19,7 +19,8 @@ Gunakan PostgreSQL table dengan status:
 pending | processing | succeeded | failed | dead
 ```
 
-Worker mengambil batch menggunakan transaction dan `FOR UPDATE SKIP LOCKED`, menetapkan lease/attempt, lalu memproses di luar lock panjang.
+Worker mengambil batch menggunakan transaction dan `FOR UPDATE SKIP LOCKED`, menetapkan
+lease/attempt, lalu memproses di luar lock panjang.
 
 ## Retry
 
@@ -30,4 +31,5 @@ Worker mengambil batch menggunakan transaction dan `FOR UPDATE SKIP LOCKED`, men
 
 ## Idempotency
 
-Setiap job memiliki `dedupe_key`; email/invoice/notifikasi tidak boleh terkirim ganda hanya karena retry.
+Setiap job memiliki `dedupe_key`; email/invoice/notifikasi tidak boleh terkirim ganda hanya karena
+retry.

@@ -33,4 +33,5 @@ Home | Orders | Cart | Notifications | Account
 
 ## Data
 
-Dashboard membaca API yang sama dengan storefront. Tidak ada database connection di browser. Semua tanggal ditampilkan `id-ID` dan `Asia/Jakarta`.
+Dashboard membaca API yang sama dengan storefront. Tidak ada database connection di browser. Semua
+tanggal ditampilkan `id-ID` dan `Asia/Jakarta`.

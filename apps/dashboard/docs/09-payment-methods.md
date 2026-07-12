@@ -6,7 +6,8 @@
 
 ## Scope
 
-Halaman ini hanya tersedia bila payment provider mendukung penyimpanan metode pembayaran melalui tokenisasi/provider vault.
+Halaman ini hanya tersedia bila payment provider mendukung penyimpanan metode pembayaran melalui
+tokenisasi/provider vault.
 
 ## Informasi yang boleh ditampilkan
 
@@ -24,7 +25,8 @@ Halaman ini hanya tersedia bila payment provider mendukung penyimpanan metode pe
 - PIN/OTP.
 - Raw banking credential.
 
-Database hanya menyimpan `provider`, `provider_customer_id`, `provider_payment_method_id`, display metadata, status, dan timestamps.
+Database hanya menyimpan `provider`, `provider_customer_id`, `provider_payment_method_id`, display
+metadata, status, dan timestamps.
 
 ## Aksi
 
@@ -42,7 +44,8 @@ PATCH  /v1/me/payment-methods/{id}/default
 DELETE /v1/me/payment-methods/{id}
 ```
 
-Semua aksi harus memverifikasi ownership. Penambahan metode dilakukan melalui UI/SDK provider agar raw credential tidak melewati server aplikasi.
+Semua aksi harus memverifikasi ownership. Penambahan metode dilakukan melalui UI/SDK provider agar
+raw credential tidak melewati server aplikasi.
 
 ## Toast
 

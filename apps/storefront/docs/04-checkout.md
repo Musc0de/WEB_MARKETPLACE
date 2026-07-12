@@ -37,7 +37,8 @@
 
 ## Langkah 5 — Result
 
-Redirect browser bukan bukti final payment. Status akhir ditetapkan dari webhook provider yang diverifikasi.
+Redirect browser bukan bukti final payment. Status akhir ditetapkan dari webhook provider yang
+diverifikasi.
 
 ## Transaction minimum
 

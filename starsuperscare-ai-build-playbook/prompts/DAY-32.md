@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 32/50 — INVOICE PDF, OBJECT STORAGE, DAN TRANSACTIONAL EMAIL
 PHASE: Worker, Invoice, Notification
 
@@ -73,7 +73,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-32-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

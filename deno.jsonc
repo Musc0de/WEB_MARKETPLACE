@@ -10,8 +10,16 @@
     "noUnusedParameters": true,
     "exactOptionalPropertyTypes": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": [
+      "npm:@types/react@^18.3.3",
+      "npm:@types/react-dom@^18.3.0"
+    ]
   },
+  "nodeModulesDir": "auto",
   "fmt": {
     "useTabs": false,
     "lineWidth": 100,
@@ -36,9 +44,19 @@
     "dev:dashboard": "deno task --cwd apps/dashboard dev",
     "dev:admin": "deno task --cwd apps/admin dev",
     "dev:auth": "deno task --cwd apps/auth dev",
-    "db:migrate": "deno task --cwd packages/database migrate"
+    "db:migrate": "deno task --cwd packages/database migrate",
+    "build:frontends": "deno task --cwd apps/storefront build && deno task --cwd apps/auth build && deno task --cwd apps/dashboard build && deno task --cwd apps/admin build && deno task --cwd apps/tracking build"
   },
   "imports": {
-    // Shared dependencies will be defined here in the future
+    "react": "npm:react@^18.3.1",
+    "react/jsx-runtime": "npm:react@^18.3.1/jsx-runtime",
+    "react/jsx-dev-runtime": "npm:react@^18.3.1/jsx-dev-runtime",
+    "react-dom": "npm:react-dom@^18.3.1",
+    "react-router-dom": "npm:react-router-dom@^6.28.0",
+    "react-error-boundary": "npm:react-error-boundary@^4.1.2",
+    "vite": "npm:vite@^5.4.10",
+    "@vitejs/plugin-react": "npm:@vitejs/plugin-react@^4.3.3",
+    "@starsuperscare/ui": "./packages/ui/index.tsx",
+    "@starsuperscare/config": "./packages/config/index.ts"
   }
 }

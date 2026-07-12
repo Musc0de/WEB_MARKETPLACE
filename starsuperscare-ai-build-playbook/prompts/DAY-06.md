@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 06/50 — HUBUNGKAN NEON, DRIZZLE, DAN MIGRATION TOOLING
 PHASE: Neon dan schema
 
@@ -72,7 +72,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-06-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

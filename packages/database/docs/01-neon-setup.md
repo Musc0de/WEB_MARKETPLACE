@@ -9,7 +9,8 @@ development
 preview/{pull-request}
 ```
 
-Gunakan schema-only atau anonymized branch saat data production sensitif tidak boleh disalin ke development.
+Gunakan schema-only atau anonymized branch saat data production sensitif tidak boleh disalin ke
+development.
 
 ## Langkah
 
@@ -25,8 +26,10 @@ Gunakan schema-only atau anonymized branch saat data production sensitif tidak b
 
 - One-shot query dapat memakai Neon HTTP driver.
 - Session/interactive transaction memakai WebSocket/serverful driver yang mendukung transaction.
-- Untuk blueprint ini, abstraksikan client agar deployment profile dapat dipilih tanpa mengubah domain logic.
+- Untuk blueprint ini, abstraksikan client agar deployment profile dapat dipilih tanpa mengubah
+  domain logic.
 
 ## Retry
 
-Transient connection failure harus ditangani dengan retry terbatas untuk operasi yang aman/idempotent. Jangan retry payment side effect tanpa idempotency.
+Transient connection failure harus ditangani dengan retry terbatas untuk operasi yang
+aman/idempotent. Jangan retry payment side effect tanpa idempotency.

@@ -14,9 +14,9 @@
 
 ## Commands executed
 
-| Command | Result | Notes |
-|---|---|---|
-| `...` | PASS/FAIL | ... |
+| Command | Result    | Notes |
+| ------- | --------- | ----- |
+| `...`   | PASS/FAIL | ...   |
 
 ## Test scenarios added
 

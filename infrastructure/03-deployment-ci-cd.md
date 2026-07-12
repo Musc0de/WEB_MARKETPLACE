@@ -27,4 +27,5 @@
 4. Deploy UI.
 5. Smoke test payment non-destructive atau provider test mode.
 6. Monitor error, latency, queue backlog, webhook failure.
-7. Rollback app bila perlu; database rollback memakai forward fix kecuali migration benar-benar reversible.
+7. Rollback app bila perlu; database rollback memakai forward fix kecuali migration benar-benar
+   reversible.

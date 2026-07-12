@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 37/50 — PROFILE, SECURITY, SESSIONS, ADDRESSES, DAN PAYMENT METHOD METADATA
 PHASE: Dashboard client
 
@@ -72,7 +72,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-37-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

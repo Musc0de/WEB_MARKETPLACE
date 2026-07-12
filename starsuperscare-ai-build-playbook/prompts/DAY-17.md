@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 17/50 — ADMIN RBAC DAN CRUD CATALOG API
 PHASE: Catalog dan Admin
 
@@ -70,7 +70,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-17-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

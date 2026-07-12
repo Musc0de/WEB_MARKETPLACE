@@ -1,6 +1,7 @@
 # Struktur Directory Proyek yang Disarankan
 
-Struktur berikut adalah target repository kode. Dokumen Markdown dalam paket ini ditempatkan pada folder yang sama agar keputusan fitur selalu dekat dengan implementasinya.
+Struktur berikut adalah target repository kode. Dokumen Markdown dalam paket ini ditempatkan pada
+folder yang sama agar keputusan fitur selalu dekat dengan implementasinya.
 
 ```text
 starsuperscare/

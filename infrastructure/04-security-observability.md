@@ -29,7 +29,8 @@ latency_ms
 error_code
 ```
 
-Jangan log password, raw session, activation/reset token, payment credential, signed URL, atau full sensitive payload.
+Jangan log password, raw session, activation/reset token, payment credential, signed URL, atau full
+sensitive payload.
 
 ## Metrics
 
@@ -44,4 +45,5 @@ Jangan log password, raw session, activation/reset token, payment credential, si
 
 ## Alerts
 
-Alert pada payment webhook backlog, database failure, elevated 5xx, dead jobs, email activation failure, dan negative inventory attempt.
+Alert pada payment webhook backlog, database failure, elevated 5xx, dead jobs, email activation
+failure, dan negative inventory attempt.

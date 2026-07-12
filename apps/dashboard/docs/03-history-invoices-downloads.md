@@ -30,7 +30,8 @@ Semua query date memakai format ISO `YYYY-MM-DD`; UI menampilkan format Indonesi
 /dashboard/invoices/{invoice_number}
 ```
 
-Fitur: lihat, download PDF, filter tanggal/status, cari nomor invoice. Download memakai signed URL dan authorization check.
+Fitur: lihat, download PDF, filter tanggal/status, cari nomor invoice. Download memakai signed URL
+dan authorization check.
 
 ## Digital downloads
 
@@ -45,4 +46,5 @@ Tampilkan:
 - Tombol download.
 - License key bila berlaku.
 
-API membuat signed URL singkat setelah memverifikasi entitlement. Catat download audit, tetapi jangan log URL rahasia.
+API membuat signed URL singkat setelah memverifikasi entitlement. Catat download audit, tetapi
+jangan log URL rahasia.

@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 49/50 — DEPLOY STAGING, MIGRATION REHEARSAL, DNS/CORS/COOKIE VALIDATION, DAN UAT
 PHASE: Hardening dan rilis
 
@@ -72,7 +72,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-49-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

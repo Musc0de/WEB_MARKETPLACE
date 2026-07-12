@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 29/50 — CHECKOUT ADDRESS/SHIPPING/REVIEW, ORDER SNAPSHOT, DAN STOCK RESERVATION
 PHASE: Cart, Checkout, Payment
 
@@ -72,7 +72,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-29-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

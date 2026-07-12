@@ -34,4 +34,5 @@ Jangan seed production dengan password default tetap.
 
 ## Preview branch
 
-Pull request dapat memakai branch Neon terisolasi. Gunakan schema-only/anonymized data bila sumbernya production.
+Pull request dapat memakai branch Neon terisolasi. Gunakan schema-only/anonymized data bila
+sumbernya production.

@@ -12,7 +12,8 @@ Kelompokkan menu menjadi:
 
 ## Mobile
 
-Bottom nav maksimal lima item: Home, Orders, Cart, Notifications, Account. Menu lain masuk Account/More.
+Bottom nav maksimal lima item: Home, Orders, Cart, Notifications, Account. Menu lain masuk
+Account/More.
 
 ## Cross-domain links
 
@@ -22,4 +23,5 @@ Bottom nav maksimal lima item: Home, Orders, Cart, Notifications, Account. Menu 
 
 ## UX states
 
-Setiap route wajib memiliki loading, empty, partial error, authorization error, dan retry. Gunakan toast untuk feedback singkat; gunakan inline alert untuk error yang harus dibaca sebelum lanjut.
+Setiap route wajib memiliki loading, empty, partial error, authorization error, dan retry. Gunakan
+toast untuk feedback singkat; gunakan inline alert untuk error yang harus dibaca sebelum lanjut.

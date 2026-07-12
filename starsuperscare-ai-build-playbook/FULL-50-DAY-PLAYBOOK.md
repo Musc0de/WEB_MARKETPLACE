@@ -1,18 +1,22 @@
 # StarSuperScare — AI Build Playbook
 
-Playbook ini mengubah blueprint menjadi **50 hari kerja, 8 jam per hari**, untuk satu developer yang dibantu coding AI. Empat blok kerja harian memakai zona waktu Asia/Jakarta:
+Playbook ini mengubah blueprint menjadi **50 hari kerja, 8 jam per hari**, untuk satu developer yang
+dibantu coding AI. Empat blok kerja harian memakai zona waktu Asia/Jakarta:
 
 - 08:00–10:00
 - 10:15–12:15
 - 13:15–15:15
 - 15:30–17:30
 
-Targetnya bukan menjanjikan semua pekerjaan pasti selesai persis dalam 50 hari. Ini adalah urutan dependency yang aman. Bila satu acceptance gate belum lulus, lanjutkan hari tersebut sebelum masuk hari berikutnya.
+Targetnya bukan menjanjikan semua pekerjaan pasti selesai persis dalam 50 hari. Ini adalah urutan
+dependency yang aman. Bila satu acceptance gate belum lulus, lanjutkan hari tersebut sebelum masuk
+hari berikutnya.
 
 ## Arsitektur yang tidak boleh diubah
 
 - `starsuperscare.net`: landing dan halaman informasi publik.
-- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest wishlist.
+- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest
+  wishlist.
 - `auth.starsuperscare.net`: login, signup, verifikasi, aktivasi, forgot/reset, dan logout.
 - `dashboard.starsuperscare.net`: area client setelah login.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
@@ -21,7 +25,8 @@ Targetnya bukan menjanjikan semua pekerjaan pasti selesai persis dalam 50 hari. 
 - `assets.starsuperscare.net`: target aset publik/CDN bila dipakai.
 - `apps/worker`: proses internal; tidak mempunyai subdomain publik.
 
-Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan `apps/worker` melalui `packages/database`.
+Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan
+`apps/worker` melalui `packages/database`.
 
 ## Cara memakai
 
@@ -45,19 +50,18 @@ Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses o
 
 ## Checkpoint utama
 
-| Hari | Gate | Hasil minimum |
-|---:|---|---|
-| 5 | Foundation | Workspace, app scaffold, shared packages, CI |
-| 10 | Database | Migration dari DB kosong dan seed berhasil |
-| 15 | Auth | Signup/verify/login/session/recovery/activation bekerja |
-| 20 | Catalog | Public catalog dan admin catalog/inventory bekerja |
-| 25 | Storefront | Product list/detail/search/wishlist selesai |
-| 30 | Checkout | Guest/user cart, order, reservation, payment mock/webhook selesai |
-| 35 | Integration | Payment → invoice/email/account/notification teruji |
-| 40 | Dashboard | Lifecycle client dapat dilihat dan dikelola |
-| 45 | Operations | Return/support/admin/tracking selesai |
-| 50 | Launch | Test, security, staging, production, handover |
-
+| Hari | Gate        | Hasil minimum                                                     |
+| ---: | ----------- | ----------------------------------------------------------------- |
+|    5 | Foundation  | Workspace, app scaffold, shared packages, CI                      |
+|   10 | Database    | Migration dari DB kosong dan seed berhasil                        |
+|   15 | Auth        | Signup/verify/login/session/recovery/activation bekerja           |
+|   20 | Catalog     | Public catalog dan admin catalog/inventory bekerja                |
+|   25 | Storefront  | Product list/detail/search/wishlist selesai                       |
+|   30 | Checkout    | Guest/user cart, order, reservation, payment mock/webhook selesai |
+|   35 | Integration | Payment → invoice/email/account/notification teruji               |
+|   40 | Dashboard   | Lifecycle client dapat dilihat dan dikelola                       |
+|   45 | Operations  | Return/support/admin/tracking selesai                             |
+|   50 | Launch      | Test, security, staging, production, handover                     |
 
 ---
 
@@ -65,7 +69,7 @@ Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses o
 
 Gunakan prompt ini sebagai konteks tetap sebelum menjalankan prompt harian.
 
-~~~text
+```text
 Anda adalah senior full-stack engineer, database engineer, security reviewer, dan test engineer yang mengerjakan repository StarSuperScare Marketplace.
 
 Tujuan Anda adalah MEMODIFIKASI REPOSITORY secara bertahap sampai sistem production-ready. Jangan hanya memberikan tutorial atau potongan kode terpisah. Selalu inspeksi repository, edit file yang tepat, jalankan command yang relevan, dan buat laporan hasil.
@@ -115,8 +119,7 @@ WORK METHOD:
 8. Return: files changed, decisions, tests/results, migrations/env changes, blockers, and next-day handoff.
 
 Do not ask for confirmation on ordinary implementation details. Make conservative, documented choices. If an external credential is missing, complete all provider-independent work and provide the exact env variables and verification steps needed later.
-~~~
-
+```
 
 ---
 
@@ -129,17 +132,27 @@ Do not ask for confirmation on ordinary implementation details. Make conservativ
 3. Kerjakan hanya scope hari itu dan shared prerequisite yang benar-benar diperlukan.
 4. Jangan mengubah domain, batas aplikasi, database ownership, atau flow akun tanpa ADR baru.
 5. Gunakan TypeScript strict; hindari `any`, non-null assertion, dan cast yang tidak dibuktikan.
-6. Semua input eksternal divalidasi server-side dengan kontrak Zod. Client validation hanya untuk UX.
-7. Semua nilai uang disimpan sebagai integer rupiah. Jangan memakai floating-point untuk total finansial.
+6. Semua input eksternal divalidasi server-side dengan kontrak Zod. Client validation hanya untuk
+   UX.
+7. Semua nilai uang disimpan sebagai integer rupiah. Jangan memakai floating-point untuk total
+   finansial.
 8. Semua waktu disimpan UTC; UI memakai `id-ID` dan `Asia/Jakarta`.
 9. Frontend tidak boleh memegang database URL, provider secret, session ID, atau raw payment data.
-10. Password disimpan sebagai hash kuat; token sekali pakai disimpan sebagai digest; password tidak pernah dikirim lewat email.
-11. Gunakan session cookie `Secure`, `HttpOnly`, host-only untuk API, explicit CORS credentials, CSRF protection, dan authorization default-deny.
+10. Password disimpan sebagai hash kuat; token sekali pakai disimpan sebagai digest; password tidak
+    pernah dikirim lewat email.
+11. Gunakan session cookie `Secure`, `HttpOnly`, host-only untuk API, explicit CORS credentials,
+    CSRF protection, dan authorization default-deny.
 12. Gunakan `goey-toast` untuk feedback aksi UI; notifikasi persisten tetap berasal dari database.
-13. Payment/shipping/email/storage harus memakai adapter. Bila credential belum tersedia, buat deterministic fake untuk development/test dan dokumentasikan gap; jangan mengklaim integrasi nyata berhasil.
-14. Jangan hanya menjelaskan. Edit file repository, tambahkan test, jalankan command, dan tunjukkan hasil nyata.
-15. Jangan mengarang hasil command. Bila gagal, tampilkan error ringkas, perbaiki semampunya, lalu catat blocker yang tersisa.
-16. Akhiri setiap hari dengan laporan di `docs/14-ai-build-playbook/progress/DAY-XX-REPORT.md` berisi perubahan, migration, env baru, command + hasil, risiko, blocker, dan handoff hari berikutnya.
+13. Payment/shipping/email/storage harus memakai adapter. Bila credential belum tersedia, buat
+    deterministic fake untuk development/test dan dokumentasikan gap; jangan mengklaim integrasi
+    nyata berhasil.
+14. Jangan hanya menjelaskan. Edit file repository, tambahkan test, jalankan command, dan tunjukkan
+    hasil nyata.
+15. Jangan mengarang hasil command. Bila gagal, tampilkan error ringkas, perbaiki semampunya, lalu
+    catat blocker yang tersisa.
+16. Akhiri setiap hari dengan laporan di `docs/14-ai-build-playbook/progress/DAY-XX-REPORT.md`
+    berisi perubahan, migration, env baru, command + hasil, risiko, blocker, dan handoff hari
+    berikutnya.
 
 ## Ritme 8 jam
 
@@ -181,12 +194,13 @@ Do not ask for confirmation on ordinary implementation details. Make conservativ
 - Pastikan semua nominal integer dan timestamp UTC.
 - Commit kecil dengan pesan yang menjelaskan outcome, bukan aktivitas.
 
-
 ---
 
 # External Service Gates
 
-Coding AI dapat membangun adapter dan fake, tetapi layanan berikut memerlukan tindakan manusia/credential. Jangan memasukkan secret ke prompt, chat, commit, screenshot, atau file Markdown.
+Coding AI dapat membangun adapter dan fake, tetapi layanan berikut memerlukan tindakan
+manusia/credential. Jangan memasukkan secret ke prompt, chat, commit, screenshot, atau file
+Markdown.
 
 ## Day 06 — Neon
 
@@ -201,7 +215,8 @@ Verifikasi: connection smoke test, migration development, dan query `select 1`.
 
 ## Day 18/32 — Object storage
 
-Dibutuhkan S3-compatible storage atau provider setara untuk product images, bukti retur, attachments, digital files, dan private invoices.
+Dibutuhkan S3-compatible storage atau provider setara untuk product images, bukti retur,
+attachments, digital files, dan private invoices.
 
 Env generik:
 
@@ -219,7 +234,8 @@ Gunakan presigned upload/download. Secret hanya pada API/worker.
 
 ## Day 29/45 — Shipping/courier
 
-Sebelum provider dipilih, gunakan `MockShippingProvider` yang deterministic. Untuk provider nyata dibutuhkan base URL, client/key, webhook secret, dan mapping status.
+Sebelum provider dipilih, gunakan `MockShippingProvider` yang deterministic. Untuk provider nyata
+dibutuhkan base URL, client/key, webhook secret, dan mapping status.
 
 ## Day 30 — Payment gateway
 
@@ -247,12 +263,14 @@ EMAIL_FROM_ADDRESS
 EMAIL_REPLY_TO
 ```
 
-Test/dev memakai fake inbox atau provider sandbox; jangan mengklaim delivery nyata tanpa provider response.
+Test/dev memakai fake inbox atau provider sandbox; jangan mengklaim delivery nyata tanpa provider
+response.
 
 ## Day 49 — Deployment dan DNS
 
-Dibutuhkan akses deployment platform dan DNS untuk host yang sudah ada pada blueprint. `apps/worker` tidak mendapat DNS publik. Pastikan staging dan production memakai secret, DB branch, provider mode, bucket, dan webhook yang terpisah.
-
+Dibutuhkan akses deployment platform dan DNS untuk host yang sudah ada pada blueprint. `apps/worker`
+tidak mendapat DNS publik. Pastikan staging dan production memakai secret, DB branch, provider mode,
+bucket, dan webhook yang terpisah.
 
 ---
 
@@ -291,7 +309,6 @@ Dibutuhkan akses deployment platform dan DNS untuk host yang sudah ada pada blue
 - Webhook tidak diverifikasi atau tidak idempotent.
 - Migration destructive tidak mempunyai rollout/rollback plan.
 
-
 ---
 
 # Minggu 1 — Foundation: arsitektur, workspace, app scaffold, CI
@@ -299,7 +316,8 @@ Dibutuhkan akses deployment platform dan DNS untuk host yang sudah ada pada blue
 ## Arsitektur yang tidak boleh diubah
 
 - `starsuperscare.net`: landing dan halaman informasi publik.
-- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest wishlist.
+- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest
+  wishlist.
 - `auth.starsuperscare.net`: login, signup, verifikasi, aktivasi, forgot/reset, dan logout.
 - `dashboard.starsuperscare.net`: area client setelah login.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
@@ -308,7 +326,8 @@ Dibutuhkan akses deployment platform dan DNS untuk host yang sudah ada pada blue
 - `assets.starsuperscare.net`: target aset publik/CDN bila dipakai.
 - `apps/worker`: proses internal; tidak mempunyai subdomain publik.
 
-Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan `apps/worker` melalui `packages/database`.
+Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan
+`apps/worker` melalui `packages/database`.
 
 ## Hari 01 — Audit repository dan kunci arsitektur
 
@@ -325,10 +344,14 @@ Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses o
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Inventaris semua file, status Git, konfigurasi yang sudah ada, dokumen yang saling bertentangan, serta bagian yang masih kosong. Jangan menulis fitur.
-- **10:15–12:15:** Buat ADR-001 yang mengunci domain, batas aplikasi, alur request, aturan akses database, format uang, zona waktu, dan prinsip akun otomatis.
-- **13:15–15:15:** Buat baseline backlog, daftar risiko, non-goals MVP, konvensi branch/commit, dan aturan bahwa perubahan arsitektur wajib melalui ADR baru.
-- **15:30–17:30:** Validasi seluruh route terhadap dokumen sumber, buat laporan hari pertama, dan commit fondasi dokumentasi.
+- **08:00–10:00:** Inventaris semua file, status Git, konfigurasi yang sudah ada, dokumen yang
+  saling bertentangan, serta bagian yang masih kosong. Jangan menulis fitur.
+- **10:15–12:15:** Buat ADR-001 yang mengunci domain, batas aplikasi, alur request, aturan akses
+  database, format uang, zona waktu, dan prinsip akun otomatis.
+- **13:15–15:15:** Buat baseline backlog, daftar risiko, non-goals MVP, konvensi branch/commit, dan
+  aturan bahwa perubahan arsitektur wajib melalui ADR baru.
+- **15:30–17:30:** Validasi seluruh route terhadap dokumen sumber, buat laporan hari pertama, dan
+  commit fondasi dokumentasi.
 
 **Deliverables:**
 
@@ -374,10 +397,14 @@ git diff --check
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Buat root deno.jsonc, workspace globs, lockfile policy, import/catalog strategy, formatter, linter, dan strict TypeScript policy.
-- **10:15–12:15:** Buat konfigurasi minimal untuk setiap apps/* dan packages/* yang tercantum pada blueprint; jangan mengisi fitur bisnis.
-- **13:15–15:15:** Tambahkan root tasks untuk dev, format, lint, check, test, build, dan quality; tambahkan .editorconfig, .gitignore, serta VS Code settings.
-- **15:30–17:30:** Instal/cache dependency yang sudah dipilih, jalankan quality baseline, perbaiki error, dan dokumentasikan cara menjalankan workspace.
+- **08:00–10:00:** Buat root deno.jsonc, workspace globs, lockfile policy, import/catalog strategy,
+  formatter, linter, dan strict TypeScript policy.
+- **10:15–12:15:** Buat konfigurasi minimal untuk setiap apps/* dan packages/* yang tercantum pada
+  blueprint; jangan mengisi fitur bisnis.
+- **13:15–15:15:** Tambahkan root tasks untuk dev, format, lint, check, test, build, dan quality;
+  tambahkan .editorconfig, .gitignore, serta VS Code settings.
+- **15:30–17:30:** Instal/cache dependency yang sudah dipilih, jalankan quality baseline, perbaiki
+  error, dan dokumentasikan cara menjalankan workspace.
 
 **Deliverables:**
 
@@ -431,10 +458,14 @@ deno lint
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Scaffold storefront, auth, dashboard, admin, dan tracking sebagai React + Vite + TypeScript tanpa mengubah nama folder blueprint.
-- **10:15–12:15:** Tambahkan router, App shell minimal, not-found page, error boundary, loading state, dan konfigurasi base URL per aplikasi.
-- **13:15–15:15:** Hubungkan packages/ui dan packages/config secara minimal; tampilkan halaman identitas aplikasi agar setiap dev server mudah dibedakan.
-- **15:30–17:30:** Jalankan type-check dan build untuk kelima aplikasi, perbaiki masalah dependency/workspace, lalu tulis petunjuk dev.
+- **08:00–10:00:** Scaffold storefront, auth, dashboard, admin, dan tracking sebagai React + Vite +
+  TypeScript tanpa mengubah nama folder blueprint.
+- **10:15–12:15:** Tambahkan router, App shell minimal, not-found page, error boundary, loading
+  state, dan konfigurasi base URL per aplikasi.
+- **13:15–15:15:** Hubungkan packages/ui dan packages/config secara minimal; tampilkan halaman
+  identitas aplikasi agar setiap dev server mudah dibedakan.
+- **15:30–17:30:** Jalankan type-check dan build untuk kelima aplikasi, perbaiki masalah
+  dependency/workspace, lalu tulis petunjuk dev.
 
 **Deliverables:**
 
@@ -482,10 +513,14 @@ deno task check
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Buat composition root Hono, route /health dan /ready, version prefix /v1, serta server entrypoint untuk Deno.
-- **10:15–12:15:** Buat request ID, structured logger, error envelope, not-found handler, dan exception handler tanpa membocorkan stack production.
-- **13:15–15:15:** Buat worker entrypoint, lifecycle, graceful shutdown, polling interface kosong, dan health logging; worker bukan HTTP app publik.
-- **15:30–17:30:** Tambahkan unit smoke test API/worker, jalankan lokal, dan dokumentasikan permission Deno minimum.
+- **08:00–10:00:** Buat composition root Hono, route /health dan /ready, version prefix /v1, serta
+  server entrypoint untuk Deno.
+- **10:15–12:15:** Buat request ID, structured logger, error envelope, not-found handler, dan
+  exception handler tanpa membocorkan stack production.
+- **13:15–15:15:** Buat worker entrypoint, lifecycle, graceful shutdown, polling interface kosong,
+  dan health logging; worker bukan HTTP app publik.
+- **15:30–17:30:** Tambahkan unit smoke test API/worker, jalankan lokal, dan dokumentasikan
+  permission Deno minimum.
 
 **Deliverables:**
 
@@ -536,10 +571,14 @@ deno task check
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Buat export surface minimal untuk config, contracts, database, auth, ui, dan email; hindari circular dependency.
-- **10:15–12:15:** Buat parser env terpusat dengan schema berbeda untuk frontend, API, worker, dan migration; tambahkan .env.example lengkap tanpa nilai rahasia.
-- **13:15–15:15:** Buat CI yang menjalankan format, lint, type-check, unit test, build, dan dependency audit sesuai kemampuan repository.
-- **15:30–17:30:** Jalankan CI-equivalent lokal, bereskan semua error, dokumentasikan dependency graph, dan tandai Foundation Gate.
+- **08:00–10:00:** Buat export surface minimal untuk config, contracts, database, auth, ui, dan
+  email; hindari circular dependency.
+- **10:15–12:15:** Buat parser env terpusat dengan schema berbeda untuk frontend, API, worker, dan
+  migration; tambahkan .env.example lengkap tanpa nilai rahasia.
+- **13:15–15:15:** Buat CI yang menjalankan format, lint, type-check, unit test, build, dan
+  dependency audit sesuai kemampuan repository.
+- **15:30–17:30:** Jalankan CI-equivalent lokal, bereskan semua error, dokumentasikan dependency
+  graph, dan tandai Foundation Gate.
 
 **Deliverables:**
 
@@ -573,7 +612,6 @@ deno task build
 
 ---
 
-
 ---
 
 # Minggu 2 — Neon dan schema database
@@ -581,7 +619,8 @@ deno task build
 ## Arsitektur yang tidak boleh diubah
 
 - `starsuperscare.net`: landing dan halaman informasi publik.
-- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest wishlist.
+- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest
+  wishlist.
 - `auth.starsuperscare.net`: login, signup, verifikasi, aktivasi, forgot/reset, dan logout.
 - `dashboard.starsuperscare.net`: area client setelah login.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
@@ -590,7 +629,8 @@ deno task build
 - `assets.starsuperscare.net`: target aset publik/CDN bila dipakai.
 - `apps/worker`: proses internal; tidak mempunyai subdomain publik.
 
-Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan `apps/worker` melalui `packages/database`.
+Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan
+`apps/worker` melalui `packages/database`.
 
 ## Hari 06 — Hubungkan Neon, Drizzle, dan migration tooling
 
@@ -604,10 +644,14 @@ Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses o
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Siapkan konfigurasi Neon development/staging/production dan dokumentasikan pooled runtime URL versus direct migration URL.
-- **10:15–12:15:** Implement packages/database client untuk API/worker, Drizzle config untuk migration, serta pencegahan import database dari frontend.
-- **13:15–15:15:** Buat connection smoke test, transaction helper, UTC timestamp convention, dan integer-IDR helper boundaries.
-- **15:30–17:30:** Jalankan koneksi development, buat migration kosong pertama, cek secret hygiene, dan tulis panduan branch database.
+- **08:00–10:00:** Siapkan konfigurasi Neon development/staging/production dan dokumentasikan pooled
+  runtime URL versus direct migration URL.
+- **10:15–12:15:** Implement packages/database client untuk API/worker, Drizzle config untuk
+  migration, serta pencegahan import database dari frontend.
+- **13:15–15:15:** Buat connection smoke test, transaction helper, UTC timestamp convention, dan
+  integer-IDR helper boundaries.
+- **15:30–17:30:** Jalankan koneksi development, buat migration kosong pertama, cek secret hygiene,
+  dan tulis panduan branch database.
 
 **Deliverables:**
 
@@ -640,7 +684,8 @@ deno task quality
 
 **External gate:**
 
-- Neon project dan connection strings development diperlukan untuk koneksi nyata. Bila belum ada, selesaikan adapter dan gunakan test yang di-skip dengan alasan eksplisit.
+- Neon project dan connection strings development diperlukan untuk koneksi nyata. Bila belum ada,
+  selesaikan adapter dan gunakan test yang di-skip dengan alasan eksplisit.
 
 **Prompt siap-tempel:** `../prompts/DAY-06.md`
 
@@ -658,10 +703,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Model users, profiles, password credentials, roles, permissions, mappings, dan status lifecycle dengan constraint yang jelas.
-- **10:15–12:15:** Model sessions, login attempts, verification/reset/activation tokens; simpan token digest, expiry, used/revoked timestamps.
-- **13:15–15:15:** Model addresses dengan type shipping/billing, primary flags, ownership, dan normalisasi field Indonesia tanpa mengunci provider wilayah.
-- **15:30–17:30:** Buat migration, schema tests untuk unique/index/FK, factory data, dan review keamanan field sensitif.
+- **08:00–10:00:** Model users, profiles, password credentials, roles, permissions, mappings, dan
+  status lifecycle dengan constraint yang jelas.
+- **10:15–12:15:** Model sessions, login attempts, verification/reset/activation tokens; simpan
+  token digest, expiry, used/revoked timestamps.
+- **13:15–15:15:** Model addresses dengan type shipping/billing, primary flags, ownership, dan
+  normalisasi field Indonesia tanpa mengunci provider wilayah.
+- **15:30–17:30:** Buat migration, schema tests untuk unique/index/FK, factory data, dan review
+  keamanan field sensitif.
 
 **Deliverables:**
 
@@ -708,10 +757,14 @@ deno task test:db
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Model brands, categories bertingkat, products, product-category mapping, product variants, status, type physical/digital, dan SEO fields.
-- **10:15–12:15:** Model images/assets metadata dan pricing history dengan integer rupiah, compare-at price, effective range, serta constraint non-negatif.
-- **13:15–15:15:** Model warehouses, inventory levels, reservations, movements ledger, purchase limit, dan concurrency/version field.
-- **15:30–17:30:** Model rating/review statistics dan product_sales_stats gross/refunded/net; buat migration, index, tests, dan seed sample.
+- **08:00–10:00:** Model brands, categories bertingkat, products, product-category mapping, product
+  variants, status, type physical/digital, dan SEO fields.
+- **10:15–12:15:** Model images/assets metadata dan pricing history dengan integer rupiah,
+  compare-at price, effective range, serta constraint non-negatif.
+- **13:15–15:15:** Model warehouses, inventory levels, reservations, movements ledger, purchase
+  limit, dan concurrency/version field.
+- **15:30–17:30:** Model rating/review statistics dan product_sales_stats gross/refunded/net; buat
+  migration, index, tests, dan seed sample.
 
 **Deliverables:**
 
@@ -759,10 +812,14 @@ deno task test:db
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Model carts/cart_items untuk guest token hash atau user, active-cart uniqueness, selected/save-for-later state, dan price observation.
-- **10:15–12:15:** Model orders/order_items/order_addresses sebagai immutable snapshot, order number, amount breakdown integer, status transitions, dan idempotency link.
-- **13:15–15:15:** Model payments/payment_events, provider IDs, invoices, shipments/events, vouchers/redemptions, serta customer payment method token metadata.
-- **15:30–17:30:** Model digital assets dan entitlements/download limits; buat migration, index, FK policy, dan schema tests.
+- **08:00–10:00:** Model carts/cart_items untuk guest token hash atau user, active-cart uniqueness,
+  selected/save-for-later state, dan price observation.
+- **10:15–12:15:** Model orders/order_items/order_addresses sebagai immutable snapshot, order
+  number, amount breakdown integer, status transitions, dan idempotency link.
+- **13:15–15:15:** Model payments/payment_events, provider IDs, invoices, shipments/events,
+  vouchers/redemptions, serta customer payment method token metadata.
+- **15:30–17:30:** Model digital assets dan entitlements/download limits; buat migration, index, FK
+  policy, dan schema tests.
 
 **Deliverables:**
 
@@ -810,10 +867,14 @@ deno task test:db
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Model returns, return_items, refunds, support tickets/messages, attachments metadata, dan verified-purchase reviews.
-- **10:15–12:15:** Model notifications dengan read_at, notification deliveries, outbox events, job attempts, audit logs, serta idempotency keys.
-- **13:15–15:15:** Buat seed roles/permissions/admin development/category/product/stock; buat data factory dan reset strategy khusus non-production.
-- **15:30–17:30:** Jalankan migration dari database kosong, seed, schema assertions, dan DB gate report; perbaiki seluruh masalah constraint/index.
+- **08:00–10:00:** Model returns, return_items, refunds, support tickets/messages, attachments
+  metadata, dan verified-purchase reviews.
+- **10:15–12:15:** Model notifications dengan read_at, notification deliveries, outbox events, job
+  attempts, audit logs, serta idempotency keys.
+- **13:15–15:15:** Buat seed roles/permissions/admin development/category/product/stock; buat data
+  factory dan reset strategy khusus non-production.
+- **15:30–17:30:** Jalankan migration dari database kosong, seed, schema assertions, dan DB gate
+  report; perbaiki seluruh masalah constraint/index.
 
 **Deliverables:**
 
@@ -850,7 +911,6 @@ deno task quality
 
 ---
 
-
 ---
 
 # Minggu 3 — API baseline dan autentikasi
@@ -858,7 +918,8 @@ deno task quality
 ## Arsitektur yang tidak boleh diubah
 
 - `starsuperscare.net`: landing dan halaman informasi publik.
-- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest wishlist.
+- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest
+  wishlist.
 - `auth.starsuperscare.net`: login, signup, verifikasi, aktivasi, forgot/reset, dan logout.
 - `dashboard.starsuperscare.net`: area client setelah login.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
@@ -867,7 +928,8 @@ deno task quality
 - `assets.starsuperscare.net`: target aset publik/CDN bila dipakai.
 - `apps/worker`: proses internal; tidak mempunyai subdomain publik.
 
-Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan `apps/worker` melalui `packages/database`.
+Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan
+`apps/worker` melalui `packages/database`.
 
 ## Hari 11 — Lengkapi API conventions, validation, CORS, CSRF, rate limit, dan RBAC context
 
@@ -882,10 +944,14 @@ Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses o
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Buat route modules, dependency injection/context, typed success/error response, request parsing, pagination envelope, dan request ID propagation.
-- **10:15–12:15:** Implement Zod validation middleware, sanitized errors, security headers, explicit CORS origin allowlist, dan credential handling.
-- **13:15–15:15:** Implement CSRF strategy untuk state-changing cookie-auth requests, rate limiter interface/storage, dan trusted proxy configuration.
-- **15:30–17:30:** Implement session loader dan RBAC/permission guard skeleton; tulis middleware tests termasuk origin, CSRF, dan error cases.
+- **08:00–10:00:** Buat route modules, dependency injection/context, typed success/error response,
+  request parsing, pagination envelope, dan request ID propagation.
+- **10:15–12:15:** Implement Zod validation middleware, sanitized errors, security headers, explicit
+  CORS origin allowlist, dan credential handling.
+- **13:15–15:15:** Implement CSRF strategy untuk state-changing cookie-auth requests, rate limiter
+  interface/storage, dan trusted proxy configuration.
+- **15:30–17:30:** Implement session loader dan RBAC/permission guard skeleton; tulis middleware
+  tests termasuk origin, CSRF, dan error cases.
 
 **Deliverables:**
 
@@ -931,10 +997,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement password policy dan Argon2id wrapper yang dapat diuji, constant-time comparison semantics, serta secure random token helpers.
-- **10:15–12:15:** Implement POST /v1/auth/signup dengan transaction user/profile/credential, normalized identity, status pending_verification, dan audit event.
-- **13:15–15:15:** Implement verification token issuance, resend throttling, POST /verify-email, token rotation/revocation, dan outbox email event.
-- **15:30–17:30:** Tulis unit/integration tests untuk duplicate username/email, invalid input, token expiry/reuse, rollback, dan generic responses.
+- **08:00–10:00:** Implement password policy dan Argon2id wrapper yang dapat diuji, constant-time
+  comparison semantics, serta secure random token helpers.
+- **10:15–12:15:** Implement POST /v1/auth/signup dengan transaction user/profile/credential,
+  normalized identity, status pending_verification, dan audit event.
+- **13:15–15:15:** Implement verification token issuance, resend throttling, POST /verify-email,
+  token rotation/revocation, dan outbox email event.
+- **15:30–17:30:** Tulis unit/integration tests untuk duplicate username/email, invalid input, token
+  expiry/reuse, rollback, dan generic responses.
 
 **Deliverables:**
 
@@ -981,10 +1051,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement POST /auth/login dengan username normalized, generic credential error, throttling, account-status checks, dan audit login.
-- **10:15–12:15:** Implement opaque session ID, database digest, expiry/idle timeout, rotation, Secure HttpOnly host-only cookie pada API, dan GET /session.
-- **13:15–15:15:** Implement logout current, logout-all, session listing/revocation primitives, serta cleanup query untuk worker.
-- **15:30–17:30:** Tulis tests untuk valid/invalid login, lock/rate limit, cookie flags, session rotation, revoked/expired session, dan cross-origin credential flow.
+- **08:00–10:00:** Implement POST /auth/login dengan username normalized, generic credential error,
+  throttling, account-status checks, dan audit login.
+- **10:15–12:15:** Implement opaque session ID, database digest, expiry/idle timeout, rotation,
+  Secure HttpOnly host-only cookie pada API, dan GET /session.
+- **13:15–15:15:** Implement logout current, logout-all, session listing/revocation primitives,
+  serta cleanup query untuk worker.
+- **15:30–17:30:** Tulis tests untuk valid/invalid login, lock/rate limit, cookie flags, session
+  rotation, revoked/expired session, dan cross-origin credential flow.
 
 **Deliverables:**
 
@@ -1031,10 +1105,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement forgot-password generic response, reset token issuance, expiry/reuse prevention, password replacement, dan optional revoke-all sessions.
-- **10:15–12:15:** Implement account activation endpoint untuk pending guest account: token verification, username final, password creation, email verification, dan activation audit.
-- **13:15–15:15:** Implement return_to parser dengan allowlist host/path, anti-open-redirect, dan safe default dashboard home.
-- **15:30–17:30:** Tulis integration tests untuk expired/reused token, reset unknown email, activation conflict, session revocation, dan malicious return_to.
+- **08:00–10:00:** Implement forgot-password generic response, reset token issuance, expiry/reuse
+  prevention, password replacement, dan optional revoke-all sessions.
+- **10:15–12:15:** Implement account activation endpoint untuk pending guest account: token
+  verification, username final, password creation, email verification, dan activation audit.
+- **13:15–15:15:** Implement return_to parser dengan allowlist host/path, anti-open-redirect, dan
+  safe default dashboard home.
+- **15:30–17:30:** Tulis integration tests untuk expired/reused token, reset unknown email,
+  activation conflict, session revocation, dan malicious return_to.
 
 **Deliverables:**
 
@@ -1082,10 +1160,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Bangun API client dengan credentials, CSRF bootstrap, typed errors, loading/cancellation, dan return_to handling.
-- **10:15–12:15:** Bangun halaman login dan signup dengan accessible forms, client validation yang sama kontraknya, password visibility, dan goey-toast.
-- **13:15–15:15:** Bangun verify-email, resend, forgot-password, reset-password, activation, logout result, dan invalid/expired token states.
-- **15:30–17:30:** Jalankan integration/E2E auth lokal, perbaiki responsive/accessibility, dan tulis Auth Gate report.
+- **08:00–10:00:** Bangun API client dengan credentials, CSRF bootstrap, typed errors,
+  loading/cancellation, dan return_to handling.
+- **10:15–12:15:** Bangun halaman login dan signup dengan accessible forms, client validation yang
+  sama kontraknya, password visibility, dan goey-toast.
+- **13:15–15:15:** Bangun verify-email, resend, forgot-password, reset-password, activation, logout
+  result, dan invalid/expired token states.
+- **15:30–17:30:** Jalankan integration/E2E auth lokal, perbaiki responsive/accessibility, dan tulis
+  Auth Gate report.
 
 **Deliverables:**
 
@@ -1120,7 +1202,6 @@ deno task quality
 
 ---
 
-
 ---
 
 # Minggu 4 — Catalog dan admin catalog/inventory
@@ -1128,7 +1209,8 @@ deno task quality
 ## Arsitektur yang tidak boleh diubah
 
 - `starsuperscare.net`: landing dan halaman informasi publik.
-- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest wishlist.
+- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest
+  wishlist.
 - `auth.starsuperscare.net`: login, signup, verifikasi, aktivasi, forgot/reset, dan logout.
 - `dashboard.starsuperscare.net`: area client setelah login.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
@@ -1137,7 +1219,8 @@ deno task quality
 - `assets.starsuperscare.net`: target aset publik/CDN bila dipakai.
 - `apps/worker`: proses internal; tidak mempunyai subdomain publik.
 
-Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan `apps/worker` melalui `packages/database`.
+Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan
+`apps/worker` melalui `packages/database`.
 
 ## Hari 16 — Public catalog API: list, detail, category, brand, search
 
@@ -1151,10 +1234,14 @@ Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses o
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement repository/service query untuk active products, variant summary, effective price, available stock, rating, review count, dan net_sold.
-- **10:15–12:15:** Implement GET /products dengan page/per_page, search, category, brand, price range, stock, badges, dan sort allowlist.
-- **13:15–15:15:** Implement GET /products/{slug}, categories, brands, reviews; gunakan typed contracts dan stable response envelope.
-- **15:30–17:30:** Tulis query/integration tests, EXPLAIN critical queries bila tersedia, perbaiki index/N+1, dan seed data yang cukup untuk pagination.
+- **08:00–10:00:** Implement repository/service query untuk active products, variant summary,
+  effective price, available stock, rating, review count, dan net_sold.
+- **10:15–12:15:** Implement GET /products dengan page/per_page, search, category, brand, price
+  range, stock, badges, dan sort allowlist.
+- **13:15–15:15:** Implement GET /products/{slug}, categories, brands, reviews; gunakan typed
+  contracts dan stable response envelope.
+- **15:30–17:30:** Tulis query/integration tests, EXPLAIN critical queries bila tersedia, perbaiki
+  index/N+1, dan seed data yang cukup untuk pagination.
 
 **Deliverables:**
 
@@ -1200,10 +1287,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Definisikan permissions granular catalog.read/write/publish, inventory.adjust, order.manage, refund.manage, support.manage, dan admin role seed.
-- **10:15–12:15:** Implement admin endpoints category, brand, product, variant, price, publish/unpublish/archive dengan Zod dan optimistic concurrency.
-- **13:15–15:15:** Implement audit trail before/after yang aman, soft-delete policy, slug/SKU conflict handling, dan transaction boundaries.
-- **15:30–17:30:** Tulis authorization matrix tests: unauthenticated, customer, staff terbatas, admin; pastikan default-deny.
+- **08:00–10:00:** Definisikan permissions granular catalog.read/write/publish, inventory.adjust,
+  order.manage, refund.manage, support.manage, dan admin role seed.
+- **10:15–12:15:** Implement admin endpoints category, brand, product, variant, price,
+  publish/unpublish/archive dengan Zod dan optimistic concurrency.
+- **13:15–15:15:** Implement audit trail before/after yang aman, soft-delete policy, slug/SKU
+  conflict handling, dan transaction boundaries.
+- **15:30–17:30:** Tulis authorization matrix tests: unauthenticated, customer, staff terbatas,
+  admin; pastikan default-deny.
 
 **Deliverables:**
 
@@ -1248,10 +1339,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Bangun admin shell, auth guard, permission-aware navigation, product list, filters, empty/loading/error states.
-- **10:15–12:15:** Bangun create/edit product, category, brand, variant, price, digital/physical fields, validation, dan unsaved-change guard.
-- **13:15–15:15:** Implement object storage adapter/presigned upload flow untuk product image; validate MIME/size/ownership dan simpan metadata saja di Neon.
-- **15:30–17:30:** Integrasikan goey-toast, optimistic UI yang aman, upload progress, build/test, dan dokumentasikan provider storage env.
+- **08:00–10:00:** Bangun admin shell, auth guard, permission-aware navigation, product list,
+  filters, empty/loading/error states.
+- **10:15–12:15:** Bangun create/edit product, category, brand, variant, price, digital/physical
+  fields, validation, dan unsaved-change guard.
+- **13:15–15:15:** Implement object storage adapter/presigned upload flow untuk product image;
+  validate MIME/size/ownership dan simpan metadata saja di Neon.
+- **15:30–17:30:** Integrasikan goey-toast, optimistic UI yang aman, upload progress, build/test,
+  dan dokumentasikan provider storage env.
 
 **Deliverables:**
 
@@ -1283,7 +1378,8 @@ deno task quality
 
 **External gate:**
 
-- Object storage S3-compatible diperlukan untuk upload nyata. Bila belum ada, gunakan in-memory/local development adapter dan jangan memalsukan URL production.
+- Object storage S3-compatible diperlukan untuk upload nyata. Bila belum ada, gunakan
+  in-memory/local development adapter dan jangan memalsukan URL production.
 
 **Prompt siap-tempel:** `../prompts/DAY-18.md`
 
@@ -1301,10 +1397,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement inventory query dan movement service dengan transaction/locking, reason codes, actor, source reference, serta invariant available/reserved/sold.
-- **10:15–12:15:** Implement stock adjustment, transfer-ready abstraction, low-stock query, and reservation primitive create/commit/release/expire.
-- **13:15–15:15:** Bangun admin inventory list/detail/adjustment history dan form adjustment dengan permission plus confirmation.
-- **15:30–17:30:** Tulis concurrency/invariant tests dan audit reconciliation report untuk sample data.
+- **08:00–10:00:** Implement inventory query dan movement service dengan transaction/locking, reason
+  codes, actor, source reference, serta invariant available/reserved/sold.
+- **10:15–12:15:** Implement stock adjustment, transfer-ready abstraction, low-stock query, and
+  reservation primitive create/commit/release/expire.
+- **13:15–15:15:** Bangun admin inventory list/detail/adjustment history dan form adjustment dengan
+  permission plus confirmation.
+- **15:30–17:30:** Tulis concurrency/invariant tests dan audit reconciliation report untuk sample
+  data.
 
 **Deliverables:**
 
@@ -1349,10 +1449,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement pure functions dan database operations untuk gross_sold, refunded_sold, net_sold, average rating, review count, dan Indonesian sold label.
-- **10:15–12:15:** Implement review public read API dengan moderation/verified flags dan aggregate recalculation/reconciliation command.
-- **13:15–15:15:** Tambahkan sample paid/refunded/reviewed orders untuk test, lalu verifikasi card projection dan product detail response.
-- **15:30–17:30:** Jalankan catalog/admin test suite, query review, quality gate, dan tulis Catalog Gate report.
+- **08:00–10:00:** Implement pure functions dan database operations untuk gross_sold, refunded_sold,
+  net_sold, average rating, review count, dan Indonesian sold label.
+- **10:15–12:15:** Implement review public read API dengan moderation/verified flags dan aggregate
+  recalculation/reconciliation command.
+- **13:15–15:15:** Tambahkan sample paid/refunded/reviewed orders untuk test, lalu verifikasi card
+  projection dan product detail response.
+- **15:30–17:30:** Jalankan catalog/admin test suite, query review, quality gate, dan tulis Catalog
+  Gate report.
 
 **Deliverables:**
 
@@ -1386,7 +1490,6 @@ deno task quality
 
 ---
 
-
 ---
 
 # Minggu 5 — Storefront products, search, wishlist
@@ -1394,7 +1497,8 @@ deno task quality
 ## Arsitektur yang tidak boleh diubah
 
 - `starsuperscare.net`: landing dan halaman informasi publik.
-- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest wishlist.
+- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest
+  wishlist.
 - `auth.starsuperscare.net`: login, signup, verifikasi, aktivasi, forgot/reset, dan logout.
 - `dashboard.starsuperscare.net`: area client setelah login.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
@@ -1403,7 +1507,8 @@ deno task quality
 - `assets.starsuperscare.net`: target aset publik/CDN bila dipakai.
 - `apps/worker`: proses internal; tidak mempunyai subdomain publik.
 
-Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan `apps/worker` melalui `packages/database`.
+Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan
+`apps/worker` melalui `packages/database`.
 
 ## Hari 21 — Storefront shell, design system, API client, dan goey-toast wrapper
 
@@ -1418,10 +1523,14 @@ Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses o
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Bangun design tokens, typography, spacing, buttons, forms, cards, skeleton, dialog, pagination, badge, dan responsive containers di packages/ui.
-- **10:15–12:15:** Buat wrapper goey-toast terstandar untuk success/error/warning/info/promise, reduced-motion support, dan pesan Indonesia yang konsisten.
-- **13:15–15:15:** Bangun storefront header/nav/search/cart/account shell, API client typed, currency/date/sold formatter, dan error boundary.
-- **15:30–17:30:** Buat component tests/smoke page, audit keyboard/focus, dan build storefront baseline.
+- **08:00–10:00:** Bangun design tokens, typography, spacing, buttons, forms, cards, skeleton,
+  dialog, pagination, badge, dan responsive containers di packages/ui.
+- **10:15–12:15:** Buat wrapper goey-toast terstandar untuk success/error/warning/info/promise,
+  reduced-motion support, dan pesan Indonesia yang konsisten.
+- **13:15–15:15:** Bangun storefront header/nav/search/cart/account shell, API client typed,
+  currency/date/sold formatter, dan error boundary.
+- **15:30–17:30:** Buat component tests/smoke page, audit keyboard/focus, dan build storefront
+  baseline.
 
 **Deliverables:**
 
@@ -1467,10 +1576,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Bangun /products data loader/query state dan URL pagination per_page=12 dengan cancellation serta cache policy sederhana.
-- **10:15–12:15:** Bangun ProductCard berisi image, name, brand, category, regular/selling price, discount, rating, review count, net sold, stock, badges, dan wishlist state.
-- **13:15–15:15:** Implement add-to-cart/buy-now/wishlist action stubs yang terhubung kontrak, responsive grid, skeleton, empty/error/out-of-stock states.
-- **15:30–17:30:** Tulis component/integration tests untuk sold label, price discount, stock, new badge, action accessibility, dan mobile layout.
+- **08:00–10:00:** Bangun /products data loader/query state dan URL pagination per_page=12 dengan
+  cancellation serta cache policy sederhana.
+- **10:15–12:15:** Bangun ProductCard berisi image, name, brand, category, regular/selling price,
+  discount, rating, review count, net sold, stock, badges, dan wishlist state.
+- **13:15–15:15:** Implement add-to-cart/buy-now/wishlist action stubs yang terhubung kontrak,
+  responsive grid, skeleton, empty/error/out-of-stock states.
+- **15:30–17:30:** Tulis component/integration tests untuk sold label, price discount, stock, new
+  badge, action accessibility, dan mobile layout.
 
 **Deliverables:**
 
@@ -1514,10 +1627,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Bangun /products/{slug} loader dengan not-found/inactive states dan metadata dasar.
-- **10:15–12:15:** Bangun gallery, product summary, variant selector, effective price, stock, quantity limits, add-cart, buy-now, wishlist, dan shipping/digital indicator.
-- **13:15–15:15:** Bangun tabs/accordion description, benefits, composition, usage, warning, shipping, reviews, serta related products.
-- **15:30–17:30:** Tulis tests untuk variant URL/state, sold/stock display, quantity clamping, image alt, and out-of-stock behavior.
+- **08:00–10:00:** Bangun /products/{slug} loader dengan not-found/inactive states dan metadata
+  dasar.
+- **10:15–12:15:** Bangun gallery, product summary, variant selector, effective price, stock,
+  quantity limits, add-cart, buy-now, wishlist, dan shipping/digital indicator.
+- **13:15–15:15:** Bangun tabs/accordion description, benefits, composition, usage, warning,
+  shipping, reviews, serta related products.
+- **15:30–17:30:** Tulis tests untuk variant URL/state, sold/stock display, quantity clamping, image
+  alt, and out-of-stock behavior.
 
 **Deliverables:**
 
@@ -1561,9 +1678,12 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Bangun /search, /categories/{slug}, dan /brands/{slug} menggunakan endpoint yang sama dan URL query sebagai source of truth.
-- **10:15–12:15:** Implement keyword debounce, filter category/brand/price/stock/rating/promo, sort allowlist, reset filter, dan mobile filter drawer.
-- **13:15–15:15:** Jaga browser back/forward, shareable URLs, page reset saat filter berubah, serta empty suggestions/popular products.
+- **08:00–10:00:** Bangun /search, /categories/{slug}, dan /brands/{slug} menggunakan endpoint yang
+  sama dan URL query sebagai source of truth.
+- **10:15–12:15:** Implement keyword debounce, filter category/brand/price/stock/rating/promo, sort
+  allowlist, reset filter, dan mobile filter drawer.
+- **13:15–15:15:** Jaga browser back/forward, shareable URLs, page reset saat filter berubah, serta
+  empty suggestions/popular products.
 - **15:30–17:30:** Tulis query-state tests, accessibility, and API error recovery; build storefront.
 
 **Deliverables:**
@@ -1609,10 +1729,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement guest wishlist local storage dengan versioned schema, graceful corruption handling, dan no-sensitive-data rule.
-- **10:15–12:15:** Implement account wishlist API list/add/remove, ownership, duplicate prevention, stock/price projection, dan optional merge after login.
-- **13:15–15:15:** Integrasikan heart state pada list/detail, optimistic update rollback, goey-toast, dan dashboard deep link.
-- **15:30–17:30:** Jalankan storefront tests, accessibility smoke, performance baseline, dan tulis Storefront Gate report.
+- **08:00–10:00:** Implement guest wishlist local storage dengan versioned schema, graceful
+  corruption handling, dan no-sensitive-data rule.
+- **10:15–12:15:** Implement account wishlist API list/add/remove, ownership, duplicate prevention,
+  stock/price projection, dan optional merge after login.
+- **13:15–15:15:** Integrasikan heart state pada list/detail, optimistic update rollback,
+  goey-toast, dan dashboard deep link.
+- **15:30–17:30:** Jalankan storefront tests, accessibility smoke, performance baseline, dan tulis
+  Storefront Gate report.
 
 **Deliverables:**
 
@@ -1646,7 +1770,6 @@ deno task quality
 
 ---
 
-
 ---
 
 # Minggu 6 — Cart, checkout, order, payment
@@ -1654,7 +1777,8 @@ deno task quality
 ## Arsitektur yang tidak boleh diubah
 
 - `starsuperscare.net`: landing dan halaman informasi publik.
-- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest wishlist.
+- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest
+  wishlist.
 - `auth.starsuperscare.net`: login, signup, verifikasi, aktivasi, forgot/reset, dan logout.
 - `dashboard.starsuperscare.net`: area client setelah login.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
@@ -1663,7 +1787,8 @@ deno task quality
 - `assets.starsuperscare.net`: target aset publik/CDN bila dipakai.
 - `apps/worker`: proses internal; tidak mempunyai subdomain publik.
 
-Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan `apps/worker` melalui `packages/database`.
+Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan
+`apps/worker` melalui `packages/database`.
 
 ## Hari 26 — Cart API untuk guest dan account
 
@@ -1677,10 +1802,14 @@ Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses o
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement guest cart token issuance dengan random opaque token, server-side digest, expiry/rotation, serta one-active-cart invariant.
-- **10:15–12:15:** Implement GET cart dan add/update/remove/clear item transactionally untuk guest atau session user.
-- **13:15–15:15:** Hitung line totals/discount/subtotal di server, return item status available/out_of_stock/price_changed/inactive/quantity_adjusted.
-- **15:30–17:30:** Tulis authorization, token, validation, concurrent update, purchase limit, and total calculation tests.
+- **08:00–10:00:** Implement guest cart token issuance dengan random opaque token, server-side
+  digest, expiry/rotation, serta one-active-cart invariant.
+- **10:15–12:15:** Implement GET cart dan add/update/remove/clear item transactionally untuk guest
+  atau session user.
+- **13:15–15:15:** Hitung line totals/discount/subtotal di server, return item status
+  available/out_of_stock/price_changed/inactive/quantity_adjusted.
+- **15:30–17:30:** Tulis authorization, token, validation, concurrent update, purchase limit, and
+  total calculation tests.
 
 **Deliverables:**
 
@@ -1725,10 +1854,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement POST /cart/merge transaction: merge variant sama, clamp stock/purchase limit, latest price, merged marker, dan idempotency.
-- **10:15–12:15:** Implement revalidation saat cart dibaca/diubah, warning changes, inactive cleanup policy, dan race-safe versioning.
-- **13:15–15:15:** Implement save-for-later dan voucher validation/application dasar dengan explicit rule engine serta integer amounts.
-- **15:30–17:30:** Tulis merge matrix tests, price/stock changes, duplicate retry, voucher edge cases, dan rollback behavior.
+- **08:00–10:00:** Implement POST /cart/merge transaction: merge variant sama, clamp stock/purchase
+  limit, latest price, merged marker, dan idempotency.
+- **10:15–12:15:** Implement revalidation saat cart dibaca/diubah, warning changes, inactive cleanup
+  policy, dan race-safe versioning.
+- **13:15–15:15:** Implement save-for-later dan voucher validation/application dasar dengan explicit
+  rule engine serta integer amounts.
+- **15:30–17:30:** Tulis merge matrix tests, price/stock changes, duplicate retry, voucher edge
+  cases, dan rollback behavior.
 
 **Deliverables:**
 
@@ -1773,10 +1906,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Bangun /cart loader dan cart summary untuk guest/session dengan states loading/empty/error/expired token.
-- **10:15–12:15:** Bangun item table/card responsive, select checkout, increment/decrement, remove, clear, save-for-later, voucher, dan order note.
-- **13:15–15:15:** Tampilkan server totals, price/stock warnings, shipping estimate placeholder yang jelas, and checkout eligibility.
-- **15:30–17:30:** Tulis UI/integration tests, keyboard/focus, optimistic mutation rollback, goey-toast, and build storefront.
+- **08:00–10:00:** Bangun /cart loader dan cart summary untuk guest/session dengan states
+  loading/empty/error/expired token.
+- **10:15–12:15:** Bangun item table/card responsive, select checkout, increment/decrement, remove,
+  clear, save-for-later, voucher, dan order note.
+- **13:15–15:15:** Tampilkan server totals, price/stock warnings, shipping estimate placeholder yang
+  jelas, and checkout eligibility.
+- **15:30–17:30:** Tulis UI/integration tests, keyboard/focus, optimistic mutation rollback,
+  goey-toast, and build storefront.
 
 **Deliverables:**
 
@@ -1821,10 +1958,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement address validation/persistence and guest address input, shipping option adapter dengan deterministic mock, serta digital-only no-shipping branch.
-- **10:15–12:15:** Implement checkout validate/shipping-options endpoints dan server recomputation untuk product, stock, price, voucher, shipping, tax, total.
-- **13:15–15:15:** Implement POST /checkout/orders dengan idempotency key, immutable order/address/item snapshot, dan inventory reservation expiry.
-- **15:30–17:30:** Bangun address/shipping/review UI state machine, recovery after refresh, tests untuk mixed cart, stale price/stock, duplicate submit, and reservation release schedule.
+- **08:00–10:00:** Implement address validation/persistence and guest address input, shipping option
+  adapter dengan deterministic mock, serta digital-only no-shipping branch.
+- **10:15–12:15:** Implement checkout validate/shipping-options endpoints dan server recomputation
+  untuk product, stock, price, voucher, shipping, tax, total.
+- **13:15–15:15:** Implement POST /checkout/orders dengan idempotency key, immutable
+  order/address/item snapshot, dan inventory reservation expiry.
+- **15:30–17:30:** Bangun address/shipping/review UI state machine, recovery after refresh, tests
+  untuk mixed cart, stale price/stock, duplicate submit, and reservation release schedule.
 
 **Deliverables:**
 
@@ -1857,7 +1998,8 @@ deno task quality
 
 **External gate:**
 
-- Real shipping provider dapat ditambahkan nanti melalui adapter. Mock harus jelas hanya untuk development/test.
+- Real shipping provider dapat ditambahkan nanti melalui adapter. Mock harus jelas hanya untuk
+  development/test.
 
 **Prompt siap-tempel:** `../prompts/DAY-29.md`
 
@@ -1875,10 +2017,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Definisikan PaymentProvider interface dan implement deterministic sandbox/mock provider tanpa menyimpan raw card data.
-- **10:15–12:15:** Implement create payment intent/session, payment page handoff, pending/success/failed UI, dan provider reference persistence.
-- **13:15–15:15:** Implement webhook signature verification contract, unique provider event, state transition validation, transaction order paid + reservation commit + outbox.
-- **15:30–17:30:** Tulis duplicate/out-of-order/invalid-signature tests, browser-success-not-source-of-truth test, quality gate, dan Checkout Gate report.
+- **08:00–10:00:** Definisikan PaymentProvider interface dan implement deterministic sandbox/mock
+  provider tanpa menyimpan raw card data.
+- **10:15–12:15:** Implement create payment intent/session, payment page handoff,
+  pending/success/failed UI, dan provider reference persistence.
+- **13:15–15:15:** Implement webhook signature verification contract, unique provider event, state
+  transition validation, transaction order paid + reservation commit + outbox.
+- **15:30–17:30:** Tulis duplicate/out-of-order/invalid-signature tests,
+  browser-success-not-source-of-truth test, quality gate, dan Checkout Gate report.
 
 **Deliverables:**
 
@@ -1910,12 +2056,12 @@ deno task quality
 
 **External gate:**
 
-- Pilih dan siapkan payment gateway sandbox untuk integrasi nyata. Sampai tersedia, mock provider harus mencakup success, pending, failed, duplicate, dan invalid webhook.
+- Pilih dan siapkan payment gateway sandbox untuk integrasi nyata. Sampai tersedia, mock provider
+  harus mencakup success, pending, failed, duplicate, dan invalid webhook.
 
 **Prompt siap-tempel:** `../prompts/DAY-30.md`
 
 ---
-
 
 ---
 
@@ -1924,7 +2070,8 @@ deno task quality
 ## Arsitektur yang tidak boleh diubah
 
 - `starsuperscare.net`: landing dan halaman informasi publik.
-- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest wishlist.
+- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest
+  wishlist.
 - `auth.starsuperscare.net`: login, signup, verifikasi, aktivasi, forgot/reset, dan logout.
 - `dashboard.starsuperscare.net`: area client setelah login.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
@@ -1933,7 +2080,8 @@ deno task quality
 - `assets.starsuperscare.net`: target aset publik/CDN bila dipakai.
 - `apps/worker`: proses internal; tidak mempunyai subdomain publik.
 
-Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan `apps/worker` melalui `packages/database`.
+Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan
+`apps/worker` melalui `packages/database`.
 
 ## Hari 31 — Transactional outbox worker, locking, retry, dan cleanup jobs
 
@@ -1947,10 +2095,14 @@ Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses o
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement outbox poller dengan claim/lock aman, batch size, available_at, SKIP LOCKED atau strategi setara, correlation ID, dan graceful shutdown.
-- **10:15–12:15:** Implement handler registry, idempotency/dedupe, exponential backoff with cap/jitter, max attempts, failed state/dead-letter semantics.
-- **13:15–15:15:** Implement scheduled cleanup untuk expired session/token, release expired inventory reservation, dan stale guest cart policy.
-- **15:30–17:30:** Tulis worker concurrency/retry/crash-recovery tests serta operational commands untuk inspect/retry failed job.
+- **08:00–10:00:** Implement outbox poller dengan claim/lock aman, batch size, available_at, SKIP
+  LOCKED atau strategi setara, correlation ID, dan graceful shutdown.
+- **10:15–12:15:** Implement handler registry, idempotency/dedupe, exponential backoff with
+  cap/jitter, max attempts, failed state/dead-letter semantics.
+- **13:15–15:15:** Implement scheduled cleanup untuk expired session/token, release expired
+  inventory reservation, dan stale guest cart policy.
+- **15:30–17:30:** Tulis worker concurrency/retry/crash-recovery tests serta operational commands
+  untuk inspect/retry failed job.
 
 **Deliverables:**
 
@@ -1996,10 +2148,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement invoice number, immutable invoice data snapshot, PDF renderer, locale id-ID, integer amounts, and safe file naming.
-- **10:15–12:15:** Upload invoice ke private object storage, simpan metadata, dan buat authenticated/signed download path dengan expiry.
-- **13:15–15:15:** Implement EmailProvider interface, invoice/order/verification/reset/activation templates, delivery records, retry categories, and provider message ID.
-- **15:30–17:30:** Hubungkan paid outbox ke invoice generation dan email; test PDF metadata, template rendering, provider failure/retry, and no public invoice leakage.
+- **08:00–10:00:** Implement invoice number, immutable invoice data snapshot, PDF renderer, locale
+  id-ID, integer amounts, and safe file naming.
+- **10:15–12:15:** Upload invoice ke private object storage, simpan metadata, dan buat
+  authenticated/signed download path dengan expiry.
+- **13:15–15:15:** Implement EmailProvider interface, invoice/order/verification/reset/activation
+  templates, delivery records, retry categories, and provider message ID.
+- **15:30–17:30:** Hubungkan paid outbox ke invoice generation dan email; test PDF metadata,
+  template rendering, provider failure/retry, and no public invoice leakage.
 
 **Deliverables:**
 
@@ -2033,7 +2189,8 @@ deno task quality
 
 **External gate:**
 
-- Email transactional provider dan object storage credentials diperlukan untuk delivery nyata. Gunakan fake provider dalam test dan development tanpa mengklaim email terkirim.
+- Email transactional provider dan object storage credentials diperlukan untuk delivery nyata.
+  Gunakan fake provider dalam test dan development tanpa mengklaim email terkirim.
 
 **Prompt siap-tempel:** `../prompts/DAY-32.md`
 
@@ -2050,10 +2207,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement paid-order handler: bila guest email belum memiliki user, buat pending_activation user/profile dan activation token dalam transaksi idempotent.
-- **10:15–12:15:** Bila email sudah terkait akun, jangan auto-link hanya dari input guest; buat secure claim/notification flow yang memverifikasi kepemilikan.
-- **13:15–15:15:** Hubungkan activation UI/API ke pending order claim, username selection, password creation, verified email, session issue, dan redirect dashboard order.
-- **15:30–17:30:** Tulis duplicate paid event, existing account, expired token, conflicting username, replay, and order-ownership tests.
+- **08:00–10:00:** Implement paid-order handler: bila guest email belum memiliki user, buat
+  pending_activation user/profile dan activation token dalam transaksi idempotent.
+- **10:15–12:15:** Bila email sudah terkait akun, jangan auto-link hanya dari input guest; buat
+  secure claim/notification flow yang memverifikasi kepemilikan.
+- **13:15–15:15:** Hubungkan activation UI/API ke pending order claim, username selection, password
+  creation, verified email, session issue, dan redirect dashboard order.
+- **15:30–17:30:** Tulis duplicate paid event, existing account, expired token, conflicting
+  username, replay, and order-ownership tests.
 
 **Deliverables:**
 
@@ -2098,10 +2259,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement notification creation handlers dari business outbox dengan dedupe_key, user ownership, type, data payload version, dan created_at.
-- **10:15–12:15:** Implement list/pagination/unread-count/read/read-all endpoints; status hanya derived dari read_at.
-- **13:15–15:15:** Implement authenticated SSE stream dengan heartbeat, reconnect guidance, bounded resources, last event cursor/refresh strategy, dan authorization.
-- **15:30–17:30:** Tulis SSE/read tests termasuk disconnect/reconnect, unauthorized stream, duplicate events, and database-source-of-truth behavior.
+- **08:00–10:00:** Implement notification creation handlers dari business outbox dengan dedupe_key,
+  user ownership, type, data payload version, dan created_at.
+- **10:15–12:15:** Implement list/pagination/unread-count/read/read-all endpoints; status hanya
+  derived dari read_at.
+- **13:15–15:15:** Implement authenticated SSE stream dengan heartbeat, reconnect guidance, bounded
+  resources, last event cursor/refresh strategy, dan authorization.
+- **15:30–17:30:** Tulis SSE/read tests termasuk disconnect/reconnect, unauthorized stream,
+  duplicate events, and database-source-of-truth behavior.
 
 **Deliverables:**
 
@@ -2147,10 +2312,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Buat integration fixture end-to-end: product aktif, guest cart, checkout, order pending, verified payment, stock commit, stats, outbox, invoice, email record, account pending.
-- **10:15–12:15:** Lanjutkan aktivasi, login, session, order ownership, notification, invoice access, dan digital entitlement bila item digital.
-- **13:15–15:15:** Tambahkan failure matrix: price/stock change, expired reservation, duplicate/out-of-order webhook, worker crash/retry, email fail, expired activation.
-- **15:30–17:30:** Jalankan seluruh integration suite dari database test bersih, perbaiki flakiness, dan tulis Integration Gate report.
+- **08:00–10:00:** Buat integration fixture end-to-end: product aktif, guest cart, checkout, order
+  pending, verified payment, stock commit, stats, outbox, invoice, email record, account pending.
+- **10:15–12:15:** Lanjutkan aktivasi, login, session, order ownership, notification, invoice
+  access, dan digital entitlement bila item digital.
+- **13:15–15:15:** Tambahkan failure matrix: price/stock change, expired reservation,
+  duplicate/out-of-order webhook, worker crash/retry, email fail, expired activation.
+- **15:30–17:30:** Jalankan seluruh integration suite dari database test bersih, perbaiki flakiness,
+  dan tulis Integration Gate report.
 
 **Deliverables:**
 
@@ -2183,7 +2352,6 @@ deno task quality
 
 ---
 
-
 ---
 
 # Minggu 8 — Dashboard client
@@ -2191,7 +2359,8 @@ deno task quality
 ## Arsitektur yang tidak boleh diubah
 
 - `starsuperscare.net`: landing dan halaman informasi publik.
-- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest wishlist.
+- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest
+  wishlist.
 - `auth.starsuperscare.net`: login, signup, verifikasi, aktivasi, forgot/reset, dan logout.
 - `dashboard.starsuperscare.net`: area client setelah login.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
@@ -2200,7 +2369,8 @@ deno task quality
 - `assets.starsuperscare.net`: target aset publik/CDN bila dipakai.
 - `apps/worker`: proses internal; tidak mempunyai subdomain publik.
 
-Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan `apps/worker` melalui `packages/database`.
+Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan
+`apps/worker` melalui `packages/database`.
 
 ## Hari 36 — Dashboard shell, route guards, navigation, dan home summary
 
@@ -2214,10 +2384,14 @@ Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses o
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Bangun dashboard API client/session bootstrap, protected route guard, unauthorized/expired flow, error boundary, dan app layout.
-- **10:15–12:15:** Bangun desktop sidebar sesuai blueprint dan mobile nav Home/Orders/Cart/Notifications/Account; Cart link kembali ke shop.
-- **13:15–15:15:** Implement home summary endpoint dan UI: active orders, latest, shipping, total purchases, unread notification, unpaid status, recommendation link.
-- **15:30–17:30:** Tulis dashboard shell/home tests, loading/empty/error states, accessibility, and responsive build.
+- **08:00–10:00:** Bangun dashboard API client/session bootstrap, protected route guard,
+  unauthorized/expired flow, error boundary, dan app layout.
+- **10:15–12:15:** Bangun desktop sidebar sesuai blueprint dan mobile nav
+  Home/Orders/Cart/Notifications/Account; Cart link kembali ke shop.
+- **13:15–15:15:** Implement home summary endpoint dan UI: active orders, latest, shipping, total
+  purchases, unread notification, unpaid status, recommendation link.
+- **15:30–17:30:** Tulis dashboard shell/home tests, loading/empty/error states, accessibility, and
+  responsive build.
 
 **Deliverables:**
 
@@ -2263,10 +2437,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement GET/PATCH /me dan profile UI untuk name, email display/policy, phone, avatar metadata, joined date, and validation.
-- **10:15–12:15:** Implement change password, sessions list, revoke one/all other sessions, login history summary, and security feedback.
-- **13:15–15:15:** Implement addresses CRUD/default shipping/billing with ownership and dashboard UI.
-- **15:30–17:30:** Implement tokenized payment-method metadata list/delete only if provider supports it; no raw card data; test ownership and responsive forms.
+- **08:00–10:00:** Implement GET/PATCH /me dan profile UI untuk name, email display/policy, phone,
+  avatar metadata, joined date, and validation.
+- **10:15–12:15:** Implement change password, sessions list, revoke one/all other sessions, login
+  history summary, and security feedback.
+- **13:15–15:15:** Implement addresses CRUD/default shipping/billing with ownership and dashboard
+  UI.
+- **15:30–17:30:** Implement tokenized payment-method metadata list/delete only if provider supports
+  it; no raw card data; test ownership and responsive forms.
 
 **Deliverables:**
 
@@ -2312,10 +2490,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement user-scoped orders list with tabs Semua/Aktif/Selesai/Dibatalkan/Refund, stable pagination, and summary fields.
-- **10:15–12:15:** Implement order detail endpoint/UI with snapshots, payment/shipping/status timeline, totals, invoice and product links.
-- **13:15–15:15:** Implement tracking endpoint/UI and buy-again service yang revalidasi product/variant/price/stock sebelum menambah cart.
-- **15:30–17:30:** Tulis ownership/IDOR tests, status display, mixed digital/physical tracking, buy-again warnings, and responsive detail tests.
+- **08:00–10:00:** Implement user-scoped orders list with tabs
+  Semua/Aktif/Selesai/Dibatalkan/Refund, stable pagination, and summary fields.
+- **10:15–12:15:** Implement order detail endpoint/UI with snapshots, payment/shipping/status
+  timeline, totals, invoice and product links.
+- **13:15–15:15:** Implement tracking endpoint/UI and buy-again service yang revalidasi
+  product/variant/price/stock sebelum menambah cart.
+- **15:30–17:30:** Tulis ownership/IDOR tests, status display, mixed digital/physical tracking,
+  buy-again warnings, and responsive detail tests.
 
 **Deliverables:**
 
@@ -2359,10 +2541,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement /history default per_page=5 dengan status/year/start_date/end_date, total transactions/nominal/completed/refund summary.
-- **10:15–12:15:** Bangun history UI, filter URL state, IDR/time formatting id-ID Asia/Jakarta, buy-again, review, and invoice actions.
-- **13:15–15:15:** Implement invoices list/detail/download authorization dan signed/streamed private file access.
-- **15:30–17:30:** Implement digital entitlements/download list, expiry/download-count checks, secure download, and tests for ownership/tampering.
+- **08:00–10:00:** Implement /history default per_page=5 dengan status/year/start_date/end_date,
+  total transactions/nominal/completed/refund summary.
+- **10:15–12:15:** Bangun history UI, filter URL state, IDR/time formatting id-ID Asia/Jakarta,
+  buy-again, review, and invoice actions.
+- **13:15–15:15:** Implement invoices list/detail/download authorization dan signed/streamed private
+  file access.
+- **15:30–17:30:** Implement digital entitlements/download list, expiry/download-count checks,
+  secure download, and tests for ownership/tampering.
 
 **Deliverables:**
 
@@ -2410,10 +2596,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Bangun notification center list/read/read-all/unread badge dan SSE listener dengan reconnect, REST refresh, and goey-toast for live events.
-- **10:15–12:15:** Bangun account wishlist page dengan stock/price projection, remove/add-cart/product links.
-- **13:15–15:15:** Implement eligible verified-purchase reviews list/create/edit/delete policy dan settings profile/security/notification/privacy shells.
-- **15:30–17:30:** Jalankan dashboard tests, accessibility/mobile audit, build, dan tulis Dashboard Gate report.
+- **08:00–10:00:** Bangun notification center list/read/read-all/unread badge dan SSE listener
+  dengan reconnect, REST refresh, and goey-toast for live events.
+- **10:15–12:15:** Bangun account wishlist page dengan stock/price projection,
+  remove/add-cart/product links.
+- **13:15–15:15:** Implement eligible verified-purchase reviews list/create/edit/delete policy dan
+  settings profile/security/notification/privacy shells.
+- **15:30–17:30:** Jalankan dashboard tests, accessibility/mobile audit, build, dan tulis Dashboard
+  Gate report.
 
 **Deliverables:**
 
@@ -2448,7 +2638,6 @@ deno task quality
 
 ---
 
-
 ---
 
 # Minggu 9 — Returns, support, admin operations, tracking
@@ -2456,7 +2645,8 @@ deno task quality
 ## Arsitektur yang tidak boleh diubah
 
 - `starsuperscare.net`: landing dan halaman informasi publik.
-- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest wishlist.
+- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest
+  wishlist.
 - `auth.starsuperscare.net`: login, signup, verifikasi, aktivasi, forgot/reset, dan logout.
 - `dashboard.starsuperscare.net`: area client setelah login.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
@@ -2465,7 +2655,8 @@ deno task quality
 - `assets.starsuperscare.net`: target aset publik/CDN bila dipakai.
 - `apps/worker`: proses internal; tidak mempunyai subdomain publik.
 
-Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan `apps/worker` melalui `packages/database`.
+Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan
+`apps/worker` melalui `packages/database`.
 
 ## Hari 41 — Returns dan refunds end-to-end
 
@@ -2479,10 +2670,14 @@ Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses o
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement return eligibility policy by order item/status/window, create request, reason, quantity, evidence metadata, communication history.
-- **10:15–12:15:** Implement dashboard returns/refunds list/detail/form/upload flow dan user ownership.
-- **13:15–15:15:** Implement admin review/approve/reject/receive/refund actions dengan permission, provider refund adapter, audit, and idempotency.
-- **15:30–17:30:** Update finalized refund to refunded_sold/net_sold and optional restock decision; test partial/full/duplicate/refund-failure cases.
+- **08:00–10:00:** Implement return eligibility policy by order item/status/window, create request,
+  reason, quantity, evidence metadata, communication history.
+- **10:15–12:15:** Implement dashboard returns/refunds list/detail/form/upload flow dan user
+  ownership.
+- **13:15–15:15:** Implement admin review/approve/reject/receive/refund actions dengan permission,
+  provider refund adapter, audit, and idempotency.
+- **15:30–17:30:** Update finalized refund to refunded_sold/net_sold and optional restock decision;
+  test partial/full/duplicate/refund-failure cases.
 
 **Deliverables:**
 
@@ -2528,9 +2723,12 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement public/account FAQ read model and support ticket create/list/detail with category, order link validation, priority/status, and ownership.
-- **10:15–12:15:** Implement ticket message thread and private attachment upload/download with MIME/size/authorization rules.
-- **13:15–15:15:** Bangun dashboard support UI dan admin queue/detail/reply/assign/status workflow dengan notifications/outbox.
+- **08:00–10:00:** Implement public/account FAQ read model and support ticket create/list/detail
+  with category, order link validation, priority/status, and ownership.
+- **10:15–12:15:** Implement ticket message thread and private attachment upload/download with
+  MIME/size/authorization rules.
+- **13:15–15:15:** Bangun dashboard support UI dan admin queue/detail/reply/assign/status workflow
+  dengan notifications/outbox.
 - **15:30–17:30:** Tulis IDOR, attachment, spam/rate-limit, closed-ticket, and notification tests.
 
 **Deliverables:**
@@ -2578,10 +2776,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement admin order list/detail filters, status timeline, customer snapshot, items, totals, payment, shipment, invoice, and support links.
-- **10:15–12:15:** Implement permitted operations: mark processing, attach shipment, cancel rules, resend invoice, retry job, without editing immutable financial snapshot arbitrarily.
-- **13:15–15:15:** Implement payment events/invoice/customer list/detail with least-privilege data masking and no password/session secret exposure.
-- **15:30–17:30:** Bangun admin UI, audit all state changes, and authorization/status-transition tests.
+- **08:00–10:00:** Implement admin order list/detail filters, status timeline, customer snapshot,
+  items, totals, payment, shipment, invoice, and support links.
+- **10:15–12:15:** Implement permitted operations: mark processing, attach shipment, cancel rules,
+  resend invoice, retry job, without editing immutable financial snapshot arbitrarily.
+- **13:15–15:15:** Implement payment events/invoice/customer list/detail with least-privilege data
+  masking and no password/session secret exposure.
+- **15:30–17:30:** Bangun admin UI, audit all state changes, and authorization/status-transition
+  tests.
 
 **Deliverables:**
 
@@ -2627,10 +2829,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement review moderation queue with publish/reject policy, reason, audit, and aggregate recalculation.
-- **10:15–12:15:** Complete admin catalog/inventory operations including low stock, movement history, product status, and bulk action safeguards.
-- **13:15–15:15:** Build operational dashboard cards for orders/payments/outbox/email/low-stock using bounded queries and permission-aware metrics.
-- **15:30–17:30:** Build audit log viewer with filters/redaction, test admin boundaries, and responsive admin build.
+- **08:00–10:00:** Implement review moderation queue with publish/reject policy, reason, audit, and
+  aggregate recalculation.
+- **10:15–12:15:** Complete admin catalog/inventory operations including low stock, movement
+  history, product status, and bulk action safeguards.
+- **13:15–15:15:** Build operational dashboard cards for orders/payments/outbox/email/low-stock
+  using bounded queries and permission-aware metrics.
+- **15:30–17:30:** Build audit log viewer with filters/redaction, test admin boundaries, and
+  responsive admin build.
 
 **Deliverables:**
 
@@ -2677,10 +2883,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement opaque public tracking token issue/revoke/expiry and endpoint projection that exposes only safe shipment/order fields.
-- **10:15–12:15:** Implement shipment provider adapter/webhook or deterministic mock, unique event handling, timeline ordering, and order notification outbox.
-- **13:15–15:15:** Bangun tracking app with token route, invalid/expired/not-found states, timeline, estimated delivery, and no account PII.
-- **15:30–17:30:** Run operations integration tests, security review tracking enumeration, build admin/dashboard/tracking, and write Operations Gate report.
+- **08:00–10:00:** Implement opaque public tracking token issue/revoke/expiry and endpoint
+  projection that exposes only safe shipment/order fields.
+- **10:15–12:15:** Implement shipment provider adapter/webhook or deterministic mock, unique event
+  handling, timeline ordering, and order notification outbox.
+- **13:15–15:15:** Bangun tracking app with token route, invalid/expired/not-found states, timeline,
+  estimated delivery, and no account PII.
+- **15:30–17:30:** Run operations integration tests, security review tracking enumeration, build
+  admin/dashboard/tracking, and write Operations Gate report.
 
 **Deliverables:**
 
@@ -2712,12 +2922,12 @@ deno task quality
 
 **External gate:**
 
-- Real courier integration dapat mengganti mock adapter setelah akun provider dan webhook secret tersedia.
+- Real courier integration dapat mengganti mock adapter setelah akun provider dan webhook secret
+  tersedia.
 
 **Prompt siap-tempel:** `../prompts/DAY-45.md`
 
 ---
-
 
 ---
 
@@ -2726,7 +2936,8 @@ deno task quality
 ## Arsitektur yang tidak boleh diubah
 
 - `starsuperscare.net`: landing dan halaman informasi publik.
-- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest wishlist.
+- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest
+  wishlist.
 - `auth.starsuperscare.net`: login, signup, verifikasi, aktivasi, forgot/reset, dan logout.
 - `dashboard.starsuperscare.net`: area client setelah login.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
@@ -2735,7 +2946,8 @@ deno task quality
 - `assets.starsuperscare.net`: target aset publik/CDN bila dipakai.
 - `apps/worker`: proses internal; tidak mempunyai subdomain publik.
 
-Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan `apps/worker` melalui `packages/database`.
+Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan
+`apps/worker` melalui `packages/database`.
 
 ## Hari 46 — Lengkapi unit/integration test, factories, dan coverage gate
 
@@ -2749,10 +2961,15 @@ Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses o
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Audit test coverage by domain and map every critical invariant/status transition to at least one test.
-- **10:15–12:15:** Lengkapi unit tests price/discount/sold/cart merge/voucher/order total/token expiry/permission/status transition.
-- **13:15–15:15:** Lengkapi integration tests auth/catalog/cart/reservation/payment/refund/outbox/invoice/notification/support menggunakan isolated test DB/branch.
-- **15:30–17:30:** Stabilkan factories, time/random/provider fakes, parallelization policy, coverage report, and fail threshold.
+- **08:00–10:00:** Audit test coverage by domain and map every critical invariant/status transition
+  to at least one test.
+- **10:15–12:15:** Lengkapi unit tests price/discount/sold/cart merge/voucher/order total/token
+  expiry/permission/status transition.
+- **13:15–15:15:** Lengkapi integration tests
+  auth/catalog/cart/reservation/payment/refund/outbox/invoice/notification/support menggunakan
+  isolated test DB/branch.
+- **15:30–17:30:** Stabilkan factories, time/random/provider fakes, parallelization policy, coverage
+  report, and fail threshold.
 
 **Deliverables:**
 
@@ -2799,10 +3016,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Set up E2E runner and isolated environment; seed deterministic user/products/payment mock and launch all required apps.
-- **10:15–12:15:** Automate guest product→cart→checkout→paid→invoice/account activation→login→dashboard order journey.
-- **13:15–15:15:** Automate signup/login/recovery, cart merge, wishlist, history pagination, notification reconnect, return, support, admin operations, and public tracking.
-- **15:30–17:30:** Run accessibility keyboard/focus/labels/contrast checks and desktop/mobile viewport suite; capture artifacts on failure.
+- **08:00–10:00:** Set up E2E runner and isolated environment; seed deterministic
+  user/products/payment mock and launch all required apps.
+- **10:15–12:15:** Automate guest product→cart→checkout→paid→invoice/account
+  activation→login→dashboard order journey.
+- **13:15–15:15:** Automate signup/login/recovery, cart merge, wishlist, history pagination,
+  notification reconnect, return, support, admin operations, and public tracking.
+- **15:30–17:30:** Run accessibility keyboard/focus/labels/contrast checks and desktop/mobile
+  viewport suite; capture artifacts on failure.
 
 **Deliverables:**
 
@@ -2849,10 +3070,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Threat-model auth/payment/upload/IDOR/webhook/SSE/tracking/admin; remediate high risks, headers, CSRF, CORS, rate limit, validation, and authorization.
-- **10:15–12:15:** Audit dependency/secrets/log redaction, cookie flags, token handling, upload controls, CSP, and production error responses.
-- **13:15–15:15:** Implement structured logs, health/readiness, metrics/alerts for errors, latency, webhook failures, email failures, outbox backlog, and stock anomalies.
-- **15:30–17:30:** Document and rehearse Neon backup/restore or branch-based recovery, migration rollback/forward, incident response, and provider outage runbooks.
+- **08:00–10:00:** Threat-model auth/payment/upload/IDOR/webhook/SSE/tracking/admin; remediate high
+  risks, headers, CSRF, CORS, rate limit, validation, and authorization.
+- **10:15–12:15:** Audit dependency/secrets/log redaction, cookie flags, token handling, upload
+  controls, CSP, and production error responses.
+- **13:15–15:15:** Implement structured logs, health/readiness, metrics/alerts for errors, latency,
+  webhook failures, email failures, outbox backlog, and stock anomalies.
+- **15:30–17:30:** Document and rehearse Neon backup/restore or branch-based recovery, migration
+  rollback/forward, incident response, and provider outage runbooks.
 
 **Deliverables:**
 
@@ -2900,10 +3125,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Create staging environment matrix, deployment configs for each existing app, secret injection, build commands, and Neon staging branch.
-- **10:15–12:15:** Run migration rehearsal from production-like snapshot, deploy API/worker first then frontends, and verify health/readiness.
-- **13:15–15:15:** Configure only documented DNS hosts, HTTPS, CORS allowlist, API host-only secure session cookie, CSP, object storage, payment/email/shipping webhooks.
-- **15:30–17:30:** Run staging smoke/E2E/UAT, capture defects, fix release blockers, freeze release candidate, and document rollback.
+- **08:00–10:00:** Create staging environment matrix, deployment configs for each existing app,
+  secret injection, build commands, and Neon staging branch.
+- **10:15–12:15:** Run migration rehearsal from production-like snapshot, deploy API/worker first
+  then frontends, and verify health/readiness.
+- **13:15–15:15:** Configure only documented DNS hosts, HTTPS, CORS allowlist, API host-only secure
+  session cookie, CSP, object storage, payment/email/shipping webhooks.
+- **15:30–17:30:** Run staging smoke/E2E/UAT, capture defects, fix release blockers, freeze release
+  candidate, and document rollback.
 
 **Deliverables:**
 
@@ -2935,7 +3164,8 @@ deno task quality
 
 **External gate:**
 
-- Deployment platform, DNS access, Neon staging, email/payment/storage/shipping sandbox credentials diperlukan untuk UAT penuh.
+- Deployment platform, DNS access, Neon staging, email/payment/storage/shipping sandbox credentials
+  diperlukan untuk UAT penuh.
 
 **Prompt siap-tempel:** `../prompts/DAY-49.md`
 
@@ -2953,10 +3183,15 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Review release diff, dependency lock, secrets, database migration, backup/restore point, feature flags, provider production settings, and change approval.
-- **10:15–12:15:** Run production migration with logs, deploy API and worker, verify health, then deploy storefront/auth/dashboard/admin/tracking and public site as applicable.
-- **13:15–15:15:** Run production smoke: login, products, cart, provider-approved controlled payment verification, webhook, invoice, email, activation, dashboard, admin, tracking, notification. Jangan memakai sandbox credential pada production.
-- **15:30–17:30:** Monitor errors/latency/outbox/webhooks/email, execute rollback if thresholds breached, finalize release notes, handover docs, and 24-hour observation checklist.
+- **08:00–10:00:** Review release diff, dependency lock, secrets, database migration, backup/restore
+  point, feature flags, provider production settings, and change approval.
+- **10:15–12:15:** Run production migration with logs, deploy API and worker, verify health, then
+  deploy storefront/auth/dashboard/admin/tracking and public site as applicable.
+- **13:15–15:15:** Run production smoke: login, products, cart, provider-approved controlled payment
+  verification, webhook, invoice, email, activation, dashboard, admin, tracking, notification.
+  Jangan memakai sandbox credential pada production.
+- **15:30–17:30:** Monitor errors/latency/outbox/webhooks/email, execute rollback if thresholds
+  breached, finalize release notes, handover docs, and 24-hour observation checklist.
 
 **Deliverables:**
 
@@ -2988,11 +3223,11 @@ deno task test:smoke:production
 
 **External gate:**
 
-- Production credentials dan explicit change approval diperlukan. Jangan pernah menguji transaksi riil tanpa prosedur pembayaran aman yang disetujui.
+- Production credentials dan explicit change approval diperlukan. Jangan pernah menguji transaksi
+  riil tanpa prosedur pembayaran aman yang disetujui.
 
 **Prompt siap-tempel:** `../prompts/DAY-50.md`
 
 ---
-
 
 ---

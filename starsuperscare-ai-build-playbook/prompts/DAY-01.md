@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 01/50 — AUDIT REPOSITORY DAN KUNCI ARSITEKTUR
 PHASE: Fondasi repository
 
@@ -73,7 +73,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-01-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

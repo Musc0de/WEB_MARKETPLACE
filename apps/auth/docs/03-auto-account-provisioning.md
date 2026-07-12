@@ -2,7 +2,8 @@
 
 ## Tujuan
 
-Guest yang berhasil membayar otomatis memiliki akun client untuk melihat order dan invoice tanpa mengirim password plaintext.
+Guest yang berhasil membayar otomatis memiliki akun client untuk melihat order dan invoice tanpa
+mengirim password plaintext.
 
 ## Data checkout minimum
 

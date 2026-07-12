@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 20/50 — SOLD/RATING STATISTICS, REVIEW READ MODEL, DAN CATALOG GATE
 PHASE: Catalog dan Admin
 
@@ -70,7 +70,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-20-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

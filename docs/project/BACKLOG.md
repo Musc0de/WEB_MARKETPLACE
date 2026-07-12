@@ -2,7 +2,8 @@
 
 ## MVP Goals
 
-The Minimum Viable Product (MVP) focuses on launching a secure, end-to-end purchasing flow and user management system.
+The Minimum Viable Product (MVP) focuses on launching a secure, end-to-end purchasing flow and user
+management system.
 
 1. **Identity and Access Management (`auth`)**
    - User registration (username + password)
@@ -33,14 +34,18 @@ The Minimum Viable Product (MVP) focuses on launching a secure, end-to-end purch
 ## Non-Goals for MVP
 
 To ensure timely delivery, the following features are strictly excluded from the initial release:
+
 - **Complex Event Streaming:** No Kafka. The MVP will rely on PostgreSQL transactional outbox.
-- **Advanced Analytics:** Basic sales tracking only (`net_sold`). No machine learning recommendations or complex BI dashboards.
+- **Advanced Analytics:** Basic sales tracking only (`net_sold`). No machine learning
+  recommendations or complex BI dashboards.
 - **Multi-tenant / Multi-vendor:** The marketplace is single-vendor for the MVP.
-- **Mobile Apps:** Development is exclusively focused on responsive web views. No native iOS/Android development.
+- **Mobile Apps:** Development is exclusively focused on responsive web views. No native iOS/Android
+  development.
 - **Direct Database Access from Client:** Strictly prohibited by architecture rules.
 
 ## Branch and Commit Conventions
 
 - Changes to architecture rules must be preceded by a new ADR.
-- Commits should follow conventional commits format: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`.
+- Commits should follow conventional commits format: `feat:`, `fix:`, `chore:`, `docs:`,
+  `refactor:`.
 - All features must pass the daily acceptance criteria before being marked as done.

@@ -2,16 +2,16 @@
 
 ## Domain publik
 
-| Domain | Fungsi |
-|---|---|
-| `starsuperscare.net` | Landing, tentang, kontak, kebijakan |
-| `shop.starsuperscare.net` | Produk, cart, checkout |
-| `auth.starsuperscare.net` | Login, signup, aktivasi, recovery |
-| `dashboard.starsuperscare.net` | Area client |
-| `admin.starsuperscare.net` | Area admin |
-| `api.starsuperscare.net` | API v1 dan SSE |
-| `assets.starsuperscare.net` | Asset dan file publik |
-| `tracking.starsuperscare.net` | Tracking publik berbasis token |
+| Domain                         | Fungsi                              |
+| ------------------------------ | ----------------------------------- |
+| `starsuperscare.net`           | Landing, tentang, kontak, kebijakan |
+| `shop.starsuperscare.net`      | Produk, cart, checkout              |
+| `auth.starsuperscare.net`      | Login, signup, aktivasi, recovery   |
+| `dashboard.starsuperscare.net` | Area client                         |
+| `admin.starsuperscare.net`     | Area admin                          |
+| `api.starsuperscare.net`       | API v1 dan SSE                      |
+| `assets.starsuperscare.net`    | Asset dan file publik               |
+| `tracking.starsuperscare.net`  | Tracking publik berbasis token      |
 
 ## Route canonical
 

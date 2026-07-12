@@ -3,7 +3,8 @@
 ## Arsitektur yang tidak boleh diubah
 
 - `starsuperscare.net`: landing dan halaman informasi publik.
-- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest wishlist.
+- `shop.starsuperscare.net`: products, product detail, category/search, cart, checkout, dan guest
+  wishlist.
 - `auth.starsuperscare.net`: login, signup, verifikasi, aktivasi, forgot/reset, dan logout.
 - `dashboard.starsuperscare.net`: area client setelah login.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
@@ -12,7 +13,8 @@
 - `assets.starsuperscare.net`: target aset publik/CDN bila dipakai.
 - `apps/worker`: proses internal; tidak mempunyai subdomain publik.
 
-Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan `apps/worker` melalui `packages/database`.
+Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses oleh `apps/api` dan
+`apps/worker` melalui `packages/database`.
 
 ## Hari 31 — Transactional outbox worker, locking, retry, dan cleanup jobs
 
@@ -26,10 +28,14 @@ Cart dan checkout tidak dipindahkan ke dashboard. Database hanya boleh diakses o
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement outbox poller dengan claim/lock aman, batch size, available_at, SKIP LOCKED atau strategi setara, correlation ID, dan graceful shutdown.
-- **10:15–12:15:** Implement handler registry, idempotency/dedupe, exponential backoff with cap/jitter, max attempts, failed state/dead-letter semantics.
-- **13:15–15:15:** Implement scheduled cleanup untuk expired session/token, release expired inventory reservation, dan stale guest cart policy.
-- **15:30–17:30:** Tulis worker concurrency/retry/crash-recovery tests serta operational commands untuk inspect/retry failed job.
+- **08:00–10:00:** Implement outbox poller dengan claim/lock aman, batch size, available_at, SKIP
+  LOCKED atau strategi setara, correlation ID, dan graceful shutdown.
+- **10:15–12:15:** Implement handler registry, idempotency/dedupe, exponential backoff with
+  cap/jitter, max attempts, failed state/dead-letter semantics.
+- **13:15–15:15:** Implement scheduled cleanup untuk expired session/token, release expired
+  inventory reservation, dan stale guest cart policy.
+- **15:30–17:30:** Tulis worker concurrency/retry/crash-recovery tests serta operational commands
+  untuk inspect/retry failed job.
 
 **Deliverables:**
 
@@ -75,10 +81,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement invoice number, immutable invoice data snapshot, PDF renderer, locale id-ID, integer amounts, and safe file naming.
-- **10:15–12:15:** Upload invoice ke private object storage, simpan metadata, dan buat authenticated/signed download path dengan expiry.
-- **13:15–15:15:** Implement EmailProvider interface, invoice/order/verification/reset/activation templates, delivery records, retry categories, and provider message ID.
-- **15:30–17:30:** Hubungkan paid outbox ke invoice generation dan email; test PDF metadata, template rendering, provider failure/retry, and no public invoice leakage.
+- **08:00–10:00:** Implement invoice number, immutable invoice data snapshot, PDF renderer, locale
+  id-ID, integer amounts, and safe file naming.
+- **10:15–12:15:** Upload invoice ke private object storage, simpan metadata, dan buat
+  authenticated/signed download path dengan expiry.
+- **13:15–15:15:** Implement EmailProvider interface, invoice/order/verification/reset/activation
+  templates, delivery records, retry categories, and provider message ID.
+- **15:30–17:30:** Hubungkan paid outbox ke invoice generation dan email; test PDF metadata,
+  template rendering, provider failure/retry, and no public invoice leakage.
 
 **Deliverables:**
 
@@ -112,7 +122,8 @@ deno task quality
 
 **External gate:**
 
-- Email transactional provider dan object storage credentials diperlukan untuk delivery nyata. Gunakan fake provider dalam test dan development tanpa mengklaim email terkirim.
+- Email transactional provider dan object storage credentials diperlukan untuk delivery nyata.
+  Gunakan fake provider dalam test dan development tanpa mengklaim email terkirim.
 
 **Prompt siap-tempel:** `../prompts/DAY-32.md`
 
@@ -129,10 +140,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement paid-order handler: bila guest email belum memiliki user, buat pending_activation user/profile dan activation token dalam transaksi idempotent.
-- **10:15–12:15:** Bila email sudah terkait akun, jangan auto-link hanya dari input guest; buat secure claim/notification flow yang memverifikasi kepemilikan.
-- **13:15–15:15:** Hubungkan activation UI/API ke pending order claim, username selection, password creation, verified email, session issue, dan redirect dashboard order.
-- **15:30–17:30:** Tulis duplicate paid event, existing account, expired token, conflicting username, replay, and order-ownership tests.
+- **08:00–10:00:** Implement paid-order handler: bila guest email belum memiliki user, buat
+  pending_activation user/profile dan activation token dalam transaksi idempotent.
+- **10:15–12:15:** Bila email sudah terkait akun, jangan auto-link hanya dari input guest; buat
+  secure claim/notification flow yang memverifikasi kepemilikan.
+- **13:15–15:15:** Hubungkan activation UI/API ke pending order claim, username selection, password
+  creation, verified email, session issue, dan redirect dashboard order.
+- **15:30–17:30:** Tulis duplicate paid event, existing account, expired token, conflicting
+  username, replay, and order-ownership tests.
 
 **Deliverables:**
 
@@ -177,10 +192,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Implement notification creation handlers dari business outbox dengan dedupe_key, user ownership, type, data payload version, dan created_at.
-- **10:15–12:15:** Implement list/pagination/unread-count/read/read-all endpoints; status hanya derived dari read_at.
-- **13:15–15:15:** Implement authenticated SSE stream dengan heartbeat, reconnect guidance, bounded resources, last event cursor/refresh strategy, dan authorization.
-- **15:30–17:30:** Tulis SSE/read tests termasuk disconnect/reconnect, unauthorized stream, duplicate events, and database-source-of-truth behavior.
+- **08:00–10:00:** Implement notification creation handlers dari business outbox dengan dedupe_key,
+  user ownership, type, data payload version, dan created_at.
+- **10:15–12:15:** Implement list/pagination/unread-count/read/read-all endpoints; status hanya
+  derived dari read_at.
+- **13:15–15:15:** Implement authenticated SSE stream dengan heartbeat, reconnect guidance, bounded
+  resources, last event cursor/refresh strategy, dan authorization.
+- **15:30–17:30:** Tulis SSE/read tests termasuk disconnect/reconnect, unauthorized stream,
+  duplicate events, and database-source-of-truth behavior.
 
 **Deliverables:**
 
@@ -226,10 +245,14 @@ deno task quality
 
 **Jadwal per jam:**
 
-- **08:00–10:00:** Buat integration fixture end-to-end: product aktif, guest cart, checkout, order pending, verified payment, stock commit, stats, outbox, invoice, email record, account pending.
-- **10:15–12:15:** Lanjutkan aktivasi, login, session, order ownership, notification, invoice access, dan digital entitlement bila item digital.
-- **13:15–15:15:** Tambahkan failure matrix: price/stock change, expired reservation, duplicate/out-of-order webhook, worker crash/retry, email fail, expired activation.
-- **15:30–17:30:** Jalankan seluruh integration suite dari database test bersih, perbaiki flakiness, dan tulis Integration Gate report.
+- **08:00–10:00:** Buat integration fixture end-to-end: product aktif, guest cart, checkout, order
+  pending, verified payment, stock commit, stats, outbox, invoice, email record, account pending.
+- **10:15–12:15:** Lanjutkan aktivasi, login, session, order ownership, notification, invoice
+  access, dan digital entitlement bila item digital.
+- **13:15–15:15:** Tambahkan failure matrix: price/stock change, expired reservation,
+  duplicate/out-of-order webhook, worker crash/retry, email fail, expired activation.
+- **15:30–17:30:** Jalankan seluruh integration suite dari database test bersih, perbaiki flakiness,
+  dan tulis Integration Gate report.
 
 **Deliverables:**
 

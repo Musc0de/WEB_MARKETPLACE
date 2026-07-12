@@ -2,7 +2,7 @@
 
 Tempel `00-MASTER-PROMPT.md` satu kali pada project instruction, kemudian tempel blok berikut.
 
-~~~text
+```text
 KERJAKAN DAY 05/50 — SHARED PACKAGES, CI, DAN QUALITY GATE
 PHASE: Fondasi repository
 
@@ -75,7 +75,7 @@ RESPONS AKHIR ANDA HARUS RINGKAS DAN FAKTUAL:
 - Test/build commands dan hasil nyata
 - Blocker yang belum selesai
 - Path DAY-05-REPORT.md
-~~~
+```
 
 ## Checklist operator
 

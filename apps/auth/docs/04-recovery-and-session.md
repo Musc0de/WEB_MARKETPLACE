@@ -15,8 +15,10 @@
 - Database menyimpan hash token, bukan raw token.
 - Cookie contoh: `__Secure-ssc_session`.
 - Attribute: `Secure`, `HttpOnly`, `SameSite=Lax`, `Path=/`.
-- Untuk SSO sederhana antar-subdomain gunakan domain cookie `.starsuperscare.net` dan lindungi seluruh subdomain.
-- Opsi lebih kuat untuk fase lanjut: central authorization-code exchange dan host-only cookie per aplikasi.
+- Untuk SSO sederhana antar-subdomain gunakan domain cookie `.starsuperscare.net` dan lindungi
+  seluruh subdomain.
+- Opsi lebih kuat untuk fase lanjut: central authorization-code exchange dan host-only cookie per
+  aplikasi.
 
 ## Session lifecycle
 

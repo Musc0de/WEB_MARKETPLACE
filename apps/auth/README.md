@@ -16,7 +16,8 @@
 
 ## Identitas login
 
-Client login menggunakan `username + password`. Email tetap wajib untuk invoice, aktivasi, recovery, dan notifikasi.
+Client login menggunakan `username + password`. Email tetap wajib untuk invoice, aktivasi, recovery,
+dan notifikasi.
 
 ## Status akun
 
