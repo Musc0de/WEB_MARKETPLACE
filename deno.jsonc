@@ -1,0 +1,44 @@
+{
+  "workspace": [
+    "apps/*",
+    "packages/*"
+  ],
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "singleQuote": true,
+    "semiColons": true
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"],
+      "include": ["ban-untagged-todo"],
+      "exclude": ["no-explicit-any"]
+    }
+  },
+  "tasks": {
+    "check": "deno fmt --check && deno lint && deno check apps/*/src/**/*.ts apps/*/src/**/*.tsx",
+    "test": "deno test -A",
+    "format": "deno fmt",
+    "lint": "deno lint",
+    "dev:api": "deno task --cwd apps/api dev",
+    "dev:storefront": "deno task --cwd apps/storefront dev",
+    "dev:dashboard": "deno task --cwd apps/dashboard dev",
+    "dev:admin": "deno task --cwd apps/admin dev",
+    "dev:auth": "deno task --cwd apps/auth dev",
+    "db:migrate": "deno task --cwd packages/database migrate"
+  },
+  "imports": {
+    // Shared dependencies will be defined here in the future
+  }
+}
