@@ -1,0 +1,1975 @@
+[
+  {
+    "day": 1,
+    "week": 1,
+    "phase": "Fondasi repository",
+    "title": "Audit repository dan kunci arsitektur",
+    "read": [
+      "README.md",
+      "START-HERE.md",
+      "DIRECTORY-TREE.md",
+      "MANIFEST.md",
+      "docs/01-architecture/SUBDOMAINS-AND-ROUTES.md",
+      "docs/13-decisions/DECISIONS.md"
+    ],
+    "blocks": [
+      "Inventaris semua file, status Git, konfigurasi yang sudah ada, dokumen yang saling bertentangan, serta bagian yang masih kosong. Jangan menulis fitur.",
+      "Buat ADR-001 yang mengunci domain, batas aplikasi, alur request, aturan akses database, format uang, zona waktu, dan prinsip akun otomatis.",
+      "Buat baseline backlog, daftar risiko, non-goals MVP, konvensi branch/commit, dan aturan bahwa perubahan arsitektur wajib melalui ADR baru.",
+      "Validasi seluruh route terhadap dokumen sumber, buat laporan hari pertama, dan commit fondasi dokumentasi."
+    ],
+    "deliverables": [
+      "ADR-001 architecture freeze",
+      "Baseline repository audit",
+      "MVP scope dan non-goals",
+      "Daily report Day 01"
+    ],
+    "acceptance": [
+      "Tidak ada subdomain atau aplikasi baru di luar blueprint",
+      "Cart/checkout tetap di storefront",
+      "Frontend tidak mengakses Neon langsung",
+      "Kontradiksi dokumen dicatat, bukan disembunyikan"
+    ],
+    "files": [
+      "docs/decisions/ADR-001-architecture-freeze.md",
+      "docs/14-ai-build-playbook/progress/DAY-01-REPORT.md",
+      "docs/project/BACKLOG.md",
+      "docs/project/RISKS.md"
+    ],
+    "commands": [
+      "git status",
+      "git diff --check"
+    ]
+  },
+  {
+    "day": 2,
+    "week": 1,
+    "phase": "Fondasi repository",
+    "title": "Buat root Deno workspace dan tooling dasar",
+    "read": [
+      "docs/12-roadmap/MVP-ROADMAP.md",
+      "DIRECTORY-TREE.md",
+      "deno.json.example"
+    ],
+    "blocks": [
+      "Buat root deno.jsonc, workspace globs, lockfile policy, import/catalog strategy, formatter, linter, dan strict TypeScript policy.",
+      "Buat konfigurasi minimal untuk setiap apps/* dan packages/* yang tercantum pada blueprint; jangan mengisi fitur bisnis.",
+      "Tambahkan root tasks untuk dev, format, lint, check, test, build, dan quality; tambahkan .editorconfig, .gitignore, serta VS Code settings.",
+      "Instal/cache dependency yang sudah dipilih, jalankan quality baseline, perbaiki error, dan dokumentasikan cara menjalankan workspace."
+    ],
+    "deliverables": [
+      "Root Deno workspace valid",
+      "Task runner konsisten",
+      "Editor dan lockfile policy",
+      "Workspace bootstrap documentation"
+    ],
+    "acceptance": [
+      "Semua member dikenali workspace",
+      "Deno fmt dan lint dapat dijalankan dari root",
+      "Tidak ada secret nyata masuk repository",
+      "Task names terdokumentasi"
+    ],
+    "files": [
+      "deno.jsonc",
+      "deno.lock",
+      ".editorconfig",
+      ".gitignore",
+      ".vscode/settings.json",
+      "apps/*/deno.json",
+      "packages/*/deno.json"
+    ],
+    "commands": [
+      "deno --version",
+      "deno install",
+      "deno fmt --check",
+      "deno lint"
+    ]
+  },
+  {
+    "day": 3,
+    "week": 1,
+    "phase": "Fondasi repository",
+    "title": "Scaffold lima aplikasi React + Vite",
+    "read": [
+      "DIRECTORY-TREE.md",
+      "apps/storefront/README.md",
+      "apps/auth/README.md",
+      "apps/dashboard/README.md",
+      "apps/admin/README.md",
+      "docs/01-architecture/SUBDOMAINS-AND-ROUTES.md"
+    ],
+    "blocks": [
+      "Scaffold storefront, auth, dashboard, admin, dan tracking sebagai React + Vite + TypeScript tanpa mengubah nama folder blueprint.",
+      "Tambahkan router, App shell minimal, not-found page, error boundary, loading state, dan konfigurasi base URL per aplikasi.",
+      "Hubungkan packages/ui dan packages/config secara minimal; tampilkan halaman identitas aplikasi agar setiap dev server mudah dibedakan.",
+      "Jalankan type-check dan build untuk kelima aplikasi, perbaiki masalah dependency/workspace, lalu tulis petunjuk dev."
+    ],
+    "deliverables": [
+      "Lima frontend dapat berjalan",
+      "Routing shell",
+      "Error boundary dan 404",
+      "Build frontend baseline"
+    ],
+    "acceptance": [
+      "Tidak ada fitur ditempatkan pada aplikasi yang salah",
+      "Semua app memakai strict TypeScript",
+      "Base API berasal dari env tervalidasi",
+      "Build kelima app berhasil"
+    ],
+    "files": [
+      "apps/storefront/src",
+      "apps/auth/src",
+      "apps/dashboard/src",
+      "apps/admin/src",
+      "apps/tracking/src"
+    ],
+    "commands": [
+      "deno task build:frontends",
+      "deno task check"
+    ]
+  },
+  {
+    "day": 4,
+    "week": 1,
+    "phase": "Fondasi repository",
+    "title": "Scaffold Hono API dan worker internal",
+    "read": [
+      "apps/api/README.md",
+      "docs/04-dashboard/NOTIFICATIONS.md",
+      "docs/05-api/ERROR-CONTRACT.md",
+      "docs/01-architecture/REQUEST-FLOW.md"
+    ],
+    "blocks": [
+      "Buat composition root Hono, route /health dan /ready, version prefix /v1, serta server entrypoint untuk Deno.",
+      "Buat request ID, structured logger, error envelope, not-found handler, dan exception handler tanpa membocorkan stack production.",
+      "Buat worker entrypoint, lifecycle, graceful shutdown, polling interface kosong, dan health logging; worker bukan HTTP app publik.",
+      "Tambahkan unit smoke test API/worker, jalankan lokal, dan dokumentasikan permission Deno minimum."
+    ],
+    "deliverables": [
+      "Hono API baseline",
+      "Worker baseline",
+      "Error contract",
+      "Health/readiness tests"
+    ],
+    "acceptance": [
+      "GET /health memberi respons stabil",
+      "Error contract seragam",
+      "Worker dapat start/stop bersih",
+      "Tidak ada koneksi DB dari frontend"
+    ],
+    "files": [
+      "apps/api/src/main.ts",
+      "apps/api/src/app.ts",
+      "apps/api/src/middleware",
+      "apps/worker/src/main.ts"
+    ],
+    "commands": [
+      "deno task dev:api",
+      "deno task test:api",
+      "deno task check"
+    ]
+  },
+  {
+    "day": 5,
+    "week": 1,
+    "phase": "Fondasi repository",
+    "title": "Shared packages, CI, dan quality gate",
+    "read": [
+      "packages/database/README.md",
+      "packages/auth/README.md",
+      "packages/contracts/README.md",
+      "packages/ui/README.md",
+      "packages/email/README.md",
+      ".env.example",
+      "docs/10-testing/TEST-PLAN.md"
+    ],
+    "blocks": [
+      "Buat export surface minimal untuk config, contracts, database, auth, ui, dan email; hindari circular dependency.",
+      "Buat parser env terpusat dengan schema berbeda untuk frontend, API, worker, dan migration; tambahkan .env.example lengkap tanpa nilai rahasia.",
+      "Buat CI yang menjalankan format, lint, type-check, unit test, build, dan dependency audit sesuai kemampuan repository.",
+      "Jalankan CI-equivalent lokal, bereskan semua error, dokumentasikan dependency graph, dan tandai Foundation Gate."
+    ],
+    "deliverables": [
+      "Shared package skeletons",
+      "Typed environment config",
+      "CI pipeline",
+      "Foundation gate report"
+    ],
+    "acceptance": [
+      "Satu perintah quality berjalan dari root",
+      "Frontend env tidak memuat DATABASE_URL",
+      "Dependency direction terdokumentasi",
+      "CI gagal bila quality gate gagal"
+    ],
+    "files": [
+      "packages/*/mod.ts",
+      "packages/config",
+      ".env.example",
+      ".github/workflows/ci.yml"
+    ],
+    "commands": [
+      "deno task quality",
+      "deno task build"
+    ]
+  },
+  {
+    "day": 6,
+    "week": 2,
+    "phase": "Neon dan schema",
+    "title": "Hubungkan Neon, Drizzle, dan migration tooling",
+    "read": [
+      "docs/06-database/NEON-CONNECTION.md",
+      "packages/database/README.md",
+      "database/migrations/README.md"
+    ],
+    "blocks": [
+      "Siapkan konfigurasi Neon development/staging/production dan dokumentasikan pooled runtime URL versus direct migration URL.",
+      "Implement packages/database client untuk API/worker, Drizzle config untuk migration, serta pencegahan import database dari frontend.",
+      "Buat connection smoke test, transaction helper, UTC timestamp convention, dan integer-IDR helper boundaries.",
+      "Jalankan koneksi development, buat migration kosong pertama, cek secret hygiene, dan tulis panduan branch database."
+    ],
+    "deliverables": [
+      "Neon runtime client",
+      "Drizzle migration config",
+      "DB smoke test",
+      "Environment matrix"
+    ],
+    "acceptance": [
+      "Runtime memakai pooled URL",
+      "Migration memakai direct URL",
+      "SSL diwajibkan",
+      "DATABASE_URL hanya tersedia pada API/worker/migration"
+    ],
+    "files": [
+      "packages/database/src/client.ts",
+      "packages/database/drizzle.config.ts",
+      "packages/database/src/transaction.ts",
+      "scripts/db-smoke.ts"
+    ],
+    "commands": [
+      "deno task db:check",
+      "deno task db:generate",
+      "deno task quality"
+    ],
+    "external": [
+      "Neon project dan connection strings development diperlukan untuk koneksi nyata. Bila belum ada, selesaikan adapter dan gunakan test yang di-skip dengan alasan eksplisit."
+    ]
+  },
+  {
+    "day": 7,
+    "week": 2,
+    "phase": "Neon dan schema",
+    "title": "Implement identity, role, profile, address, dan session schema",
+    "read": [
+      "docs/06-database/SCHEMA.md",
+      "docs/02-auth/LOGIN-SIGNUP-FLOWS.md"
+    ],
+    "blocks": [
+      "Model users, profiles, password credentials, roles, permissions, mappings, dan status lifecycle dengan constraint yang jelas.",
+      "Model sessions, login attempts, verification/reset/activation tokens; simpan token digest, expiry, used/revoked timestamps.",
+      "Model addresses dengan type shipping/billing, primary flags, ownership, dan normalisasi field Indonesia tanpa mengunci provider wilayah.",
+      "Buat migration, schema tests untuk unique/index/FK, factory data, dan review keamanan field sensitif."
+    ],
+    "deliverables": [
+      "Identity schema",
+      "Session/token schema",
+      "RBAC schema",
+      "Address schema dan tests"
+    ],
+    "acceptance": [
+      "Username dan normalized email unik",
+      "Password plaintext tidak memiliki kolom",
+      "Token hanya disimpan sebagai hash/digest",
+      "Session dapat direvoke per perangkat"
+    ],
+    "files": [
+      "packages/database/src/schema/identity.ts",
+      "packages/database/src/schema/rbac.ts",
+      "packages/database/src/schema/addresses.ts",
+      "migrations/*"
+    ],
+    "commands": [
+      "deno task db:generate",
+      "deno task db:migrate",
+      "deno task test:db"
+    ]
+  },
+  {
+    "day": 8,
+    "week": 2,
+    "phase": "Neon dan schema",
+    "title": "Implement catalog, pricing, inventory, dan review schema",
+    "read": [
+      "docs/03-storefront/PRODUCTS.md",
+      "docs/06-database/SCHEMA.md"
+    ],
+    "blocks": [
+      "Model brands, categories bertingkat, products, product-category mapping, product variants, status, type physical/digital, dan SEO fields.",
+      "Model images/assets metadata dan pricing history dengan integer rupiah, compare-at price, effective range, serta constraint non-negatif.",
+      "Model warehouses, inventory levels, reservations, movements ledger, purchase limit, dan concurrency/version field.",
+      "Model rating/review statistics dan product_sales_stats gross/refunded/net; buat migration, index, tests, dan seed sample."
+    ],
+    "deliverables": [
+      "Catalog schema",
+      "Price schema",
+      "Inventory ledger/reservation schema",
+      "Sold/rating stats schema"
+    ],
+    "acceptance": [
+      "Slug dan SKU unik",
+      "Harga/stok tidak negatif",
+      "net_sold dapat direkonsiliasi",
+      "Produk digital tidak diwajibkan memiliki berat/shipping"
+    ],
+    "files": [
+      "packages/database/src/schema/catalog.ts",
+      "packages/database/src/schema/inventory.ts",
+      "packages/database/src/schema/reviews.ts",
+      "migrations/*"
+    ],
+    "commands": [
+      "deno task db:generate",
+      "deno task db:migrate",
+      "deno task test:db"
+    ]
+  },
+  {
+    "day": 9,
+    "week": 2,
+    "phase": "Neon dan schema",
+    "title": "Implement cart, order, payment, invoice, shipment, dan digital schema",
+    "read": [
+      "docs/03-storefront/CART.md",
+      "docs/03-storefront/CHECKOUT.md",
+      "docs/06-database/SCHEMA.md"
+    ],
+    "blocks": [
+      "Model carts/cart_items untuk guest token hash atau user, active-cart uniqueness, selected/save-for-later state, dan price observation.",
+      "Model orders/order_items/order_addresses sebagai immutable snapshot, order number, amount breakdown integer, status transitions, dan idempotency link.",
+      "Model payments/payment_events, provider IDs, invoices, shipments/events, vouchers/redemptions, serta customer payment method token metadata.",
+      "Model digital assets dan entitlements/download limits; buat migration, index, FK policy, dan schema tests."
+    ],
+    "deliverables": [
+      "Cart schema",
+      "Order snapshot schema",
+      "Payment/invoice/shipment schema",
+      "Digital entitlement schema"
+    ],
+    "acceptance": [
+      "Order item tetap terbaca meski produk berubah",
+      "Provider event ID unik",
+      "Tidak ada raw card data",
+      "Guest cart dan account cart dapat dibedakan aman"
+    ],
+    "files": [
+      "packages/database/src/schema/cart.ts",
+      "packages/database/src/schema/orders.ts",
+      "packages/database/src/schema/payments.ts",
+      "packages/database/src/schema/digital.ts"
+    ],
+    "commands": [
+      "deno task db:generate",
+      "deno task db:migrate",
+      "deno task test:db"
+    ]
+  },
+  {
+    "day": 10,
+    "week": 2,
+    "phase": "Neon dan schema",
+    "title": "Implement purnajual, notifikasi, outbox, audit, seed, dan DB gate",
+    "read": [
+      "docs/04-dashboard/NOTIFICATIONS.md",
+      "docs/06-database/SCHEMA.md",
+      "database/migrations/README.md"
+    ],
+    "blocks": [
+      "Model returns, return_items, refunds, support tickets/messages, attachments metadata, dan verified-purchase reviews.",
+      "Model notifications dengan read_at, notification deliveries, outbox events, job attempts, audit logs, serta idempotency keys.",
+      "Buat seed roles/permissions/admin development/category/product/stock; buat data factory dan reset strategy khusus non-production.",
+      "Jalankan migration dari database kosong, seed, schema assertions, dan DB gate report; perbaiki seluruh masalah constraint/index."
+    ],
+    "deliverables": [
+      "Purnajual/support schema",
+      "Notification/outbox schema",
+      "Audit/idempotency schema",
+      "Repeatable migrations and seeds"
+    ],
+    "acceptance": [
+      "Migration fresh database berhasil",
+      "Seed idempotent atau reset-safe",
+      "read/unread hanya bersumber dari read_at",
+      "Outbox siap diproses idempotent"
+    ],
+    "files": [
+      "packages/database/src/schema/aftercare.ts",
+      "packages/database/src/schema/notifications.ts",
+      "packages/database/src/schema/audit.ts",
+      "database/seeds/*"
+    ],
+    "commands": [
+      "deno task db:reset:dev",
+      "deno task db:migrate",
+      "deno task db:seed",
+      "deno task test:db",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 11,
+    "week": 3,
+    "phase": "API dan Auth",
+    "title": "Lengkapi API conventions, validation, CORS, CSRF, rate limit, dan RBAC context",
+    "read": [
+      "docs/05-api/ENDPOINTS.md",
+      "docs/05-api/ERROR-CONTRACT.md",
+      "docs/08-security/SECURITY-CHECKLIST.md"
+    ],
+    "blocks": [
+      "Buat route modules, dependency injection/context, typed success/error response, request parsing, pagination envelope, dan request ID propagation.",
+      "Implement Zod validation middleware, sanitized errors, security headers, explicit CORS origin allowlist, dan credential handling.",
+      "Implement CSRF strategy untuk state-changing cookie-auth requests, rate limiter interface/storage, dan trusted proxy configuration.",
+      "Implement session loader dan RBAC/permission guard skeleton; tulis middleware tests termasuk origin, CSRF, dan error cases."
+    ],
+    "deliverables": [
+      "API conventions",
+      "Validation/error middleware",
+      "CORS/CSRF/rate limit",
+      "Session/RBAC context"
+    ],
+    "acceptance": [
+      "Origin wildcard tidak dipakai dengan credentials",
+      "State-changing request terlindungi CSRF",
+      "Validation error konsisten",
+      "Permission default-deny"
+    ],
+    "files": [
+      "apps/api/src/middleware",
+      "apps/api/src/http",
+      "packages/contracts/src/http.ts",
+      "apps/api/tests/middleware_test.ts"
+    ],
+    "commands": [
+      "deno task test:api",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 12,
+    "week": 3,
+    "phase": "API dan Auth",
+    "title": "Signup, password hashing, dan verifikasi email",
+    "read": [
+      "docs/02-auth/LOGIN-SIGNUP-FLOWS.md",
+      "docs/05-api/ENDPOINTS.md",
+      "packages/auth/README.md"
+    ],
+    "blocks": [
+      "Implement password policy dan Argon2id wrapper yang dapat diuji, constant-time comparison semantics, serta secure random token helpers.",
+      "Implement POST /v1/auth/signup dengan transaction user/profile/credential, normalized identity, status pending_verification, dan audit event.",
+      "Implement verification token issuance, resend throttling, POST /verify-email, token rotation/revocation, dan outbox email event.",
+      "Tulis unit/integration tests untuk duplicate username/email, invalid input, token expiry/reuse, rollback, dan generic responses."
+    ],
+    "deliverables": [
+      "Secure password module",
+      "Signup API",
+      "Email verification API",
+      "Auth tests"
+    ],
+    "acceptance": [
+      "Password tidak pernah dilog",
+      "Token plaintext hanya tampil saat dibuat untuk dikirim",
+      "Signup transactional",
+      "Verification token one-time"
+    ],
+    "files": [
+      "packages/auth/src/password.ts",
+      "packages/auth/src/tokens.ts",
+      "apps/api/src/modules/auth/signup.ts",
+      "apps/api/src/routes/v1/auth.ts"
+    ],
+    "commands": [
+      "deno task test:auth",
+      "deno task test:api",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 13,
+    "week": 3,
+    "phase": "API dan Auth",
+    "title": "Login username/password, session, logout, dan audit",
+    "read": [
+      "docs/02-auth/LOGIN-SIGNUP-FLOWS.md",
+      "docs/08-security/SECURITY-CHECKLIST.md",
+      "packages/auth/README.md"
+    ],
+    "blocks": [
+      "Implement POST /auth/login dengan username normalized, generic credential error, throttling, account-status checks, dan audit login.",
+      "Implement opaque session ID, database digest, expiry/idle timeout, rotation, Secure HttpOnly host-only cookie pada API, dan GET /session.",
+      "Implement logout current, logout-all, session listing/revocation primitives, serta cleanup query untuk worker.",
+      "Tulis tests untuk valid/invalid login, lock/rate limit, cookie flags, session rotation, revoked/expired session, dan cross-origin credential flow."
+    ],
+    "deliverables": [
+      "Login API",
+      "Session lifecycle",
+      "Logout/logout-all",
+      "Login audit and tests"
+    ],
+    "acceptance": [
+      "Cookie tidak dapat dibaca JavaScript",
+      "Session ID tidak disimpan plaintext",
+      "Pesan login tidak melakukan user enumeration",
+      "Revoked session langsung ditolak"
+    ],
+    "files": [
+      "packages/auth/src/session.ts",
+      "apps/api/src/modules/auth/login.ts",
+      "apps/api/src/modules/auth/session.ts",
+      "apps/api/tests/auth_session_test.ts"
+    ],
+    "commands": [
+      "deno task test:auth",
+      "deno task test:api",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 14,
+    "week": 3,
+    "phase": "API dan Auth",
+    "title": "Forgot/reset password, activation, dan return_to allowlist",
+    "read": [
+      "docs/02-auth/LOGIN-SIGNUP-FLOWS.md",
+      "docs/02-auth/AUTO-ACCOUNT-AFTER-PURCHASE.md"
+    ],
+    "blocks": [
+      "Implement forgot-password generic response, reset token issuance, expiry/reuse prevention, password replacement, dan optional revoke-all sessions.",
+      "Implement account activation endpoint untuk pending guest account: token verification, username final, password creation, email verification, dan activation audit.",
+      "Implement return_to parser dengan allowlist host/path, anti-open-redirect, dan safe default dashboard home.",
+      "Tulis integration tests untuk expired/reused token, reset unknown email, activation conflict, session revocation, dan malicious return_to."
+    ],
+    "deliverables": [
+      "Password recovery API",
+      "Account activation API",
+      "Safe return_to",
+      "Recovery/activation tests"
+    ],
+    "acceptance": [
+      "Response forgot password tetap generik",
+      "Aktivasi tidak mengirim password",
+      "Token one-time dan hashed",
+      "Open redirect ditolak"
+    ],
+    "files": [
+      "apps/api/src/modules/auth/recovery.ts",
+      "apps/api/src/modules/auth/activation.ts",
+      "packages/auth/src/return-to.ts"
+    ],
+    "commands": [
+      "deno task test:auth",
+      "deno task test:api",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 15,
+    "week": 3,
+    "phase": "API dan Auth",
+    "title": "Bangun aplikasi auth dan selesaikan Auth Gate",
+    "read": [
+      "apps/auth/README.md",
+      "docs/02-auth/LOGIN-SIGNUP-FLOWS.md",
+      "docs/02-auth/AUTO-ACCOUNT-AFTER-PURCHASE.md",
+      "docs/07-ui/GOOEY-TOAST.md"
+    ],
+    "blocks": [
+      "Bangun API client dengan credentials, CSRF bootstrap, typed errors, loading/cancellation, dan return_to handling.",
+      "Bangun halaman login dan signup dengan accessible forms, client validation yang sama kontraknya, password visibility, dan goey-toast.",
+      "Bangun verify-email, resend, forgot-password, reset-password, activation, logout result, dan invalid/expired token states.",
+      "Jalankan integration/E2E auth lokal, perbaiki responsive/accessibility, dan tulis Auth Gate report."
+    ],
+    "deliverables": [
+      "Auth frontend complete",
+      "API integration",
+      "Accessible feedback/toasts",
+      "Auth gate report"
+    ],
+    "acceptance": [
+      "User active dapat login menuju dashboard",
+      "Semua form mempunyai label/error accessible",
+      "Credentials dikirim hanya ke API resmi",
+      "Build dan auth tests lulus"
+    ],
+    "files": [
+      "apps/auth/src/features/login",
+      "apps/auth/src/features/signup",
+      "apps/auth/src/features/recovery",
+      "apps/auth/src/features/activation"
+    ],
+    "commands": [
+      "deno task test:auth",
+      "deno task build:auth",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 16,
+    "week": 4,
+    "phase": "Catalog dan Admin",
+    "title": "Public catalog API: list, detail, category, brand, search",
+    "read": [
+      "docs/03-storefront/PRODUCTS.md",
+      "docs/05-api/ENDPOINTS.md"
+    ],
+    "blocks": [
+      "Implement repository/service query untuk active products, variant summary, effective price, available stock, rating, review count, dan net_sold.",
+      "Implement GET /products dengan page/per_page, search, category, brand, price range, stock, badges, dan sort allowlist.",
+      "Implement GET /products/{slug}, categories, brands, reviews; gunakan typed contracts dan stable response envelope.",
+      "Tulis query/integration tests, EXPLAIN critical queries bila tersedia, perbaiki index/N+1, dan seed data yang cukup untuk pagination."
+    ],
+    "deliverables": [
+      "Public product list/detail APIs",
+      "Filter/sort/search",
+      "Category/brand endpoints",
+      "Catalog API tests"
+    ],
+    "acceptance": [
+      "Produk draft/inactive tidak bocor",
+      "Harga/rating/sold/stok konsisten",
+      "Pagination deterministic",
+      "Query tidak N+1 pada card list"
+    ],
+    "files": [
+      "apps/api/src/modules/catalog",
+      "apps/api/src/routes/v1/products.ts",
+      "packages/contracts/src/catalog.ts"
+    ],
+    "commands": [
+      "deno task test:catalog",
+      "deno task test:api",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 17,
+    "week": 4,
+    "phase": "Catalog dan Admin",
+    "title": "Admin RBAC dan CRUD catalog API",
+    "read": [
+      "apps/admin/README.md",
+      "docs/05-api/ENDPOINTS.md",
+      "docs/08-security/SECURITY-CHECKLIST.md"
+    ],
+    "blocks": [
+      "Definisikan permissions granular catalog.read/write/publish, inventory.adjust, order.manage, refund.manage, support.manage, dan admin role seed.",
+      "Implement admin endpoints category, brand, product, variant, price, publish/unpublish/archive dengan Zod dan optimistic concurrency.",
+      "Implement audit trail before/after yang aman, soft-delete policy, slug/SKU conflict handling, dan transaction boundaries.",
+      "Tulis authorization matrix tests: unauthenticated, customer, staff terbatas, admin; pastikan default-deny."
+    ],
+    "deliverables": [
+      "RBAC permissions",
+      "Admin catalog CRUD API",
+      "Audit trail",
+      "Authorization tests"
+    ],
+    "acceptance": [
+      "Customer tidak dapat mengakses /v1/admin/*",
+      "Publish membutuhkan data minimum valid",
+      "Perubahan tercatat audit",
+      "Concurrent edit terdeteksi"
+    ],
+    "files": [
+      "apps/api/src/modules/admin/catalog",
+      "apps/api/src/routes/v1/admin/catalog.ts",
+      "packages/contracts/src/admin-catalog.ts"
+    ],
+    "commands": [
+      "deno task test:admin-api",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 18,
+    "week": 4,
+    "phase": "Catalog dan Admin",
+    "title": "Admin catalog UI dan upload assets",
+    "read": [
+      "apps/admin/README.md",
+      "docs/03-storefront/PRODUCTS.md",
+      "docs/08-security/SECURITY-CHECKLIST.md"
+    ],
+    "blocks": [
+      "Bangun admin shell, auth guard, permission-aware navigation, product list, filters, empty/loading/error states.",
+      "Bangun create/edit product, category, brand, variant, price, digital/physical fields, validation, dan unsaved-change guard.",
+      "Implement object storage adapter/presigned upload flow untuk product image; validate MIME/size/ownership dan simpan metadata saja di Neon.",
+      "Integrasikan goey-toast, optimistic UI yang aman, upload progress, build/test, dan dokumentasikan provider storage env."
+    ],
+    "deliverables": [
+      "Admin product UI",
+      "Variant/price forms",
+      "Asset upload adapter",
+      "Admin UI tests"
+    ],
+    "acceptance": [
+      "Frontend tidak menerima storage secret",
+      "Upload tervalidasi server",
+      "Admin action mengikuti permission",
+      "Form physical/digital conditional benar"
+    ],
+    "files": [
+      "apps/admin/src/features/catalog",
+      "apps/api/src/modules/assets",
+      "packages/contracts/src/assets.ts"
+    ],
+    "commands": [
+      "deno task build:admin",
+      "deno task test:admin",
+      "deno task quality"
+    ],
+    "external": [
+      "Object storage S3-compatible diperlukan untuk upload nyata. Bila belum ada, gunakan in-memory/local development adapter dan jangan memalsukan URL production."
+    ]
+  },
+  {
+    "day": 19,
+    "week": 4,
+    "phase": "Catalog dan Admin",
+    "title": "Inventory service, reservations primitive, dan admin stock UI",
+    "read": [
+      "docs/03-storefront/CHECKOUT.md",
+      "docs/06-database/SCHEMA.md",
+      "apps/admin/README.md"
+    ],
+    "blocks": [
+      "Implement inventory query dan movement service dengan transaction/locking, reason codes, actor, source reference, serta invariant available/reserved/sold.",
+      "Implement stock adjustment, transfer-ready abstraction, low-stock query, and reservation primitive create/commit/release/expire.",
+      "Bangun admin inventory list/detail/adjustment history dan form adjustment dengan permission plus confirmation.",
+      "Tulis concurrency/invariant tests dan audit reconciliation report untuk sample data."
+    ],
+    "deliverables": [
+      "Inventory domain service",
+      "Reservation primitives",
+      "Admin inventory UI",
+      "Concurrency tests"
+    ],
+    "acceptance": [
+      "Stok tidak dapat negatif",
+      "Setiap perubahan memiliki ledger",
+      "Reservation idempotent",
+      "Adjustment manual diaudit"
+    ],
+    "files": [
+      "apps/api/src/modules/inventory",
+      "apps/admin/src/features/inventory",
+      "packages/contracts/src/inventory.ts"
+    ],
+    "commands": [
+      "deno task test:inventory",
+      "deno task build:admin",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 20,
+    "week": 4,
+    "phase": "Catalog dan Admin",
+    "title": "Sold/rating statistics, review read model, dan Catalog Gate",
+    "read": [
+      "docs/03-storefront/PRODUCTS.md",
+      "docs/10-testing/TEST-PLAN.md"
+    ],
+    "blocks": [
+      "Implement pure functions dan database operations untuk gross_sold, refunded_sold, net_sold, average rating, review count, dan Indonesian sold label.",
+      "Implement review public read API dengan moderation/verified flags dan aggregate recalculation/reconciliation command.",
+      "Tambahkan sample paid/refunded/reviewed orders untuk test, lalu verifikasi card projection dan product detail response.",
+      "Jalankan catalog/admin test suite, query review, quality gate, dan tulis Catalog Gate report."
+    ],
+    "deliverables": [
+      "Sales/rating projection",
+      "Review read API",
+      "Reconciliation command",
+      "Catalog gate report"
+    ],
+    "acceptance": [
+      "Cart tidak mengubah sold",
+      "Refund finalized mengoreksi net_sold",
+      "Label 1,2 rb benar untuk locale Indonesia",
+      "Aggregate dapat direbuild dari source events"
+    ],
+    "files": [
+      "apps/api/src/modules/catalog/stats.ts",
+      "apps/api/src/modules/reviews/read.ts",
+      "scripts/reconcile-product-stats.ts"
+    ],
+    "commands": [
+      "deno task test:catalog",
+      "deno task stats:reconcile:dry",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 21,
+    "week": 5,
+    "phase": "Storefront",
+    "title": "Storefront shell, design system, API client, dan goey-toast wrapper",
+    "read": [
+      "apps/storefront/README.md",
+      "packages/ui/README.md",
+      "docs/07-ui/GOOEY-TOAST.md"
+    ],
+    "blocks": [
+      "Bangun design tokens, typography, spacing, buttons, forms, cards, skeleton, dialog, pagination, badge, dan responsive containers di packages/ui.",
+      "Buat wrapper goey-toast terstandar untuk success/error/warning/info/promise, reduced-motion support, dan pesan Indonesia yang konsisten.",
+      "Bangun storefront header/nav/search/cart/account shell, API client typed, currency/date/sold formatter, dan error boundary.",
+      "Buat component tests/smoke page, audit keyboard/focus, dan build storefront baseline."
+    ],
+    "deliverables": [
+      "Shared UI foundation",
+      "Goey-toast wrapper",
+      "Storefront shell",
+      "Formatter helpers"
+    ],
+    "acceptance": [
+      "Toast bukan pengganti persistent notification",
+      "Reduced motion dihormati",
+      "Currency IDR tanpa floating point",
+      "Komponen keyboard-accessible"
+    ],
+    "files": [
+      "packages/ui/src",
+      "apps/storefront/src/app",
+      "apps/storefront/src/lib/api.ts",
+      "packages/ui/src/toast.tsx"
+    ],
+    "commands": [
+      "deno task test:ui",
+      "deno task build:storefront",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 22,
+    "week": 5,
+    "phase": "Storefront",
+    "title": "Product list dan product card final",
+    "read": [
+      "docs/03-storefront/PRODUCTS.md"
+    ],
+    "blocks": [
+      "Bangun /products data loader/query state dan URL pagination per_page=12 dengan cancellation serta cache policy sederhana.",
+      "Bangun ProductCard berisi image, name, brand, category, regular/selling price, discount, rating, review count, net sold, stock, badges, dan wishlist state.",
+      "Implement add-to-cart/buy-now/wishlist action stubs yang terhubung kontrak, responsive grid, skeleton, empty/error/out-of-stock states.",
+      "Tulis component/integration tests untuk sold label, price discount, stock, new badge, action accessibility, dan mobile layout."
+    ],
+    "deliverables": [
+      "Products page",
+      "Final ProductCard",
+      "Responsive states",
+      "Product card tests"
+    ],
+    "acceptance": [
+      "Tampilan memuat Terjual dan Stok",
+      "Terjual 0 dapat diganti Baru sesuai rule",
+      "Harga normal/promo jelas",
+      "Out-of-stock mencegah CTA invalid"
+    ],
+    "files": [
+      "apps/storefront/src/features/catalog/pages/ProductsPage.tsx",
+      "apps/storefront/src/features/catalog/components/ProductCard.tsx"
+    ],
+    "commands": [
+      "deno task test:storefront",
+      "deno task build:storefront",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 23,
+    "week": 5,
+    "phase": "Storefront",
+    "title": "Product detail, variants, gallery, reviews, dan related products",
+    "read": [
+      "docs/03-storefront/PRODUCTS.md"
+    ],
+    "blocks": [
+      "Bangun /products/{slug} loader dengan not-found/inactive states dan metadata dasar.",
+      "Bangun gallery, product summary, variant selector, effective price, stock, quantity limits, add-cart, buy-now, wishlist, dan shipping/digital indicator.",
+      "Bangun tabs/accordion description, benefits, composition, usage, warning, shipping, reviews, serta related products.",
+      "Tulis tests untuk variant URL/state, sold/stock display, quantity clamping, image alt, and out-of-stock behavior."
+    ],
+    "deliverables": [
+      "Product detail page",
+      "Variant-aware CTA",
+      "Review display",
+      "Related products"
+    ],
+    "acceptance": [
+      "Cart action selalu membawa variant_id",
+      "Harga/stok berubah saat variant berubah",
+      "Semua image punya alt",
+      "Inactive slug memberi 404 aman"
+    ],
+    "files": [
+      "apps/storefront/src/features/catalog/pages/ProductDetailPage.tsx",
+      "apps/storefront/src/features/catalog/components"
+    ],
+    "commands": [
+      "deno task test:storefront",
+      "deno task build:storefront",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 24,
+    "week": 5,
+    "phase": "Storefront",
+    "title": "Search, category, brand, filters, sort, dan URL state",
+    "read": [
+      "docs/03-storefront/PRODUCTS.md"
+    ],
+    "blocks": [
+      "Bangun /search, /categories/{slug}, dan /brands/{slug} menggunakan endpoint yang sama dan URL query sebagai source of truth.",
+      "Implement keyword debounce, filter category/brand/price/stock/rating/promo, sort allowlist, reset filter, dan mobile filter drawer.",
+      "Jaga browser back/forward, shareable URLs, page reset saat filter berubah, serta empty suggestions/popular products.",
+      "Tulis query-state tests, accessibility, and API error recovery; build storefront."
+    ],
+    "deliverables": [
+      "Search page",
+      "Category/brand listing",
+      "Filter/sort UI",
+      "URL-state tests"
+    ],
+    "acceptance": [
+      "URL dapat dibagikan dan direstore",
+      "Invalid query jatuh ke default aman",
+      "Filter tidak menghapus parameter yang relevan",
+      "Mobile controls accessible"
+    ],
+    "files": [
+      "apps/storefront/src/features/search",
+      "apps/storefront/src/features/catalog/filters"
+    ],
+    "commands": [
+      "deno task test:storefront",
+      "deno task build:storefront",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 25,
+    "week": 5,
+    "phase": "Storefront",
+    "title": "Wishlist guest/account dan Storefront Gate",
+    "read": [
+      "docs/03-storefront/PRODUCTS.md",
+      "docs/03-storefront/CART.md",
+      "docs/10-testing/TEST-PLAN.md"
+    ],
+    "blocks": [
+      "Implement guest wishlist local storage dengan versioned schema, graceful corruption handling, dan no-sensitive-data rule.",
+      "Implement account wishlist API list/add/remove, ownership, duplicate prevention, stock/price projection, dan optional merge after login.",
+      "Integrasikan heart state pada list/detail, optimistic update rollback, goey-toast, dan dashboard deep link.",
+      "Jalankan storefront tests, accessibility smoke, performance baseline, dan tulis Storefront Gate report."
+    ],
+    "deliverables": [
+      "Guest wishlist",
+      "Account wishlist API",
+      "Wishlist UI integration",
+      "Storefront gate report"
+    ],
+    "acceptance": [
+      "Guest wishlist tetap setelah refresh",
+      "User hanya melihat wishlist sendiri",
+      "Optimistic failure di-rollback",
+      "Product data tetap berasal dari server"
+    ],
+    "files": [
+      "apps/api/src/modules/wishlist",
+      "apps/storefront/src/features/wishlist",
+      "packages/contracts/src/wishlist.ts"
+    ],
+    "commands": [
+      "deno task test:wishlist",
+      "deno task test:storefront",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 26,
+    "week": 6,
+    "phase": "Cart, Checkout, Payment",
+    "title": "Cart API untuk guest dan account",
+    "read": [
+      "docs/03-storefront/CART.md",
+      "docs/05-api/ENDPOINTS.md"
+    ],
+    "blocks": [
+      "Implement guest cart token issuance dengan random opaque token, server-side digest, expiry/rotation, serta one-active-cart invariant.",
+      "Implement GET cart dan add/update/remove/clear item transactionally untuk guest atau session user.",
+      "Hitung line totals/discount/subtotal di server, return item status available/out_of_stock/price_changed/inactive/quantity_adjusted.",
+      "Tulis authorization, token, validation, concurrent update, purchase limit, and total calculation tests."
+    ],
+    "deliverables": [
+      "Guest cart identity",
+      "Cart CRUD API",
+      "Server-calculated totals",
+      "Cart API tests"
+    ],
+    "acceptance": [
+      "Browser tidak menjadi source of truth cart",
+      "Guest token tidak disimpan plaintext DB",
+      "Harga client diabaikan",
+      "User tidak dapat membaca cart lain"
+    ],
+    "files": [
+      "apps/api/src/modules/cart",
+      "apps/api/src/routes/v1/cart.ts",
+      "packages/contracts/src/cart.ts"
+    ],
+    "commands": [
+      "deno task test:cart",
+      "deno task test:api",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 27,
+    "week": 6,
+    "phase": "Cart, Checkout, Payment",
+    "title": "Cart merge, revalidation, voucher, dan save-for-later",
+    "read": [
+      "docs/03-storefront/CART.md",
+      "docs/10-testing/TEST-PLAN.md"
+    ],
+    "blocks": [
+      "Implement POST /cart/merge transaction: merge variant sama, clamp stock/purchase limit, latest price, merged marker, dan idempotency.",
+      "Implement revalidation saat cart dibaca/diubah, warning changes, inactive cleanup policy, dan race-safe versioning.",
+      "Implement save-for-later dan voucher validation/application dasar dengan explicit rule engine serta integer amounts.",
+      "Tulis merge matrix tests, price/stock changes, duplicate retry, voucher edge cases, dan rollback behavior."
+    ],
+    "deliverables": [
+      "Idempotent cart merge",
+      "Real-time revalidation",
+      "Voucher foundation",
+      "Save-for-later"
+    ],
+    "acceptance": [
+      "Merge ulang tidak menduplikasi item",
+      "Stok tidak terlampaui",
+      "Perubahan harga transparan",
+      "Voucher tidak dipercaya dari client"
+    ],
+    "files": [
+      "apps/api/src/modules/cart/merge.ts",
+      "apps/api/src/modules/cart/revalidate.ts",
+      "apps/api/src/modules/vouchers"
+    ],
+    "commands": [
+      "deno task test:cart",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 28,
+    "week": 6,
+    "phase": "Cart, Checkout, Payment",
+    "title": "Cart UI lengkap",
+    "read": [
+      "docs/03-storefront/CART.md",
+      "docs/07-ui/GOOEY-TOAST.md"
+    ],
+    "blocks": [
+      "Bangun /cart loader dan cart summary untuk guest/session dengan states loading/empty/error/expired token.",
+      "Bangun item table/card responsive, select checkout, increment/decrement, remove, clear, save-for-later, voucher, dan order note.",
+      "Tampilkan server totals, price/stock warnings, shipping estimate placeholder yang jelas, and checkout eligibility.",
+      "Tulis UI/integration tests, keyboard/focus, optimistic mutation rollback, goey-toast, and build storefront."
+    ],
+    "deliverables": [
+      "Cart page",
+      "CRUD interactions",
+      "Warnings and totals",
+      "Cart UI tests"
+    ],
+    "acceptance": [
+      "Total selalu dari response server",
+      "Mutation disabled saat pending",
+      "Warning price/stock terlihat",
+      "Mobile cart tetap usable"
+    ],
+    "files": [
+      "apps/storefront/src/features/cart",
+      "apps/storefront/src/pages/CartPage.tsx"
+    ],
+    "commands": [
+      "deno task test:storefront",
+      "deno task build:storefront",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 29,
+    "week": 6,
+    "phase": "Cart, Checkout, Payment",
+    "title": "Checkout address/shipping/review, order snapshot, dan stock reservation",
+    "read": [
+      "docs/03-storefront/CHECKOUT.md"
+    ],
+    "blocks": [
+      "Implement address validation/persistence and guest address input, shipping option adapter dengan deterministic mock, serta digital-only no-shipping branch.",
+      "Implement checkout validate/shipping-options endpoints dan server recomputation untuk product, stock, price, voucher, shipping, tax, total.",
+      "Implement POST /checkout/orders dengan idempotency key, immutable order/address/item snapshot, dan inventory reservation expiry.",
+      "Bangun address/shipping/review UI state machine, recovery after refresh, tests untuk mixed cart, stale price/stock, duplicate submit, and reservation release schedule."
+    ],
+    "deliverables": [
+      "Checkout validation",
+      "Shipping adapter",
+      "Idempotent order creation",
+      "Inventory reservation and checkout UI"
+    ],
+    "acceptance": [
+      "Double-click tidak membuat dua order",
+      "Digital-only tidak meminta shipping",
+      "Order total dihitung server",
+      "Reservation punya expiry dan release path"
+    ],
+    "files": [
+      "apps/api/src/modules/checkout",
+      "apps/api/src/modules/shipping",
+      "apps/storefront/src/features/checkout"
+    ],
+    "commands": [
+      "deno task test:checkout",
+      "deno task test:inventory",
+      "deno task build:storefront",
+      "deno task quality"
+    ],
+    "external": [
+      "Real shipping provider dapat ditambahkan nanti melalui adapter. Mock harus jelas hanya untuk development/test."
+    ]
+  },
+  {
+    "day": 30,
+    "week": 6,
+    "phase": "Cart, Checkout, Payment",
+    "title": "Payment adapter, verified webhook, dan Checkout Gate",
+    "read": [
+      "docs/03-storefront/CHECKOUT.md",
+      "docs/05-api/ENDPOINTS.md",
+      "docs/10-testing/TEST-PLAN.md"
+    ],
+    "blocks": [
+      "Definisikan PaymentProvider interface dan implement deterministic sandbox/mock provider tanpa menyimpan raw card data.",
+      "Implement create payment intent/session, payment page handoff, pending/success/failed UI, dan provider reference persistence.",
+      "Implement webhook signature verification contract, unique provider event, state transition validation, transaction order paid + reservation commit + outbox.",
+      "Tulis duplicate/out-of-order/invalid-signature tests, browser-success-not-source-of-truth test, quality gate, dan Checkout Gate report."
+    ],
+    "deliverables": [
+      "Payment provider abstraction",
+      "Payment flow UI/API",
+      "Idempotent verified webhook",
+      "Checkout gate report"
+    ],
+    "acceptance": [
+      "Order paid hanya lewat event terverifikasi",
+      "Duplicate webhook aman",
+      "Invalid signature ditolak",
+      "Raw payment secret/card data tidak dilog"
+    ],
+    "files": [
+      "apps/api/src/modules/payments",
+      "apps/api/src/routes/v1/webhooks.ts",
+      "apps/storefront/src/features/checkout/payment"
+    ],
+    "commands": [
+      "deno task test:payments",
+      "deno task test:checkout",
+      "deno task quality"
+    ],
+    "external": [
+      "Pilih dan siapkan payment gateway sandbox untuk integrasi nyata. Sampai tersedia, mock provider harus mencakup success, pending, failed, duplicate, dan invalid webhook."
+    ]
+  },
+  {
+    "day": 31,
+    "week": 7,
+    "phase": "Worker, Invoice, Notification",
+    "title": "Transactional outbox worker, locking, retry, dan cleanup jobs",
+    "read": [
+      "docs/04-dashboard/NOTIFICATIONS.md",
+      "docs/10-testing/TEST-PLAN.md"
+    ],
+    "blocks": [
+      "Implement outbox poller dengan claim/lock aman, batch size, available_at, SKIP LOCKED atau strategi setara, correlation ID, dan graceful shutdown.",
+      "Implement handler registry, idempotency/dedupe, exponential backoff with cap/jitter, max attempts, failed state/dead-letter semantics.",
+      "Implement scheduled cleanup untuk expired session/token, release expired inventory reservation, dan stale guest cart policy.",
+      "Tulis worker concurrency/retry/crash-recovery tests serta operational commands untuk inspect/retry failed job."
+    ],
+    "deliverables": [
+      "Outbox worker",
+      "Retry/dead-letter semantics",
+      "Cleanup jobs",
+      "Worker tests/ops commands"
+    ],
+    "acceptance": [
+      "Dua worker tidak memproses row yang sama bersamaan",
+      "Handler retry idempotent",
+      "Failure tidak hilang diam-diam",
+      "Reservation expired kembali tersedia"
+    ],
+    "files": [
+      "apps/worker/src/outbox",
+      "apps/worker/src/jobs",
+      "apps/worker/tests"
+    ],
+    "commands": [
+      "deno task test:worker",
+      "deno task worker:once",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 32,
+    "week": 7,
+    "phase": "Worker, Invoice, Notification",
+    "title": "Invoice PDF, object storage, dan transactional email",
+    "read": [
+      "docs/09-email/EMAIL-AND-INVOICE.md",
+      "packages/email/README.md",
+      "docs/03-storefront/CHECKOUT.md"
+    ],
+    "blocks": [
+      "Implement invoice number, immutable invoice data snapshot, PDF renderer, locale id-ID, integer amounts, and safe file naming.",
+      "Upload invoice ke private object storage, simpan metadata, dan buat authenticated/signed download path dengan expiry.",
+      "Implement EmailProvider interface, invoice/order/verification/reset/activation templates, delivery records, retry categories, and provider message ID.",
+      "Hubungkan paid outbox ke invoice generation dan email; test PDF metadata, template rendering, provider failure/retry, and no public invoice leakage."
+    ],
+    "deliverables": [
+      "Invoice generator",
+      "Private invoice storage",
+      "Email provider abstraction/templates",
+      "Paid-to-invoice-email job"
+    ],
+    "acceptance": [
+      "Invoice total sama dengan order snapshot",
+      "Invoice tidak publik permanen",
+      "Email failure dapat di-retry",
+      "Template tidak memuat password"
+    ],
+    "files": [
+      "apps/worker/src/jobs/invoice.ts",
+      "packages/email/src",
+      "apps/api/src/modules/invoices",
+      "packages/contracts/src/invoice.ts"
+    ],
+    "commands": [
+      "deno task test:invoice",
+      "deno task test:email",
+      "deno task test:worker",
+      "deno task quality"
+    ],
+    "external": [
+      "Email transactional provider dan object storage credentials diperlukan untuk delivery nyata. Gunakan fake provider dalam test dan development tanpa mengklaim email terkirim."
+    ]
+  },
+  {
+    "day": 33,
+    "week": 7,
+    "phase": "Worker, Invoice, Notification",
+    "title": "Akun otomatis setelah guest payment dan claim order aman",
+    "read": [
+      "docs/02-auth/AUTO-ACCOUNT-AFTER-PURCHASE.md"
+    ],
+    "blocks": [
+      "Implement paid-order handler: bila guest email belum memiliki user, buat pending_activation user/profile dan activation token dalam transaksi idempotent.",
+      "Bila email sudah terkait akun, jangan auto-link hanya dari input guest; buat secure claim/notification flow yang memverifikasi kepemilikan.",
+      "Hubungkan activation UI/API ke pending order claim, username selection, password creation, verified email, session issue, dan redirect dashboard order.",
+      "Tulis duplicate paid event, existing account, expired token, conflicting username, replay, and order-ownership tests."
+    ],
+    "deliverables": [
+      "Auto-account worker handler",
+      "Secure order claim",
+      "Activation-to-dashboard flow",
+      "Provisioning tests"
+    ],
+    "acceptance": [
+      "Akun hanya dibuat setelah payment verified",
+      "Tidak ada password via email",
+      "Event ulang tidak membuat akun ganda",
+      "Order tidak ditautkan ke akun salah"
+    ],
+    "files": [
+      "apps/worker/src/jobs/provision-account.ts",
+      "apps/api/src/modules/auth/order-claim.ts",
+      "apps/auth/src/features/activation"
+    ],
+    "commands": [
+      "deno task test:auto-account",
+      "deno task test:auth",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 34,
+    "week": 7,
+    "phase": "Worker, Invoice, Notification",
+    "title": "Persistent notifications, read/unread API, dan SSE",
+    "read": [
+      "docs/04-dashboard/NOTIFICATIONS.md"
+    ],
+    "blocks": [
+      "Implement notification creation handlers dari business outbox dengan dedupe_key, user ownership, type, data payload version, dan created_at.",
+      "Implement list/pagination/unread-count/read/read-all endpoints; status hanya derived dari read_at.",
+      "Implement authenticated SSE stream dengan heartbeat, reconnect guidance, bounded resources, last event cursor/refresh strategy, dan authorization.",
+      "Tulis SSE/read tests termasuk disconnect/reconnect, unauthorized stream, duplicate events, and database-source-of-truth behavior."
+    ],
+    "deliverables": [
+      "Notification worker handlers",
+      "Read/unread REST API",
+      "Authenticated SSE",
+      "Notification tests"
+    ],
+    "acceptance": [
+      "SSE bukan satu-satunya source",
+      "User tidak menerima notifikasi user lain",
+      "read_at konsisten",
+      "Reconnect tidak menggandakan persistent records"
+    ],
+    "files": [
+      "apps/worker/src/jobs/notifications.ts",
+      "apps/api/src/modules/notifications",
+      "apps/api/src/routes/v1/notifications.ts"
+    ],
+    "commands": [
+      "deno task test:notifications",
+      "deno task test:worker",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 35,
+    "week": 7,
+    "phase": "Worker, Invoice, Notification",
+    "title": "Commerce E2E, failure recovery, dan Integration Gate",
+    "read": [
+      "docs/10-testing/TEST-PLAN.md",
+      "docs/02-auth/AUTO-ACCOUNT-AFTER-PURCHASE.md",
+      "docs/09-email/EMAIL-AND-INVOICE.md"
+    ],
+    "blocks": [
+      "Buat integration fixture end-to-end: product aktif, guest cart, checkout, order pending, verified payment, stock commit, stats, outbox, invoice, email record, account pending.",
+      "Lanjutkan aktivasi, login, session, order ownership, notification, invoice access, dan digital entitlement bila item digital.",
+      "Tambahkan failure matrix: price/stock change, expired reservation, duplicate/out-of-order webhook, worker crash/retry, email fail, expired activation.",
+      "Jalankan seluruh integration suite dari database test bersih, perbaiki flakiness, dan tulis Integration Gate report."
+    ],
+    "deliverables": [
+      "Full commerce integration suite",
+      "Failure/retry matrix",
+      "Test fixtures",
+      "Integration gate report"
+    ],
+    "acceptance": [
+      "Happy path berjalan tanpa manual DB edit",
+      "Duplicate events tidak menggandakan side effect",
+      "Failure dapat dipulihkan",
+      "Test repeatable dari DB kosong"
+    ],
+    "files": [
+      "quality/integration/commerce_flow_test.ts",
+      "quality/fixtures",
+      "docs/14-ai-build-playbook/progress/DAY-35-REPORT.md"
+    ],
+    "commands": [
+      "deno task test:integration",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 36,
+    "week": 8,
+    "phase": "Dashboard client",
+    "title": "Dashboard shell, route guards, navigation, dan home summary",
+    "read": [
+      "apps/dashboard/README.md",
+      "docs/04-dashboard/README.md"
+    ],
+    "blocks": [
+      "Bangun dashboard API client/session bootstrap, protected route guard, unauthorized/expired flow, error boundary, dan app layout.",
+      "Bangun desktop sidebar sesuai blueprint dan mobile nav Home/Orders/Cart/Notifications/Account; Cart link kembali ke shop.",
+      "Implement home summary endpoint dan UI: active orders, latest, shipping, total purchases, unread notification, unpaid status, recommendation link.",
+      "Tulis dashboard shell/home tests, loading/empty/error states, accessibility, and responsive build."
+    ],
+    "deliverables": [
+      "Protected dashboard shell",
+      "Desktop/mobile navigation",
+      "Home summary API/UI",
+      "Dashboard baseline tests"
+    ],
+    "acceptance": [
+      "Unauthenticated diarahkan ke auth dengan safe return_to",
+      "Cart tidak dipindah ke dashboard",
+      "Total IDR server-derived",
+      "Mobile nav sesuai blueprint"
+    ],
+    "files": [
+      "apps/dashboard/src/app",
+      "apps/dashboard/src/features/home",
+      "apps/api/src/modules/dashboard/home.ts"
+    ],
+    "commands": [
+      "deno task test:dashboard",
+      "deno task build:dashboard",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 37,
+    "week": 8,
+    "phase": "Dashboard client",
+    "title": "Profile, security, sessions, addresses, dan payment method metadata",
+    "read": [
+      "docs/04-dashboard/README.md"
+    ],
+    "blocks": [
+      "Implement GET/PATCH /me dan profile UI untuk name, email display/policy, phone, avatar metadata, joined date, and validation.",
+      "Implement change password, sessions list, revoke one/all other sessions, login history summary, and security feedback.",
+      "Implement addresses CRUD/default shipping/billing with ownership and dashboard UI.",
+      "Implement tokenized payment-method metadata list/delete only if provider supports it; no raw card data; test ownership and responsive forms."
+    ],
+    "deliverables": [
+      "Profile UI/API",
+      "Security/session management",
+      "Address CRUD",
+      "Payment method metadata"
+    ],
+    "acceptance": [
+      "Password lama diverifikasi",
+      "Password tidak ditampilkan",
+      "Session revoke efektif",
+      "Card PAN/CVV tidak tersimpan"
+    ],
+    "files": [
+      "apps/dashboard/src/features/profile",
+      "apps/dashboard/src/features/addresses",
+      "apps/dashboard/src/features/payment-methods",
+      "apps/api/src/modules/me"
+    ],
+    "commands": [
+      "deno task test:dashboard",
+      "deno task test:auth",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 38,
+    "week": 8,
+    "phase": "Dashboard client",
+    "title": "Orders list, detail, tracking, buy-again, dan invoice link",
+    "read": [
+      "docs/04-dashboard/ORDERS-HISTORY-INVOICES.md"
+    ],
+    "blocks": [
+      "Implement user-scoped orders list with tabs Semua/Aktif/Selesai/Dibatalkan/Refund, stable pagination, and summary fields.",
+      "Implement order detail endpoint/UI with snapshots, payment/shipping/status timeline, totals, invoice and product links.",
+      "Implement tracking endpoint/UI and buy-again service yang revalidasi product/variant/price/stock sebelum menambah cart.",
+      "Tulis ownership/IDOR tests, status display, mixed digital/physical tracking, buy-again warnings, and responsive detail tests."
+    ],
+    "deliverables": [
+      "Orders list/detail",
+      "Tracking timeline",
+      "Buy again",
+      "Order ownership tests"
+    ],
+    "acceptance": [
+      "User hanya membaca order sendiri",
+      "Order number bukan authorization",
+      "Buy-again tidak memakai harga lama",
+      "Detail tidak bergantung pada product aktif"
+    ],
+    "files": [
+      "apps/api/src/modules/orders",
+      "apps/dashboard/src/features/orders"
+    ],
+    "commands": [
+      "deno task test:orders",
+      "deno task test:dashboard",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 39,
+    "week": 8,
+    "phase": "Dashboard client",
+    "title": "History, invoices, dan digital downloads",
+    "read": [
+      "docs/04-dashboard/ORDERS-HISTORY-INVOICES.md"
+    ],
+    "blocks": [
+      "Implement /history default per_page=5 dengan status/year/start_date/end_date, total transactions/nominal/completed/refund summary.",
+      "Bangun history UI, filter URL state, IDR/time formatting id-ID Asia/Jakarta, buy-again, review, and invoice actions.",
+      "Implement invoices list/detail/download authorization dan signed/streamed private file access.",
+      "Implement digital entitlements/download list, expiry/download-count checks, secure download, and tests for ownership/tampering."
+    ],
+    "deliverables": [
+      "History API/UI",
+      "Invoice center",
+      "Secure invoice download",
+      "Digital downloads"
+    ],
+    "acceptance": [
+      "Pagination default 5",
+      "Date input canonical dan timezone-safe",
+      "File access user-scoped",
+      "Download entitlement enforced"
+    ],
+    "files": [
+      "apps/api/src/modules/history",
+      "apps/api/src/modules/invoices",
+      "apps/api/src/modules/downloads",
+      "apps/dashboard/src/features/history"
+    ],
+    "commands": [
+      "deno task test:history",
+      "deno task test:invoices",
+      "deno task build:dashboard",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 40,
+    "week": 8,
+    "phase": "Dashboard client",
+    "title": "Notifications, wishlist, reviews, settings, dan Dashboard Gate",
+    "read": [
+      "docs/04-dashboard/README.md",
+      "docs/04-dashboard/NOTIFICATIONS.md"
+    ],
+    "blocks": [
+      "Bangun notification center list/read/read-all/unread badge dan SSE listener dengan reconnect, REST refresh, and goey-toast for live events.",
+      "Bangun account wishlist page dengan stock/price projection, remove/add-cart/product links.",
+      "Implement eligible verified-purchase reviews list/create/edit/delete policy dan settings profile/security/notification/privacy shells.",
+      "Jalankan dashboard tests, accessibility/mobile audit, build, dan tulis Dashboard Gate report."
+    ],
+    "deliverables": [
+      "Notification center + SSE",
+      "Wishlist dashboard",
+      "Reviews lifecycle",
+      "Settings and dashboard gate"
+    ],
+    "acceptance": [
+      "Toast live tidak menggantikan database record",
+      "Review hanya untuk eligible order item",
+      "Unread badge pulih setelah reconnect",
+      "Semua route mobile usable"
+    ],
+    "files": [
+      "apps/dashboard/src/features/notifications",
+      "apps/dashboard/src/features/wishlist",
+      "apps/dashboard/src/features/reviews",
+      "apps/dashboard/src/features/settings"
+    ],
+    "commands": [
+      "deno task test:dashboard",
+      "deno task build:dashboard",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 41,
+    "week": 9,
+    "phase": "Operasional dan purnajual",
+    "title": "Returns dan refunds end-to-end",
+    "read": [
+      "docs/04-dashboard/README.md",
+      "docs/06-database/SCHEMA.md",
+      "docs/10-testing/TEST-PLAN.md"
+    ],
+    "blocks": [
+      "Implement return eligibility policy by order item/status/window, create request, reason, quantity, evidence metadata, communication history.",
+      "Implement dashboard returns/refunds list/detail/form/upload flow dan user ownership.",
+      "Implement admin review/approve/reject/receive/refund actions dengan permission, provider refund adapter, audit, and idempotency.",
+      "Update finalized refund to refunded_sold/net_sold and optional restock decision; test partial/full/duplicate/refund-failure cases."
+    ],
+    "deliverables": [
+      "Return API/dashboard",
+      "Admin return workflow",
+      "Refund adapter/state machine",
+      "Sold correction tests"
+    ],
+    "acceptance": [
+      "Refund tidak otomatis restock tanpa keputusan",
+      "Partial refund amount bounded",
+      "net_sold corrected once",
+      "Evidence private and validated"
+    ],
+    "files": [
+      "apps/api/src/modules/returns",
+      "apps/api/src/modules/refunds",
+      "apps/dashboard/src/features/returns",
+      "apps/admin/src/features/returns"
+    ],
+    "commands": [
+      "deno task test:returns",
+      "deno task test:refunds",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 42,
+    "week": 9,
+    "phase": "Operasional dan purnajual",
+    "title": "Support FAQ, tickets, messages, dan attachments",
+    "read": [
+      "docs/04-dashboard/README.md",
+      "docs/06-database/SCHEMA.md"
+    ],
+    "blocks": [
+      "Implement public/account FAQ read model and support ticket create/list/detail with category, order link validation, priority/status, and ownership.",
+      "Implement ticket message thread and private attachment upload/download with MIME/size/authorization rules.",
+      "Bangun dashboard support UI dan admin queue/detail/reply/assign/status workflow dengan notifications/outbox.",
+      "Tulis IDOR, attachment, spam/rate-limit, closed-ticket, and notification tests."
+    ],
+    "deliverables": [
+      "FAQ/ticket API",
+      "Dashboard support center",
+      "Admin support queue",
+      "Attachment security tests"
+    ],
+    "acceptance": [
+      "Order link hanya bila milik user",
+      "Attachment tidak publik",
+      "Admin actions diaudit",
+      "Ticket notification idempotent"
+    ],
+    "files": [
+      "apps/api/src/modules/support",
+      "apps/dashboard/src/features/support",
+      "apps/admin/src/features/support"
+    ],
+    "commands": [
+      "deno task test:support",
+      "deno task build:dashboard",
+      "deno task build:admin",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 43,
+    "week": 9,
+    "phase": "Operasional dan purnajual",
+    "title": "Admin orders, payments, invoices, dan customers",
+    "read": [
+      "apps/admin/README.md",
+      "docs/05-api/ENDPOINTS.md",
+      "docs/08-security/SECURITY-CHECKLIST.md"
+    ],
+    "blocks": [
+      "Implement admin order list/detail filters, status timeline, customer snapshot, items, totals, payment, shipment, invoice, and support links.",
+      "Implement permitted operations: mark processing, attach shipment, cancel rules, resend invoice, retry job, without editing immutable financial snapshot arbitrarily.",
+      "Implement payment events/invoice/customer list/detail with least-privilege data masking and no password/session secret exposure.",
+      "Bangun admin UI, audit all state changes, and authorization/status-transition tests."
+    ],
+    "deliverables": [
+      "Admin order operations",
+      "Payment/invoice views",
+      "Customer operations",
+      "Audit/authorization tests"
+    ],
+    "acceptance": [
+      "Status transitions validated server-side",
+      "Sensitive data masked",
+      "Financial snapshot not silently editable",
+      "Every action has actor/audit"
+    ],
+    "files": [
+      "apps/api/src/modules/admin/orders",
+      "apps/admin/src/features/orders",
+      "apps/admin/src/features/customers",
+      "apps/admin/src/features/payments"
+    ],
+    "commands": [
+      "deno task test:admin-api",
+      "deno task test:admin",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 44,
+    "week": 9,
+    "phase": "Operasional dan purnajual",
+    "title": "Admin review moderation, inventory operations, audit, dan operational dashboard",
+    "read": [
+      "apps/admin/README.md",
+      "docs/08-security/SECURITY-CHECKLIST.md"
+    ],
+    "blocks": [
+      "Implement review moderation queue with publish/reject policy, reason, audit, and aggregate recalculation.",
+      "Complete admin catalog/inventory operations including low stock, movement history, product status, and bulk action safeguards.",
+      "Build operational dashboard cards for orders/payments/outbox/email/low-stock using bounded queries and permission-aware metrics.",
+      "Build audit log viewer with filters/redaction, test admin boundaries, and responsive admin build."
+    ],
+    "deliverables": [
+      "Review moderation",
+      "Inventory operations",
+      "Operational metrics",
+      "Audit log viewer"
+    ],
+    "acceptance": [
+      "Moderation does not edit review content silently",
+      "Bulk actions require explicit selection/confirmation",
+      "Metrics do not leak PII",
+      "Audit immutable to normal admin"
+    ],
+    "files": [
+      "apps/api/src/modules/admin/reviews",
+      "apps/admin/src/features/reviews",
+      "apps/admin/src/features/overview",
+      "apps/admin/src/features/audit"
+    ],
+    "commands": [
+      "deno task test:admin",
+      "deno task build:admin",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 45,
+    "week": 9,
+    "phase": "Operasional dan purnajual",
+    "title": "Public tracking, shipment events, dan Operations Gate",
+    "read": [
+      "docs/01-architecture/SUBDOMAINS-AND-ROUTES.md",
+      "docs/04-dashboard/ORDERS-HISTORY-INVOICES.md"
+    ],
+    "blocks": [
+      "Implement opaque public tracking token issue/revoke/expiry and endpoint projection that exposes only safe shipment/order fields.",
+      "Implement shipment provider adapter/webhook or deterministic mock, unique event handling, timeline ordering, and order notification outbox.",
+      "Bangun tracking app with token route, invalid/expired/not-found states, timeline, estimated delivery, and no account PII.",
+      "Run operations integration tests, security review tracking enumeration, build admin/dashboard/tracking, and write Operations Gate report."
+    ],
+    "deliverables": [
+      "Public tracking token/API",
+      "Shipment event adapter",
+      "Tracking frontend",
+      "Operations gate report"
+    ],
+    "acceptance": [
+      "Order ID mentah bukan public credential",
+      "Token sulit ditebak dan revocable",
+      "Payload tidak memuat email/alamat lengkap",
+      "Duplicate shipping event idempotent"
+    ],
+    "files": [
+      "apps/api/src/modules/tracking",
+      "apps/api/src/modules/shipping/webhook.ts",
+      "apps/tracking/src"
+    ],
+    "commands": [
+      "deno task test:tracking",
+      "deno task build:tracking",
+      "deno task quality"
+    ],
+    "external": [
+      "Real courier integration dapat mengganti mock adapter setelah akun provider dan webhook secret tersedia."
+    ]
+  },
+  {
+    "day": 46,
+    "week": 10,
+    "phase": "Hardening dan rilis",
+    "title": "Lengkapi unit/integration test, factories, dan coverage gate",
+    "read": [
+      "docs/10-testing/TEST-PLAN.md"
+    ],
+    "blocks": [
+      "Audit test coverage by domain and map every critical invariant/status transition to at least one test.",
+      "Lengkapi unit tests price/discount/sold/cart merge/voucher/order total/token expiry/permission/status transition.",
+      "Lengkapi integration tests auth/catalog/cart/reservation/payment/refund/outbox/invoice/notification/support menggunakan isolated test DB/branch.",
+      "Stabilkan factories, time/random/provider fakes, parallelization policy, coverage report, and fail threshold."
+    ],
+    "deliverables": [
+      "Critical unit coverage",
+      "Integration coverage",
+      "Deterministic factories/fakes",
+      "Coverage gate"
+    ],
+    "acceptance": [
+      "Tidak ada test bergantung urutan",
+      "External provider dipalsukan deterministik",
+      "Critical invariants covered",
+      "Suite repeatable"
+    ],
+    "files": [
+      "quality/unit",
+      "quality/integration",
+      "quality/fixtures",
+      "deno.jsonc"
+    ],
+    "commands": [
+      "deno task test:unit",
+      "deno task test:integration",
+      "deno task test:coverage",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 47,
+    "week": 10,
+    "phase": "Hardening dan rilis",
+    "title": "E2E browser, accessibility, responsive, dan failure journeys",
+    "read": [
+      "docs/10-testing/TEST-PLAN.md"
+    ],
+    "blocks": [
+      "Set up E2E runner and isolated environment; seed deterministic user/products/payment mock and launch all required apps.",
+      "Automate guest product→cart→checkout→paid→invoice/account activation→login→dashboard order journey.",
+      "Automate signup/login/recovery, cart merge, wishlist, history pagination, notification reconnect, return, support, admin operations, and public tracking.",
+      "Run accessibility keyboard/focus/labels/contrast checks and desktop/mobile viewport suite; capture artifacts on failure."
+    ],
+    "deliverables": [
+      "Core E2E suite",
+      "Failure journey tests",
+      "Accessibility checks",
+      "Responsive tests"
+    ],
+    "acceptance": [
+      "Core purchase path tested in browser",
+      "No test uses production secrets",
+      "Failure artifacts retained",
+      "Keyboard-only critical flows usable"
+    ],
+    "files": [
+      "quality/e2e",
+      "quality/e2e/config",
+      "scripts/start-test-stack.ts"
+    ],
+    "commands": [
+      "deno task test:e2e",
+      "deno task test:a11y",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 48,
+    "week": 10,
+    "phase": "Hardening dan rilis",
+    "title": "Security, observability, backup/restore, dan operational runbooks",
+    "read": [
+      "docs/08-security/SECURITY-CHECKLIST.md",
+      "docs/11-deployment/DENO-DEPLOY-NEON.md"
+    ],
+    "blocks": [
+      "Threat-model auth/payment/upload/IDOR/webhook/SSE/tracking/admin; remediate high risks, headers, CSRF, CORS, rate limit, validation, and authorization.",
+      "Audit dependency/secrets/log redaction, cookie flags, token handling, upload controls, CSP, and production error responses.",
+      "Implement structured logs, health/readiness, metrics/alerts for errors, latency, webhook failures, email failures, outbox backlog, and stock anomalies.",
+      "Document and rehearse Neon backup/restore or branch-based recovery, migration rollback/forward, incident response, and provider outage runbooks."
+    ],
+    "deliverables": [
+      "Threat model/remediation",
+      "Observability and alerts",
+      "Backup/restore rehearsal",
+      "Operational runbooks"
+    ],
+    "acceptance": [
+      "No known high-severity finding open",
+      "Secrets absent from logs/repo",
+      "Restore exercise evidenced",
+      "Critical alerts have owner/action"
+    ],
+    "files": [
+      "docs/security/THREAT-MODEL.md",
+      "docs/runbooks",
+      "apps/api/src/observability",
+      "apps/worker/src/observability"
+    ],
+    "commands": [
+      "deno task audit",
+      "deno task test:security",
+      "deno task quality"
+    ]
+  },
+  {
+    "day": 49,
+    "week": 10,
+    "phase": "Hardening dan rilis",
+    "title": "Deploy staging, migration rehearsal, DNS/CORS/cookie validation, dan UAT",
+    "read": [
+      "docs/11-deployment/DENO-DEPLOY-NEON.md",
+      ".env.example",
+      "docs/01-architecture/SUBDOMAINS-AND-ROUTES.md",
+      "IMPLEMENTATION-CHECKLIST.md"
+    ],
+    "blocks": [
+      "Create staging environment matrix, deployment configs for each existing app, secret injection, build commands, and Neon staging branch.",
+      "Run migration rehearsal from production-like snapshot, deploy API/worker first then frontends, and verify health/readiness.",
+      "Configure only documented DNS hosts, HTTPS, CORS allowlist, API host-only secure session cookie, CSP, object storage, payment/email/shipping webhooks.",
+      "Run staging smoke/E2E/UAT, capture defects, fix release blockers, freeze release candidate, and document rollback."
+    ],
+    "deliverables": [
+      "Staging deployments",
+      "Migration rehearsal",
+      "DNS/security validation",
+      "Signed UAT/release candidate"
+    ],
+    "acceptance": [
+      "No architecture/domain drift",
+      "Staging uses non-production DB/provider credentials",
+      "All canonical URLs work",
+      "Rollback steps tested/documented"
+    ],
+    "files": [
+      "infrastructure/deploy",
+      "docs/releases/RC-1.md",
+      "docs/runbooks/rollback.md"
+    ],
+    "commands": [
+      "deno task build",
+      "deno task test:smoke:staging",
+      "deno task quality"
+    ],
+    "external": [
+      "Deployment platform, DNS access, Neon staging, email/payment/storage/shipping sandbox credentials diperlukan untuk UAT penuh."
+    ]
+  },
+  {
+    "day": 50,
+    "week": 10,
+    "phase": "Hardening dan rilis",
+    "title": "Production release, smoke test, rollback readiness, dan handover",
+    "read": [
+      "IMPLEMENTATION-CHECKLIST.md",
+      "docs/11-deployment/DENO-DEPLOY-NEON.md"
+    ],
+    "blocks": [
+      "Review release diff, dependency lock, secrets, database migration, backup/restore point, feature flags, provider production settings, and change approval.",
+      "Run production migration with logs, deploy API and worker, verify health, then deploy storefront/auth/dashboard/admin/tracking and public site as applicable.",
+      "Run production smoke: login, products, cart, provider-approved controlled payment verification, webhook, invoice, email, activation, dashboard, admin, tracking, notification. Jangan memakai sandbox credential pada production.",
+      "Monitor errors/latency/outbox/webhooks/email, execute rollback if thresholds breached, finalize release notes, handover docs, and 24-hour observation checklist."
+    ],
+    "deliverables": [
+      "Production release",
+      "Smoke evidence",
+      "Rollback readiness",
+      "Final handover and post-launch checklist"
+    ],
+    "acceptance": [
+      "Migration/deploy evidence tersimpan",
+      "Critical smoke checks pass",
+      "Monitoring aktif",
+      "Known limitations documented with owners"
+    ],
+    "files": [
+      "docs/releases/PRODUCTION-1.0.0.md",
+      "docs/operations/HANDOVER.md",
+      "docs/operations/POST-LAUNCH-CHECKLIST.md"
+    ],
+    "commands": [
+      "deno task quality",
+      "deno task build",
+      "deno task test:smoke:production"
+    ],
+    "external": [
+      "Production credentials dan explicit change approval diperlukan. Jangan pernah menguji transaksi riil tanpa prosedur pembayaran aman yang disetujui."
+    ]
+  }
+]
