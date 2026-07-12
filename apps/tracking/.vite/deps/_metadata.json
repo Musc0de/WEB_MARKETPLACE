@@ -1,0 +1,58 @@
+{
+  "hash": "6a4cafb3",
+  "configHash": "847b1aa6",
+  "lockfileHash": "e3b0c442",
+  "browserHash": "ed7993fc",
+  "optimized": {
+    "react": {
+      "src": "../../../../node_modules/.deno/react@18.3.1/node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "6c7f48d2",
+      "needsInterop": true
+    },
+    "react-dom": {
+      "src": "../../../../node_modules/.deno/react-dom@18.3.1/node_modules/react-dom/index.js",
+      "file": "react-dom.js",
+      "fileHash": "dbe7c42e",
+      "needsInterop": true
+    },
+    "react/jsx-dev-runtime": {
+      "src": "../../../../node_modules/.deno/react@18.3.1/node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "0cfccb58",
+      "needsInterop": true
+    },
+    "react/jsx-runtime": {
+      "src": "../../../../node_modules/.deno/react@18.3.1/node_modules/react/jsx-runtime.js",
+      "file": "react_jsx-runtime.js",
+      "fileHash": "b38ebeb7",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../../../node_modules/.deno/react-dom@18.3.1/node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "3c123308",
+      "needsInterop": true
+    },
+    "react-error-boundary": {
+      "src": "../../../../node_modules/.deno/react-error-boundary@4.1.2/node_modules/react-error-boundary/dist/react-error-boundary.development.esm.js",
+      "file": "react-error-boundary.js",
+      "fileHash": "27ca5716",
+      "needsInterop": false
+    },
+    "react-router-dom": {
+      "src": "../../../../node_modules/.deno/react-router-dom@6.30.4/node_modules/react-router-dom/dist/index.js",
+      "file": "react-router-dom.js",
+      "fileHash": "5f5cc16a",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-EGBXYNOP": {
+      "file": "chunk-EGBXYNOP.js"
+    },
+    "chunk-RBM32MWW": {
+      "file": "chunk-RBM32MWW.js"
+    }
+  }
+}
