@@ -79,9 +79,17 @@ export function AdminLayout() {
 
         <nav className='flex-1 overflow-y-auto py-4 px-3 space-y-1'>
           {navItems.map((item) => {
-            const isActive = item.href === '/'
-              ? location.pathname === '/'
-              : location.pathname.startsWith(item.href);
+            let isActive = false;
+            if (item.href === '/') {
+              isActive = location.pathname === '/';
+            } else if (item.href === '/catalog') {
+              isActive = location.pathname === '/catalog' ||
+                (location.pathname.startsWith('/catalog/') &&
+                  !location.pathname.startsWith('/catalog/categories') &&
+                  !location.pathname.startsWith('/catalog/brands'));
+            } else {
+              isActive = location.pathname.startsWith(item.href);
+            }
             return (
               <NavLink
                 key={item.href}
