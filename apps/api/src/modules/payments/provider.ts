@@ -27,13 +27,18 @@ export class SandboxPaymentProvider implements PaymentProvider {
   }
 
   createIntent(orderId: string, _amount: number) {
-    // Deterministic transaction ID based on orderId for testing
-    const providerTransactionId = `txn_${
-      createHash('sha256').update(orderId).digest('hex').substring(0, 12)
-    }`;
-    // Deterministic client secret
+    // Use orderId hash as base + timestamp suffix to ensure uniqueness per intent creation.
+    // This prevents duplicate key violations if /intent is called multiple times for an order
+    // that previously had its payment row deleted/failed.
+    const base = createHash('sha256').update(orderId).digest('hex').substring(0, 8);
+    const suffix = Date.now().toString(36).slice(-4); // 4-char timestamp suffix
+    const providerTransactionId = `txn_${base}${suffix}`;
+    // Deterministic client secret based on the transaction ID
     const clientSecret = `sec_${
-      createHash('sha256').update(orderId + this.secretKey).digest('hex').substring(0, 16)
+      createHash('sha256').update(providerTransactionId + this.secretKey).digest('hex').substring(
+        0,
+        16,
+      )
     }`;
 
     return Promise.resolve({

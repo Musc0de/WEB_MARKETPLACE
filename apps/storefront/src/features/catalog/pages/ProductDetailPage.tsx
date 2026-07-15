@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { ProductDetail } from '@starsuperscare/contracts';
 import { Button, H3, Skeleton, Text } from '@starsuperscare/ui';
-import { toast } from '@starsuperscare/ui';
+
 import { client } from '../../../lib/api.ts';
 import { ProductGallery } from '../components/ProductGallery.tsx';
 import { ProductSummary } from '../components/ProductSummary.tsx';
@@ -54,11 +54,15 @@ export const ProductDetailPage = (): JSX.Element => {
 
         setProduct(payload.data);
       } catch (err: any) {
+        // If the request was intentionally aborted (component unmount / slug change),
+        // do NOT update state — the new request will handle it.
         if (err.name === 'AbortError') return;
         setError(err.message || 'Gagal memuat detail produk.');
-        toast.error(err.message || 'Gagal memuat detail produk.');
       } finally {
-        setLoading(false);
+        // Only clear loading if we haven't been aborted
+        if (!abortController.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 

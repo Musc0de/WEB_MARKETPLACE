@@ -1,8 +1,36 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ErrorBoundary } from 'react-error-boundary';
 import { client } from '../../lib/api.ts';
 import { useCart } from '../../features/cart/api/useCart.ts';
+
+/** Animated cart badge — bounces every time itemCount changes */
+const CartBadge = ({ count }: { count: number }) => {
+  const [animKey, setAnimKey] = useState(0);
+  const prevCount = useRef(count);
+
+  useEffect(() => {
+    if (count !== prevCount.current) {
+      setAnimKey((k) => k + 1); // force re-mount to replay animation
+      prevCount.current = count;
+    }
+  }, [count]);
+
+  if (count <= 0) return null;
+
+  return (
+    <span
+      key={animKey}
+      style={{
+        animation: 'cartBadgeBounce 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both',
+      }}
+      className='absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold leading-none text-white bg-red-600 rounded-full shadow-sm'
+    >
+      {count > 99 ? '99+' : count}
+    </span>
+  );
+};
+
 
 const Header = () => {
   const navigate = useNavigate();
@@ -68,11 +96,7 @@ const Header = () => {
                 <circle cx='19' cy='21' r='1' />
                 <path d='M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12' />
               </svg>
-              {cartItemCount > 0 && (
-                <span className='absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full'>
-                  {cartItemCount}
-                </span>
-              )}
+              <CartBadge count={cartItemCount} />
             </a>
           </div>
         </div>
@@ -176,12 +200,8 @@ const Header = () => {
               <circle cx='19' cy='21' r='1' />
               <path d='M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12' />
             </svg>
-            {cartItemCount > 0 && (
-              <span className='absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full'>
-                {cartItemCount}
-              </span>
-            )}
-          </a>
+              <CartBadge count={cartItemCount} />
+            </a>
           <div className='w-px h-6 bg-gray-300 mx-2' />
           <a
             href={accountUrl}

@@ -2,15 +2,20 @@ import { useState } from 'react';
 import type { ProductDetail, ProductVariant } from '@starsuperscare/contracts';
 import { Badge, Button, formatIndonesianSold, H1, H3, Text } from '@starsuperscare/ui';
 import { toast } from '@starsuperscare/ui';
-import { ShieldCheck, ShoppingCart, Star } from 'lucide-react';
+import { ShieldCheck, ShoppingCart, Star, Check, Loader2 } from 'lucide-react';
 import { WishlistButton } from '../../wishlist/components/WishlistButton.tsx';
+import { useCart } from '../../cart/api/useCart.ts';
+import { useNavigate } from 'react-router-dom';
 
 export const ProductSummary = ({ product }: { product: ProductDetail }) => {
+  const navigate = useNavigate();
+  const { addItem } = useCart();
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(
     product.variants.length > 0 ? product.variants[0].id : null,
   );
-
   const [quantity, setQuantity] = useState<number>(1);
+  const [addingToCart, setAddingToCart] = useState(false);
+  const [addedToCart, setAddedToCart] = useState(false);
 
   const selectedVariant =
     product.variants.find((v: ProductVariant) => v.id === selectedVariantId) || product.variants[0];
@@ -32,14 +37,31 @@ export const ProductSummary = ({ product }: { product: ProductDetail }) => {
     setQuantity(newQty);
   };
 
-  const handleAddToCart = () => {
-    if (!selectedVariantId) return;
-    toast.success(`Ditambahkan ke keranjang (Varian ID: ${selectedVariantId}, Qty: ${quantity})`);
+  const handleAddToCart = async () => {
+    if (!selectedVariantId || addingToCart) return;
+    setAddingToCart(true);
+    try {
+      await addItem(selectedVariantId, quantity);
+      setAddedToCart(true);
+      // Reset checkmark after 2 seconds
+      setTimeout(() => setAddedToCart(false), 2000);
+    } catch (_err) {
+      toast.error('Gagal menambahkan ke keranjang');
+    } finally {
+      setAddingToCart(false);
+    }
   };
 
-  const handleBuyNow = () => {
-    if (!selectedVariantId) return;
-    toast.success(`Melanjutkan ke pembayaran (Varian ID: ${selectedVariantId}, Qty: ${quantity})`);
+  const handleBuyNow = async () => {
+    if (!selectedVariantId || addingToCart) return;
+    setAddingToCart(true);
+    try {
+      await addItem(selectedVariantId, quantity);
+      navigate('/checkout');
+    } catch (_err) {
+      toast.error('Gagal memproses pembelian');
+      setAddingToCart(false);
+    }
   };
 
   return (
@@ -90,6 +112,7 @@ export const ProductSummary = ({ product }: { product: ProductDetail }) => {
                 onClick={() => {
                   setSelectedVariantId(v.id);
                   setQuantity(1); // Reset qty on variant change
+                  setAddedToCart(false);
                 }}
                 disabled={v.availableStock <= 0}
                 className={`px-4 py-2 rounded-md border text-sm font-medium transition-colors ${
@@ -142,20 +165,28 @@ export const ProductSummary = ({ product }: { product: ProductDetail }) => {
           <Button
             variant='outline'
             size='lg'
-            className='flex-1 flex items-center justify-center gap-2 border-blue-600 text-blue-600 hover:bg-blue-50'
+            className={`flex-1 flex items-center justify-center gap-2 transition-all ${
+              addedToCart
+                ? 'border-green-500 text-green-600 bg-green-50 hover:bg-green-50'
+                : 'border-blue-600 text-blue-600 hover:bg-blue-50'
+            }`}
             onClick={handleAddToCart}
-            disabled={isOutOfStock}
+            disabled={isOutOfStock || addingToCart}
           >
-            <ShoppingCart className='w-5 h-5' />
-            + Keranjang
+            {addingToCart
+              ? <Loader2 className='w-5 h-5 animate-spin' />
+              : addedToCart
+              ? <Check className='w-5 h-5' />
+              : <ShoppingCart className='w-5 h-5' />}
+            {addedToCart ? 'Ditambahkan!' : '+ Keranjang'}
           </Button>
           <Button
             size='lg'
             className='flex-1 bg-blue-600 hover:bg-blue-700 text-white'
             onClick={handleBuyNow}
-            disabled={isOutOfStock}
+            disabled={isOutOfStock || addingToCart}
           >
-            Beli Langsung
+            {addingToCart ? <Loader2 className='w-5 h-5 animate-spin' /> : 'Beli Langsung'}
           </Button>
           <WishlistButton
             productId={product.id}

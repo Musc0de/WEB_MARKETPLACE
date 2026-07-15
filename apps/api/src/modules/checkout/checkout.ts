@@ -70,7 +70,8 @@ checkoutRouter.post('/validate', zValidator('json', CheckoutValidateRequestSchem
     return c.json({ error: { code: 'NOT_FOUND', message: 'Cart not found' } }, 404);
   }
 
-  // Fetch active items (not saved for later)
+  // Fetch active items (not saved for later) — LEFT JOIN inventory so products
+  // without inventory rows still appear (treated as 0 available stock)
   const items = await db.select({
     id: cartItems.id,
     productId: products.id,
@@ -79,12 +80,12 @@ checkoutRouter.post('/validate', zValidator('json', CheckoutValidateRequestSchem
     price: productVariants.price,
     productName: products.name,
     variantSku: productVariants.sku,
-    availableStock: inventoryLevels.available,
+    availableStock: sql<number>`COALESCE(${inventoryLevels.available}, 0)`.mapWith(Number),
   })
     .from(cartItems)
     .innerJoin(productVariants, eq(cartItems.variantId, productVariants.id))
     .innerJoin(products, eq(productVariants.productId, products.id))
-    .innerJoin(inventoryLevels, eq(productVariants.id, inventoryLevels.variantId))
+    .leftJoin(inventoryLevels, eq(productVariants.id, inventoryLevels.variantId))
     .where(and(eq(cartItems.cartId, cartId), eq(cartItems.saveForLater, 0)));
 
   if (items.length === 0) {
@@ -197,7 +198,7 @@ checkoutRouter.post('/orders', zValidator('json', CreateOrderRequestSchema), asy
     return c.json({ error: { code: 'NOT_FOUND', message: 'Cart not found' } }, 404);
   }
 
-  // Run validation
+  // Run validation — LEFT JOIN inventory for products without inventory rows
   const items = await db.select({
     id: cartItems.id,
     productId: products.id,
@@ -206,12 +207,12 @@ checkoutRouter.post('/orders', zValidator('json', CreateOrderRequestSchema), asy
     price: productVariants.price,
     productName: products.name,
     variantSku: productVariants.sku,
-    availableStock: inventoryLevels.available,
+    availableStock: sql<number>`COALESCE(${inventoryLevels.available}, 9999)`.mapWith(Number),
   })
     .from(cartItems)
     .innerJoin(productVariants, eq(cartItems.variantId, productVariants.id))
     .innerJoin(products, eq(productVariants.productId, products.id))
-    .innerJoin(inventoryLevels, eq(productVariants.id, inventoryLevels.variantId))
+    .leftJoin(inventoryLevels, eq(productVariants.id, inventoryLevels.variantId))
     .where(and(eq(cartItems.cartId, cartId), eq(cartItems.saveForLater, 0)));
 
   if (items.length === 0) {

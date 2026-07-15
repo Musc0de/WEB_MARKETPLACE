@@ -10,10 +10,12 @@ import type {
 } from '@starsuperscare/contracts';
 import { API_URL } from '../../../lib/api.ts';
 
-const CHECKOUT_API = `${API_URL}/v1/checkout`;
+// Strip trailing slash from API_URL to normalize, then rebuild cleanly
+const BASE = API_URL.replace(/\/$/, '');
+const CHECKOUT_API = `${BASE}/v1/checkout`;
 
 async function fetcher(url: string, options: RequestInit) {
-  const res = await fetch(url, options);
+  const res = await fetch(url, { ...options, credentials: 'include' });
   const json = await res.json();
   if (!res.ok || json.error) {
     throw new Error(json.error?.message || 'Request failed');
@@ -92,7 +94,7 @@ export function useCreateOrder() {
 
 export function usePaymentIntent() {
   return useSWRMutation<PaymentIntentResponse, Error, string, PaymentIntentRequest>(
-    `${API_URL}/v1/payments/intent`,
+    `${BASE}/v1/payments/intent`,
     async (url, { arg }) => {
       const res = await fetcher(url, {
         method: 'POST',
@@ -111,7 +113,7 @@ export async function checkOrderStatus(orderId: string): Promise<string> {
   try {
     // There is no /v1/orders endpoint yet?
     // Let's call a hypothetical endpoint or we will add it.
-    const res = await fetcher(`${API_URL}/v1/checkout/orders/${orderId}`, {
+    const res = await fetcher(`${BASE}/v1/checkout/orders/${orderId}`, {
       headers: { 'Content-Type': 'application/json' },
     });
     return res.data.status;
@@ -121,7 +123,7 @@ export async function checkOrderStatus(orderId: string): Promise<string> {
 }
 
 export function simulateWebhook(payload: WebhookPayload) {
-  return fetch(`${API_URL}/v1/payments/simulate`, {
+  return fetch(`${BASE}/v1/payments/simulate`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

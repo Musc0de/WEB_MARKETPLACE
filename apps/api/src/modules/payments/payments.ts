@@ -5,6 +5,7 @@ import { orders, payments } from '@starsuperscare/database';
 import { eq } from 'drizzle-orm';
 import { PaymentIntentRequestSchema } from '@starsuperscare/contracts';
 import { paymentProvider } from './provider.ts';
+
 type AppContext = {
   Variables: {
     requestId: string;
@@ -29,40 +30,49 @@ paymentsRouter.post('/intent', zValidator('json', PaymentIntentRequestSchema), a
     }, 400);
   }
 
-  // Check if there's already a pending payment for this order
+  // Check if there's already a payment for this order
   const existingPaymentList = await db
     .select()
     .from(payments)
     .where(eq(payments.orderId, orderId))
     .limit(1);
 
+  // If order is already paid, reject
   if (existingPaymentList.length > 0 && existingPaymentList[0].status === 'success') {
     return c.json({ error: { code: 'BAD_REQUEST', message: 'Order already paid' } }, 400);
   }
 
+  // If a pending payment already exists, REUSE it (idempotent).
+  // This prevents duplicate key violations on re-requesting an intent for the same order.
+  if (existingPaymentList.length > 0 && existingPaymentList[0].status === 'pending') {
+    const existing = existingPaymentList[0];
+    return c.json({
+      data: {
+        paymentId: existing.id,
+        providerTransactionId: existing.providerTransactionId,
+        clientSecret: `sec_${existing.providerTransactionId?.replace('txn_', '')}`,
+        amount: order.totalAmount,
+        currency: 'IDR',
+        status: 'pending',
+      },
+      meta: { request_id: c.get('requestId') },
+      error: null,
+    });
+  }
+
+  // Generate new intent for this order
   const intent = await paymentProvider.createIntent(order.id, order.totalAmount);
 
-  let paymentId = '';
+  // Insert the new payment record
+  const inserted = await db.insert(payments).values({
+    orderId: order.id,
+    provider: 'sandbox',
+    providerTransactionId: intent.providerTransactionId,
+    amount: order.totalAmount,
+    status: 'pending',
+  }).returning({ id: payments.id });
 
-  if (existingPaymentList.length > 0) {
-    paymentId = existingPaymentList[0].id;
-    // Update existing
-    await db.update(payments).set({
-      providerTransactionId: intent.providerTransactionId,
-      amount: order.totalAmount,
-      updatedAt: new Date().toISOString(),
-    }).where(eq(payments.id, paymentId));
-  } else {
-    // Create new
-    const inserted = await db.insert(payments).values({
-      orderId: order.id,
-      provider: 'sandbox',
-      providerTransactionId: intent.providerTransactionId,
-      amount: order.totalAmount,
-      status: 'pending',
-    }).returning({ id: payments.id });
-    paymentId = inserted[0].id;
-  }
+  const paymentId = inserted[0].id;
 
   return c.json({
     data: {
