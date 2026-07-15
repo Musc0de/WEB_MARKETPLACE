@@ -106,11 +106,11 @@ export function ProductForm() {
         ]);
         if (catRes.ok) {
           const catData = await catRes.json();
-          setCategoriesList(catData.data);
+          setCategoriesList(catData.data.items);
         }
         if (brandRes.ok) {
           const brandData = await brandRes.json();
-          setBrandsList(brandData.data);
+          setBrandsList(brandData.data.items);
         }
       } catch (e) {
         console.error('Failed to fetch options', e);
