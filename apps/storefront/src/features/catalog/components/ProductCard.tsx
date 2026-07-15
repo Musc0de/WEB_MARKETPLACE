@@ -39,22 +39,22 @@ export const ProductCard = (
   return (
     <div className='flex flex-col bg-white rounded-lg border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 group relative'>
       {/* ── Top badge — priority: Habis > Diskon > Baru ── */}
-      <div className='absolute top-1.5 left-1.5 z-10'>
+      <div className='absolute top-2 left-2 z-10'>
         {isOutOfStock
           ? (
-            <span className='bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm leading-tight'>
+            <span className='bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded border border-white shadow-md shadow-black/10 leading-tight'>
               Habis
             </span>
           )
           : hasDiscount
           ? (
-            <span className='bg-orange-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm leading-tight'>
+            <span className='bg-orange-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded border border-white shadow-md shadow-black/10 leading-tight'>
               -{discountPct}%
             </span>
           )
           : product.netSold === 0
           ? (
-            <span className='bg-blue-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm leading-tight'>
+            <span className='bg-blue-500 text-white text-[10px] font-bold px-2 py-0.5 rounded border border-white shadow-md shadow-black/10 leading-tight'>
               Baru
             </span>
           )

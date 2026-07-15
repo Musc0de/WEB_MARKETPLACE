@@ -102,21 +102,32 @@ export default function HomePage() {
 
         {loading
           ? (
-            <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
-              {Array.from({ length: 8 }).map((_, i) => <ProductCardSkeleton key={i} />)}
+            <div className='flex overflow-x-auto gap-3 pb-2 md:grid md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 snap-x no-scrollbar'>
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div
+                  key={i}
+                  className='w-[140px] sm:w-[160px] shrink-0 snap-start md:w-auto md:shrink'
+                >
+                  <ProductCardSkeleton />
+                </div>
+              ))}
             </div>
           )
           : products.length > 0
           ? (
-            <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
+            <div className='flex overflow-x-auto gap-3 pb-2 md:grid md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 snap-x no-scrollbar'>
               {products.map((product) => (
-                <ProductCard
+                <div
                   key={product.id}
-                  product={product}
-                  isLoading={actionLoading === product.id}
-                  onAddToCart={(p) => handleAction(p, false)}
-                  onBuyNow={(p) => handleAction(p, true)}
-                />
+                  className='w-[140px] sm:w-[160px] shrink-0 snap-start md:w-auto md:shrink'
+                >
+                  <ProductCard
+                    product={product}
+                    isLoading={actionLoading === product.id}
+                    onAddToCart={(p) => handleAction(p, false)}
+                    onBuyNow={(p) => handleAction(p, true)}
+                  />
+                </div>
               ))}
             </div>
           )
