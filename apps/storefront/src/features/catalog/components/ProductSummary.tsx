@@ -113,9 +113,9 @@ export const ProductSummary = ({ product }: { product: ProductDetail }) => {
           )}
         </div>
         {comparePrice && comparePrice > price && (
-          <Badge className='w-max bg-red-50 text-red-600 hover:bg-red-50 border border-red-200 text-xs'>
+          <div className='w-max bg-red-100 text-red-600 font-semibold px-2.5 py-1 rounded-md border border-red-200 text-xs shadow-sm'>
             Hemat Rp {(comparePrice - price).toLocaleString('id-ID')}
-          </Badge>
+          </div>
         )}
       </div>
 
