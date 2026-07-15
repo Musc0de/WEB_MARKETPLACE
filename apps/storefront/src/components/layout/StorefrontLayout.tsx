@@ -34,6 +34,10 @@ const CartBadge = ({ count }: { count: number }) => {
 const Header = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [isSuggestionsLoading, setIsSuggestionsLoading] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
   const [accountUrl, setAccountUrl] = useState(`${(import.meta as any).env.VITE_AUTH_URL}/login`);
   const { cart } = useCart();
   // Use TOTAL QUANTITY (sum of all item quantities) so the badge animates
@@ -57,6 +61,33 @@ const Header = () => {
     };
     checkSession();
   }, []);
+
+  // Fetch search suggestions
+  useEffect(() => {
+    if (searchQuery.trim().length < 2) {
+      setSuggestions([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        setIsSuggestionsLoading(true);
+        const res = await fetch(
+          `/api/v1/products?search=${encodeURIComponent(searchQuery.trim())}&per_page=5`,
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setSuggestions(data.data || []);
+        }
+      } catch (err) {
+        // ignore error
+      } finally {
+        setIsSuggestionsLoading(false);
+      }
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -141,6 +172,8 @@ const Header = () => {
               placeholder='Cari produk, kategori, atau brand...'
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => setShowSuggestions(true)}
+              onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
               className='w-full h-11 pl-4 pr-10 rounded-full border border-gray-300 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-all'
             />
             <button
@@ -162,6 +195,67 @@ const Header = () => {
                 <path d='m21 21-4.3-4.3' />
               </svg>
             </button>
+
+            {/* Auto-complete Dropdown */}
+            {showSuggestions && searchQuery.trim().length >= 2 && (
+              <div className='absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2'>
+                {isSuggestionsLoading
+                  ? (
+                    <div className='p-4 text-center text-sm text-gray-500'>
+                      Mencari...
+                    </div>
+                  )
+                  : suggestions.length > 0
+                  ? (
+                    <ul>
+                      {suggestions.map((product) => (
+                        <li key={product.id}>
+                          <a
+                            href={`/products/${product.slug}`}
+                            className='flex items-center gap-3 p-3 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors'
+                            onClick={() => setShowSuggestions(false)}
+                          >
+                            <div className='w-10 h-10 rounded-md bg-gray-100 overflow-hidden shrink-0 flex items-center justify-center'>
+                              {product.images && product.images.length > 0
+                                ? (
+                                  <img
+                                    src={product.images[0].url}
+                                    alt={product.name}
+                                    className='w-full h-full object-cover'
+                                  />
+                                )
+                                : <span className='text-[8px] text-gray-400'>No Img</span>}
+                            </div>
+                            <div className='flex flex-col min-w-0'>
+                              <span className='text-sm font-medium text-gray-800 truncate'>
+                                {product.name}
+                              </span>
+                              <span className='text-xs text-blue-600 font-bold'>
+                                Rp{' '}
+                                {(product.variantsSummary?.minPrice || 0).toLocaleString('id-ID')}
+                              </span>
+                            </div>
+                          </a>
+                        </li>
+                      ))}
+                      <li>
+                        <button
+                          type='button'
+                          onClick={handleSearch}
+                          className='w-full p-3 text-sm text-center text-blue-600 font-medium hover:bg-gray-50 transition-colors'
+                        >
+                          Lihat semua hasil untuk "{searchQuery}"
+                        </button>
+                      </li>
+                    </ul>
+                  )
+                  : (
+                    <div className='p-4 text-center text-sm text-gray-500'>
+                      Tidak ada produk ditemukan.
+                    </div>
+                  )}
+              </div>
+            )}
           </form>
         </div>
 
