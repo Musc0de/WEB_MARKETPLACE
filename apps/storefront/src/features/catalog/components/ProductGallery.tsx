@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { ProductDetail } from '@starsuperscare/contracts';
 
 export const ProductGallery = ({ product }: { product: ProductDetail }) => {
@@ -8,6 +8,29 @@ export const ProductGallery = ({ product }: { product: ProductDetail }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(
     allImages.length > 0 ? allImages[0] : null,
   );
+  const [direction, setDirection] = useState<1 | -1>(1);
+
+  useEffect(() => {
+    if (allImages.length <= 1) return;
+    const interval = setInterval(() => {
+      setSelectedImage((prevImg) => {
+        if (!prevImg) return allImages[0];
+        const prevIdx = allImages.indexOf(prevImg);
+
+        if (prevIdx >= allImages.length - 1) {
+          setDirection(-1);
+          return allImages[prevIdx - 1];
+        }
+        if (prevIdx <= 0) {
+          setDirection(1);
+          return allImages[prevIdx + 1];
+        }
+        return allImages[prevIdx + direction];
+      });
+    }, 3500); // 3.5 seconds
+
+    return () => clearInterval(interval);
+  }, [allImages, direction]);
 
   return (
     <div className='flex flex-col gap-4'>
