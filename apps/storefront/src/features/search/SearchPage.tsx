@@ -8,7 +8,7 @@ import { useCart } from '../cart/api/useCart.ts';
 import { createDirectBuyCart } from '../cart/api/createDirectBuyCart.ts';
 import { ProductCard } from '../catalog/components/ProductCard.tsx';
 import { ProductCardSkeleton } from '../catalog/components/ProductCardSkeleton.tsx';
-import { Search, SearchX } from 'lucide-react';
+import { SearchX } from 'lucide-react';
 import { useSearchFilters } from './useSearchFilters.ts';
 import { CatalogFilters } from '../catalog/filters/CatalogFilters.tsx';
 import { MobileFilterDrawer } from '../catalog/filters/MobileFilterDrawer.tsx';

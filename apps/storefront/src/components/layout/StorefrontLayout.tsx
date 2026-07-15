@@ -234,10 +234,10 @@ const Header = () => {
                             onClick={() => setShowSuggestions(false)}
                           >
                             <div className='w-10 h-10 rounded-md bg-gray-100 overflow-hidden shrink-0 flex items-center justify-center'>
-                              {product.images && product.images.length > 0
+                              {product.primaryImage
                                 ? (
                                   <img
-                                    src={product.images[0].url}
+                                    src={product.primaryImage}
                                     alt={product.name}
                                     className='w-full h-full object-cover'
                                   />
