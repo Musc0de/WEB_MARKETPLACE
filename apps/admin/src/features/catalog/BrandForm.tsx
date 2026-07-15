@@ -110,7 +110,7 @@ export function BrandForm() {
       if (!parsed.success) {
         const newErrors: Record<string, string> = {};
         for (const err of parsed.error.issues) {
-          newErrors[err.path[0]] = err.message;
+          newErrors[err.path[0] as string] = err.message;
         }
         setErrors(newErrors);
         toast.error('Periksa kembali isian form Anda');

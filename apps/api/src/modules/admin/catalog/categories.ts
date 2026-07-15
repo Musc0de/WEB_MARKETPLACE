@@ -68,8 +68,12 @@ const routes = app
         });
       }
 
+      const insertData = Object.fromEntries(
+        Object.entries(data).filter(([_, v]) => v !== undefined),
+      ) as typeof data;
+
       const category = await db.transaction(async (tx) => {
-        const [newCat] = await tx.insert(categories).values(data).returning();
+        const [newCat] = await tx.insert(categories).values(insertData as any).returning();
         await logAudit(tx, {
           actorId: user.id,
           entityType: 'category',
@@ -109,11 +113,15 @@ const routes = app
         }
       }
 
+      const updateData = Object.fromEntries(
+        Object.entries(data).filter(([_, v]) => v !== undefined),
+      );
+
       const category = await db.transaction(async (tx) => {
         const [updated] = await tx.update(categories).set({
-          ...data,
+          ...(updateData as any),
           updatedAt: new Date().toISOString(),
-        })
+        } as any)
           .where(eq(categories.id, id)).returning();
         await logAudit(tx, {
           actorId: user.id,

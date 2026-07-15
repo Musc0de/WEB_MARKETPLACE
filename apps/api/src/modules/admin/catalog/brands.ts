@@ -66,8 +66,12 @@ const routes = app
         throw new HTTPException(409, { message: 'Brand slug already exists' });
       }
 
+      const insertData = Object.fromEntries(
+        Object.entries(data).filter(([_, v]) => v !== undefined),
+      ) as any;
+
       const brand = await db.transaction(async (tx) => {
-        const [newBrand] = await tx.insert(brands).values(data).returning();
+        const [newBrand] = await tx.insert(brands).values(insertData as any).returning();
         await logAudit(tx, {
           actorId: user.id,
           entityType: 'brand',
@@ -107,11 +111,15 @@ const routes = app
         }
       }
 
+      const updateData = Object.fromEntries(
+        Object.entries(data).filter(([_, v]) => v !== undefined),
+      );
+
       const brand = await db.transaction(async (tx) => {
         const [updated] = await tx.update(brands).set({
-          ...data,
+          ...(updateData as any),
           updatedAt: new Date().toISOString(),
-        })
+        } as any)
           .where(eq(brands.id, id)).returning();
         await logAudit(tx, {
           actorId: user.id,
