@@ -35,7 +35,8 @@ export const ProductReviews = ({ productId }: { productId: string }) => {
         }
 
         const payload = await res.json();
-        setReviews(payload.data.items);
+        // read.ts returns { data: [...reviews], meta: {...} } — data is the array directly
+        setReviews(Array.isArray(payload.data) ? payload.data : (payload.data?.items ?? []));
       } catch (err: any) {
         setError(err.message || 'Gagal memuat ulasan');
       } finally {
@@ -59,7 +60,7 @@ export const ProductReviews = ({ productId }: { productId: string }) => {
     return <Text className='text-red-500 py-4'>{error}</Text>;
   }
 
-  if (reviews.length === 0) {
+  if (!reviews || reviews.length === 0) {
     return (
       <div className='flex flex-col items-center justify-center py-10 text-center bg-gray-50 rounded-lg'>
         <MessageSquare className='w-12 h-12 text-gray-300 mb-3' />
