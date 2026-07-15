@@ -22,7 +22,15 @@ export const ProductSummary = ({ product }: { product: ProductDetail }) => {
     product.variants.find((v: ProductVariant) => v.id === selectedVariantId) || product.variants[0];
 
   const price = selectedVariant?.price || product.variantsSummary.minPrice;
-  const comparePrice = selectedVariant?.comparePrice || null;
+  // Fall back to maxComparePrice if no variant is selected
+  const comparePrice = selectedVariant?.comparePrice || product.variantsSummary.maxComparePrice ||
+    null;
+
+  const hasDiscount = comparePrice != null && comparePrice > 0 && comparePrice !== price;
+  const safeMin = hasDiscount ? Math.min(price, comparePrice) : price;
+  const safeMax = hasDiscount ? Math.max(price, comparePrice) : price;
+  const discountPct = hasDiscount ? Math.round((1 - safeMin / safeMax) * 100) : 0;
+  const savings = hasDiscount ? Math.abs(comparePrice - price) : 0;
   const stock = selectedVariant?.availableStock || 0;
 
   const isOutOfStock = stock <= 0;
@@ -101,20 +109,20 @@ export const ProductSummary = ({ product }: { product: ProductDetail }) => {
           <H3 className='text-3xl font-bold text-blue-700'>
             Rp {price.toLocaleString('id-ID')}
           </H3>
-          {comparePrice && comparePrice > price && (
+          {hasDiscount && (
             <>
               <span className='text-base line-through text-gray-400'>
                 Rp {comparePrice.toLocaleString('id-ID')}
               </span>
               <span className='bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded'>
-                -{Math.round((1 - price / comparePrice) * 100)}%
+                -{discountPct}%
               </span>
             </>
           )}
         </div>
-        {comparePrice && comparePrice > price && (
+        {hasDiscount && (
           <div className='w-max bg-red-100 text-red-600 font-semibold px-2.5 py-1 rounded-md border border-red-200 text-xs shadow-sm'>
-            Hemat Rp {(comparePrice - price).toLocaleString('id-ID')}
+            Hemat Rp {savings.toLocaleString('id-ID')}
           </div>
         )}
       </div>
