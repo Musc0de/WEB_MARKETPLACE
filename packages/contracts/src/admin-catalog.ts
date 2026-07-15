@@ -65,3 +65,37 @@ const _AdminProductMutationResponse = z.object({
 export type AdminProductMutation = z.infer<typeof _AdminProductMutationResponse>;
 export const AdminProductMutationResponse: z.ZodType<AdminProductMutation> =
   _AdminProductMutationResponse;
+
+// Admin Category
+export const AdminCategoryCreateSchema = z.object({
+  name: z.string().min(1),
+  slug: z.string().min(1),
+  parentId: z.string().uuid().nullable().optional(),
+  description: z.string().nullable().optional(),
+  seoTitle: z.string().nullable().optional(),
+  seoDescription: z.string().nullable().optional(),
+});
+export type AdminCategoryCreate = z.infer<typeof AdminCategoryCreateSchema>;
+
+export const AdminCategoryUpdateSchema = z.object({
+  name: z.string().min(1).optional(),
+  slug: z.string().min(1).optional(),
+  parentId: z.string().uuid().nullable().optional(),
+  description: z.string().nullable().optional(),
+  seoTitle: z.string().nullable().optional(),
+  seoDescription: z.string().nullable().optional(),
+});
+export type AdminCategoryUpdate = z.infer<typeof AdminCategoryUpdateSchema>;
+
+// Admin Brand
+export const AdminBrandCreateSchema = z.object({
+  name: z.string().min(1),
+  slug: z.string().min(1),
+});
+export type AdminBrandCreate = z.infer<typeof AdminBrandCreateSchema>;
+
+export const AdminBrandUpdateSchema = z.object({
+  name: z.string().min(1).optional(),
+  slug: z.string().min(1).optional(),
+});
+export type AdminBrandUpdate = z.infer<typeof AdminBrandUpdateSchema>;
