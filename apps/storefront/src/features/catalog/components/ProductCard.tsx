@@ -150,12 +150,12 @@ export const ProductCard = (
         </div>
 
         {/* ── Action buttons ── */}
-        <div className='flex gap-1 mt-1.5'>
+        <div className='flex gap-1 mt-1.5 w-full'>
           <button
             type='button'
             onClick={handleBuyNow}
             disabled={isOutOfStock || isLoading}
-            className='flex-1 text-[11px] font-medium py-1 rounded border border-gray-300 text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed'
+            className='w-1/3 shrink-0 text-[11px] font-medium py-1 rounded border border-gray-300 text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center'
           >
             {isLoading ? <Loader2 className='w-3 h-3 animate-spin mx-auto' /> : 'Beli'}
           </button>
@@ -163,20 +163,18 @@ export const ProductCard = (
             type='button'
             onClick={handleAddToCart}
             disabled={isOutOfStock || isLoading}
-            className={`flex-1 text-[11px] font-semibold py-1 rounded flex items-center justify-center gap-0.5 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed ${
+            className={`flex-1 min-w-0 px-1 text-[11px] font-semibold py-1 rounded flex items-center justify-center gap-1 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed ${
               cartSuccess ? 'bg-green-500 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
             }`}
           >
             {isLoading
-              ? <Loader2 className='w-3 h-3 animate-spin' />
+              ? <Loader2 className='w-3 h-3 animate-spin shrink-0' />
               : cartSuccess
-              ? <CheckCircle className='w-3 h-3' />
-              : (
-                <>
-                  <ShoppingCart className='w-3 h-3' />
-                  <span>Keranjang</span>
-                </>
-              )}
+              ? <CheckCircle className='w-3 h-3 shrink-0' />
+              : <ShoppingCart className='w-3 h-3 shrink-0' />}
+            {!isLoading && !cartSuccess && (
+              <span className='truncate leading-none pt-0.5'>Keranjang</span>
+            )}
           </button>
         </div>
       </div>
