@@ -69,7 +69,7 @@ export const AdminProductMutationResponse: z.ZodType<AdminProductMutation> =
   _AdminProductMutationResponse;
 
 // Admin Category
-export const AdminCategoryCreateSchema = z.object({
+const _AdminCategoryCreateSchema = z.object({
   name: z.string().min(1),
   slug: z.string().min(1),
   parentId: z.string().uuid().nullable().optional(),
@@ -77,9 +77,10 @@ export const AdminCategoryCreateSchema = z.object({
   seoTitle: z.string().nullable().optional(),
   seoDescription: z.string().nullable().optional(),
 });
-export type AdminCategoryCreate = z.infer<typeof AdminCategoryCreateSchema>;
+export type AdminCategoryCreate = z.infer<typeof _AdminCategoryCreateSchema>;
+export const AdminCategoryCreateSchema: z.ZodType<AdminCategoryCreate> = _AdminCategoryCreateSchema;
 
-export const AdminCategoryUpdateSchema = z.object({
+const _AdminCategoryUpdateSchema = z.object({
   name: z.string().min(1).optional(),
   slug: z.string().min(1).optional(),
   parentId: z.string().uuid().nullable().optional(),
@@ -87,17 +88,20 @@ export const AdminCategoryUpdateSchema = z.object({
   seoTitle: z.string().nullable().optional(),
   seoDescription: z.string().nullable().optional(),
 });
-export type AdminCategoryUpdate = z.infer<typeof AdminCategoryUpdateSchema>;
+export type AdminCategoryUpdate = z.infer<typeof _AdminCategoryUpdateSchema>;
+export const AdminCategoryUpdateSchema: z.ZodType<AdminCategoryUpdate> = _AdminCategoryUpdateSchema;
 
 // Admin Brand
-export const AdminBrandCreateSchema = z.object({
+const _AdminBrandCreateSchema = z.object({
   name: z.string().min(1),
   slug: z.string().min(1),
 });
-export type AdminBrandCreate = z.infer<typeof AdminBrandCreateSchema>;
+export type AdminBrandCreate = z.infer<typeof _AdminBrandCreateSchema>;
+export const AdminBrandCreateSchema: z.ZodType<AdminBrandCreate> = _AdminBrandCreateSchema;
 
-export const AdminBrandUpdateSchema = z.object({
+const _AdminBrandUpdateSchema = z.object({
   name: z.string().min(1).optional(),
   slug: z.string().min(1).optional(),
 });
-export type AdminBrandUpdate = z.infer<typeof AdminBrandUpdateSchema>;
+export type AdminBrandUpdate = z.infer<typeof _AdminBrandUpdateSchema>;
+export const AdminBrandUpdateSchema: z.ZodType<AdminBrandUpdate> = _AdminBrandUpdateSchema;
