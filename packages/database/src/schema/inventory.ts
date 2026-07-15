@@ -1,17 +1,20 @@
+// deno-lint-ignore-file explicit-module-boundary-types
 import { check, integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { productVariants, stores } from './catalog.ts';
 import { users } from './identity.ts';
 
-export const warehouses = pgTable('sss_warehouses', {
+const _warehouses = pgTable('sss_warehouses', {
   id: uuid('id').defaultRandom().primaryKey(),
   storeId: uuid('store_id').notNull().references(() => stores.id),
   name: text('name').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });
+export type WarehousesTable = typeof _warehouses;
+export const warehouses: WarehousesTable = _warehouses;
 
-export const inventoryLevels = pgTable('sss_inventory_levels', {
+const _inventoryLevels = pgTable('sss_inventory_levels', {
   id: uuid('id').defaultRandom().primaryKey(),
   variantId: uuid('variant_id').notNull().references(() => productVariants.id, {
     onDelete: 'cascade',
@@ -29,8 +32,10 @@ export const inventoryLevels = pgTable('sss_inventory_levels', {
   reservedCheck: check('reserved_check', sql`${table.reserved} >= 0`),
   damagedCheck: check('damaged_check', sql`${table.damaged} >= 0`),
 }));
+export type InventoryLevelsTable = typeof _inventoryLevels;
+export const inventoryLevels: InventoryLevelsTable = _inventoryLevels;
 
-export const inventoryReservations = pgTable('sss_inventory_reservations', {
+const _inventoryReservations = pgTable('sss_inventory_reservations', {
   id: uuid('id').defaultRandom().primaryKey(),
   variantId: uuid('variant_id').notNull().references(() => productVariants.id, {
     onDelete: 'cascade',
@@ -42,8 +47,10 @@ export const inventoryReservations = pgTable('sss_inventory_reservations', {
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });
+export type InventoryReservationsTable = typeof _inventoryReservations;
+export const inventoryReservations: InventoryReservationsTable = _inventoryReservations;
 
-export const inventoryMovements = pgTable('sss_inventory_movements', {
+const _inventoryMovements = pgTable('sss_inventory_movements', {
   id: uuid('id').defaultRandom().primaryKey(),
   variantId: uuid('variant_id').notNull().references(() => productVariants.id),
   warehouseId: uuid('warehouse_id').notNull().references(() => warehouses.id),
@@ -53,3 +60,5 @@ export const inventoryMovements = pgTable('sss_inventory_movements', {
   note: text('note'),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });
+export type InventoryMovementsTable = typeof _inventoryMovements;
+export const inventoryMovements: InventoryMovementsTable = _inventoryMovements;

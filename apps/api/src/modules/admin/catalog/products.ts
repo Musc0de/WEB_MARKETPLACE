@@ -1,11 +1,17 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
-import { db, products, productVariants } from '@starsuperscare/database';
+import {
+  db,
+  inventoryLevels,
+  inventoryMovements,
+  products,
+  productVariants,
+} from '@starsuperscare/database';
 import { AdminProductCreateSchema, AdminProductUpdateSchema } from '@starsuperscare/contracts';
 import { AuthContext, authMiddleware, requirePermission } from '../../../middleware/auth.ts';
 import { logAudit } from '../../../utils/audit.ts';
-import { eq } from 'drizzle-orm';
+import { eq, isNull, sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
 const app = new Hono<AuthContext>();
@@ -15,8 +21,46 @@ const routes = app
   // Ensure every endpoint here requires at least catalog.read
   .use('*', requirePermission('catalog.read'))
   .get('/', async (c) => {
-    const list = await db.select().from(products);
-    return c.json({ data: list, meta: { request_id: c.get('requestId') }, error: null });
+    // Parse pagination params
+    const page = Math.max(1, Number(c.req.query('page') ?? 1));
+    const limit = Math.min(200, Math.max(1, Number(c.req.query('limit') ?? 50)));
+    const offset = (page - 1) * limit;
+
+    // Exclude soft-deleted products
+    const [countRow] = await db
+      .select({ total: sql<number>`COUNT(*)` })
+      .from(products)
+      .where(isNull(products.deletedAt));
+
+    const total = Number(countRow?.total ?? 0);
+
+    // Status counts for admin stats cards (excludes soft-deleted)
+    const statusCountsRaw = await db
+      .select({ status: products.status, count: sql<number>`COUNT(*)` })
+      .from(products)
+      .where(isNull(products.deletedAt))
+      .groupBy(products.status);
+
+    const statusCounts = Object.fromEntries(
+      statusCountsRaw.map((r) => [r.status, Number(r.count)]),
+    );
+
+    const list = await db
+      .select()
+      .from(products)
+      .where(isNull(products.deletedAt))
+      .limit(limit)
+      .offset(offset);
+
+    return c.json({
+      data: list,
+      total,
+      statusCounts,
+      page,
+      limit,
+      meta: { request_id: c.get('requestId') },
+      error: null,
+    });
   })
   .get('/:id', async (c) => {
     const id = c.req.param('id');
@@ -26,25 +70,105 @@ const routes = app
   })
   .get('/:id/variants', async (c) => {
     const id = c.req.param('id');
-    const list = await db.select().from(productVariants).where(eq(productVariants.productId, id));
+    const list = await db.select({
+      id: productVariants.id,
+      productId: productVariants.productId,
+      sku: productVariants.sku,
+      price: productVariants.price,
+      comparePrice: productVariants.comparePrice,
+      createdAt: productVariants.createdAt,
+      updatedAt: productVariants.updatedAt,
+      availableStock: inventoryLevels.available,
+      initialStock: sql<number>`COALESCE((SELECT quantity FROM sss_inventory_movements WHERE variant_id = ${productVariants.id} AND type = 'initial' LIMIT 1), 0)`.as('initial_stock'),
+    })
+      .from(productVariants)
+      .leftJoin(inventoryLevels, eq(inventoryLevels.variantId, productVariants.id))
+      .where(eq(productVariants.productId, id));
     return c.json({ data: list, meta: { request_id: c.get('requestId') }, error: null });
   })
   .post(
     '/:id/variants',
     requirePermission('catalog.write'),
-    zValidator('json', z.object({ sku: z.string(), price: z.number() })),
+    zValidator(
+      'json',
+      z.object({
+        sku: z.string(),
+        price: z.number(),
+        comparePrice: z.number().optional(),
+        initialStock: z.number().optional(),
+      }),
+    ),
     async (c) => {
       const id = c.req.param('id');
       const data = c.req.valid('json');
-      const [newVariant] = await db.insert(productVariants).values({
-        productId: id,
-        sku: data.sku,
-        price: data.price,
-      }).returning();
+      const [newVariant] = await db.transaction(async (tx) => {
+        const [variant] = await tx.insert(productVariants).values({
+          productId: id,
+          sku: data.sku,
+          price: data.price,
+          comparePrice: data.comparePrice ?? null,
+        }).returning();
+
+        // Create empty inventory record for the new variant
+        await tx.insert(inventoryLevels).values({
+          variantId: variant.id,
+          warehouseId: 'default', // Assuming 'default' warehouse, or adjust as needed
+          available: data.initialStock || 0,
+        });
+
+        if (data.initialStock && data.initialStock > 0) {
+          await tx.insert(inventoryMovements).values({
+            variantId: variant.id,
+            warehouseId: 'default',
+            quantity: data.initialStock,
+            type: 'initial',
+            note: 'Stok Awal Sistem',
+          });
+        }
+
+        return [variant];
+      });
+
       return c.json(
         { data: newVariant, meta: { request_id: c.get('requestId') }, error: null },
         201,
       );
+    },
+  )
+  .put(
+    '/:id/variants/:variantId',
+    requirePermission('catalog.write'),
+    zValidator(
+      'json',
+      z.object({ sku: z.string(), price: z.number(), comparePrice: z.number().optional() }),
+    ),
+    async (c) => {
+      const variantId = c.req.param('variantId') as string;
+      const data = c.req.valid('json');
+      const [updated] = await db.update(productVariants).set({
+        sku: data.sku,
+        price: data.price,
+        comparePrice: data.comparePrice ?? null,
+        updatedAt: new Date().toISOString(),
+      }).where(eq(productVariants.id, variantId)).returning();
+
+      if (!updated) throw new HTTPException(404, { message: 'Variant not found' });
+      return c.json({ data: updated, meta: { request_id: c.get('requestId') }, error: null });
+    },
+  )
+  .delete(
+    '/:id/variants/:variantId',
+    requirePermission('catalog.write'),
+    async (c) => {
+      const variantId = c.req.param('variantId') as string;
+      const [deleted] = await db.delete(productVariants).where(eq(productVariants.id, variantId))
+        .returning();
+      if (!deleted) throw new HTTPException(404, { message: 'Variant not found' });
+      return c.json({
+        data: { success: true },
+        meta: { request_id: c.get('requestId') },
+        error: null,
+      });
     },
   )
   .post(
@@ -140,6 +264,10 @@ const routes = app
         deletedAt: new Date().toISOString(),
       }).where(eq(products.id, id));
 
+      await tx.update(productVariants).set({
+        deletedAt: new Date().toISOString(),
+      }).where(eq(productVariants.productId, id));
+
       await logAudit(tx, {
         actorId: user.id,
         entityType: 'product',
@@ -172,7 +300,7 @@ const routes = app
 
     await db.transaction(async (tx) => {
       await tx.update(products).set({
-        status: 'active',
+        status: 'published', // Unified single live status
         publishedAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         version: product.version + 1,
@@ -202,7 +330,7 @@ const routes = app
 
     await db.transaction(async (tx) => {
       await tx.update(products).set({
-        status: 'inactive',
+        status: 'draft', // Unpublished → back to draft
         updatedAt: new Date().toISOString(),
         version: product.version + 1,
       }).where(eq(products.id, id));

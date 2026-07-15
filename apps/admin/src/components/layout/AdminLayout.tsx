@@ -8,7 +8,6 @@ import {
   LifeBuoy,
   Menu,
   Package,
-  Search,
   ShoppingCart,
   Undo2,
   Users,
@@ -42,13 +41,6 @@ export function AdminLayout() {
     navigate('/login');
   };
 
-  const getPageTitle = () => {
-    const activeItem = navItems.find((item) =>
-      item.href === location.pathname ||
-      (item.href !== '/' && location.pathname.startsWith(item.href))
-    );
-    return activeItem ? activeItem.name : 'Admin Portal';
-  };
 
   return (
     <div className='flex min-h-screen bg-gray-50 font-sans text-gray-900'>
@@ -130,18 +122,6 @@ export function AdminLayout() {
             >
               <Menu size={24} />
             </button>
-
-            {/* Command / Search */}
-            <div className='hidden sm:flex max-w-lg w-full relative group'>
-              <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
-                <Search className='h-4 w-4 text-gray-400 group-focus-within:text-blue-500' />
-              </div>
-              <input
-                type='text'
-                placeholder='Ketik "/" untuk mencari (Command Palette)...'
-                className='block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-gray-50 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 focus:bg-white sm:text-sm transition-colors'
-              />
-            </div>
           </div>
 
           <div className='flex items-center gap-4 ml-4'>
@@ -157,12 +137,7 @@ export function AdminLayout() {
 
         {/* Page Content Container */}
         <main className='flex-1 relative overflow-y-auto focus:outline-none bg-gray-50'>
-          <div className='py-6'>
-            <div className='max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8'>
-              <h1 className='text-2xl font-bold text-gray-900 mb-6'>{getPageTitle()}</h1>
-              <Outlet />
-            </div>
-          </div>
+          <Outlet />
         </main>
       </div>
     </div>

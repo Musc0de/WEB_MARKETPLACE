@@ -12,7 +12,7 @@ import {
   productSalesStats,
   productVariants,
 } from '@starsuperscare/database';
-import { and, asc, desc, eq, ilike, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, ilike, isNull, sql } from 'drizzle-orm';
 import { ProductListQuerySchema } from '@starsuperscare/contracts';
 // no zod
 import { HTTPException } from 'hono/http-exception';
@@ -47,7 +47,11 @@ const routes = productsRouter
       const limit = query.per_page;
       const offset = (query.page - 1) * limit;
 
-      const whereClauses = [eq(products.status, 'active')];
+      // Only show 'published' products on storefront (single live status after migration)
+      const whereClauses = [
+        eq(products.status, 'published'),
+        isNull(products.deletedAt),
+      ];
 
       if (query.search) {
         whereClauses.push(ilike(products.name, `%${query.search}%`));
@@ -93,6 +97,10 @@ const routes = productsRouter
         );
       }
 
+      // FIX: GROUP BY only products.id — stats columns use MAX() aggregation
+      // Bug was: including salesStats/ratingStats columns in GROUP BY caused
+      // products with multiple stat records to appear as separate groups,
+      // resulting in fewer unique products returned than actually exist.
       const baseQuery = db.select({
         id: products.id,
         name: products.name,
@@ -101,14 +109,14 @@ const routes = productsRouter
         type: products.type,
         status: products.status,
         publishedAt: products.publishedAt,
-        netSold: productSalesStats.netSold,
-        averageRating: productRatingStats.averageRating,
-        reviewCount: productRatingStats.reviewCount,
+        netSold: sql<number>`COALESCE(MAX(${productSalesStats.netSold}), 0)`,
+        averageRating: sql<number>`COALESCE(MAX(${productRatingStats.averageRating}), 0)`,
+        reviewCount: sql<number>`COALESCE(MAX(${productRatingStats.reviewCount}), 0)`,
         primaryImage: sql<
           string | null
         >`(SELECT object_key FROM sss_product_images WHERE product_id = ${products.id} AND is_primary = true LIMIT 1)`,
         minPrice: sql<number>`COALESCE(MIN(${productVariants.price}), 0)`,
-        maxPrice: sql<number>`MAX(${productVariants.price})`,
+        maxPrice: sql<number>`COALESCE(MAX(${productVariants.price}), 0)`,
         totalAvailableStock: sql<number>`COALESCE(SUM(${inventoryLevels.available}), 0)`,
       })
         .from(products)
@@ -120,17 +128,13 @@ const routes = productsRouter
         .leftJoin(categories, eq(categories.id, productCategories.categoryId))
         .leftJoin(brands, eq(brands.id, products.brandId))
         .where(and(...whereClauses))
-        .groupBy(
-          products.id,
-          productSalesStats.netSold,
-          productRatingStats.averageRating,
-          productRatingStats.reviewCount,
-        )
+        .groupBy(products.id)  // Only group by PK — correct SQL practice
         .having(havingClauses.length > 0 ? and(...havingClauses) : undefined);
 
       const fullResults = await baseQuery;
       const total = fullResults.length;
 
+      // FIX: Same GROUP BY fix as baseQuery — only products.id, stats use MAX()
       let finalQuery = db.select({
         id: products.id,
         name: products.name,
@@ -139,14 +143,14 @@ const routes = productsRouter
         type: products.type,
         status: products.status,
         publishedAt: products.publishedAt,
-        netSold: productSalesStats.netSold,
-        averageRating: productRatingStats.averageRating,
-        reviewCount: productRatingStats.reviewCount,
+        netSold: sql<number>`COALESCE(MAX(${productSalesStats.netSold}), 0)`,
+        averageRating: sql<number>`COALESCE(MAX(${productRatingStats.averageRating}), 0)`,
+        reviewCount: sql<number>`COALESCE(MAX(${productRatingStats.reviewCount}), 0)`,
         primaryImage: sql<
           string | null
         >`(SELECT object_key FROM sss_product_images WHERE product_id = ${products.id} AND is_primary = true LIMIT 1)`,
         minPrice: sql<number>`COALESCE(MIN(${productVariants.price}), 0)`,
-        maxPrice: sql<number>`MAX(${productVariants.price})`,
+        maxPrice: sql<number>`COALESCE(MAX(${productVariants.price}), 0)`,
         totalAvailableStock: sql<number>`COALESCE(SUM(${inventoryLevels.available}), 0)`,
       })
         .from(products)
@@ -158,12 +162,7 @@ const routes = productsRouter
         .leftJoin(categories, eq(categories.id, productCategories.categoryId))
         .leftJoin(brands, eq(brands.id, products.brandId))
         .where(and(...whereClauses))
-        .groupBy(
-          products.id,
-          productSalesStats.netSold,
-          productRatingStats.averageRating,
-          productRatingStats.reviewCount,
-        )
+        .groupBy(products.id)  // Only group by PK — correct SQL practice
         .having(havingClauses.length > 0 ? and(...havingClauses) : undefined)
         .$dynamic();
 
@@ -175,7 +174,8 @@ const routes = productsRouter
           finalQuery = finalQuery.orderBy(sql`MAX(${productVariants.price}) DESC`);
           break;
         case 'best_selling':
-          finalQuery = finalQuery.orderBy(desc(productSalesStats.netSold));
+          // Use MAX() since netSold is now aggregated
+          finalQuery = finalQuery.orderBy(sql`COALESCE(MAX(${productSalesStats.netSold}), 0) DESC`);
           break;
         case 'newest':
         default:
@@ -222,7 +222,11 @@ const routes = productsRouter
       const slug = c.req.param('slug');
 
       const [product] = await db.select().from(products)
-        .where(and(eq(products.slug, slug), eq(products.status, 'active')))
+        .where(and(
+          eq(products.slug, slug),
+          eq(products.status, 'published'),
+          isNull(products.deletedAt),
+        ))
         .limit(1);
 
       if (!product) {

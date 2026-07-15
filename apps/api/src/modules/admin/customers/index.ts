@@ -49,15 +49,29 @@ adminCustomersRouter.get(
 
     const countResult = await db.select({ count: sql<number>`count(*)` })
       .from(users)
+      .leftJoin(userProfiles, eq(users.id, userProfiles.userId))
       .where(whereClause);
 
     const total = Number(countResult[0]?.count || 0);
+
+    // Per-status breakdown across ALL customers (not just current page/filter)
+    const statusCountsRaw = await db.select({
+      status: users.status,
+      count: sql<number>`count(*)`,
+    })
+      .from(users)
+      .groupBy(users.status);
+
+    const statusCounts = Object.fromEntries(
+      statusCountsRaw.map((r) => [r.status, Number(r.count)]),
+    );
 
     return c.json({
       data: results,
       total,
       page: p,
       limit: l,
+      statusCounts,
     });
   },
 );

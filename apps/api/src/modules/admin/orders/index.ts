@@ -69,6 +69,18 @@ adminOrdersRouter.get(
 
     const total = Number(countResult[0]?.count || 0);
 
+    // Per-status breakdown across ALL orders (not just current page/filter)
+    const statusCountsRaw = await db.select({
+      status: orders.status,
+      count: sql<number>`count(*)`,
+    })
+      .from(orders)
+      .groupBy(orders.status);
+
+    const statusCounts = Object.fromEntries(
+      statusCountsRaw.map((r) => [r.status, Number(r.count)]),
+    );
+
     const formattedData = results.map((r) => ({
       id: r.id,
       orderNumber: r.orderNumber,
@@ -87,6 +99,7 @@ adminOrdersRouter.get(
       total,
       page: p,
       limit: l,
+      statusCounts,
     });
   },
 );

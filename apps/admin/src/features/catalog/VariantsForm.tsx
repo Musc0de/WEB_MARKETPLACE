@@ -1,15 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { client } from '../../lib/rpc.ts';
-import { Button } from '@starsuperscare/ui';
 import { goeyToast as toast } from 'goey-toast';
 
-export function VariantsForm({ productId }: { productId: string }) {
-  const [variants, setVariants] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+interface Variant {
+  id: string;
+  sku: string;
+  price: number;
+  comparePrice?: number | null;
+  availableStock?: number;
+  initialStock?: number;
+}
 
-  // New variant state
+export function VariantsForm({ productId }: { productId: string }) {
+  const [variants, setVariants] = useState<Variant[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAdding, setIsAdding] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  
+  // Form State
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [sku, setSku] = useState('');
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState('');
+  const [comparePrice, setComparePrice] = useState('');
+  const [initialStock, setInitialStock] = useState('');
 
   const fetchVariants = async () => {
     try {
@@ -19,88 +32,271 @@ export function VariantsForm({ productId }: { productId: string }) {
       });
       if (res.ok) {
         const json = await res.json();
-        setVariants(json.data as any[]);
+        setVariants((json.data as Variant[]) ?? []);
       }
     } catch (_e) {
-      toast.error('Failed to load variants');
+      toast.error('Gagal memuat varian produk');
     } finally {
       setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchVariants();
+  useEffect(() => { 
+    fetchVariants(); 
+    const handleFocus = () => fetchVariants();
+    globalThis.addEventListener('focus', handleFocus);
+    return () => globalThis.removeEventListener('focus', handleFocus);
   }, [productId]);
 
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const payload = { sku, price };
-      const res = await client.v1.admin.catalog.products[':id'].variants.$post({
-        param: { id: productId },
-        json: payload,
-      });
-      if (!res.ok) throw new Error('Failed to create variant');
+  const handleEditClick = (v: Variant) => {
+    setEditingId(v.id);
+    setSku(v.sku);
+    setPrice(v.price.toString());
+    setComparePrice(v.comparePrice ? v.comparePrice.toString() : '');
+    setShowForm(true);
+  };
 
-      toast.success('Variant created');
-      setSku('');
-      setPrice(0);
+  const handleCancelForm = () => {
+    setShowForm(false);
+    setEditingId(null);
+    setSku('');
+    setPrice('');
+    setComparePrice('');
+    setInitialStock('');
+  };
+
+  const handleDelete = async (variantId: string) => {
+    if (!globalThis.confirm('Apakah Anda yakin ingin menghapus varian ini?')) return;
+    try {
+      // Temporary use any cast since we added DELETE dynamically
+      const res = await (client.v1.admin.catalog.products[':id'].variants as any)[':variantId'].$delete({
+        param: { id: productId, variantId },
+      });
+      if (!res.ok) throw new Error('Gagal menghapus varian');
+      toast.success('Varian dihapus');
       fetchVariants();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Error creating variant');
+      toast.error(err instanceof Error ? err.message : 'Terjadi kesalahan');
     }
   };
 
-  return (
-    <div style={{ marginTop: '2rem', borderTop: '1px solid #eee', paddingTop: '2rem' }}>
-      <h3>Product Variants & Pricing</h3>
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!sku.trim()) { toast.error('SKU tidak boleh kosong'); return; }
+    const priceNum = Number(price);
+    if (!priceNum || priceNum <= 0) { toast.error('Harga harus lebih dari 0'); return; }
+    setIsAdding(true);
+    try {
+      const payload: any = { sku: sku.trim(), price: priceNum };
+      if (comparePrice && Number(comparePrice) > 0) payload.comparePrice = Number(comparePrice);
+      if (!editingId && initialStock && parseInt(initialStock, 10) > 0) payload.initialStock = parseInt(initialStock, 10);
 
-      {isLoading ? <p>Loading variants...</p> : (
-        <div style={{ marginBottom: '2rem' }}>
-          {variants.length === 0
-            ? <p>No variants configured. Please add a default variant to set the price.</p>
-            : (
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                <thead>
-                  <tr style={{ background: '#f8f8f8', borderBottom: '1px solid #eee' }}>
-                    <th style={{ padding: '1rem' }}>SKU</th>
-                    <th style={{ padding: '1rem' }}>Price (IDR)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {variants.map((v) => (
-                    <tr key={v.id} style={{ borderBottom: '1px solid #eee' }}>
-                      <td style={{ padding: '1rem' }}>{v.sku}</td>
-                      <td style={{ padding: '1rem' }}>Rp {v.price.toLocaleString('id-ID')}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+      if (editingId) {
+        // Edit mode
+        const res = await (client.v1.admin.catalog.products[':id'].variants as any)[':variantId'].$put({
+          param: { id: productId, variantId: editingId },
+          json: payload,
+        });
+        if (!res.ok) throw new Error('Gagal menyimpan varian');
+        toast.success('Varian berhasil diperbarui!');
+      } else {
+        // Create mode
+        const res = await client.v1.admin.catalog.products[':id'].variants.$post({
+          param: { id: productId },
+          json: payload,
+        });
+        if (!res.ok) throw new Error('Gagal menambahkan varian');
+        toast.success('Varian berhasil ditambahkan!');
+      }
+
+      handleCancelForm();
+      fetchVariants();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Terjadi kesalahan');
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  const formatRupiah = (val: number) =>
+    new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val);
+
+  return (
+    <div className='space-y-4'>
+      {/* Variants Table */}
+      {isLoading ? (
+        <div className='flex items-center gap-2 py-6 text-gray-400 text-sm'>
+          <svg className='w-4 h-4 animate-spin' fill='none' viewBox='0 0 24 24'>
+            <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
+            <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8v8z' />
+          </svg>
+          Memuat varian...
+        </div>
+      ) : variants.length === 0 ? (
+        <div className='border border-dashed border-gray-200 rounded-xl py-8 flex flex-col items-center gap-2 text-center'>
+          <div className='w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center'>
+            <svg className='w-5 h-5 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.5} d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' />
+            </svg>
+          </div>
+          <p className='text-sm font-medium text-gray-600'>Belum ada varian</p>
+          <p className='text-xs text-gray-400'>Tambahkan minimal satu varian untuk menetapkan harga produk</p>
+        </div>
+      ) : (
+        <div className='overflow-hidden border border-gray-200 rounded-xl'>
+          <table className='w-full text-sm'>
+            <thead>
+              <tr className='bg-gray-50 border-b border-gray-200'>
+                <th className='text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-3'>SKU</th>
+                <th className='text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-3'>Harga Jual</th>
+                <th className='text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-3'>Harga Coret</th>
+                <th className='text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-3'>Stok Awal</th>
+                <th className='text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-3'>Stok Tersedia</th>
+                <th className='text-right text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-3'>Aksi</th>
+              </tr>
+            </thead>
+            <tbody className='divide-y divide-gray-100'>
+              {variants.map((v) => (
+                <tr key={v.id} className='hover:bg-gray-50 transition-colors'>
+                  <td className='px-4 py-3 font-mono text-xs text-gray-700 font-medium'>{v.sku}</td>
+                  <td className='px-4 py-3 text-gray-900 font-semibold'>{formatRupiah(v.price)}</td>
+                  <td className='px-4 py-3 text-gray-400 line-through text-xs'>
+                    {v.comparePrice ? formatRupiah(v.comparePrice) : '—'}
+                  </td>
+                  <td className='px-4 py-3 text-gray-500 font-medium text-xs'>
+                    {v.initialStock ?? 0}
+                  </td>
+                  <td className='px-4 py-3'>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${
+                      (v.availableStock ?? 0) > 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'
+                    }`}>
+                      {v.availableStock ?? 0} unit
+                    </span>
+                  </td>
+                  <td className='px-4 py-3 text-right'>
+                    <div className='flex items-center justify-end gap-2'>
+                      <button
+                        type='button'
+                        onClick={() => handleEditClick(v)}
+                        className='text-blue-600 hover:text-blue-800 text-xs font-semibold px-2 py-1'
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type='button'
+                        onClick={() => handleDelete(v.id)}
+                        className='text-red-500 hover:text-red-700 text-xs font-semibold px-2 py-1'
+                      >
+                        Hapus
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
-      <h4>Add Variant</h4>
-      <form
-        onSubmit={handleCreate}
-        style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}
-      >
-        <div>
-          <label>SKU</label>
-          <input value={sku} onChange={(e) => setSku(e.target.value)} required />
+      {/* Add/Edit Variant Form */}
+      {!showForm ? (
+        <button
+          type='button'
+          onClick={() => setShowForm(true)}
+          className='flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors mt-2'
+        >
+          <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 4v16m8-8H4' />
+          </svg>
+          Tambah Varian Baru
+        </button>
+      ) : (
+        <div className='border border-blue-100 bg-blue-50/40 rounded-xl p-4 space-y-4 mt-4'>
+          <p className='text-sm font-semibold text-gray-700'>
+            {editingId ? 'Edit Varian' : 'Varian Baru'}
+          </p>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-3'>
+            {/* SKU */}
+            <div className='space-y-1'>
+              <label className='text-xs font-semibold text-gray-600'>SKU <span className='text-red-500'>*</span></label>
+              <input
+                type='text'
+                value={sku}
+                onChange={(e) => setSku(e.target.value)}
+                placeholder='cth: PRODUK-001'
+                className='w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white'
+                required
+              />
+            </div>
+            {/* Price */}
+            <div className='space-y-1'>
+              <label className='text-xs font-semibold text-gray-600'>Harga Jual (Rp) <span className='text-red-500'>*</span></label>
+              <input
+                type='number'
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder='cth: 150000'
+                min={1}
+                className='w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white'
+                required
+              />
+            </div>
+            {/* Compare Price */}
+            <div className='space-y-1'>
+              <label className='text-xs font-semibold text-gray-600'>Harga Coret (opsional)</label>
+              <input
+                type='number'
+                value={comparePrice}
+                onChange={(e) => setComparePrice(e.target.value)}
+                placeholder='cth: 200000'
+                min={0}
+                className='w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white'
+              />
+            </div>
+            {/* Initial Stock (Only for new variants) */}
+            {!editingId && (
+              <div className='space-y-1'>
+                <label className='text-xs font-semibold text-gray-600'>Stok Awal (Sistem Permanen)</label>
+                <input
+                  type='number'
+                  value={initialStock}
+                  onChange={(e) => setInitialStock(e.target.value)}
+                  placeholder='cth: 10'
+                  min={0}
+                  className='w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white'
+                />
+              </div>
+            )}
+          </div>
+          <div className='flex items-center gap-2 pt-1'>
+            <button
+              type='button'
+              onClick={handleSubmit}
+              disabled={isAdding}
+              className='flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-all'
+            >
+              {isAdding ? (
+                <>
+                  <svg className='w-4 h-4 animate-spin' fill='none' viewBox='0 0 24 24'>
+                    <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
+                    <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8v8z' />
+                  </svg>
+                  Menyimpan...
+                </>
+              ) : (
+                editingId ? 'Simpan Perubahan' : 'Simpan Varian'
+              )}
+            </button>
+            <button
+              type='button'
+              onClick={handleCancelForm}
+              className='px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all'
+            >
+              Batal
+            </button>
+          </div>
         </div>
-        <div>
-          <label>Price (IDR)</label>
-          <input
-            type='number'
-            value={price}
-            onChange={(e) => setPrice(Number(e.target.value))}
-            required
-            min={0}
-          />
-        </div>
-        <Button type='submit' disabled={!sku || price <= 0}>Add</Button>
-      </form>
+      )}
     </div>
   );
 }

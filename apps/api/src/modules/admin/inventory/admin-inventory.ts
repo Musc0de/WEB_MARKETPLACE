@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
-import { desc, eq, sql } from 'drizzle-orm';
+import { desc, eq, sql, and, isNull, ne } from 'drizzle-orm';
 import {
   db,
   inventoryLevels,
@@ -18,8 +18,10 @@ const app = new Hono<AuthContext>();
 const routes = app
   .use('*', authMiddleware)
   .get('/', requirePermission('catalog.read'), async (c) => {
-    // In MVP, we just return all levels. In reality, add pagination.
-    const levels = await db
+    const productId = c.req.query('productId');
+    
+    // In MVP, we just return all levels (or filter by productId). In reality, add pagination.
+    let query = db
       .select({
         id: inventoryLevels.id,
         variantId: inventoryLevels.variantId,
@@ -34,11 +36,19 @@ const routes = app
         product: {
           name: products.name,
         },
+        initialStock: sql<number>`COALESCE((SELECT quantity FROM sss_inventory_movements WHERE variant_id = ${inventoryLevels.variantId} AND type = 'initial' LIMIT 1), 0)`.as('initial_stock'),
       })
       .from(inventoryLevels)
       .innerJoin(productVariants, eq(inventoryLevels.variantId, productVariants.id))
-      .innerJoin(products, eq(productVariants.productId, products.id));
+      .innerJoin(products, eq(productVariants.productId, products.id))
+      .where(and(isNull(productVariants.deletedAt), ne(products.status, 'archived')))
+      .$dynamic();
 
+    if (productId) {
+      query = query.where(and(isNull(productVariants.deletedAt), ne(products.status, 'archived'), eq(products.id, productId)));
+    }
+
+    const levels = await query;
     return c.json({ data: levels }, 200);
   })
   .get(
