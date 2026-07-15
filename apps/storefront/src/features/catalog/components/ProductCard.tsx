@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { ProductListItem } from '@starsuperscare/contracts';
 import { formatIDR, formatIndonesianSold } from '@starsuperscare/ui';
 import { CheckCircle, Loader2, ShoppingCart, Star } from 'lucide-react';
@@ -15,6 +15,16 @@ export const ProductCard = (
   { product, onAddToCart, onBuyNow, isLoading = false }: ProductCardProps,
 ): JSX.Element => {
   const [cartSuccess, setCartSuccess] = useState(false);
+  const [currentImgIdx, setCurrentImgIdx] = useState(0);
+
+  useEffect(() => {
+    if (!product.images || product.images.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentImgIdx((prev) => (prev + 1) % product.images!.length);
+    }, 3500); // 3.5 seconds
+    return () => clearInterval(interval);
+  }, [product.images]);
+
   const isOutOfStock = product.variantsSummary.totalAvailableStock <= 0;
 
   const { minPrice, maxPrice, maxComparePrice } = product.variantsSummary;
@@ -72,12 +82,15 @@ export const ProductCard = (
       <div className='aspect-square relative bg-gray-50 overflow-hidden group/slider'>
         {product.images && product.images.length > 0
           ? (
-            <div className='w-full h-full flex overflow-x-auto snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'>
+            <div
+              className='w-full h-full flex transition-transform duration-700 ease-in-out'
+              style={{ transform: `translateX(-${currentImgIdx * 100}%)` }}
+            >
               {product.images.map((img, idx) => (
                 <a
                   key={idx}
                   href={`/products/${product.slug}`}
-                  className='w-full h-full flex-shrink-0 snap-center relative block'
+                  className='w-full h-full flex-shrink-0 relative block'
                 >
                   <img
                     src={img}
@@ -124,7 +137,9 @@ export const ProductCard = (
             {product.images.map((_, i) => (
               <div
                 key={i}
-                className='w-1 h-1 rounded-full bg-white/70 shadow-sm border border-black/10'
+                className={`w-1 h-1 rounded-full shadow-sm border border-black/10 transition-colors ${
+                  i === currentImgIdx ? 'bg-blue-600 w-2.5' : 'bg-white/80'
+                }`}
               />
             ))}
           </div>
