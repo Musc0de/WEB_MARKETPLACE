@@ -120,38 +120,48 @@ const routes = app
     async (c) => {
       const id = c.req.param('id');
       const data = c.req.valid('json');
-      const [newVariant] = await db.transaction(async (tx) => {
-        const [variant] = await tx.insert(productVariants).values({
-          productId: id,
-          sku: data.sku,
-          price: data.price,
-          comparePrice: data.comparePrice ?? null,
-          optionValues: data.size ? { size: data.size } : null,
-        }).returning();
+      let newVariant;
+      try {
+        [newVariant] = await db.transaction(async (tx) => {
+          const [variant] = await tx.insert(productVariants).values({
+            productId: id,
+            sku: data.sku,
+            price: data.price,
+            comparePrice: data.comparePrice ?? null,
+            optionValues: data.size ? { size: data.size } : null,
+          }).returning();
 
-        const [defaultWarehouse] = await tx.select().from(warehouses).limit(1);
-        const warehouseId = defaultWarehouse?.id;
-        if (!warehouseId) throw new HTTPException(500, { message: 'No warehouse configured' });
+          const [defaultWarehouse] = await tx.select().from(warehouses).limit(1);
+          const warehouseId = defaultWarehouse?.id;
+          if (!warehouseId) throw new HTTPException(500, { message: 'No warehouse configured' });
 
-        // Create empty inventory record for the new variant
-        await tx.insert(inventoryLevels).values({
-          variantId: variant.id,
-          warehouseId,
-          available: data.initialStock || 0,
-        });
-
-        if (data.initialStock && data.initialStock > 0) {
-          await tx.insert(inventoryMovements).values({
+          // Create empty inventory record for the new variant
+          await tx.insert(inventoryLevels).values({
             variantId: variant.id,
             warehouseId,
-            quantity: data.initialStock,
-            type: 'initial',
-            note: 'Stok Awal Sistem',
+            available: data.initialStock || 0,
+          });
+
+          if (data.initialStock && data.initialStock > 0) {
+            await tx.insert(inventoryMovements).values({
+              variantId: variant.id,
+              warehouseId,
+              quantity: data.initialStock,
+              type: 'initial',
+              note: 'Stok Awal Sistem',
+            });
+          }
+
+          return [variant];
+        });
+      } catch (err: any) {
+        if (err.message?.includes('sss_product_variants_sku_unique')) {
+          throw new HTTPException(400, {
+            message: `SKU "${data.sku}" sudah digunakan oleh varian lain.`,
           });
         }
-
-        return [variant];
-      });
+        throw err;
+      }
 
       return c.json(
         { data: newVariant, meta: { request_id: c.get('requestId') }, error: null },
@@ -174,13 +184,23 @@ const routes = app
     async (c) => {
       const variantId = c.req.param('variantId') as string;
       const data = c.req.valid('json');
-      const [updated] = await db.update(productVariants).set({
-        sku: data.sku,
-        price: data.price,
-        comparePrice: data.comparePrice ?? null,
-        optionValues: data.size ? { size: data.size } : null,
-        updatedAt: new Date().toISOString(),
-      }).where(eq(productVariants.id, variantId)).returning();
+      let updated;
+      try {
+        [updated] = await db.update(productVariants).set({
+          sku: data.sku,
+          price: data.price,
+          comparePrice: data.comparePrice ?? null,
+          optionValues: data.size ? { size: data.size } : null,
+          updatedAt: new Date().toISOString(),
+        }).where(eq(productVariants.id, variantId)).returning();
+      } catch (err: any) {
+        if (err.message?.includes('sss_product_variants_sku_unique')) {
+          throw new HTTPException(400, {
+            message: `SKU "${data.sku}" sudah digunakan oleh varian lain.`,
+          });
+        }
+        throw err;
+      }
 
       if (!updated) throw new HTTPException(404, { message: 'Variant not found' });
       return c.json({ data: updated, meta: { request_id: c.get('requestId') }, error: null });
