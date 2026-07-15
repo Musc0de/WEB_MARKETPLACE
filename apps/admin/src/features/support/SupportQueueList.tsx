@@ -13,6 +13,7 @@ import {
   StatusPill,
   TableSkeleton,
 } from '../../components/admin-ui.tsx';
+import { Pagination } from '../../components/Pagination.tsx';
 
 type SupportStatus = 'all' | 'open' | 'in_progress' | 'resolved' | 'closed';
 
@@ -44,6 +45,8 @@ const PRIORITY_ICON: Record<string, React.ReactNode> = {
 export const SupportQueueList = () => {
   const [statusFilter, setStatusFilter] = useState<SupportStatus>('all');
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const limit = 10;
 
   const { data: tickets, isLoading } = useSWR(
     ['/api/admin/support/tickets', statusFilter],
@@ -70,6 +73,9 @@ export const SupportQueueList = () => {
       t.category?.toLowerCase().includes(search.toLowerCase())
     );
   });
+
+  const total = filtered.length;
+  const paginated = filtered.slice((page - 1) * limit, page * limit);
 
   return (
     <div className='space-y-6'>
@@ -151,7 +157,7 @@ export const SupportQueueList = () => {
       {/* Table */}
       <DataTable
         headers={TABLE_HEADERS}
-        summary={`${filtered.length} tiket ditemukan`}
+        summary={`${total} tiket ditemukan`}
       >
         {isLoading ? <TableSkeleton cols={7} /> : !filtered.length
           ? (
@@ -166,7 +172,7 @@ export const SupportQueueList = () => {
             </tr>
           )
           : (
-            filtered.map((ticket: any) => (
+            paginated.map((ticket: any) => (
               <tr key={ticket.id} className='hover:bg-rose-50/20 transition-colors'>
                 <td className='px-5 py-3.5'>
                   <Link
@@ -215,6 +221,15 @@ export const SupportQueueList = () => {
             ))
           )}
       </DataTable>
+
+      {total > 0 && (
+        <Pagination
+          page={page}
+          limit={limit}
+          total={total}
+          onPageChange={setPage}
+        />
+      )}
     </div>
   );
 };
