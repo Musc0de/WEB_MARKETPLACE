@@ -96,19 +96,24 @@ export const ProductSummary = ({ product }: { product: ProductDetail }) => {
 
       <H1 className='text-2xl md:text-3xl font-bold mb-4 text-gray-900'>{product.name}</H1>
 
-      <div className='bg-gray-50 p-4 rounded-lg mb-6 border border-gray-100 flex flex-col gap-1'>
-        <div className='flex items-end gap-3'>
+      <div className='bg-gray-50 p-4 rounded-lg mb-6 border border-gray-100 flex flex-col gap-2'>
+        <div className='flex items-center gap-3 flex-wrap'>
           <H3 className='text-3xl font-bold text-blue-700'>
             Rp {price.toLocaleString('id-ID')}
           </H3>
           {comparePrice && comparePrice > price && (
-            <Text className='text-lg line-through text-gray-400 mb-1'>
-              Rp {comparePrice.toLocaleString('id-ID')}
-            </Text>
+            <>
+              <span className='text-base line-through text-gray-400'>
+                Rp {comparePrice.toLocaleString('id-ID')}
+              </span>
+              <span className='bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded'>
+                -{Math.round((1 - price / comparePrice) * 100)}%
+              </span>
+            </>
           )}
         </div>
         {comparePrice && comparePrice > price && (
-          <Badge className='w-max bg-red-100 text-red-600 hover:bg-red-100'>
+          <Badge className='w-max bg-red-50 text-red-600 hover:bg-red-50 border border-red-200 text-xs'>
             Hemat Rp {(comparePrice - price).toLocaleString('id-ID')}
           </Badge>
         )}

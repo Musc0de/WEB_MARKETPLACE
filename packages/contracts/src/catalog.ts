@@ -27,6 +27,7 @@ export interface ProductVariant {
 export interface ProductListVariantSummary {
   minPrice: number;
   maxPrice?: number | undefined;
+  maxComparePrice?: number | null | undefined;
   totalAvailableStock: number;
 }
 
@@ -132,6 +133,7 @@ export const ProductVariantSchema: z.ZodType<ProductVariant> = z.object({
 export const ProductListVariantSummarySchema: z.ZodType<ProductListVariantSummary> = z.object({
   minPrice: z.number(),
   maxPrice: z.number().optional(),
+  maxComparePrice: z.number().nullable().optional(),
   totalAvailableStock: z.number().default(0),
 });
 

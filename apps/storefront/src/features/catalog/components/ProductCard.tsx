@@ -17,10 +17,11 @@ export const ProductCard = (
   const [cartSuccess, setCartSuccess] = useState(false);
   const isOutOfStock = product.variantsSummary.totalAvailableStock <= 0;
 
-  const { minPrice, maxPrice } = product.variantsSummary;
-  const priceDisplay = maxPrice && maxPrice > minPrice
-    ? `${formatIDR(minPrice)}`
-    : formatIDR(minPrice);
+  const { minPrice, maxPrice, maxComparePrice } = product.variantsSummary;
+
+  // Discount badge — show if comparePrice > minPrice
+  const hasDiscount = maxComparePrice != null && maxComparePrice > minPrice;
+  const discountPct = hasDiscount ? Math.round((1 - minPrice / maxComparePrice!) * 100) : 0;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -38,28 +39,33 @@ export const ProductCard = (
 
   return (
     <div className='flex flex-col bg-white rounded-lg border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 group relative'>
-      {/* Badge: Baru / Habis */}
+      {/* ── Top badges ── */}
       <div className='absolute top-1.5 left-1.5 flex flex-col gap-0.5 z-10'>
         {product.netSold === 0 && !isOutOfStock && (
-          <span className='bg-blue-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm'>
+          <span className='bg-blue-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm leading-tight'>
             Baru
           </span>
         )}
         {isOutOfStock && (
-          <span className='bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm'>
+          <span className='bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm leading-tight'>
             Habis
+          </span>
+        )}
+        {hasDiscount && (
+          <span className='bg-orange-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm leading-tight'>
+            -{discountPct}%
           </span>
         )}
       </div>
 
-      {/* Wishlist button */}
+      {/* Wishlist */}
       <WishlistButton
         productId={product.id}
         className='absolute top-1.5 right-1.5 z-10 bg-white/80 backdrop-blur-sm shadow-sm w-6 h-6 p-0.5 rounded-full'
         iconClassName='w-3.5 h-3.5'
       />
 
-      {/* Image — compact square */}
+      {/* Image */}
       <a href={`/products/${product.slug}`} className='block'>
         <div className='aspect-square relative bg-gray-50 overflow-hidden'>
           {product.primaryImage
@@ -77,15 +83,15 @@ export const ProductCard = (
               />
             )
             : (
-              <div className='flex items-center justify-center w-full h-full text-gray-300 text-xs select-none'>
+              <div className='flex items-center justify-center w-full h-full text-gray-300 text-[11px] select-none'>
                 No Image
               </div>
             )}
         </div>
       </a>
 
-      {/* Content */}
-      <div className='flex flex-col flex-grow px-2 py-2 gap-0.5'>
+      {/* ── Content ── */}
+      <div className='flex flex-col flex-grow px-2 pt-2 pb-2 gap-0.5'>
         {/* Brand */}
         <span className='text-[10px] text-gray-400 truncate'>
           {product.brandId ? 'Brand' : 'Unbranded'}
@@ -93,22 +99,32 @@ export const ProductCard = (
 
         {/* Name */}
         <a href={`/products/${product.slug}`}>
-          <p className='text-xs font-medium text-gray-800 line-clamp-2 leading-tight min-h-[2.5rem] group-hover:text-blue-600 transition-colors'>
+          <p className='text-[11px] font-medium text-gray-800 line-clamp-2 leading-tight min-h-[2.2rem] group-hover:text-blue-600 transition-colors'>
             {product.name}
           </p>
         </a>
 
-        {/* Price */}
-        <p
-          className={`text-sm font-bold mt-0.5 ${isOutOfStock ? 'text-gray-400' : 'text-gray-900'}`}
-        >
-          {priceDisplay}
-          {maxPrice && maxPrice > minPrice && (
-            <span className='text-[10px] font-normal text-gray-400 ml-0.5'>
-              ~
+        {/* Price + strikethrough */}
+        <div className='mt-0.5'>
+          <div className='flex items-baseline gap-1 flex-wrap'>
+            <span
+              className={`text-sm font-bold ${isOutOfStock ? 'text-gray-400' : 'text-gray-900'}`}
+            >
+              {formatIDR(minPrice)}
+              {maxPrice && maxPrice > minPrice && (
+                <span className='text-[10px] font-normal text-gray-400 ml-0.5'>
+                  ~
+                </span>
+              )}
             </span>
-          )}
-        </p>
+            {/* Strikethrough compare price — always visible when set */}
+            {hasDiscount && (
+              <span className='text-[10px] text-gray-400 line-through'>
+                {formatIDR(maxComparePrice!)}
+              </span>
+            )}
+          </div>
+        </div>
 
         {/* Rating · Sold */}
         <div className='flex items-center gap-1 text-[10px] text-gray-400 mt-0.5'>
@@ -121,7 +137,7 @@ export const ProductCard = (
                 </span>
               </span>
             )
-            : <span>Belum ada rating</span>}
+            : <span className='text-[10px] text-gray-400'>Belum ada rating</span>}
           {product.netSold > 0 && (
             <>
               <span className='text-gray-300'>·</span>
@@ -130,7 +146,7 @@ export const ProductCard = (
           )}
         </div>
 
-        {/* Action buttons — compact */}
+        {/* ── Action buttons ── */}
         <div className='flex gap-1 mt-1.5'>
           <button
             type='button'

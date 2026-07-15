@@ -118,6 +118,7 @@ const routes = productsRouter
         >`(SELECT object_key FROM sss_product_images WHERE product_id = ${products.id} AND is_primary = true LIMIT 1)`,
         minPrice: sql<number>`COALESCE(MIN(${productVariants.price}), 0)`,
         maxPrice: sql<number>`COALESCE(MAX(${productVariants.price}), 0)`,
+        maxComparePrice: sql<number | null>`MAX(${productVariants.comparePrice})`,
         totalAvailableStock: sql<number>`COALESCE(SUM(${inventoryLevels.available}), 0)`,
       })
         .from(products)
@@ -152,6 +153,7 @@ const routes = productsRouter
         >`(SELECT object_key FROM sss_product_images WHERE product_id = ${products.id} AND is_primary = true LIMIT 1)`,
         minPrice: sql<number>`COALESCE(MIN(${productVariants.price}), 0)`,
         maxPrice: sql<number>`COALESCE(MAX(${productVariants.price}), 0)`,
+        maxComparePrice: sql<number | null>`MAX(${productVariants.comparePrice})`,
         totalAvailableStock: sql<number>`COALESCE(SUM(${inventoryLevels.available}), 0)`,
       })
         .from(products)
@@ -206,6 +208,7 @@ const routes = productsRouter
           variantsSummary: {
             minPrice: Number(item.minPrice),
             maxPrice: Number(item.maxPrice),
+            maxComparePrice: item.maxComparePrice ? Number(item.maxComparePrice) : null,
             totalAvailableStock: Number(item.totalAvailableStock),
           },
         };
