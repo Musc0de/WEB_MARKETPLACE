@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { client } from '../../lib/rpc.ts';
 import { goeyToast as toast } from 'goey-toast';
 import { InventoryAdjustModal } from './InventoryAdjustModal.tsx';
+import { Pagination } from '../../components/Pagination.tsx';
 
 type InventoryLevel = {
   id: string;
@@ -26,6 +27,9 @@ export function InventoryList() {
   const [isLoading, setIsLoading] = useState(true);
   const [adjustingLevel, setAdjustingLevel] = useState<InventoryLevel | null>(null);
 
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
   const fetchInventory = async () => {
     setIsLoading(true);
     try {
@@ -48,6 +52,8 @@ export function InventoryList() {
   const totalAvailable = levels.reduce((sum, l) => sum + l.available, 0);
   const totalReserved = levels.reduce((sum, l) => sum + l.reserved, 0);
   const totalDamaged = levels.reduce((sum, l) => sum + l.damaged, 0);
+
+  const paginatedLevels = levels.slice((page - 1) * limit, page * limit);
 
   return (
     <div className='max-w-6xl mx-auto space-y-6 pb-16 px-4 md:px-0'>
@@ -169,7 +175,7 @@ export function InventoryList() {
                       </tr>
                     )
                     : (
-                      levels.map((level) => (
+                      paginatedLevels.map((level) => (
                         <tr key={level.id} className='hover:bg-gray-50/80 transition-colors'>
                           <td className='px-6 py-4 font-medium text-gray-900'>
                             {level.product.name}
@@ -231,6 +237,15 @@ export function InventoryList() {
             </div>
           )}
       </div>
+
+      {levels.length > 0 && (
+        <Pagination
+          page={page}
+          limit={limit}
+          total={levels.length}
+          onPageChange={setPage}
+        />
+      )}
 
       {adjustingLevel && (
         <InventoryAdjustModal

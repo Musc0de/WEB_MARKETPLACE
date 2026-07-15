@@ -14,6 +14,7 @@ import {
 } from '../../components/admin-ui.tsx';
 import { ConfirmModal, InputModal, useModalState } from '../../components/modal.tsx';
 import { formatDate } from '@starsuperscare/ui';
+import { Pagination } from '../../components/Pagination.tsx';
 
 type ReturnStatus = 'all' | 'pending' | 'approved' | 'rejected' | 'received' | 'completed';
 
@@ -39,6 +40,8 @@ const TABLE_HEADERS = [
 export const ReturnsList = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<ReturnStatus>('all');
+  const [page, setPage] = useState(1);
+  const limit = 10;
 
   // Modal state
   const approveModal = useModalState();
@@ -98,6 +101,7 @@ export const ReturnsList = () => {
   });
 
   const total = filtered?.length ?? 0;
+  const paginated = filtered?.slice((page - 1) * limit, page * limit) || [];
 
   return (
     <div className='space-y-6'>
@@ -138,7 +142,7 @@ export const ReturnsList = () => {
             </tr>
           )
           : (
-            filtered.map((ret: any) => (
+            paginated.map((ret: any) => (
               <tr key={ret.id} className='hover:bg-blue-50/20 transition-colors'>
                 <td className='px-5 py-3.5'>
                   <span className='font-mono text-sm font-semibold text-blue-600'>
@@ -222,6 +226,15 @@ export const ReturnsList = () => {
             ))
           )}
       </DataTable>
+
+      {total > 0 && (
+        <Pagination
+          page={page}
+          limit={limit}
+          total={total}
+          onPageChange={setPage}
+        />
+      )}
 
       {/* ── Modals ── */}
       <ConfirmModal

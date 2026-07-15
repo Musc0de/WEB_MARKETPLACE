@@ -14,6 +14,7 @@ import {
 } from '../../components/admin-ui.tsx';
 import { ToggleInputModal, useModalState } from '../../components/modal.tsx';
 import { formatDate, formatIDR } from '@starsuperscare/ui';
+import { Pagination } from '../../components/Pagination.tsx';
 
 type RefundStatus = 'all' | 'pending' | 'processing' | 'completed' | 'failed';
 
@@ -39,6 +40,8 @@ export const RefundsList = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<RefundStatus>('all');
   const [processing, setProcessing] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const limit = 10;
 
   // Modal state
   const processModal = useModalState();
@@ -89,6 +92,9 @@ export const RefundsList = () => {
     return matchSearch && matchStatus;
   });
 
+  const total = filtered?.length ?? 0;
+  const paginated = filtered?.slice((page - 1) * limit, page * limit) || [];
+
   return (
     <div className='space-y-6'>
       <PageHeader
@@ -116,7 +122,7 @@ export const RefundsList = () => {
       {/* Table */}
       <DataTable
         headers={TABLE_HEADERS}
-        summary={`${filtered?.length ?? 0} refund ditemukan`}
+        summary={`${total} refund ditemukan`}
       >
         {isLoading ? <TableSkeleton cols={7} /> : !filtered?.length
           ? (
@@ -131,7 +137,7 @@ export const RefundsList = () => {
             </tr>
           )
           : (
-            filtered.map((refund: any) => (
+            paginated.map((refund: any) => (
               <tr key={refund.id} className='hover:bg-amber-50/20 transition-colors'>
                 <td className='px-5 py-3.5'>
                   <span className='font-mono text-sm font-semibold text-amber-600'>
@@ -191,6 +197,15 @@ export const RefundsList = () => {
             ))
           )}
       </DataTable>
+
+      {total > 0 && (
+        <Pagination
+          page={page}
+          limit={limit}
+          total={total}
+          onPageChange={setPage}
+        />
+      )}
 
       {/* ── Process Refund Modal ── */}
       <ToggleInputModal
