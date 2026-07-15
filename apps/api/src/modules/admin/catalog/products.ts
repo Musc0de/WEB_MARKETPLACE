@@ -18,7 +18,7 @@ import {
 } from '@starsuperscare/contracts';
 import { AuthContext, authMiddleware, requirePermission } from '../../../middleware/auth.ts';
 import { logAudit } from '../../../utils/audit.ts';
-import { eq, isNull, sql } from 'drizzle-orm';
+import { asc, desc, eq, isNull, sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 import { storageAdapter } from '../../../adapters/storage.ts';
 
