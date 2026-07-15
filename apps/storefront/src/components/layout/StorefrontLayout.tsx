@@ -33,6 +33,7 @@ const CartBadge = ({ count }: { count: number }) => {
 
 const Header = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [isSuggestionsLoading, setIsSuggestionsLoading] = useState(false);
@@ -62,6 +63,17 @@ const Header = () => {
     checkSession();
   }, []);
 
+  // Sync global search bar with URL parameter if on /search
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const q = params.get('q');
+    if (location.pathname === '/search' && q) {
+      setSearchQuery(q);
+    } else if (location.pathname !== '/search') {
+      setSearchQuery('');
+    }
+  }, [location.search, location.pathname]);
+
   // Fetch search suggestions
   useEffect(() => {
     if (searchQuery.trim().length < 2) {
@@ -73,13 +85,13 @@ const Header = () => {
       try {
         setIsSuggestionsLoading(true);
         const res = await fetch(
-          `/api/v1/products?search=${encodeURIComponent(searchQuery.trim())}&per_page=5`,
+          `/api/v1/products?search=${encodeURIComponent(searchQuery.trim())}&per_page=10`,
         );
         if (res.ok) {
           const data = await res.json();
           setSuggestions(data.data || []);
         }
-      } catch (err) {
+      } catch (_err) {
         // ignore error
       } finally {
         setIsSuggestionsLoading(false);

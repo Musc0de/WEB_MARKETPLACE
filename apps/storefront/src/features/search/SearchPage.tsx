@@ -161,18 +161,7 @@ export const SearchPage = (): JSX.Element => {
         {/* Main Content */}
         <div className='flex-1'>
           {/* Controls Bar */}
-          <div className='flex flex-col md:flex-row gap-4 justify-between items-center mb-6'>
-            <div className='relative w-full md:max-w-md flex-1'>
-              <Search className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5' />
-              <input
-                type='text'
-                placeholder='Cari produk...'
-                className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none'
-                value={filters.q}
-                onChange={(e) => updateFilter('q', e.target.value)}
-              />
-            </div>
-
+          <div className='flex flex-col md:flex-row gap-4 justify-end items-center mb-6'>
             <div className='flex gap-2 w-full md:w-auto'>
               <MobileFilterDrawer
                 fixedCategorySlug={isCategoryRoute ? slug : undefined}
