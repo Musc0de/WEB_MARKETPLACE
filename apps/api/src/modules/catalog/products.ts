@@ -150,7 +150,7 @@ const routes = productsRouter
         reviewCount: sql<number>`COALESCE(MAX(${productRatingStats.reviewCount}), 0)`,
         primaryImage: sql<
           string | null
-        >`(SELECT object_key FROM sss_product_images WHERE product_id = ${products.id} AND is_primary = true LIMIT 1)`,
+        >`(SELECT object_key FROM sss_product_images WHERE product_id = ${products.id} ORDER BY is_primary DESC, sort_order ASC, created_at ASC LIMIT 1)`,
         minPrice: sql<number>`COALESCE(MIN(${productVariants.price}), 0)`,
         maxPrice: sql<number>`COALESCE(MAX(${productVariants.price}), 0)`,
         maxComparePrice: sql<number | null>`MAX(${productVariants.comparePrice})`,
