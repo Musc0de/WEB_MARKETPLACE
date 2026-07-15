@@ -1,0 +1,2 @@
+ALTER TABLE "sss_outbox_events" ALTER COLUMN "retry_count" SET DATA TYPE integer;--> statement-breakpoint
+ALTER TABLE "sss_outbox_events" ADD COLUMN "available_at" timestamp with time zone DEFAULT now() NOT NULL;

@@ -39,3 +39,9 @@ src/features/wishlist/
 /cart                     cart
 /checkout/*               checkout wizard
 ```
+
+## UI/UX V2
+
+Mulai dari `docs/ui/00-scope-and-routes.md`. Desktop dan mobile untuk listing, detail, search,
+wishlist, cart, dan checkout dipisah pada file masing-masing. Product card final berada di
+`docs/ui/07-product-card-spec.md`.

@@ -11,8 +11,7 @@ mkdir -p packages/{database,auth,ui,email,contracts,config}
 
 ## Langkah 2 — Inisialisasi root
 
-Buat `deno.jsonc` dengan workspace `apps/*` dan `packages/*`. Aktifkan formatter, linter, tasks, dan
-dependency catalog.
+Buat `deno.jsonc` dengan workspace `apps/*` dan `packages/*`. Aktifkan formatter, linter, tasks, dan dependency catalog.
 
 ## Langkah 3 — Frontend apps
 

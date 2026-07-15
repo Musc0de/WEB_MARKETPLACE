@@ -1,3 +1,4 @@
+/// <reference lib="deno.ns" />
 import app from './app.ts';
 
 const port = parseInt(Deno.env.get('PORT') || '8000', 10);
@@ -13,7 +14,7 @@ console.log(
 Deno.serve(
   {
     port,
-    onListen: ({ hostname, port }) => {
+    onListen: ({ hostname, port }: { hostname: string; port: number }) => {
       console.log(
         JSON.stringify({
           level: 'INFO',

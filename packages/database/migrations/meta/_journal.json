@@ -1,0 +1,55 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1783891335222,
+      "tag": "0000_wild_toad_men",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1783892752851,
+      "tag": "0001_unique_mad_thinker",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783938263704,
+      "tag": "0002_strong_riptide",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1783949292420,
+      "tag": "0004_talented_cassandra_nova",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1783949434650,
+      "tag": "0004_talented_cassandra_nova",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1783964719861,
+      "tag": "0005_glossy_christian_walker",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "breakpoints": true,
+      "when": 1783950660000,
+      "version": "7",
+      "tag": "0006_add_metadata_to_tokens"
+    }
+  ]
+}

@@ -1,5 +1,14 @@
 {
   "name": "@starsuperscare/api",
   "version": "0.1.0",
-  "exports": "./main.ts"
+  "exports": "./src/main.ts",
+  "tasks": {
+    "dev": "deno run --env --watch -A src/main.ts",
+    "start": "deno run --env -A src/main.ts",
+    "test": "deno test --env -A"
+  },
+  "imports": {
+    "@hono/zod-validator": "npm:@hono/zod-validator@^0.8.0",
+    "@std/assert": "jsr:@std/assert@^1.0.19"
+  }
 }

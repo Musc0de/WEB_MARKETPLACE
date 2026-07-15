@@ -36,3 +36,8 @@ deleted
 - Pesan login gagal tidak membedakan username ada atau tidak.
 - Session dirotasi setelah login dan perubahan security.
 - Semua redirect kembali divalidasi terhadap allowlist domain.
+
+## UI/UX V2
+
+Mulai dari `docs/ui/00-scope-and-routes.md`. Login, signup, activation/verification, dan recovery
+memiliki spesifikasi desktop dan mobile terpisah.

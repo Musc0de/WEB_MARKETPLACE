@@ -5,7 +5,11 @@
   ],
   "exclude": [
     "dist/",
-    "**/.vite/"
+    "**/dist/",
+    "**/.vite/",
+    "**/node_modules/",
+    "**/coverage/",
+    "**/*.timestamp-*.mjs"
   ],
   "compilerOptions": {
     "strict": true,
@@ -15,12 +19,19 @@
     "exactOptionalPropertyTypes": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "isolatedDeclarations": false,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
-    "lib": ["dom", "dom.iterable", "esnext", "deno.ns"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext",
+      "deno.ns"
+    ],
     "types": [
       "npm:@types/react@^18.3.3",
-      "npm:@types/react-dom@^18.3.0"
+      "npm:@types/react-dom@^18.3.0",
+      "npm:@types/node@^20.0.0"
     ]
   },
   "nodeModulesDir": "auto",
@@ -29,53 +40,210 @@
     "lineWidth": 100,
     "indentWidth": 2,
     "singleQuote": true,
-    "semiColons": true
+    "semiColons": true,
+    "include": [
+      "apps/",
+      "packages/",
+      "scripts/",
+      "deno.json"
+    ],
+    "exclude": [
+      "**/dist/",
+      "**/.vite/",
+      "**/node_modules/",
+      "**/coverage/",
+      "**/*.timestamp-*.mjs"
+    ]
   },
   "lint": {
+    "include": [
+      "apps/",
+      "packages/",
+      "scripts/"
+    ],
+    "exclude": [
+      "**/dist/",
+      "**/.vite/",
+      "**/node_modules/",
+      "**/coverage/",
+      "**/*.timestamp-*.mjs"
+    ],
     "rules": {
-      "tags": ["recommended"],
-      "include": ["ban-untagged-todo"],
-      "exclude": ["no-explicit-any"]
+      "tags": [
+        "recommended"
+      ],
+      "include": [
+        "ban-untagged-todo"
+      ],
+      "exclude": [
+        "no-explicit-any",
+        "no-slow-types",
+        "explicit-module-boundary-types"
+      ]
     }
   },
   "tasks": {
-    "dev": "deno run -A npm:concurrently -k -n API,WORKER,SHOP,AUTH,DASHBOARD,ADMIN,TRACKING \"deno task dev:api\" \"deno task dev:worker\" \"deno task dev:storefront\" \"deno task dev:auth\" \"deno task dev:dashboard\" \"deno task dev:admin\" \"deno task dev:tracking\"",
+    "dev": "deno task dev:all",
+
+    "dev:all": "deno run -A npm:concurrently@^10.0.3 -k -n API,WORKER,SHOP,AUTH,DASHBOARD,ADMIN,TRACKING \"deno task dev:api\" \"deno task dev:worker\" \"deno task dev:storefront\" \"deno task dev:auth\" \"deno task dev:dashboard\" \"deno task dev:admin\" \"deno task dev:tracking\"",
+
+    "dev:services": "deno run -A npm:concurrently@^10.0.3 -k -n API,WORKER \"deno task dev:api\" \"deno task dev:worker\"",
+
+    "dev:frontends": "deno run -A npm:concurrently@^10.0.3 -k -n SHOP,AUTH,DASHBOARD,ADMIN,TRACKING \"deno task dev:storefront\" \"deno task dev:auth\" \"deno task dev:dashboard\" \"deno task dev:admin\" \"deno task dev:tracking\"",
+
     "dev:api": "deno task --cwd apps/api dev",
     "dev:worker": "deno task --cwd apps/worker dev",
     "dev:storefront": "deno task --cwd apps/storefront dev",
+    "dev:shop": "deno task dev:storefront",
     "dev:auth": "deno task --cwd apps/auth dev",
     "dev:dashboard": "deno task --cwd apps/dashboard dev",
     "dev:admin": "deno task --cwd apps/admin dev",
     "dev:tracking": "deno task --cwd apps/tracking dev",
-    "check": "deno fmt --check && deno lint && deno check apps/*/src/**/*.ts apps/*/src/**/*.tsx",
-    "test": "deno test -A",
+
+    "check": "deno task check:fmt && deno task check:lint && deno task check:types",
+
+    "check:fmt": "deno fmt --check",
+
+    "check:lint": "deno lint",
+
+    "check:types": "deno check apps/*/src/**/*.ts apps/*/src/**/*.tsx packages/**/*.ts packages/**/*.tsx scripts/**/*.ts",
+
+    "test": "deno task test:backend && deno task test:frontend",
+    "test:backend": "deno test --env -A --ignore=apps/admin,apps/auth,apps/dashboard,apps/storefront,apps/tracking,packages/ui",
+    "test:frontend": "npx vitest run -c vitest.config.ts --root apps/storefront && npx vitest run -c vitest.config.ts --root apps/admin",
+
+    "test:all": "deno task test",
+    "test:history": "deno test -A apps/api/tests/history.test.ts",
+    "test:invoices": "deno test -A apps/api/tests/invoices.test.ts",
+    "test:downloads": "deno test -A apps/api/tests/downloads.test.ts",
+    "test:invoice": "deno test -A apps/worker/tests/invoice.test.ts",
+    "test:email": "deno test -A apps/worker/tests/email.test.ts",
+    "test:worker": "deno test -A apps/worker/tests/",
+    "test:integration": "deno test --env -A quality/integration/",
+    "test:unit": "deno test --env -A quality/unit/",
+
+    "test:watch": "deno test --env -A --ignore=apps/admin,apps/auth,apps/dashboard,apps/storefront,apps/tracking,packages/ui --watch",
+
+    "test:api": "deno test --env -A apps/api/tests/",
+
+    "test:catalog": "deno test --env -A apps/api/tests/catalog-stats.test.ts apps/api/tests/catalog.test.ts",
+
+    "test:coverage": "deno test --env -A --ignore=apps/admin,apps/auth,apps/dashboard,apps/storefront,apps/tracking,packages/ui --coverage=coverage",
+
+    "coverage:report": "deno coverage coverage",
+
+    "coverage:check": "deno run -A scripts/check-coverage.ts",
+
+    "stats:reconcile:dry": "deno run --env -A scripts/reconcile-product-stats.ts --dry",
+
+    "stats:reconcile": "deno run --env -A scripts/reconcile-product-stats.ts",
+
+    "quality": "deno task check && deno task test:unit && deno task test:integration && deno task test:coverage && deno task coverage:check",
+
     "format": "deno fmt",
+
+    "format:check": "deno fmt --check",
+
     "lint": "deno lint",
+
+    "lint:fix": "deno lint --fix",
+
     "build": "deno task build:frontends",
-    "build:frontends": "deno task --cwd apps/storefront build && deno task --cwd apps/auth build && deno task --cwd apps/dashboard build && deno task --cwd apps/admin build && deno task --cwd apps/tracking build",
-    "preview": "deno run -A npm:concurrently -k -n SHOP,AUTH,DASHBOARD,ADMIN,TRACKING \"deno task preview:storefront\" \"deno task preview:auth\" \"deno task preview:dashboard\" \"deno task preview:admin\" \"deno task preview:tracking\"",
+
+    "build:frontends": "deno task build:storefront && deno task build:auth && deno task build:dashboard && deno task build:admin && deno task build:tracking",
+
+    "build:storefront": "deno task --cwd apps/storefront build",
+
+    "build:auth": "deno task --cwd apps/auth build",
+
+    "build:dashboard": "deno task --cwd apps/dashboard build",
+
+    "build:admin": "deno task --cwd apps/admin build",
+
+    "build:tracking": "deno task --cwd apps/tracking build",
+
+    "preview": "deno task preview:frontends",
+
+    "preview:frontends": "deno run -A npm:concurrently@^10.0.3 -k -n SHOP,AUTH,DASHBOARD,ADMIN,TRACKING \"deno task preview:storefront\" \"deno task preview:auth\" \"deno task preview:dashboard\" \"deno task preview:admin\" \"deno task preview:tracking\"",
+
     "preview:storefront": "deno task --cwd apps/storefront preview",
+
     "preview:auth": "deno task --cwd apps/auth preview",
+
     "preview:dashboard": "deno task --cwd apps/dashboard preview",
+
     "preview:admin": "deno task --cwd apps/admin preview",
+
     "preview:tracking": "deno task --cwd apps/tracking preview",
-    "start": "deno run -A npm:concurrently -k -n API,WORKER \"deno task start:api\" \"deno task start:worker\"",
+
+    "start": "deno task start:services",
+
+    "start:services": "deno run -A npm:concurrently@^10.0.3 -k -n API,WORKER \"deno task start:api\" \"deno task start:worker\"",
+
     "start:api": "deno task --cwd apps/api start",
+
     "start:worker": "deno task --cwd apps/worker start",
-    "db:migrate": "deno task --cwd packages/database migrate"
+    "worker:once": "deno run --env -A apps/worker/src/run-once.ts",
+
+    "db:generate": "deno task --cwd packages/database generate",
+
+    "db:migrate": "deno task --cwd packages/database migrate",
+
+    "db:push": "deno task --cwd packages/database push",
+
+    "db:studio": "deno task --cwd packages/database studio",
+
+    "db:check": "deno task --cwd packages/database check",
+
+    "db:smoke": "deno run --env -A scripts/db-smoke.ts",
+
+    "cache": "deno cache --reload apps/*/src/**/*.ts apps/*/src/**/*.tsx packages/**/*.ts packages/**/*.tsx scripts/**/*.ts",
+
+    "clean": "deno run -A npm:rimraf@^6.0.0 \"apps/*/dist\" \"apps/*/.vite\" \"packages/*/dist\" \"coverage\"",
+
+    "ci": "deno task quality && deno task build"
   },
   "imports": {
+    "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.3.2",
+    "@tanstack/react-query": "npm:@tanstack/react-query@^5.101.2",
+    "@testing-library/dom": "npm:@testing-library/dom@^10.4.1",
+    "@testing-library/jest-dom": "npm:@testing-library/jest-dom@^6.9.1",
+    "@testing-library/react": "npm:@testing-library/react@^16.3.2",
+    "@testing-library/user-event": "npm:@testing-library/user-event@^14.6.1",
+    "date-fns": "npm:date-fns@^4.4.0",
+    "ioredis": "npm:ioredis@^5.11.1",
+    "jsdom": "npm:jsdom@^29.1.1",
+    "pdf-lib": "npm:pdf-lib@^1.17.1",
+    "@neondatabase/serverless": "npm:@neondatabase/serverless@^1.1.0",
+    "@std/assert": "jsr:@std/assert@^1.0.19",
+    "@std/encoding": "jsr:@std/encoding@^1.0.11",
+    "@std/expect": "jsr:@std/expect@^1.0.20",
+    "@std/testing": "jsr:@std/testing@^1.0.19",
     "concurrently": "npm:concurrently@^10.0.3",
+    "dotenv": "npm:dotenv@^17.4.2",
+    "drizzle-kit": "npm:drizzle-kit@^0.31.10",
+    "drizzle-orm": "npm:drizzle-orm@^0.31.2",
+    "lucide-react": "npm:lucide-react@^1.24.0",
     "react": "npm:react@^18.3.1",
     "react/jsx-runtime": "npm:react@^18.3.1/jsx-runtime",
     "react/jsx-dev-runtime": "npm:react@^18.3.1/jsx-dev-runtime",
     "react-dom": "npm:react-dom@^18.3.1",
     "react-router-dom": "npm:react-router-dom@^6.28.0",
     "react-error-boundary": "npm:react-error-boundary@^4.1.2",
+    "swr": "npm:swr@^2.4.2",
     "vite": "npm:vite@^5.4.10",
     "@vitejs/plugin-react": "npm:@vitejs/plugin-react@^4.3.3",
+    "hono": "npm:hono@^4.6.11",
+    "vitest": "npm:vitest@^4.1.10",
+    "zod": "npm:zod@^4.4.3",
+    "goey-toast": "npm:goey-toast@^0.5.0",
+    "framer-motion": "npm:framer-motion@^11.0.0",
+
     "@starsuperscare/ui": "./packages/ui/index.tsx",
     "@starsuperscare/config": "./packages/config/index.ts",
-    "hono": "npm:hono@^4.6.11"
+    "@starsuperscare/contracts": "./packages/contracts/index.ts",
+    "@starsuperscare/auth-pkg": "./packages/auth/index.ts",
+    "@starsuperscare/storage": "./packages/storage/src/index.ts",
+    "zustand": "npm:zustand@^5.0.14"
   }
 }

@@ -33,3 +33,8 @@ GET /v1/public/tracking/{tracking_token}
 
 Endpoint diberi rate limit, expiry/revocation policy, dan tidak boleh mengungkap apakah order privat
 tertentu ada melalui identifier yang mudah ditebak.
+
+## UI/UX V2
+
+Mulai dari `docs/ui/00-scope-and-security.md`. Desktop, mobile, timeline state, privacy, dan toast
+map tersedia secara terpisah.

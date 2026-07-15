@@ -1,4 +1,5 @@
 import { assertEquals } from 'https://deno.land/std@0.224.0/assert/mod.ts';
+/// <reference lib="deno.ns" />
 import { handleShutdown } from './main.ts';
 
 Deno.test('Worker handleShutdown triggers cleanly without throwing', () => {
@@ -8,7 +9,7 @@ Deno.test('Worker handleShutdown triggers cleanly without throwing', () => {
   let errorCaught = false;
   try {
     handleShutdown('SIGTEST');
-  } catch (err) {
+  } catch (_err) {
     errorCaught = true;
   }
   assertEquals(errorCaught, false);

@@ -19,3 +19,9 @@
 - Gunakan semantic HTML dan focus management.
 - Currency formatter memakai `Intl.NumberFormat('id-ID', { currency: 'IDR' })`.
 - Date formatter memakai `Asia/Jakarta` di presentation layer.
+
+## UI/UX V2
+
+Shared UI contract berada di `docs/01-goey-toast.md` sampai `docs/15-toast-event-policy.md`.
+Implementasi aplikasi harus memakai shared tokens, components, layout, feedback, dan accessibility
+contract ini.

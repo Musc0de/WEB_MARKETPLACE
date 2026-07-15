@@ -4,10 +4,15 @@ import { resolve } from 'node:path';
 
 export default defineConfig({
   plugins: [react()],
+  server: {
+    port: 5176,
+    strictPort: true,
+  },
   resolve: {
     alias: {
       '@starsuperscare/ui': resolve(__dirname, '../../packages/ui/index.tsx'),
       '@starsuperscare/config': resolve(__dirname, '../../packages/config/index.ts'),
+      '@starsuperscare/contracts': resolve(__dirname, '../../packages/contracts/index.ts'),
     },
   },
 });

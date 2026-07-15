@@ -1,0 +1,60 @@
+// deno-lint-ignore-file explicit-module-boundary-types
+import { z } from 'zod';
+import { ProductDetailSchema } from './catalog.ts';
+
+// We reuse the basic Product schemas but define specific mutations
+const _AdminProductCreateSchema = z.object({
+  storeId: z.string().uuid(),
+  name: z.string().min(2),
+  type: z.enum(['physical', 'digital', 'service']),
+  description: z.string().optional(),
+  brandId: z.string().uuid().optional(),
+  purchaseLimit: z.number().min(0).default(0),
+});
+export type AdminProductCreate = z.infer<typeof _AdminProductCreateSchema>;
+export const AdminProductCreateSchema: z.ZodType<AdminProductCreate> = _AdminProductCreateSchema;
+
+const _AdminProductUpdateSchema = z.object({
+  version: z.number().min(1),
+  name: z.string().min(2).optional(),
+  type: z.enum(['physical', 'digital', 'service']).optional(),
+  description: z.string().optional(),
+  brandId: z.string().uuid().nullable().optional(),
+  purchaseLimit: z.number().min(0).optional(),
+  seoTitle: z.string().optional(),
+  seoDescription: z.string().optional(),
+});
+export type AdminProductUpdate = z.infer<typeof _AdminProductUpdateSchema>;
+export const AdminProductUpdateSchema: z.ZodType<AdminProductUpdate> = _AdminProductUpdateSchema;
+
+const _AdminProductVariantCreateSchema = z.object({
+  sku: z.string().min(3),
+  price: z.number().min(0),
+  comparePrice: z.number().min(0).optional(),
+  weight: z.number().min(0).optional(),
+  dimension: z.any().optional(),
+});
+export type AdminProductVariantCreate = z.infer<typeof _AdminProductVariantCreateSchema>;
+export const AdminProductVariantCreateSchema: z.ZodType<AdminProductVariantCreate> =
+  _AdminProductVariantCreateSchema;
+
+const _AdminProductVariantUpdateSchema = z.object({
+  version: z.number().min(1),
+  sku: z.string().min(3).optional(),
+  price: z.number().min(0).optional(),
+  comparePrice: z.number().min(0).nullable().optional(),
+  weight: z.number().min(0).nullable().optional(),
+});
+export type AdminProductVariantUpdate = z.infer<typeof _AdminProductVariantUpdateSchema>;
+export const AdminProductVariantUpdateSchema: z.ZodType<AdminProductVariantUpdate> =
+  _AdminProductVariantUpdateSchema;
+
+// Admin Responses
+const _AdminProductMutationResponse = z.object({
+  data: ProductDetailSchema,
+  meta: z.object({ request_id: z.string() }),
+  error: z.null(),
+});
+export type AdminProductMutation = z.infer<typeof _AdminProductMutationResponse>;
+export const AdminProductMutationResponse: z.ZodType<AdminProductMutation> =
+  _AdminProductMutationResponse;

@@ -1,33 +1,64 @@
-# Integrasi goey-toast
+# Shared Gooey Toast Integration
 
-`goey-toast` dipakai untuk feedback sementara, bukan sebagai database notifikasi.
+Package yang digunakan adalah `goey-toast`. API package dapat berubah antar versi; seluruh aplikasi
+wajib memakai wrapper lokal agar upgrade terisolasi.
 
-## Setup
-
-- Install package dan peer dependencies React/Framer Motion.
-- Import stylesheet satu kali pada entry frontend.
-- Render satu `<GoeyToaster />` pada root setiap app.
-- Bungkus API package dalam helper `notify` agar teks, durasi, dan error mapping konsisten.
-
-## Mapping
+## Current integration contract
 
 ```text
-success -> add cart, save profile, mark read
-error   -> API failure, invalid action
-warning -> low stock, changed price
-info    -> background update, shipping update
-promise -> submit form, checkout validation, download generation
+packages/ui/src/feedback/
+├── responsive-gooey-toaster.tsx
+├── notify.ts
+├── toast-context.tsx
+└── toast-offset.css
 ```
 
-## Contoh kebijakan pesan
+Wrapper mengekspor:
 
-- Judul singkat maksimal satu kalimat.
-- Detail teknis tidak ditampilkan.
-- Error form tetap ditampilkan inline pada field.
-- Jangan menampilkan toast berulang untuk setiap SSE reconnect.
-- Gunakan action button hanya untuk aksi aman seperti `Lihat Keranjang` atau `Coba Lagi`.
+- `notify.default`
+- `notify.success`
+- `notify.error`
+- `notify.warning`
+- `notify.info`
+- `notify.promise`
+- `notify.update`
+- `notify.dismiss`
 
-## Persistent notification
+## Mount rule
 
-Order/payment notification tetap dibuat pada `notifications` table. SSE hanya memberi sinyal
-realtime, lalu client memperbarui list dan menampilkan toast bila sesuai preference.
+Import stylesheet package sekali pada entry/root UI, lalu mount tepat satu toaster per frontend.
+
+```tsx
+<ResponsiveGooeyToaster />;
+```
+
+Jangan mount pada page/card/modal.
+
+## Responsive position
+
+- Desktop/tablet landscape: `top-right`.
+- Mobile: `bottom-center`.
+- Offset menggunakan layout context CSS variables.
+
+## Capabilities yang dapat digunakan
+
+Gunakan type variants, promise transition, action, update, dismiss, queue, hover pause, close
+button, mobile swipe, dan reduced-motion sesuai versi package yang terpasang. Jangan mengasumsikan
+option yang belum tersedia; wrapper harus diuji terhadap type definitions versi lockfile.
+
+## Boundaries
+
+Toast bukan pengganti:
+
+- inline field error
+- error summary
+- modal confirmation
+- long-running job center
+- persistent notification inbox
+- payment result page
+
+## Naming
+
+Package bernama `goey-toast`, sedangkan export versi terkini memakai nama seperti `GooeyToaster` dan
+`gooeyToast`. Aplikasi tidak mengimpor export tersebut langsung; hanya wrapper `notify` yang boleh
+melakukannya.

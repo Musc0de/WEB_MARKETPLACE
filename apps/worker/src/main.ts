@@ -3,8 +3,14 @@
  * This is a standalone process for background jobs. It is not an HTTP server.
  */
 
+/// <reference lib="deno.ns" />
+import { pollOutbox } from './outbox/poller.ts';
+import { runCleanupJobs } from './jobs/cleanup.ts';
+import { initializeHandlers } from './outbox/registry.ts';
+
 let isRunning = true;
-const POLLING_INTERVAL = 5000;
+const POLLING_INTERVAL = 2000;
+const CLEANUP_INTERVAL = 1000 * 60; // 1 minute
 
 function log(level: 'INFO' | 'WARN' | 'ERROR', message: string, extra?: Record<string, unknown>) {
   console.log(
@@ -21,9 +27,29 @@ function log(level: 'INFO' | 'WARN' | 'ERROR', message: string, extra?: Record<s
 async function startWorker() {
   log('INFO', 'Worker started');
 
+  // Initialize handlers for outbox events
+  initializeHandlers();
+
+  let lastCleanupTime = 0;
+
   while (isRunning) {
-    // TODO: Implement actual job polling (e.g. queue system, cron jobs)
-    log('INFO', 'Worker health check / polling...');
+    try {
+      // 1. Poll Outbox
+      const processedCount = await pollOutbox();
+      if (processedCount > 0) {
+        log('INFO', `Processed ${processedCount} outbox events`);
+      }
+
+      // 2. Run Cleanup Jobs Periodically
+      const now = Date.now();
+      if (now - lastCleanupTime >= CLEANUP_INTERVAL) {
+        log('INFO', 'Running periodic cleanup jobs...');
+        await runCleanupJobs();
+        lastCleanupTime = now;
+      }
+    } catch (err: any) {
+      log('ERROR', 'Error during worker loop iteration', { error: err.message });
+    }
 
     // Sleep for POLLING_INTERVAL without blocking the event loop
     await new Promise((resolve) => setTimeout(resolve, POLLING_INTERVAL));

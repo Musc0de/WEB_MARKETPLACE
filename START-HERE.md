@@ -1,70 +1,42 @@
-# Mulai dari Sini — 12 Langkah Ringkas
+# StarSuperScare — Start Here
 
-Dokumen ini adalah urutan kerja paling singkat. Detail setiap langkah tersedia pada folder terkait.
+## Track A: sistem
 
-## 1. Tetapkan domain
+1. Tetapkan domain dan route.
+2. Buat Deno workspace.
+3. Siapkan Neon branches dan environment.
+4. Buat schema identity, catalog, inventory, commerce, notification, return/refund, support.
+5. Bangun auth.
+6. Bangun catalog.
+7. Bangun cart.
+8. Bangun checkout/payment.
+9. Bangun account auto-provision dan invoice email.
+10. Bangun dashboard.
+11. Bangun worker.
+12. Test dan deploy.
 
-Gunakan `shop` untuk belanja, `auth` untuk login/signup, `dashboard` untuk akun client, `api` untuk
-backend, dan `admin` untuk operasional. Terapkan redirect route lama.
+Detail berada di `docs/00-overview/`.
 
-## 2. Buat Deno monorepo
+## Track B: UI/UX V2
 
-Buat `apps/*` dan `packages/*`, lalu daftarkan semuanya pada root `deno.jsonc` workspace.
+1. Baca `UI-UX-START-HERE.md`.
+2. Terapkan design tokens dan shared UI.
+3. Terapkan responsive shell/navigation.
+4. Terapkan Gooey Toast wrapper.
+5. Bangun auth UI desktop/mobile.
+6. Bangun storefront UI desktop/mobile.
+7. Bangun dashboard client UI desktop/mobile.
+8. Bangun admin UI desktop dan mobile fallback.
+9. Bangun tracking UI.
+10. Jalankan UI/UX quality gates.
 
-## 3. Buat Neon environments
+Detail berada di `UI-UX-IMPLEMENTATION-ORDER.md`.
 
-Siapkan branch `development`, `staging`, dan `production`. Gunakan pooled URL untuk runtime dan
-direct URL untuk migration.
+## File utama
 
-## 4. Buat schema dasar
-
-Kerjakan identity/session, products/variants/inventory, cart, orders/payments/invoices,
-notification/outbox, return/refund, dan support.
-
-## 5. Bangun auth
-
-Implementasikan signup, verifikasi email, login username/password, logout, recovery, session lintas
-subdomain, CSRF, dan rate limit.
-
-## 6. Bangun catalog
-
-Implementasikan product list/detail, category/search, product card, rating, stok, dan `net_sold`
-dari order berbayar dikurangi refund.
-
-## 7. Bangun cart
-
-Guest cart menggunakan token opaque; user cart tersimpan di database. Merge keduanya setelah login
-dengan validasi stok dan harga.
-
-## 8. Bangun checkout
-
-Pisahkan address, shipping, payment, review, dan result. Semua total dihitung server dan submit
-memakai idempotency key.
-
-## 9. Integrasikan payment dan akun otomatis
-
-Webhook payment yang terverifikasi menandai order paid, membuat/menautkan akun, membuat invoice,
-serta enqueue email. Password tidak dikirim; client membuatnya melalui activation link.
-
-## 10. Bangun dashboard
-
-Kerjakan home, profile, orders, tracking, history, invoices, digital downloads, addresses, wishlist,
-notifications, return/refund, reviews, support, dan settings.
-
-## 11. Bangun worker
-
-Proses transactional outbox, invoice PDF, email, notification, SSE signal, retry, cleanup
-token/session, dan release stock reservation.
-
-## 12. Uji dan launch
-
-Jalankan unit, integration, E2E, accessibility, security, backup/restore, staging UAT, lalu
-production rollout dengan monitoring.
-
-## File pertama yang dibaca
-
-1. `README.md`
-2. `DIRECTORY-TREE.md`
-3. `docs/00-overview/04-implementation-roadmap.md`
-4. `packages/database/docs/01-neon-setup.md`
-5. `quality/03-launch-checklist.md`
+- `README.md`
+- `DIRECTORY-TREE.md`
+- `MANIFEST.md`
+- `UI-UX-START-HERE.md`
+- `PATCH-MANIFEST.md`
+- `FILES-TO-REPLACE.md`

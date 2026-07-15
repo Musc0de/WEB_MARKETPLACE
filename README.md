@@ -1,75 +1,51 @@
-# StarSuperScare Marketplace — Blueprint Deno + Neon
+# StarSuperScare Marketplace — Blueprint Deno + Neon + UI/UX V2
 
-Paket ini memecah rencana marketplace StarSuperScare menjadi dokumen Markdown per aplikasi, fitur,
-database, infrastruktur, dan tahap implementasi.
+Paket ini memecah rencana StarSuperScare menjadi dokumentasi sistem dan dokumentasi UI/UX per aplikasi, fitur, database, infrastruktur, serta tahap implementasi.
 
-## Keputusan arsitektur final
+## Arsitektur aplikasi
 
-- `starsuperscare.net`: landing page dan halaman informasi publik.
-- `shop.starsuperscare.net`: katalog produk, detail produk, cart, checkout, pencarian, dan wishlist
-  sementara.
-- `auth.starsuperscare.net`: login, signup, aktivasi akun, lupa password, dan reset password.
-- `dashboard.starsuperscare.net`: akun client, order, history, invoice, download digital, alamat,
-  notifikasi, retur, ulasan, support, dan settings.
+- `starsuperscare.net`: landing/public information.
+- `shop.starsuperscare.net`: storefront, products, search, wishlist, cart, checkout.
+- `auth.starsuperscare.net`: login, signup, activation, verification, recovery.
+- `dashboard.starsuperscare.net`: area client.
 - `api.starsuperscare.net/v1`: REST API dan SSE.
-- `admin.starsuperscare.net`: pengelolaan produk, stok, order, pembayaran, client, refund, dan
-  konten.
-- `assets.starsuperscare.net`: gambar produk, bukti retur, dan file publik.
-- `tracking.starsuperscare.net`: tracking publik menggunakan token aman.
+- `admin.starsuperscare.net`: operasional admin.
+- `tracking.starsuperscare.net`: public tracking.
+- `apps/worker`: background job internal, tanpa UI publik.
 
-## Stack yang dipilih
+## Stack
 
-- Runtime dan workspace: Deno.
-- Frontend: React + Vite agar `goey-toast` dapat dipakai langsung.
-- Backend API: Hono di Deno.
-- Database: Neon PostgreSQL.
-- ORM dan migration: Drizzle ORM/Kit.
-- Validasi kontrak: Zod.
-- Realtime dashboard: Server-Sent Events (SSE).
-- Pekerjaan async: Deno worker + transactional outbox PostgreSQL.
-- File besar: object storage; Neon hanya menyimpan metadata.
+Deno workspace, React + Vite, Hono, Neon PostgreSQL, Drizzle, Zod, SSE, transactional outbox, object storage, dan `goey-toast` melalui shared wrapper.
 
-## Cara membaca dokumen
+## Dua track dokumentasi
 
-1. Mulai dari `docs/00-overview/`.
-2. Ikuti `04-implementation-roadmap.md` sesuai urutan fase.
-3. Baca `apps/<nama-aplikasi>/README.md` sebelum mengerjakan aplikasinya.
-4. Gunakan dokumen di `packages/database/` saat membuat tabel dan migration.
-5. Jalankan skenario di `quality/` sebelum release.
+### Sistem
 
-## Prinsip utama
+Mulai dari `START-HERE.md` dan `docs/00-overview/` untuk domain, database, API, auth, cart, checkout, payment, worker, dan deployment.
 
-- Cart dan checkout berada di `shop`, bukan dashboard.
-- Dashboard hanya menampilkan aktivitas dan kepemilikan client.
-- Login memakai **username + password**; email dipakai untuk invoice, aktivasi, recovery, dan
-  notifikasi.
-- Akun guest dapat dibuat otomatis setelah pembayaran sukses, tetapi password tidak pernah dikirim
-  melalui email. Client menerima tautan aktivasi untuk membuat password sendiri.
-- Semua nilai uang disimpan sebagai integer rupiah.
-- Semua waktu disimpan sebagai UTC dan ditampilkan dengan locale `id-ID`, zona `Asia/Jakarta`.
-- Informasi `Terjual` berasal dari transaksi berbayar dikurangi refund, bukan dari cart.
+### UI/UX V2
 
-## Folder utama
+Mulai dari `UI-UX-START-HERE.md` dan `UI-UX-IMPLEMENTATION-ORDER.md`.
 
-```text
-starsuperscare-deno-neon-blueprint/
-├── docs/00-overview/
-├── apps/
-│   ├── storefront/
-│   ├── auth/
-│   ├── dashboard/
-│   ├── admin/
-│   ├── api/
-│   ├── worker/
-│   └── tracking/
-├── packages/
-│   ├── database/
-│   ├── auth/
-│   ├── ui/
-│   ├── email/
-│   ├── contracts/
-│   └── config/
-├── infrastructure/
-├── quality/
-└── references/
-```
+UI/UX V2 mencakup:
+
+- Auth login/signup/activation/recovery desktop dan mobile.
+- Marketplace storefront untuk guest/client desktop dan mobile.
+- Dashboard client seluruh halaman desktop dan mobile.
+- Admin seluruh area operasional desktop serta tablet/mobile fallback.
+- Tracking publik desktop dan mobile.
+- Shared design system dan responsive Gooey Toast.
+
+## Prinsip tetap
+
+- Cart dan checkout berada di storefront.
+- Dashboard hanya untuk aktivitas/kepemilikan client dan shortcut kembali ke shop.
+- Login client menggunakan username + password.
+- Password tidak pernah dikirim lewat email.
+- Money integer IDR; time UTC, render id-ID/Asia-Jakarta.
+- `Terjual` berasal dari paid quantity dikurangi finalized refunded quantity.
+- Database hanya diakses API/worker.
+
+## Cara menerapkan UI/UX patch
+
+Baca `APPLY-UIUX-V2-PATCH.md`. Patch hanya menimpa dokumentasi Markdown dan tidak menimpa source code atau secret.

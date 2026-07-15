@@ -2,8 +2,7 @@
 
 ## DNS
 
-Buat record untuk root, shop, auth, dashboard, api, admin, assets, dan tracking. Pakai HTTPS untuk
-seluruh origin dan redirect HTTP ke HTTPS.
+Buat record untuk root, shop, auth, dashboard, api, admin, assets, dan tracking. Pakai HTTPS untuk seluruh origin dan redirect HTTP ke HTTPS.
 
 ## CORS allowlist
 
@@ -29,10 +28,8 @@ Domain: .starsuperscare.net
 Path: /
 ```
 
-Karena domain cookie dikirim ke subdomain, semua subdomain harus dikendalikan dan diamankan. Admin
-dapat memakai session/cookie terpisah agar risiko lebih kecil.
+Karena domain cookie dikirim ke subdomain, semua subdomain harus dikendalikan dan diamankan. Admin dapat memakai session/cookie terpisah agar risiko lebih kecil.
 
 ## Headers
 
-Aktifkan HSTS, CSP yang diuji, Referrer-Policy, X-Content-Type-Options, dan frame-ancestors.
-Sesuaikan CSP untuk payment provider dan asset domain secara minimal.
+Aktifkan HSTS, CSP yang diuji, Referrer-Policy, X-Content-Type-Options, dan frame-ancestors. Sesuaikan CSP untuk payment provider dan asset domain secara minimal.

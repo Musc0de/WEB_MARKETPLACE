@@ -1,3 +1,1 @@
-export const config = {
-  env: 'development',
-};
+export * from './env.ts';

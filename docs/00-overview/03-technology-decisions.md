@@ -2,8 +2,7 @@
 
 ## Deno workspace
 
-Gunakan monorepo Deno agar aplikasi dan package berbagi lint, format, type-check, test, serta versi
-dependency.
+Gunakan monorepo Deno agar aplikasi dan package berbagi lint, format, type-check, test, serta versi dependency.
 
 Contoh root `deno.jsonc`:
 
@@ -42,11 +41,8 @@ Contoh root `deno.jsonc`:
 
 ## Async processing
 
-MVP memakai tabel `outbox_events` dan worker yang mengambil job dengan locking. Kafka baru
-ditambahkan ketika volume, jumlah service, atau kebutuhan replay membuat PostgreSQL queue tidak lagi
-cukup.
+MVP memakai tabel `outbox_events` dan worker yang mengambil job dengan locking. Kafka baru ditambahkan ketika volume, jumlah service, atau kebutuhan replay membuat PostgreSQL queue tidak lagi cukup.
 
 ## File storage
 
-Gambar produk, invoice PDF, file digital, dan bukti retur berada di object storage. Database hanya
-menyimpan key, ukuran, MIME type, checksum, dan metadata akses.
+Gambar produk, invoice PDF, file digital, dan bukti retur berada di object storage. Database hanya menyimpan key, ukuran, MIME type, checksum, dan metadata akses.

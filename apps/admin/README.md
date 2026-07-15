@@ -34,3 +34,9 @@
 - MFA sangat direkomendasikan.
 - Setiap perubahan sensitif menghasilkan audit event.
 - Admin tidak dapat melihat password, raw session token, atau raw payment credential.
+
+## UI/UX V2
+
+Mulai dari `docs/ui/00-scope-roles-and-routes.md`. Admin login, shell, overview, catalog, inventory,
+orders/payments/invoices, customers/support/reviews, table/form/bulk action, dan toast policy telah
+didokumentasikan.

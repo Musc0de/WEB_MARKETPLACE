@@ -1,0 +1,82 @@
+{
+  "hash": "1262458e",
+  "configHash": "5a05ff60",
+  "lockfileHash": "e3b0c442",
+  "browserHash": "07384ae1",
+  "optimized": {
+    "react": {
+      "src": "../../../../node_modules/.deno/react@18.3.1/node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "218b1826",
+      "needsInterop": true
+    },
+    "react-dom": {
+      "src": "../../../../node_modules/.deno/react-dom@18.3.1/node_modules/react-dom/index.js",
+      "file": "react-dom.js",
+      "fileHash": "d926d43e",
+      "needsInterop": true
+    },
+    "react/jsx-dev-runtime": {
+      "src": "../../../../node_modules/.deno/react@18.3.1/node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "92d7ce4a",
+      "needsInterop": true
+    },
+    "react/jsx-runtime": {
+      "src": "../../../../node_modules/.deno/react@18.3.1/node_modules/react/jsx-runtime.js",
+      "file": "react_jsx-runtime.js",
+      "fileHash": "77540a5a",
+      "needsInterop": true
+    },
+    "goey-toast": {
+      "src": "../../../../node_modules/.deno/goey-toast@0.5.0/node_modules/goey-toast/dist/index.js",
+      "file": "goey-toast.js",
+      "fileHash": "d94b545e",
+      "needsInterop": false
+    },
+    "hono/client": {
+      "src": "../../../../node_modules/.deno/hono@4.12.29/node_modules/hono/dist/client/index.js",
+      "file": "hono_client.js",
+      "fileHash": "ba792c79",
+      "needsInterop": false
+    },
+    "react-dom/client": {
+      "src": "../../../../node_modules/.deno/react-dom@18.3.1/node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "f80f9d09",
+      "needsInterop": true
+    },
+    "react-error-boundary": {
+      "src": "../../../../node_modules/.deno/react-error-boundary@4.1.2/node_modules/react-error-boundary/dist/react-error-boundary.development.esm.js",
+      "file": "react-error-boundary.js",
+      "fileHash": "ba8b8922",
+      "needsInterop": false
+    },
+    "react-router-dom": {
+      "src": "../../../../node_modules/.deno/react-router-dom@6.30.4/node_modules/react-router-dom/dist/index.js",
+      "file": "react-router-dom.js",
+      "fileHash": "b2d93fa2",
+      "needsInterop": false
+    },
+    "zod": {
+      "src": "../../../../node_modules/.deno/zod@4.4.3/node_modules/zod/index.js",
+      "file": "zod.js",
+      "fileHash": "a2b1bc68",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-HIGNLTFM": {
+      "file": "chunk-HIGNLTFM.js"
+    },
+    "chunk-VVF5MN7A": {
+      "file": "chunk-VVF5MN7A.js"
+    },
+    "chunk-BX5ISVL4": {
+      "file": "chunk-BX5ISVL4.js"
+    },
+    "chunk-DC5AMYBS": {
+      "file": "chunk-DC5AMYBS.js"
+    }
+  }
+}

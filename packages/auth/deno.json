@@ -1,5 +1,9 @@
 {
   "name": "@starsuperscare/auth-pkg",
   "version": "0.1.0",
-  "exports": "./index.ts"
+  "exports": "./index.ts",
+  "imports": {
+    "@std/assert": "jsr:@std/assert@^1.0.19",
+    "oslo": "npm:oslo@^1.2.1"
+  }
 }

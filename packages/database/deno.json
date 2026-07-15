@@ -1,5 +1,16 @@
 {
   "name": "@starsuperscare/database",
   "version": "0.1.0",
-  "exports": "./index.ts"
+  "exports": "./src/index.ts",
+  "tasks": {
+    "push": "drizzle-kit push",
+    "generate": "drizzle-kit generate",
+    "migrate": "deno run -A src/migrate.ts",
+    "db:smoke": "deno run -A ../../scripts/db-smoke.ts",
+    "test:db": "deno test -A tests/",
+    "db:seed": "deno run --env -A src/seeds/seed.ts"
+  },
+  "compilerOptions": {
+    "isolatedDeclarations": false
+  }
 }

@@ -1,6 +1,2 @@
-import {
-  require_react_dom
-} from "./chunk-EGBXYNOP.js";
-import "./chunk-RBM32MWW.js";
+import { t as require_react_dom } from "./react-dom-DRI03ng8.js";
 export default require_react_dom();
-//# sourceMappingURL=react-dom.js.map

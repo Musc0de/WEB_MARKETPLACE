@@ -35,3 +35,9 @@ Home | Orders | Cart | Notifications | Account
 
 Dashboard membaca API yang sama dengan storefront. Tidak ada database connection di browser. Semua
 tanggal ditampilkan `id-ID` dan `Asia/Jakarta`.
+
+## UI/UX V2
+
+Mulai dari `docs/ui/00-scope-and-routes.md`. Shell, home, profile/security, orders,
+history/invoices/downloads, commerce data, notifications, returns/refunds, support/reviews/settings
+memiliki spesifikasi desktop dan mobile.

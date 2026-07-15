@@ -1,76 +1,55 @@
-# Struktur Directory Proyek yang Disarankan
-
-Struktur berikut adalah target repository kode. Dokumen Markdown dalam paket ini ditempatkan pada
-folder yang sama agar keputusan fitur selalu dekat dengan implementasinya.
+# Directory Tree — Blueprint + UI/UX V2
 
 ```text
-starsuperscare/
-├── deno.jsonc
-├── .env.example
+starsuperscare-deno-neon-blueprint/
 ├── README.md
+├── START-HERE.md
+├── UI-UX-START-HERE.md
+├── UI-UX-IMPLEMENTATION-ORDER.md
+├── APPLY-UIUX-V2-PATCH.md
+├── PATCH-MANIFEST.md
+├── FILES-TO-REPLACE.md
+├── MANIFEST.md
+├── docs/
+│   ├── 00-overview/                 # system architecture
+│   └── 01-ui-ux/                    # shared UI/UX rules (20 files)
 ├── apps/
-│   ├── storefront/                 # React + Vite: shop.starsuperscare.net
-│   │   ├── deno.json
-│   │   ├── src/
-│   │   │   ├── pages/
-│   │   │   ├── features/
-│   │   │   │   ├── catalog/
-│   │   │   │   ├── cart/
-│   │   │   │   ├── checkout/
-│   │   │   │   └── wishlist/
-│   │   │   ├── components/
-│   │   │   └── main.tsx
-│   │   └── docs/
-│   ├── auth/                       # React + Vite: auth.starsuperscare.net
-│   │   ├── src/features/
-│   │   │   ├── login/
-│   │   │   ├── signup/
-│   │   │   ├── activation/
-│   │   │   └── recovery/
-│   │   └── docs/
-│   ├── dashboard/                  # React + Vite: dashboard.starsuperscare.net
-│   │   ├── src/features/
-│   │   │   ├── home/
-│   │   │   ├── profile/
-│   │   │   ├── orders/
-│   │   │   ├── history/
-│   │   │   ├── invoices/
-│   │   │   ├── downloads/
-│   │   │   ├── addresses/
-│   │   │   ├── notifications/
-│   │   │   ├── returns/
-│   │   │   ├── reviews/
-│   │   │   ├── support/
-│   │   │   └── settings/
-│   │   └── docs/
-│   ├── admin/                      # React + Vite: admin.starsuperscare.net
-│   ├── api/                        # Deno + Hono: api.starsuperscare.net
-│   │   ├── src/
-│   │   │   ├── routes/v1/
-│   │   │   ├── middleware/
-│   │   │   ├── modules/
-│   │   │   └── main.ts
-│   │   └── docs/
-│   ├── worker/                     # Email, outbox, invoice, notification jobs
-│   └── tracking/                   # Public tracking app
+│   ├── storefront/
+│   │   ├── docs/                    # system/feature docs
+│   │   └── docs/ui/                 # marketplace desktop/mobile (21 files, termasuk compatibility index)
+│   ├── auth/
+│   │   └── docs/ui/                 # login/signup/activation/recovery (15 files, termasuk compatibility index)
+│   ├── dashboard/
+│   │   └── docs/ui/                 # client dashboard desktop/mobile (22 files, termasuk compatibility index)
+│   ├── admin/
+│   │   └── docs/ui/                 # admin desktop/mobile (18 files, termasuk compatibility index)
+│   ├── tracking/
+│   │   └── docs/ui/                 # public tracking (5 files)
+│   ├── api/
+│   └── worker/
 ├── packages/
-│   ├── database/                   # Drizzle schema, client, migrations, seeds
-│   ├── auth/                       # Password, session, CSRF, RBAC helpers
-│   ├── ui/                         # Design system dan goey-toast wrapper
-│   ├── email/                      # Provider interface dan template
-│   ├── contracts/                  # Zod schema dan TypeScript contracts
-│   └── config/                     # Environment parser dan shared config
-├── migrations/
-├── scripts/
+│   ├── ui/
+│   │   └── docs/                    # design system + Gooey Toast (15 files)
+│   ├── database/
+│   ├── auth/
+│   ├── email/
+│   ├── contracts/
+│   └── config/
 ├── infrastructure/
-└── quality/
+├── quality/                         # system + UI QA checklists
+├── references/
+└── _templates/
 ```
 
-## Aturan penempatan
+## Source code target (tidak dibuat oleh patch dokumentasi)
 
-- Kode khusus aplikasi berada di `apps/<app>`.
-- Kode yang dipakai minimal dua aplikasi berada di `packages/<package>`.
-- Database hanya diakses oleh `apps/api` dan `apps/worker`.
-- Frontend tidak pernah menggunakan `DATABASE_URL`.
-- Dokumen fitur berada di `apps/<app>/docs`.
-- Migration bersifat append-only setelah masuk production.
+```text
+packages/ui/src/
+apps/storefront/src/
+apps/auth/src/
+apps/dashboard/src/
+apps/admin/src/
+apps/tracking/src/
+```
+
+Lihat `packages/ui/docs/08-code-file-map.md`.

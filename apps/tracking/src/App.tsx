@@ -1,6 +1,7 @@
 import { ErrorBoundary } from 'react-error-boundary';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Button } from '@starsuperscare/ui';
+import { TrackingPage } from './features/tracking/TrackingPage.tsx';
 
 const Fallback = ({ error }: { error: Error }) => (
   <div role='alert'>
@@ -30,6 +31,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path='/' element={<Home />} />
+          <Route path='/track/:token' element={<TrackingPage />} />
           <Route path='*' element={<NotFound />} />
         </Routes>
       </BrowserRouter>

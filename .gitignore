@@ -31,3 +31,9 @@ build/
 .vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json
+
+# Ignored project documentation/scripts
+starsuperscare-ai-build-playbook/
+references/
+scripts/
+quality/

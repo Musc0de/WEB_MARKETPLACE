@@ -1,3 +1,4 @@
+/// <reference lib="deno.ns" />
 import { assertEquals, assertExists } from 'https://deno.land/std@0.224.0/assert/mod.ts';
 import app from './app.ts';
 
