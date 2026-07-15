@@ -16,14 +16,30 @@ export const ProductCard = (
 ): JSX.Element => {
   const [cartSuccess, setCartSuccess] = useState(false);
   const [currentImgIdx, setCurrentImgIdx] = useState(0);
+  const [direction, setDirection] = useState<1 | -1>(1);
 
   useEffect(() => {
     if (!product.images || product.images.length <= 1) return;
+
+    // Randomize the interval between 3.5s and 5.5s so products don't slide in perfect sync
+    const randomInterval = 3500 + Math.random() * 2000;
+
     const interval = setInterval(() => {
-      setCurrentImgIdx((prev) => (prev + 1) % product.images!.length);
-    }, 3500); // 3.5 seconds
+      setCurrentImgIdx((prev) => {
+        if (prev >= product.images!.length - 1) {
+          setDirection(-1);
+          return prev - 1;
+        }
+        if (prev <= 0) {
+          setDirection(1);
+          return prev + 1;
+        }
+        return prev + direction;
+      });
+    }, randomInterval);
+
     return () => clearInterval(interval);
-  }, [product.images]);
+  }, [product.images, direction]);
 
   const isOutOfStock = product.variantsSummary.totalAvailableStock <= 0;
 
