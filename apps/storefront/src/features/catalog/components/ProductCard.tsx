@@ -21,6 +21,12 @@ export const ProductCard = (
   useEffect(() => {
     if (!product.images || product.images.length <= 1) return;
 
+    // Preload all images in the background to cache them for a smooth slider experience
+    product.images.forEach((src) => {
+      const img = new window.Image();
+      img.src = src;
+    });
+
     // Randomize the interval between 3.5s and 5.5s so products don't slide in perfect sync
     const randomInterval = 3500 + Math.random() * 2000;
 
@@ -114,7 +120,7 @@ export const ProductCard = (
                     className={`object-cover w-full h-full transition-transform duration-300 group-hover:scale-105 ${
                       isOutOfStock ? 'opacity-50 grayscale' : ''
                     }`}
-                    loading='lazy'
+                    loading={idx === 0 ? 'eager' : 'lazy'}
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = 'none';
                     }}
@@ -132,7 +138,7 @@ export const ProductCard = (
                 className={`object-cover w-full h-full transition-transform duration-300 group-hover:scale-105 ${
                   isOutOfStock ? 'opacity-50 grayscale' : ''
                 }`}
-                loading='lazy'
+                loading='eager'
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = 'none';
                 }}

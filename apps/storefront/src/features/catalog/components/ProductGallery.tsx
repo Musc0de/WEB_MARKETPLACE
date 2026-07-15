@@ -12,6 +12,13 @@ export const ProductGallery = ({ product }: { product: ProductDetail }) => {
 
   useEffect(() => {
     if (allImages.length <= 1) return;
+
+    // Preload all images in the background to cache them for a smooth slider experience
+    allImages.forEach((src) => {
+      const img = new window.Image();
+      img.src = src;
+    });
+
     const interval = setInterval(() => {
       setSelectedImage((prevImg) => {
         if (!prevImg) return allImages[0];
@@ -41,6 +48,7 @@ export const ProductGallery = ({ product }: { product: ProductDetail }) => {
               src={selectedImage}
               alt={product.name}
               className='object-cover w-full h-full'
+              loading='eager'
             />
           )
           : (
