@@ -5,6 +5,7 @@ import {
   db,
   inventoryLevels,
   inventoryMovements,
+  productCategories,
   productImages,
   products,
   productVariants,
@@ -74,7 +75,17 @@ const routes = app
     const id = c.req.param('id');
     const [item] = await db.select().from(products).where(eq(products.id, id)).limit(1);
     if (!item) throw new HTTPException(404, { message: 'Product not found' });
-    return c.json({ data: item, meta: { request_id: c.get('requestId') }, error: null });
+
+    // Fetch categories
+    const categories = await db.select({ categoryId: productCategories.categoryId })
+      .from(productCategories)
+      .where(eq(productCategories.productId, id));
+
+    return c.json({
+      data: { ...item, categoryIds: categories.map((c) => c.categoryId) },
+      meta: { request_id: c.get('requestId') },
+      error: null,
+    });
   })
   .get('/:id/variants', async (c) => {
     const id = c.req.param('id');
@@ -263,13 +274,26 @@ const routes = app
       }
 
       const product = await db.transaction(async (tx) => {
+        const insertData: any = Object.fromEntries(
+          Object.entries(data).filter(([_, v]) => v !== undefined),
+        );
         const [newProduct] = await tx.insert(products).values({
-          ...data,
+          ...insertData,
           storeId,
           slug,
           brandId: data.brandId || null,
           description: data.description || null,
-        }).returning();
+        } as any).returning();
+
+        if (data.categoryIds && data.categoryIds.length > 0) {
+          await tx.insert(productCategories).values(
+            data.categoryIds.map((catId) => ({
+              productId: newProduct.id,
+              categoryId: catId,
+            })),
+          );
+        }
+
         await logAudit(tx, {
           actorId: user.id,
           entityType: 'product',
@@ -301,14 +325,30 @@ const routes = app
         });
       }
 
+      const { categoryIds, ...updateData } = data;
+
+      const updateDataClean = Object.fromEntries(
+        Object.entries(updateData).filter(([_, v]) => v !== undefined),
+      );
+
       const updatedProduct = await db.transaction(async (tx) => {
         const [updated] = await tx.update(products).set({
-          ...data as any,
-          brandId: data.brandId || null,
-          description: data.description || null,
-          version: existing.version + 1,
+          ...updateDataClean,
           updatedAt: new Date().toISOString(),
-        }).where(eq(products.id, id)).returning();
+          version: existing.version + 1,
+        } as any).where(eq(products.id, id)).returning();
+
+        if (data.categoryIds !== undefined) {
+          await tx.delete(productCategories).where(eq(productCategories.productId, id));
+          if (data.categoryIds.length > 0) {
+            await tx.insert(productCategories).values(
+              data.categoryIds.map((catId) => ({
+                productId: id,
+                categoryId: catId,
+              })),
+            );
+          }
+        }
 
         await logAudit(tx, {
           actorId: user.id,

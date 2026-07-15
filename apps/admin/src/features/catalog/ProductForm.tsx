@@ -85,12 +85,39 @@ export function ProductForm() {
     description: '',
     purchaseLimit: 0,
     version: 1,
+    brandId: '',
+    categoryIds: [] as string[],
   });
   const [status, setStatus] = useState<string | undefined>(undefined);
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [isLoadingProduct, setIsLoadingProduct] = useState(isEditing);
+
+  const [categoriesList, setCategoriesList] = useState<{ id: string; name: string }[]>([]);
+  const [brandsList, setBrandsList] = useState<{ id: string; name: string }[]>([]);
+
+  useEffect(() => {
+    const fetchOptions = async () => {
+      try {
+        const [catRes, brandRes] = await Promise.all([
+          client.v1.admin.catalog.categories.$get({ query: {} }),
+          client.v1.admin.catalog.brands.$get({ query: {} }),
+        ]);
+        if (catRes.ok) {
+          const catData = await catRes.json();
+          setCategoriesList(catData.data);
+        }
+        if (brandRes.ok) {
+          const brandData = await brandRes.json();
+          setBrandsList(brandData.data);
+        }
+      } catch (e) {
+        console.error('Failed to fetch options', e);
+      }
+    };
+    fetchOptions();
+  }, []);
 
   // Unsaved changes guard
   useEffect(() => {
@@ -120,6 +147,8 @@ export function ProductForm() {
             description: data.data.description ?? '',
             purchaseLimit: data.data.purchaseLimit ?? 0,
             version: data.data.version ?? 1,
+            brandId: data.data.brandId ?? '',
+            categoryIds: (data.data as any).categoryIds ?? [],
           });
           setStatus(data.data.status);
         }
@@ -150,6 +179,8 @@ export function ProductForm() {
           type: formData.type as 'physical' | 'digital' | 'service',
           description: formData.description,
           purchaseLimit: formData.purchaseLimit,
+          brandId: formData.brandId || undefined,
+          categoryIds: formData.categoryIds,
         };
         const res = await client.v1.admin.catalog.products[':id'].$put({
           param: { id },
@@ -165,6 +196,8 @@ export function ProductForm() {
           type: formData.type as 'physical' | 'digital' | 'service',
           description: formData.description,
           purchaseLimit: formData.purchaseLimit,
+          brandId: formData.brandId || undefined,
+          categoryIds: formData.categoryIds,
         };
         const parsed = AdminProductCreateSchema.safeParse(payload);
         if (!parsed.success) {
@@ -449,9 +482,42 @@ export function ProductForm() {
               >
                 <option value='physical'>🏪 Produk Fisik — Memerlukan pengiriman</option>
                 <option value='digital'>💾 Produk Digital — File / unduhan</option>
-                <option value='service'>🛠️ Layanan / Jasa — Tanpa pengiriman</option>
+                <option value='service'>🤝 Layanan — Jasa tanpa pengiriman</option>
               </select>
             </Field>
+
+            {/* Category & Brand */}
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <Field label='Kategori' hint='Pilih kategori produk'>
+                <select
+                  name='categoryIds'
+                  value={formData.categoryIds[0] || ''}
+                  onChange={(e) => {
+                    setFormData({
+                      ...formData,
+                      categoryIds: e.target.value ? [e.target.value] : [],
+                    });
+                    setIsDirty(true);
+                  }}
+                  className={inputCls}
+                >
+                  <option value=''>-- Pilih Kategori --</option>
+                  {categoriesList.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </Field>
+
+              <Field label='Brand' hint='Pilih brand produk (opsional)'>
+                <select
+                  name='brandId'
+                  value={formData.brandId}
+                  onChange={handleChange}
+                  className={inputCls}
+                >
+                  <option value=''>-- Tidak Ada Brand --</option>
+                  {brandsList.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+                </select>
+              </Field>
+            </div>
 
             {/* Description */}
             <Field label='Deskripsi Produk' hint='Jelaskan detail produk Anda kepada calon pembeli'>

@@ -7,6 +7,7 @@ const _AdminProductCreateSchema = z.object({
   type: z.enum(['physical', 'digital', 'service']),
   description: z.string().optional(),
   brandId: z.string().uuid().optional(),
+  categoryIds: z.array(z.string().uuid()).optional(),
   purchaseLimit: z.number().min(0).default(0),
 });
 export type AdminProductCreate = z.infer<typeof _AdminProductCreateSchema>;
@@ -18,6 +19,7 @@ const _AdminProductUpdateSchema = z.object({
   type: z.enum(['physical', 'digital', 'service']).optional(),
   description: z.string().optional(),
   brandId: z.string().uuid().nullable().optional(),
+  categoryIds: z.array(z.string().uuid()).optional(),
   purchaseLimit: z.number().min(0).optional(),
   seoTitle: z.string().optional(),
   seoDescription: z.string().optional(),
