@@ -4,6 +4,7 @@ import type { ProductListItem } from '@starsuperscare/contracts';
 import { Button, H1, H2, Text, toast } from '@starsuperscare/ui';
 import { client } from '../../lib/api.ts';
 import { useCart } from '../cart/api/useCart.ts';
+import { createDirectBuyCart } from '../cart/api/createDirectBuyCart.ts';
 import { ProductCard } from '../catalog/components/ProductCard.tsx';
 import { ProductCardSkeleton } from '../catalog/components/ProductCardSkeleton.tsx';
 
@@ -59,18 +60,13 @@ export default function HomePage() {
         return;
       }
 
-      await addItem(detail.variants[0].id, 1);
-
       if (isBuyNow) {
-        navigate('/checkout');
+        // Direct buy: fresh isolated cart — doesn't touch user's regular cart
+        const directToken = await createDirectBuyCart(detail.variants[0].id, 1);
+        navigate(`/checkout?directToken=${encodeURIComponent(directToken)}`);
       } else {
-        // Toast dengan tombol "Lihat Keranjang" sesuai docs
-        toast.success(`${p.name} ditambahkan ke keranjang`, {
-          action: {
-            label: 'Lihat Keranjang',
-            onClick: () => navigate('/cart'),
-          },
-        } as any);
+        await addItem(detail.variants[0].id, 1);
+        // No toast — cart badge animation provides visual feedback
       }
     } catch (_e) {
       toast.error('Gagal memproses aksi. Coba lagi.');

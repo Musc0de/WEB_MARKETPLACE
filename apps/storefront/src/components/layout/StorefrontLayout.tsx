@@ -37,7 +37,12 @@ const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [accountUrl, setAccountUrl] = useState(`${(import.meta as any).env.VITE_AUTH_URL}/login`);
   const { cart } = useCart();
-  const cartItemCount = cart?.items?.length || 0;
+  // Use TOTAL QUANTITY (sum of all item quantities) so the badge animates
+  // every time any item is added — even if it's a quantity increment.
+  const cartItemCount = cart?.items?.reduce(
+    (sum: number, item: any) => sum + (item.quantity || 1),
+    0,
+  ) || 0;
 
   useEffect(() => {
     const checkSession = async () => {

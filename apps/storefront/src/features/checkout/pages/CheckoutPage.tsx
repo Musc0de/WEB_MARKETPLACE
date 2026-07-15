@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCart } from '../../cart/api/useCart.ts';
 import { useCheckoutValidation, useCreateOrder } from '../api/useCheckout.ts';
 import { AddressForm } from '../components/AddressForm.tsx';
@@ -12,6 +12,11 @@ type CheckoutStep = 'address' | 'shipping' | 'review';
 
 export function CheckoutPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // directToken: present when user clicks "Beli Langsung" — isolated cart session
+  const directToken = searchParams.get('directToken');
+
   const { cart, isLoading: isCartLoading } = useCart();
   const { trigger: validateCheckout, data: validationData } = useCheckoutValidation();
   const { trigger: createOrder, isMutating: isCreatingOrder } = useCreateOrder();
@@ -21,17 +26,25 @@ export function CheckoutPage() {
   const [shippingOptionId, setShippingOptionId] = useState<string | null>(null);
 
   // Validate on mount or when shipping/cart changes
+  // For direct-buy: pass the directToken so the API uses the fresh isolated cart
   useEffect(() => {
-    if (cart?.items?.length) {
-      validateCheckout({ shippingOptionId, voucherCode: null }).catch(() => {});
+    const hasItems = directToken || cart?.items?.length;
+    if (hasItems) {
+      validateCheckout({
+        shippingOptionId,
+        voucherCode: null,
+        _cartToken: directToken ?? null,
+      } as any).catch(() => {});
     }
-  }, [cart, shippingOptionId, validateCheckout]);
+  }, [cart, shippingOptionId, directToken, validateCheckout]);
 
-  if (isCartLoading) {
+  // Show loader while normal cart is loading (only if not in direct-buy mode)
+  if (!directToken && isCartLoading) {
     return <div className='p-8 text-center'>Memuat checkout...</div>;
   }
 
-  if (!cart || cart.items.length === 0) {
+  // Show empty-cart screen only if NOT in direct-buy mode and cart is really empty
+  if (!directToken && (!cart || cart.items.length === 0)) {
     return (
       <div className='max-w-2xl mx-auto p-8 text-center'>
         <h1 className='text-2xl font-bold mb-4'>Keranjang Kosong</h1>
@@ -65,7 +78,8 @@ export function CheckoutPage() {
         shippingOptionId,
         emailSnapshot: address.email,
         voucherCode: null,
-      });
+        _cartToken: directToken ?? null,
+      } as any);
 
       if (res && res.orderId) {
         toast.success('Pesanan berhasil dibuat');
@@ -85,6 +99,14 @@ export function CheckoutPage() {
   return (
     <div className='max-w-6xl mx-auto px-4 py-8'>
       <h1 className='text-3xl font-bold mb-8'>Checkout</h1>
+
+      {/* Direct Buy Indicator */}
+      {directToken && (
+        <div className='mb-6 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700 flex items-center gap-2'>
+          <CheckCircle2 className='w-4 h-4' />
+          <span>Checkout langsung — hanya produk yang dipilih</span>
+        </div>
+      )}
 
       {/* Progress Bar */}
       <div className='flex items-center mb-12 overflow-x-auto pb-4'>

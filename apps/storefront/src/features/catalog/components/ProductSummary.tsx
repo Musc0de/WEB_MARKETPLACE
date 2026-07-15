@@ -5,6 +5,7 @@ import { toast } from '@starsuperscare/ui';
 import { ShieldCheck, ShoppingCart, Star, Check, Loader2 } from 'lucide-react';
 import { WishlistButton } from '../../wishlist/components/WishlistButton.tsx';
 import { useCart } from '../../cart/api/useCart.ts';
+import { createDirectBuyCart } from '../../cart/api/createDirectBuyCart.ts';
 import { useNavigate } from 'react-router-dom';
 
 export const ProductSummary = ({ product }: { product: ProductDetail }) => {
@@ -56,8 +57,10 @@ export const ProductSummary = ({ product }: { product: ProductDetail }) => {
     if (!selectedVariantId || addingToCart) return;
     setAddingToCart(true);
     try {
-      await addItem(selectedVariantId, quantity);
-      navigate('/checkout');
+      // Direct buy: create a fresh isolated cart with ONLY this product
+      // so checkout shows only this item, not the user's entire cart
+      const directToken = await createDirectBuyCart(selectedVariantId, quantity);
+      navigate(`/checkout?directToken=${encodeURIComponent(directToken)}`);
     } catch (_err) {
       toast.error('Gagal memproses pembelian');
       setAddingToCart(false);

@@ -23,7 +23,8 @@ async function fetcher(url: string, options: RequestInit) {
   return json;
 }
 
-function getCartToken() {
+function getCartToken(override?: string | null) {
+  if (override) return override;
   if (typeof window !== 'undefined') {
     return localStorage.getItem('guestToken');
   }
@@ -32,9 +33,16 @@ function getCartToken() {
 
 async function validateCheckout(
   url: string,
-  { arg }: { arg: { shippingOptionId?: string | null; voucherCode?: string | null } },
+  { arg }: {
+    arg: {
+      shippingOptionId?: string | null;
+      voucherCode?: string | null;
+      _cartToken?: string | null; // optional override for direct-buy flow
+    };
+  },
 ): Promise<CheckoutValidateResponse> {
-  const token = getCartToken();
+  const { _cartToken, ...body } = arg;
+  const token = getCartToken(_cartToken);
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
@@ -44,7 +52,7 @@ async function validateCheckout(
   const res = await fetcher(`${url}/validate`, {
     method: 'POST',
     headers,
-    body: JSON.stringify(arg),
+    body: JSON.stringify(body),
   });
   return res.data;
 }
@@ -63,9 +71,10 @@ async function fetchShippingOptions(
 
 async function createOrder(
   url: string,
-  { arg }: { arg: CreateOrderRequest },
+  { arg }: { arg: CreateOrderRequest & { _cartToken?: string | null } },
 ): Promise<OrderResponse> {
-  const token = getCartToken();
+  const { _cartToken, ...body } = arg as any;
+  const token = getCartToken(_cartToken);
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
@@ -75,7 +84,7 @@ async function createOrder(
   const res = await fetcher(`${url}/orders`, {
     method: 'POST',
     headers,
-    body: JSON.stringify(arg),
+    body: JSON.stringify(body),
   });
   return res.data;
 }

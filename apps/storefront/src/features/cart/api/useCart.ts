@@ -47,8 +47,9 @@ export function useCart() {
       localStorage.setItem('guestToken', result.data.guestToken);
     }
 
-    // Now trigger revalidation — the fetcher will pick up the new token from localStorage
-    await mutate();
+    // Trigger revalidation in background — don't block the caller
+    // so the UI can immediately show the success state (checkmark/animation)
+    mutate();
     return result;
   };
 

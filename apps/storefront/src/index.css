@@ -1,3 +1,18 @@
 @import "tailwindcss";
 @import "../../../packages/ui/src/styles/globals.css";
 @source "../../../packages/ui";
+
+/* Cart badge bounce animation */
+@keyframes cartBadgeBounce {
+  0%   { transform: scale(0.3); opacity: 0; }
+  50%  { transform: scale(1.35); opacity: 1; }
+  70%  { transform: scale(0.9); }
+  85%  { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Product card loading shimmer */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}

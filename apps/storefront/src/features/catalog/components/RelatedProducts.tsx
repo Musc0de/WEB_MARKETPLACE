@@ -4,6 +4,7 @@ import type { ProductDetail, ProductListItem } from '@starsuperscare/contracts';
 import { toast } from '@starsuperscare/ui';
 import { client } from '../../../lib/api.ts';
 import { useCart } from '../../cart/api/useCart.ts';
+import { createDirectBuyCart } from '../../cart/api/createDirectBuyCart.ts';
 import { ProductCard } from './ProductCard.tsx';
 import { ProductCardSkeleton } from './ProductCardSkeleton.tsx';
 
@@ -55,13 +56,12 @@ export const RelatedProducts = ({ product }: { product: ProductDetail }) => {
         toast.error('Produk tidak memiliki varian tersedia');
         return;
       }
-      await addItem(detail.variants[0].id, 1);
       if (isBuyNow) {
-        navigate('/checkout');
+        const directToken = await createDirectBuyCart(detail.variants[0].id, 1);
+        navigate(`/checkout?directToken=${encodeURIComponent(directToken)}`);
       } else {
-        toast.success(`${p.name} ditambahkan ke keranjang`, {
-          action: { label: 'Lihat Keranjang', onClick: () => navigate('/cart') },
-        } as any);
+        await addItem(detail.variants[0].id, 1);
+        // No toast — cart badge animation provides visual feedback
       }
     } catch (_e) {
       toast.error('Gagal memproses aksi. Coba lagi.');
