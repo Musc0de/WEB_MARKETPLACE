@@ -191,8 +191,20 @@ export const SearchPage = (): JSX.Element => {
             )
             : loading
             ? (
-              <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4'>
-                {Array.from({ length: perPage }).map((_, i) => <ProductCardSkeleton key={i} />)}
+              <div
+                className='flex overflow-x-auto gap-3 pb-4 snap-x no-scrollbar'
+                onWheel={(e) => {
+                  if (e.deltaY !== 0) {
+                    e.currentTarget.scrollLeft += e.deltaY;
+                    e.preventDefault();
+                  }
+                }}
+              >
+                {Array.from({ length: perPage }).map((_, i) => (
+                  <div key={i} className='w-[140px] sm:w-[160px] md:w-[180px] shrink-0 snap-start'>
+                    <ProductCardSkeleton />
+                  </div>
+                ))}
               </div>
             )
             : products.length === 0
@@ -211,15 +223,27 @@ export const SearchPage = (): JSX.Element => {
             )
             : (
               <>
-                <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4'>
+                <div
+                  className='flex overflow-x-auto gap-3 pb-4 snap-x no-scrollbar'
+                  onWheel={(e) => {
+                    if (e.deltaY !== 0) {
+                      e.currentTarget.scrollLeft += e.deltaY;
+                      e.preventDefault();
+                    }
+                  }}
+                >
                   {products.map((product) => (
-                    <ProductCard
+                    <div
                       key={product.id}
-                      product={product}
-                      isLoading={actionLoading === product.id}
-                      onAddToCart={(p) => handleAction(p, false)}
-                      onBuyNow={(p) => handleAction(p, true)}
-                    />
+                      className='w-[140px] sm:w-[160px] md:w-[180px] shrink-0 snap-start'
+                    >
+                      <ProductCard
+                        product={product}
+                        isLoading={actionLoading === product.id}
+                        onAddToCart={(p) => handleAction(p, false)}
+                        onBuyNow={(p) => handleAction(p, true)}
+                      />
+                    </div>
                   ))}
                 </div>
 
