@@ -113,11 +113,11 @@ export const SearchPage = (): JSX.Element => {
 
       setProducts(payload.data.items);
       setTotalItems(payload.data.total);
+      setLoading(false);
     } catch (err: any) {
       if (err.name === 'AbortError') return;
       setError(err.message || 'Gagal memuat produk.');
       toast.error(err.message || 'Gagal memuat produk.');
-    } finally {
       setLoading(false);
     }
   }, [filters, debouncedSearch, isCategoryRoute, isBrandRoute, slug]);
