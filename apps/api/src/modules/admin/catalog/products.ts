@@ -459,7 +459,13 @@ const routes = app
   )
   .get('/:id/images', requirePermission('catalog.read'), async (c) => {
     const id = c.req.param('id') as string;
-    const images = await db.select().from(productImages).where(eq(productImages.productId, id));
+    const images = await db.select().from(productImages).where(eq(productImages.productId, id))
+      .orderBy(
+        desc(productImages.isPrimary),
+        asc(productImages.sortOrder),
+        asc(productImages.createdAt),
+        asc(productImages.id),
+      );
 
     const mapped = await Promise.all(
       images.map(async (img) => ({
