@@ -68,11 +68,35 @@ export const ProductCard = (
         iconClassName='w-3.5 h-3.5'
       />
 
-      {/* Image */}
-      <a href={`/products/${product.slug}`} className='block'>
-        <div className='aspect-square relative bg-gray-50 overflow-hidden'>
-          {product.primaryImage
-            ? (
+      {/* Image Slider */}
+      <div className='aspect-square relative bg-gray-50 overflow-hidden group/slider'>
+        {product.images && product.images.length > 0
+          ? (
+            <div className='w-full h-full flex overflow-x-auto snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'>
+              {product.images.map((img, idx) => (
+                <a
+                  key={idx}
+                  href={`/products/${product.slug}`}
+                  className='w-full h-full flex-shrink-0 snap-center relative block'
+                >
+                  <img
+                    src={img}
+                    alt={`Gambar produk ${product.name} ${idx + 1}`}
+                    className={`object-cover w-full h-full transition-transform duration-300 group-hover:scale-105 ${
+                      isOutOfStock ? 'opacity-50 grayscale' : ''
+                    }`}
+                    loading='lazy'
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                </a>
+              ))}
+            </div>
+          )
+          : product.primaryImage
+          ? (
+            <a href={`/products/${product.slug}`} className='block w-full h-full'>
               <img
                 src={product.primaryImage}
                 alt={`Gambar produk ${product.name}`}
@@ -84,14 +108,28 @@ export const ProductCard = (
                   (e.target as HTMLImageElement).style.display = 'none';
                 }}
               />
-            )
-            : (
+            </a>
+          )
+          : (
+            <a href={`/products/${product.slug}`} className='block w-full h-full'>
               <div className='flex items-center justify-center w-full h-full text-gray-300 text-[11px] select-none'>
                 No Image
               </div>
-            )}
-        </div>
-      </a>
+            </a>
+          )}
+
+        {/* Simple dots indicator */}
+        {product.images && product.images.length > 1 && (
+          <div className='absolute bottom-1.5 left-0 right-0 flex justify-center gap-1 z-10 pointer-events-none'>
+            {product.images.map((_, i) => (
+              <div
+                key={i}
+                className='w-1 h-1 rounded-full bg-white/70 shadow-sm border border-black/10'
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* ── Content ── */}
       <div className='flex flex-col flex-grow px-2 pt-2 pb-2 gap-0.5'>

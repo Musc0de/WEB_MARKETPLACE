@@ -151,6 +151,9 @@ const routes = productsRouter
         primaryImage: sql<
           string | null
         >`(SELECT object_key FROM sss_product_images WHERE product_id = ${products.id} ORDER BY is_primary DESC, sort_order ASC, created_at ASC LIMIT 1)`,
+        images: sql<
+          string[]
+        >`ARRAY(SELECT object_key FROM sss_product_images WHERE product_id = ${products.id} ORDER BY is_primary DESC, sort_order ASC, created_at ASC LIMIT 10)`,
         minPrice: sql<number>`COALESCE(MIN(${productVariants.price}), 0)`,
         maxPrice: sql<number>`COALESCE(MAX(${productVariants.price}), 0)`,
         maxComparePrice: sql<number | null>`MAX(${productVariants.comparePrice})`,
@@ -194,6 +197,10 @@ const routes = productsRouter
           primaryImage = await storageAdapter.generatePresignedDownloadUrl(item.primaryImage);
         }
 
+        const images = await Promise.all(
+          (item.images || []).map((key) => storageAdapter.generatePresignedDownloadUrl(key)),
+        );
+
         return {
           id: item.id,
           name: item.name,
@@ -205,6 +212,7 @@ const routes = productsRouter
           averageRating: item.averageRating ?? 0,
           reviewCount: item.reviewCount ?? 0,
           primaryImage,
+          images,
           variantsSummary: {
             minPrice: Number(item.minPrice),
             maxPrice: Number(item.maxPrice),

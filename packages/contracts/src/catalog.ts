@@ -44,6 +44,7 @@ export interface ProductListItem {
   reviewCount: number;
   variantsSummary: ProductListVariantSummary;
   primaryImage?: string | null | undefined;
+  images?: string[];
 }
 
 export interface ProductDetail extends ProductListItem {
