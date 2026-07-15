@@ -1,0 +1,49 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# .gitattributes — Normalize line endings across OS
+# - Windows devs get CRLF locally (checkout)
+# - CI/server always stores and compares with LF (checkin)
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Default: normalize all text files to LF in repo
+* text=auto eol=lf
+
+# Source code — enforce LF
+*.ts    text eol=lf
+*.tsx   text eol=lf
+*.js    text eol=lf
+*.jsx   text eol=lf
+*.mjs   text eol=lf
+*.cjs   text eol=lf
+
+# Config files — LF
+*.json  text eol=lf
+*.yaml  text eol=lf
+*.yml   text eol=lf
+*.toml  text eol=lf
+*.env   text eol=lf
+*.env.* text eol=lf
+
+# Web assets — LF
+*.css   text eol=lf
+*.html  text eol=lf
+*.md    text eol=lf
+*.mdx   text eol=lf
+
+# Shell scripts — always LF (git hooks, CI scripts)
+*.sh    text eol=lf
+
+# Binary files — do not touch
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.pdf   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.eot   binary
+*.zip   binary
+*.tar   binary
+*.gz    binary
