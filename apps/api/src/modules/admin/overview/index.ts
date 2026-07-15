@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
-import { count, eq, inArray, sum, and, isNull, ne } from 'drizzle-orm';
-import { db, inventoryLevels, orders, productVariants, products } from '@starsuperscare/database';
+import { and, count, eq, inArray, isNull, ne, sum } from 'drizzle-orm';
+import { db, inventoryLevels, orders, products, productVariants } from '@starsuperscare/database';
 import { AuthContext, authMiddleware, requirePermission } from '../../../middleware/auth.ts';
 
 const app = new Hono<AuthContext>();

@@ -3,47 +3,50 @@
  * Provides: PageHeader, StatusPill, TableSkeleton, EmptyState, Pagination, SearchBar
  */
 import type { LucideIcon } from 'lucide-react';
-import { ChevronLeft, ChevronRight, Search, AlertCircle } from 'lucide-react';
+import { AlertCircle, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 
 // ─── Status config ────────────────────────────────────────────────────────────
 
 const STATUS_MAP: Record<string, { label: string; cls: string }> = {
   // Returns
-  pending:     { label: 'Menunggu',  cls: 'bg-gray-100 text-gray-600' },
-  approved:    { label: 'Disetujui', cls: 'bg-emerald-100 text-emerald-700' },
-  rejected:    { label: 'Ditolak',   cls: 'bg-red-100 text-red-700' },
-  received:    { label: 'Diterima',  cls: 'bg-blue-100 text-blue-700' },
-  completed:   { label: 'Selesai',   cls: 'bg-teal-100 text-teal-700' },
+  pending: { label: 'Menunggu', cls: 'bg-gray-100 text-gray-600' },
+  approved: { label: 'Disetujui', cls: 'bg-emerald-100 text-emerald-700' },
+  rejected: { label: 'Ditolak', cls: 'bg-red-100 text-red-700' },
+  received: { label: 'Diterima', cls: 'bg-blue-100 text-blue-700' },
+  completed: { label: 'Selesai', cls: 'bg-teal-100 text-teal-700' },
   // Refunds
-  initiated:   { label: 'Diajukan',   cls: 'bg-amber-100 text-amber-700' },
-  processed:   { label: 'Diproses',   cls: 'bg-blue-100 text-blue-700' },
-  failed:      { label: 'Gagal',      cls: 'bg-red-100 text-red-700' },
-  refunded:    { label: 'Direfund',   cls: 'bg-purple-100 text-purple-700' },
+  initiated: { label: 'Diajukan', cls: 'bg-amber-100 text-amber-700' },
+  processed: { label: 'Diproses', cls: 'bg-blue-100 text-blue-700' },
+  failed: { label: 'Gagal', cls: 'bg-red-100 text-red-700' },
+  refunded: { label: 'Direfund', cls: 'bg-purple-100 text-purple-700' },
   // Payments
-  paid:        { label: 'Dibayar',    cls: 'bg-emerald-100 text-emerald-700' },
-  unpaid:      { label: 'Belum Bayar', cls: 'bg-rose-100 text-rose-700' },
-  overdue:     { label: 'Jatuh Tempo', cls: 'bg-red-100 text-red-800' },
+  paid: { label: 'Dibayar', cls: 'bg-emerald-100 text-emerald-700' },
+  unpaid: { label: 'Belum Bayar', cls: 'bg-rose-100 text-rose-700' },
+  overdue: { label: 'Jatuh Tempo', cls: 'bg-red-100 text-red-800' },
   // Support
-  open:        { label: 'Terbuka',    cls: 'bg-blue-100 text-blue-700' },
-  in_progress: { label: 'Diproses',   cls: 'bg-amber-100 text-amber-700' },
-  resolved:    { label: 'Selesai',    cls: 'bg-emerald-100 text-emerald-700' },
-  closed:      { label: 'Ditutup',    cls: 'bg-gray-100 text-gray-500' },
+  open: { label: 'Terbuka', cls: 'bg-blue-100 text-blue-700' },
+  in_progress: { label: 'Diproses', cls: 'bg-amber-100 text-amber-700' },
+  resolved: { label: 'Selesai', cls: 'bg-emerald-100 text-emerald-700' },
+  closed: { label: 'Ditutup', cls: 'bg-gray-100 text-gray-500' },
   // Orders
-  processing:  { label: 'Diproses',  cls: 'bg-amber-100 text-amber-700' },
-  shipped:     { label: 'Dikirim',   cls: 'bg-indigo-100 text-indigo-700' },
-  delivered:   { label: 'Terkirim',  cls: 'bg-teal-100 text-teal-700' },
-  cancelled:   { label: 'Dibatalkan', cls: 'bg-red-100 text-red-700' },
+  processing: { label: 'Diproses', cls: 'bg-amber-100 text-amber-700' },
+  shipped: { label: 'Dikirim', cls: 'bg-indigo-100 text-indigo-700' },
+  delivered: { label: 'Terkirim', cls: 'bg-teal-100 text-teal-700' },
+  cancelled: { label: 'Dibatalkan', cls: 'bg-red-100 text-red-700' },
   // Priority
-  low:         { label: 'Rendah',  cls: 'bg-gray-100 text-gray-500' },
-  normal:      { label: 'Normal',  cls: 'bg-blue-100 text-blue-700' },
-  high:        { label: 'Tinggi',  cls: 'bg-amber-100 text-amber-700' },
-  urgent:      { label: 'Darurat', cls: 'bg-red-100 text-red-700' },
+  low: { label: 'Rendah', cls: 'bg-gray-100 text-gray-500' },
+  normal: { label: 'Normal', cls: 'bg-blue-100 text-blue-700' },
+  high: { label: 'Tinggi', cls: 'bg-amber-100 text-amber-700' },
+  urgent: { label: 'Darurat', cls: 'bg-red-100 text-red-700' },
 };
 
 export function StatusPill({ status }: { status: string }) {
-  const cfg = STATUS_MAP[status] ?? { label: status.toUpperCase(), cls: 'bg-gray-100 text-gray-600' };
+  const cfg = STATUS_MAP[status] ??
+    { label: status.toUpperCase(), cls: 'bg-gray-100 text-gray-600' };
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wide ${cfg.cls}`}>
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wide ${cfg.cls}`}
+    >
       {cfg.label}
     </span>
   );
@@ -74,7 +77,9 @@ export function PageHeader({
         </span>
         <div>
           {badge && (
-            <span className={`mb-1.5 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${badgeColor}`}>
+            <span
+              className={`mb-1.5 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${badgeColor}`}
+            >
               {badge}
             </span>
           )}
@@ -193,7 +198,11 @@ export function ErrorBanner({ message, onRetry }: { message: string; onRetry?: (
         <p className='text-sm text-red-600'>{message}</p>
       </div>
       {onRetry && (
-        <button type='button' onClick={onRetry} className='text-sm font-semibold text-red-700 hover:underline flex-shrink-0'>
+        <button
+          type='button'
+          onClick={onRetry}
+          className='text-sm font-semibold text-red-700 hover:underline flex-shrink-0'
+        >
           Coba lagi
         </button>
       )}
@@ -226,7 +235,9 @@ export function DataTable({
               {headers.map(({ label, right }) => (
                 <th
                   key={label}
-                  className={`px-5 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500 ${right ? 'text-right' : 'text-left'}`}
+                  className={`px-5 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500 ${
+                    right ? 'text-right' : 'text-left'
+                  }`}
                 >
                   {label}
                 </th>
@@ -285,7 +296,9 @@ export function Pagination({
             type='button'
             onClick={() => onPageChange(p)}
             className={`h-8 w-8 rounded-lg text-sm font-semibold transition ${
-              p === page ? 'bg-blue-600 text-white shadow-sm' : 'border border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
+              p === page
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'border border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
             }`}
           >
             {p}

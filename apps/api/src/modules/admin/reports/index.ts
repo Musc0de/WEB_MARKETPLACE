@@ -1,15 +1,15 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
-import { and, desc, eq, gte, lte, sql, sum, count } from 'drizzle-orm';
+import { and, count, desc, eq, gte, lte, sql, sum } from 'drizzle-orm';
 import {
   db,
+  inventoryLevels,
   orders,
   products,
   productVariants,
-  inventoryLevels,
-  userProfiles,
   returns as returnsTable,
+  userProfiles,
 } from '@starsuperscare/database';
 import { AuthContext, authMiddleware, requirePermission } from '../../../middleware/auth.ts';
 
@@ -25,7 +25,6 @@ const DateFilterSchema = z.object({
 const routes = app
   .use('*', authMiddleware)
   .use('*', requirePermission('orders.read'))
-
   // ─── 1. Laporan Penjualan ─────────────────────────────────────────
   .get('/sales', zValidator('query', DateFilterSchema), async (c) => {
     const { startDate, endDate, page: pageStr, limit: limitStr } = c.req.valid('query');
@@ -77,7 +76,6 @@ const routes = app
       },
     });
   })
-
   // ─── 2. Laporan Keuangan ──────────────────────────────────────────
   .get('/financial', zValidator('query', DateFilterSchema), async (c) => {
     const { startDate, endDate, page: pageStr, limit: limitStr } = c.req.valid('query');
@@ -142,7 +140,6 @@ const routes = app
       },
     });
   })
-
   // ─── 3. Laporan Stok ──────────────────────────────────────────────
   .get('/stock', zValidator('query', DateFilterSchema), async (c) => {
     const { page: pageStr, limit: limitStr } = c.req.valid('query');
@@ -150,7 +147,8 @@ const routes = app
     const limit = Math.min(parseInt(limitStr) || 10, 100);
     const offset = (page - 1) * limit;
 
-    const whereClause = sql`${productVariants.deletedAt} IS NULL AND ${products.status} != 'archived'`;
+    const whereClause =
+      sql`${productVariants.deletedAt} IS NULL AND ${products.status} != 'archived'`;
 
     const [rows, countRes, stockSummary] = await Promise.all([
       db
@@ -203,7 +201,6 @@ const routes = app
       },
     });
   })
-
   // ─── 4. Laporan Retur & Kehilangan ────────────────────────────────
   .get('/returns', zValidator('query', DateFilterSchema), async (c) => {
     const { startDate, endDate, page: pageStr, limit: limitStr } = c.req.valid('query');
@@ -229,7 +226,9 @@ const routes = app
           status: returnsTable.status,
           trackingNumber: returnsTable.trackingNumber,
           // Count items per return via subquery
-          itemCount: sql<number>`(SELECT COUNT(*) FROM sss_return_items ri WHERE ri.return_id = ${returnsTable.id})`,
+          itemCount: sql<
+            number
+          >`(SELECT COUNT(*) FROM sss_return_items ri WHERE ri.return_id = ${returnsTable.id})`,
           createdAt: returnsTable.createdAt,
         })
         .from(returnsTable)

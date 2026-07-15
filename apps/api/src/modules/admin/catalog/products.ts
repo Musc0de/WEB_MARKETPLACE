@@ -429,7 +429,7 @@ const routes = app
         objectKey: img.objectKey,
         isPrimary: img.isPrimary,
         url: await storageAdapter.generatePresignedDownloadUrl(img.objectKey),
-      }))
+      })),
     );
 
     return c.json({ data: mapped, meta: { request_id: c.get('requestId') }, error: null });
@@ -440,7 +440,8 @@ const routes = app
     async (c) => {
       const imageId = c.req.param('imageId') as string;
 
-      const [img] = await db.select().from(productImages).where(eq(productImages.id, imageId)).limit(1);
+      const [img] = await db.select().from(productImages).where(eq(productImages.id, imageId))
+        .limit(1);
       if (!img) throw new HTTPException(404, { message: 'Image not found' });
 
       // Delete from DB

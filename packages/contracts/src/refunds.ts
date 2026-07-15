@@ -25,13 +25,11 @@ export const refundItemSchema: z.ZodType<RefundItem> = z.object({
 });
 
 export interface ProcessRefundRequest {
-  refundId: string;
-  amount?: number | undefined; // optional partial refund override
+  amount?: number | undefined;
   restockItems?: boolean | undefined;
 }
 
 export const processRefundRequestSchema: z.ZodType<ProcessRefundRequest> = z.object({
-  refundId: z.string().uuid(),
   amount: z.number().min(0).optional(),
   restockItems: z.boolean().optional(),
 });

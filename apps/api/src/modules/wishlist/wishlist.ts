@@ -77,26 +77,30 @@ const routes = router
       )
       .orderBy(wishlists.createdAt);
 
-    const formattedItems = await Promise.all(items.map(async ({ minPrice, maxPrice, totalAvailableStock, ...item }) => {
-      let primaryImage = null;
-      if (item.product?.primaryImage) {
-        primaryImage = await storageAdapter.generatePresignedDownloadUrl(item.product.primaryImage);
-      }
+    const formattedItems = await Promise.all(
+      items.map(async ({ minPrice, maxPrice, totalAvailableStock, ...item }) => {
+        let primaryImage = null;
+        if (item.product?.primaryImage) {
+          primaryImage = await storageAdapter.generatePresignedDownloadUrl(
+            item.product.primaryImage,
+          );
+        }
 
-      return {
-        ...item,
-        product: item.product
-          ? {
-            ...item.product,
-            primaryImage,
-            variantsSummary: { minPrice, maxPrice, totalAvailableStock },
-          }
-          : null,
-        createdAt: item.createdAt instanceof Date
-          ? item.createdAt.toISOString()
-          : new Date(item.createdAt as any).toISOString(),
-      };
-    }));
+        return {
+          ...item,
+          product: item.product
+            ? {
+              ...item.product,
+              primaryImage,
+              variantsSummary: { minPrice, maxPrice, totalAvailableStock },
+            }
+            : null,
+          createdAt: item.createdAt instanceof Date
+            ? item.createdAt.toISOString()
+            : new Date(item.createdAt as any).toISOString(),
+        };
+      }),
+    );
 
     return c.json({
       data: formattedItems,

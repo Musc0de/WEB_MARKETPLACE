@@ -50,7 +50,8 @@ export const AuthLayout: React.FC<{ children?: React.ReactNode }> = ({ children 
             <span className='text-blue-300'>Dapat Diandalkan</span>.
           </h1>
           <p className='text-lg text-indigo-100 mb-10 leading-relaxed font-medium'>
-            Bergabunglah dengan ribuan pengguna yang mempercayakan StarSuperScare untuk mengelola aset digital mereka dan melacak pesanan secara mulus di satu platform terpadu.
+            Bergabunglah dengan ribuan pengguna yang mempercayakan StarSuperScare untuk mengelola
+            aset digital mereka dan melacak pesanan secara mulus di satu platform terpadu.
           </p>
 
           {/* Social Proof */}
@@ -112,7 +113,9 @@ export const AuthLayout: React.FC<{ children?: React.ReactNode }> = ({ children 
               Syarat & Ketentuan
             </Link>
           </div>
-          <p className='mt-4 text-center lg:hidden text-xs text-gray-500'>&copy; {new Date().getFullYear()} StarSuperScare</p>
+          <p className='mt-4 text-center lg:hidden text-xs text-gray-500'>
+            &copy; {new Date().getFullYear()} StarSuperScare
+          </p>
         </div>
       </div>
     </div>

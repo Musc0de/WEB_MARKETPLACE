@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
 import { toast } from '@starsuperscare/ui';
 import { client } from '../../lib/api.ts';
-import { X, Send, Loader2, HelpCircle, Package, CreditCard, MessageSquare, AlertCircle } from 'lucide-react';
+import {
+  AlertCircle,
+  CreditCard,
+  HelpCircle,
+  Loader2,
+  MessageSquare,
+  Package,
+  Send,
+  X,
+} from 'lucide-react';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -24,10 +33,10 @@ function extractApiError(body: any): string {
 }
 
 const CATEGORIES = [
-  { value: 'general',  label: 'Pertanyaan Umum',  icon: HelpCircle,    color: 'text-blue-600'    },
-  { value: 'order',    label: 'Masalah Pesanan',   icon: Package,       color: 'text-amber-600'   },
-  { value: 'payment',  label: 'Pembayaran',        icon: CreditCard,    color: 'text-emerald-600' },
-  { value: 'product',  label: 'Pertanyaan Produk', icon: MessageSquare, color: 'text-purple-600'  },
+  { value: 'general', label: 'Pertanyaan Umum', icon: HelpCircle, color: 'text-blue-600' },
+  { value: 'order', label: 'Masalah Pesanan', icon: Package, color: 'text-amber-600' },
+  { value: 'payment', label: 'Pembayaran', icon: CreditCard, color: 'text-emerald-600' },
+  { value: 'product', label: 'Pertanyaan Produk', icon: MessageSquare, color: 'text-purple-600' },
 ];
 
 interface SupportTicketModalProps {
@@ -96,15 +105,20 @@ export const SupportTicketModal = ({ isOpen, onClose, onSuccess }: SupportTicket
     }
   };
 
-  const set = (key: keyof typeof formData) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setFormData((prev) => ({ ...prev, [key]: e.target.value }));
-    if (fieldErrors[key]) setFieldErrors((prev) => ({ ...prev, [key]: '' }));
-  };
+  const set =
+    (key: keyof typeof formData) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+      setFormData((prev) => ({ ...prev, [key]: e.target.value }));
+      if (fieldErrors[key]) setFieldErrors((prev) => ({ ...prev, [key]: '' }));
+    };
 
   return (
     <div className='fixed inset-0 z-[9999] flex items-center justify-center p-4'>
       {/* Backdrop */}
-      <div className='absolute inset-0 bg-black/50 backdrop-blur-sm' onClick={!loading ? onClose : undefined} />
+      <div
+        className='absolute inset-0 bg-black/50 backdrop-blur-sm'
+        onClick={!loading ? onClose : undefined}
+      />
 
       {/* Panel */}
       <div
@@ -112,7 +126,9 @@ export const SupportTicketModal = ({ isOpen, onClose, onSuccess }: SupportTicket
         style={{ animation: 'modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1) both' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <style>{`@keyframes modalIn{from{opacity:0;transform:scale(0.9) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}`}</style>
+        <style>
+          {`@keyframes modalIn{from{opacity:0;transform:scale(0.9) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}`}
+        </style>
 
         {/* Header */}
         <div className='flex items-start justify-between border-b border-gray-100 px-6 py-5'>
@@ -147,7 +163,9 @@ export const SupportTicketModal = ({ isOpen, onClose, onSuccess }: SupportTicket
                       : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-gray-300 hover:bg-gray-100'
                   }`}
                 >
-                  <Icon className={`h-4 w-4 ${formData.category === value ? 'text-white' : color}`} />
+                  <Icon
+                    className={`h-4 w-4 ${formData.category === value ? 'text-white' : color}`}
+                  />
                   {label}
                 </button>
               ))}
@@ -156,7 +174,9 @@ export const SupportTicketModal = ({ isOpen, onClose, onSuccess }: SupportTicket
 
           {/* Subject */}
           <div>
-            <label className='mb-1.5 block text-sm font-semibold text-gray-700'>Subjek <span className='text-red-500'>*</span></label>
+            <label className='mb-1.5 block text-sm font-semibold text-gray-700'>
+              Subjek <span className='text-red-500'>*</span>
+            </label>
             <input
               type='text'
               required
@@ -192,18 +212,24 @@ export const SupportTicketModal = ({ isOpen, onClose, onSuccess }: SupportTicket
                   : 'border-gray-200 bg-gray-50 focus:border-blue-400 focus:ring-blue-500/15 focus:bg-white'
               }`}
             />
-            {fieldErrors.orderId ? (
-              <p className='mt-1 flex items-center gap-1 text-xs text-red-600'>
-                <AlertCircle className='h-3 w-3' /> {fieldErrors.orderId}
-              </p>
-            ) : (
-              <p className='mt-1 text-xs text-gray-400'>Kosongkan jika tidak terkait pesanan tertentu.</p>
-            )}
+            {fieldErrors.orderId
+              ? (
+                <p className='mt-1 flex items-center gap-1 text-xs text-red-600'>
+                  <AlertCircle className='h-3 w-3' /> {fieldErrors.orderId}
+                </p>
+              )
+              : (
+                <p className='mt-1 text-xs text-gray-400'>
+                  Kosongkan jika tidak terkait pesanan tertentu.
+                </p>
+              )}
           </div>
 
           {/* Message */}
           <div>
-            <label className='mb-1.5 block text-sm font-semibold text-gray-700'>Pesan <span className='text-red-500'>*</span></label>
+            <label className='mb-1.5 block text-sm font-semibold text-gray-700'>
+              Pesan <span className='text-red-500'>*</span>
+            </label>
             <textarea
               required
               rows={4}
@@ -217,12 +243,18 @@ export const SupportTicketModal = ({ isOpen, onClose, onSuccess }: SupportTicket
               }`}
             />
             <div className='flex items-center justify-between mt-1'>
-              {fieldErrors.message ? (
-                <p className='flex items-center gap-1 text-xs text-red-600'>
-                  <AlertCircle className='h-3 w-3' /> {fieldErrors.message}
-                </p>
-              ) : <span />}
-              <span className={`text-xs tabular-nums ${formData.message.length < 10 ? 'text-gray-400' : 'text-emerald-600'}`}>
+              {fieldErrors.message
+                ? (
+                  <p className='flex items-center gap-1 text-xs text-red-600'>
+                    <AlertCircle className='h-3 w-3' /> {fieldErrors.message}
+                  </p>
+                )
+                : <span />}
+              <span
+                className={`text-xs tabular-nums ${
+                  formData.message.length < 10 ? 'text-gray-400' : 'text-emerald-600'
+                }`}
+              >
                 {formData.message.length} kar
               </span>
             </div>
@@ -243,7 +275,9 @@ export const SupportTicketModal = ({ isOpen, onClose, onSuccess }: SupportTicket
               disabled={loading}
               className='inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition disabled:opacity-60'
             >
-              {loading ? <Loader2 className='h-4 w-4 animate-spin' /> : <Send className='h-4 w-4' />}
+              {loading
+                ? <Loader2 className='h-4 w-4 animate-spin' />
+                : <Send className='h-4 w-4' />}
               {loading ? 'Mengirim…' : 'Kirim Tiket'}
             </button>
           </div>

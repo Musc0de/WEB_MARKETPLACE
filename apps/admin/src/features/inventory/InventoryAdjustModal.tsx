@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { client } from '../../lib/rpc.ts';
 import { goeyToast as toast } from 'goey-toast';
-
 
 interface InventoryAdjustModalProps {
   variantId: string;
@@ -21,10 +20,10 @@ export function InventoryAdjustModal({
   onSuccess,
 }: InventoryAdjustModalProps) {
   const [type, setType] = useState<'receive' | 'adjust'>('receive');
-  
+
   // For 'receive', this is the incoming quantity. For 'adjust', this is the actual physical stock.
   const [inputValue, setInputValue] = useState('');
-  
+
   const [note, setNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -32,7 +31,7 @@ export function InventoryAdjustModal({
   // Compute delta based on type
   const parsedInput = parseInt(inputValue, 10);
   const isInputValid = !isNaN(parsedInput) && inputValue !== '';
-  
+
   let computedDelta = 0;
   let finalStock = currentStock;
 
@@ -62,7 +61,7 @@ export function InventoryAdjustModal({
       setErrors({ inputValue: 'Masukkan angka yang valid' });
       return;
     }
-    
+
     if (type === 'adjust' && parsedInput < 0) {
       setErrors({ inputValue: 'Stok fisik tidak boleh minus' });
       return;
@@ -81,7 +80,8 @@ export function InventoryAdjustModal({
           warehouseId,
           delta: computedDelta,
           type,
-          note: note.trim() || (type === 'adjust' ? `Penyesuaian Audit (Stok fisik: ${parsedInput})` : 'Restock'),
+          note: note.trim() ||
+            (type === 'adjust' ? `Penyesuaian Audit (Stok fisik: ${parsedInput})` : 'Restock'),
         },
       });
 
@@ -102,35 +102,43 @@ export function InventoryAdjustModal({
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm'>
-      <div 
+      <div
         className='bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200'
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className='px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white relative z-10'>
           <h2 className='text-lg font-bold text-gray-900'>Kelola Stok</h2>
-          <button 
+          <button
             type='button'
             onClick={onClose}
             className='p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors'
           >
             <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M6 18L18 6M6 6l12 12'
+              />
             </svg>
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className='p-6 space-y-6 bg-gray-50/50'>
-          
           {/* Info Card */}
           <div className='p-4 bg-white border border-gray-200 shadow-sm rounded-xl flex items-center justify-between'>
             <div>
-              <p className='text-xs font-bold text-gray-500 uppercase tracking-wider mb-1'>Target Produk</p>
+              <p className='text-xs font-bold text-gray-500 uppercase tracking-wider mb-1'>
+                Target Produk
+              </p>
               <p className='text-sm font-semibold text-gray-900'>{variantName}</p>
             </div>
             <div className='text-right border-l border-gray-100 pl-4'>
-               <p className='text-xs font-bold text-gray-500 uppercase tracking-wider mb-1'>Stok Tersedia Saat Ini</p>
-               <p className='text-xl font-black text-blue-600'>{currentStock}</p>
+              <p className='text-xs font-bold text-gray-500 uppercase tracking-wider mb-1'>
+                Stok Tersedia Saat Ini
+              </p>
+              <p className='text-xl font-black text-blue-600'>{currentStock}</p>
             </div>
           </div>
 
@@ -144,8 +152,8 @@ export function InventoryAdjustModal({
                 type='button'
                 onClick={() => setType('receive')}
                 className={`px-4 py-3 text-sm font-semibold rounded-xl border text-center transition-all ${
-                  type === 'receive' 
-                    ? 'bg-blue-50 border-blue-600 text-blue-700 ring-1 ring-blue-600' 
+                  type === 'receive'
+                    ? 'bg-blue-50 border-blue-600 text-blue-700 ring-1 ring-blue-600'
                     : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
                 }`}
               >
@@ -155,8 +163,8 @@ export function InventoryAdjustModal({
                 type='button'
                 onClick={() => setType('adjust')}
                 className={`px-4 py-3 text-sm font-semibold rounded-xl border text-center transition-all ${
-                  type === 'adjust' 
-                    ? 'bg-purple-50 border-purple-600 text-purple-700 ring-1 ring-purple-600' 
+                  type === 'adjust'
+                    ? 'bg-purple-50 border-purple-600 text-purple-700 ring-1 ring-purple-600'
                     : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
                 }`}
               >
@@ -168,7 +176,9 @@ export function InventoryAdjustModal({
           {/* Dynamic Input */}
           <div className='space-y-2'>
             <label className='block text-sm font-bold text-gray-700 flex justify-between'>
-              <span>{type === 'receive' ? 'Jumlah Barang Masuk' : 'Hasil Hitung Fisik (Stok Nyata)'}</span>
+              <span>
+                {type === 'receive' ? 'Jumlah Barang Masuk' : 'Hasil Hitung Fisik (Stok Nyata)'}
+              </span>
             </label>
             <div className='relative'>
               <input
@@ -178,11 +188,11 @@ export function InventoryAdjustModal({
                 placeholder={type === 'receive' ? 'Contoh: 50' : 'Contoh: 15'}
                 disabled={isSubmitting}
                 className={`w-full pl-4 pr-16 py-3 text-lg font-bold bg-white border rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                  errors.inputValue 
-                    ? 'border-red-300 focus:ring-red-500/20 focus:border-red-500' 
+                  errors.inputValue
+                    ? 'border-red-300 focus:ring-red-500/20 focus:border-red-500'
                     : type === 'receive'
-                      ? 'border-gray-300 focus:ring-blue-500/20 focus:border-blue-500'
-                      : 'border-gray-300 focus:ring-purple-500/20 focus:border-purple-500'
+                    ? 'border-gray-300 focus:ring-blue-500/20 focus:border-blue-500'
+                    : 'border-gray-300 focus:ring-purple-500/20 focus:border-purple-500'
                 }`}
               />
               <div className='absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold'>
@@ -196,14 +206,21 @@ export function InventoryAdjustModal({
 
           {/* Result Calculation Display */}
           {isInputValid && (
-            <div className={`p-4 rounded-xl border ${
-              computedDelta > 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-800' :
-              computedDelta < 0 ? 'bg-rose-50 border-rose-100 text-rose-800' :
-              'bg-gray-100 border-gray-200 text-gray-600'
-            }`}>
+            <div
+              className={`p-4 rounded-xl border ${
+                computedDelta > 0
+                  ? 'bg-emerald-50 border-emerald-100 text-emerald-800'
+                  : computedDelta < 0
+                  ? 'bg-rose-50 border-rose-100 text-rose-800'
+                  : 'bg-gray-100 border-gray-200 text-gray-600'
+              }`}
+            >
               <div className='flex justify-between items-center mb-1'>
                 <span className='text-sm font-medium'>Perubahan Sistem (Selisih):</span>
-                <span className='font-bold'>{computedDelta > 0 ? '+' : ''}{computedDelta} unit</span>
+                <span className='font-bold'>
+                  {computedDelta > 0 ? '+' : ''}
+                  {computedDelta} unit
+                </span>
               </div>
               <div className='flex justify-between items-center pt-2 border-t border-black/5'>
                 <span className='text-sm font-bold uppercase'>Stok Akhir Menjadi:</span>
@@ -237,15 +254,15 @@ export function InventoryAdjustModal({
             >
               Batal
             </button>
-            <button 
-              type='submit' 
+            <button
+              type='submit'
               disabled={isSubmitting || !isInputValid || computedDelta === 0}
               className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-white rounded-xl transition-all ${
                 (!isInputValid || computedDelta === 0)
                   ? 'bg-gray-300 cursor-not-allowed'
                   : type === 'receive'
-                    ? 'bg-blue-600 hover:bg-blue-700'
-                    : 'bg-purple-600 hover:bg-purple-700'
+                  ? 'bg-blue-600 hover:bg-blue-700'
+                  : 'bg-purple-600 hover:bg-purple-700'
               }`}
             >
               {isSubmitting ? 'Memproses...' : 'Simpan Stok'}

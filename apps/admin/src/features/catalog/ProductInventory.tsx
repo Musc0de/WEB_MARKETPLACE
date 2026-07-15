@@ -72,46 +72,53 @@ export function ProductInventory({ productId }: { productId: string }) {
             </tr>
           </thead>
           <tbody className='divide-y divide-gray-50'>
-            {levels.length === 0 ? (
-              <tr>
-                <td colSpan={6} className='px-5 py-8 text-center text-gray-500 text-sm'>
-                  Belum ada data inventaris.
-                </td>
-              </tr>
-            ) : (
-              levels.map((level) => (
-                <tr key={level.id} className='hover:bg-gray-50/50 transition-colors'>
-                  <td className='px-5 py-3 font-mono text-xs text-gray-700 font-medium'>
-                    {level.variant.sku}
-                  </td>
-                  <td className='px-5 py-3 text-right text-gray-500 font-medium'>
-                    {level.initialStock ?? 0}
-                  </td>
-                  <td className='px-5 py-3 text-right'>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold ${
-                      level.available > 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
-                    }`}>
-                      {level.available} unit
-                    </span>
-                  </td>
-                  <td className='px-5 py-3 text-right text-amber-600 font-medium'>
-                    {level.reserved}
-                  </td>
-                  <td className='px-5 py-3 text-right text-rose-600 font-medium'>
-                    {level.damaged}
-                  </td>
-                  <td className='px-5 py-3 text-right'>
-                    <button
-                      type='button'
-                      onClick={() => setAdjustingLevel(level)}
-                      className='inline-flex items-center px-2.5 py-1 bg-white border border-gray-200 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-50 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm'
-                    >
-                      Sesuaikan
-                    </button>
+            {levels.length === 0
+              ? (
+                <tr>
+                  <td colSpan={6} className='px-5 py-8 text-center text-gray-500 text-sm'>
+                    Belum ada data inventaris.
                   </td>
                 </tr>
-              ))
-            )}
+              )
+              : (
+                levels.map((level) => (
+                  <tr key={level.id} className='hover:bg-gray-50/50 transition-colors'>
+                    <td className='px-5 py-3 font-mono text-xs text-gray-700 font-medium'>
+                      {level.variant.sku}
+                    </td>
+                    <td className='px-5 py-3 text-right text-gray-500 font-medium'>
+                      {level.initialStock ?? 0}
+                    </td>
+                    <td className='px-5 py-3 text-right'>
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold ${
+                          level.available > 0
+                            ? 'bg-emerald-50 text-emerald-700'
+                            : 'bg-red-50 text-red-700'
+                        }`}
+                      >
+                        {level.available} unit
+                      </span>
+                    </td>
+                    <td className='px-5 py-3 text-right text-amber-600 font-medium'>
+                      {level.reserved}
+                    </td>
+                    <td className='px-5 py-3 text-right text-rose-600 font-medium'>
+                      {level.damaged}
+                    </td>
+                    <td className='px-5 py-3 text-right'>
+                      <button
+                        type='button'
+                        onClick={() =>
+                          setAdjustingLevel(level)}
+                        className='inline-flex items-center px-2.5 py-1 bg-white border border-gray-200 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-50 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm'
+                      >
+                        Sesuaikan
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
           </tbody>
         </table>
       </div>

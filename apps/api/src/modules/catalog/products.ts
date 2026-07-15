@@ -129,7 +129,7 @@ const routes = productsRouter
         .leftJoin(categories, eq(categories.id, productCategories.categoryId))
         .leftJoin(brands, eq(brands.id, products.brandId))
         .where(and(...whereClauses))
-        .groupBy(products.id)  // Only group by PK — correct SQL practice
+        .groupBy(products.id) // Only group by PK — correct SQL practice
         .having(havingClauses.length > 0 ? and(...havingClauses) : undefined);
 
       const fullResults = await baseQuery;
@@ -163,7 +163,7 @@ const routes = productsRouter
         .leftJoin(categories, eq(categories.id, productCategories.categoryId))
         .leftJoin(brands, eq(brands.id, products.brandId))
         .where(and(...whereClauses))
-        .groupBy(products.id)  // Only group by PK — correct SQL practice
+        .groupBy(products.id) // Only group by PK — correct SQL practice
         .having(havingClauses.length > 0 ? and(...havingClauses) : undefined)
         .$dynamic();
 
@@ -191,7 +191,7 @@ const routes = productsRouter
         if (item.primaryImage) {
           primaryImage = await storageAdapter.generatePresignedDownloadUrl(item.primaryImage);
         }
-        
+
         return {
           id: item.id,
           name: item.name,
@@ -307,9 +307,9 @@ const routes = productsRouter
       );
 
       const images = await Promise.all(
-        imagesData.map((i) => storageAdapter.generatePresignedDownloadUrl(i.objectKey))
+        imagesData.map((i) => storageAdapter.generatePresignedDownloadUrl(i.objectKey)),
       );
-      
+
       const primaryImage = images.length > 0 ? images[0] : null;
 
       const responseData = {

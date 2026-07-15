@@ -42,7 +42,8 @@ export function VerifyEmailPage() {
           const meRes = await apiClient.v1.auth.me.$get();
           if (meRes.ok) {
             setRedirectingTo('storefront');
-            const storefrontUrl = (import.meta as any).env?.VITE_STOREFRONT_URL || 'http://localhost:5173';
+            const storefrontUrl = (import.meta as any).env?.VITE_STOREFRONT_URL ||
+              'http://localhost:5173';
             setTimeout(() => {
               globalThis.location.href = storefrontUrl;
             }, 3000);
@@ -60,7 +61,6 @@ export function VerifyEmailPage() {
             globalThis.location.href = `${authUrl}/login`;
           }, 3000);
         }
-
       } catch (err: any) {
         if (!isMounted) return;
         setStatus('error');
@@ -78,29 +78,45 @@ export function VerifyEmailPage() {
   return (
     <div className='w-full max-w-md mx-auto text-center'>
       {status === 'loading' && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className='flex flex-col items-center'>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className='flex flex-col items-center'
+        >
           <h1 className='text-2xl font-bold text-gray-900 mb-2'>Memverifikasi Email...</h1>
-          <p className='text-gray-500 mb-6'>Mohon tunggu sebentar, kami sedang memverifikasi alamat email Anda.</p>
-          <div className='w-8 h-8 border-4 border-gray-200 border-t-indigo-600 rounded-full animate-spin'></div>
+          <p className='text-gray-500 mb-6'>
+            Mohon tunggu sebentar, kami sedang memverifikasi alamat email Anda.
+          </p>
+          <div className='w-8 h-8 border-4 border-gray-200 border-t-indigo-600 rounded-full animate-spin'>
+          </div>
         </motion.div>
       )}
 
       {status === 'success' && (
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className='flex flex-col items-center'>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className='flex flex-col items-center'
+        >
           <div className='w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6'>
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+            <svg className='w-8 h-8' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={3}
+                d='M5 13l4 4L19 7'
+              />
             </svg>
           </div>
           <h1 className='text-2xl font-bold text-gray-900 mb-2'>Email Berhasil Diverifikasi!</h1>
           <p className='text-gray-500 mb-6'>
             Alamat email Anda telah berhasil diverifikasi. Anda sekarang memiliki akses penuh.
           </p>
-          
+
           {redirectingTo && (
             <p className='text-indigo-600 text-sm font-medium animate-pulse'>
-              {redirectingTo === 'storefront' 
-                ? 'Anda sudah login. Mengalihkan ke Storefront...' 
+              {redirectingTo === 'storefront'
+                ? 'Anda sudah login. Mengalihkan ke Storefront...'
                 : 'Mengalihkan ke halaman Login...'}
             </p>
           )}
@@ -108,10 +124,19 @@ export function VerifyEmailPage() {
       )}
 
       {status === 'error' && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className='flex flex-col items-center'>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className='flex flex-col items-center'
+        >
           <div className='w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-6'>
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg className='w-8 h-8' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M6 18L18 6M6 6l12 12'
+              />
             </svg>
           </div>
           <h1 className='text-2xl font-bold text-gray-900 mb-2'>Verifikasi Gagal</h1>

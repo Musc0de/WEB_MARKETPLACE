@@ -56,8 +56,8 @@ const _AdminProductImageAddSchema = z.object({
   isPrimary: z.boolean().default(false),
 });
 export type AdminProductImageAdd = z.infer<typeof _AdminProductImageAddSchema>;
-export const AdminProductImageAddSchema: z.ZodType<AdminProductImageAdd> = _AdminProductImageAddSchema;
-
+export const AdminProductImageAddSchema: z.ZodType<AdminProductImageAdd> =
+  _AdminProductImageAddSchema;
 
 // Admin Responses
 const _AdminProductMutationResponse = z.object({

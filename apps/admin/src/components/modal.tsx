@@ -11,7 +11,7 @@
  */
 
 import { useCallback, useState } from 'react';
-import { X, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Info, X } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -54,16 +54,41 @@ interface ToggleModalProps extends BaseModalProps {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const VARIANT_STYLES: Record<ModalVariant, { icon: typeof AlertTriangle; iconBg: string; iconColor: string; btn: string }> = {
-  danger:  { icon: AlertTriangle,  iconBg: 'bg-red-100',    iconColor: 'text-red-600',    btn: 'bg-red-600 hover:bg-red-500 text-white' },
-  warning: { icon: AlertTriangle,  iconBg: 'bg-amber-100',  iconColor: 'text-amber-600',  btn: 'bg-amber-600 hover:bg-amber-500 text-white' },
-  success: { icon: CheckCircle2,   iconBg: 'bg-emerald-100', iconColor: 'text-emerald-600', btn: 'bg-emerald-600 hover:bg-emerald-500 text-white' },
-  info:    { icon: Info,           iconBg: 'bg-blue-100',   iconColor: 'text-blue-600',   btn: 'bg-blue-600 hover:bg-blue-500 text-white' },
+const VARIANT_STYLES: Record<
+  ModalVariant,
+  { icon: typeof AlertTriangle; iconBg: string; iconColor: string; btn: string }
+> = {
+  danger: {
+    icon: AlertTriangle,
+    iconBg: 'bg-red-100',
+    iconColor: 'text-red-600',
+    btn: 'bg-red-600 hover:bg-red-500 text-white',
+  },
+  warning: {
+    icon: AlertTriangle,
+    iconBg: 'bg-amber-100',
+    iconColor: 'text-amber-600',
+    btn: 'bg-amber-600 hover:bg-amber-500 text-white',
+  },
+  success: {
+    icon: CheckCircle2,
+    iconBg: 'bg-emerald-100',
+    iconColor: 'text-emerald-600',
+    btn: 'bg-emerald-600 hover:bg-emerald-500 text-white',
+  },
+  info: {
+    icon: Info,
+    iconBg: 'bg-blue-100',
+    iconColor: 'text-blue-600',
+    btn: 'bg-blue-600 hover:bg-blue-500 text-white',
+  },
 };
 
 // ─── Backdrop & Shell ────────────────────────────────────────────────────────
 
-function ModalShell({ open, onClose, children }: { open: boolean; onClose: () => void; children: React.ReactNode }) {
+function ModalShell(
+  { open, onClose, children }: { open: boolean; onClose: () => void; children: React.ReactNode },
+) {
   if (!open) return null;
   return (
     <div className='fixed inset-0 z-[9999] flex items-center justify-center p-4'>
@@ -78,7 +103,9 @@ function ModalShell({ open, onClose, children }: { open: boolean; onClose: () =>
         style={{ animation: 'modalIn 0.18s cubic-bezier(0.34,1.56,0.64,1) both' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <style>{`@keyframes modalIn { from { opacity:0; transform:scale(0.9) translateY(8px); } to { opacity:1; transform:scale(1) translateY(0); } }`}</style>
+        <style>
+          {`@keyframes modalIn { from { opacity:0; transform:scale(0.9) translateY(8px); } to { opacity:1; transform:scale(1) translateY(0); } }`}
+        </style>
         {children}
       </div>
     </div>
@@ -104,10 +131,16 @@ export function ConfirmModal({
       <div className='p-6'>
         {/* Icon + close */}
         <div className='mb-4 flex items-start justify-between gap-3'>
-          <span className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${iconBg}`}>
+          <span
+            className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${iconBg}`}
+          >
             <Icon className={`h-5 w-5 ${iconColor}`} />
           </span>
-          <button type='button' onClick={onClose} className='rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition'>
+          <button
+            type='button'
+            onClick={onClose}
+            className='rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition'
+          >
             <X className='h-4 w-4' />
           </button>
         </div>
@@ -125,7 +158,10 @@ export function ConfirmModal({
           </button>
           <button
             type='button'
-            onClick={() => { onConfirm(); onClose(); }}
+            onClick={() => {
+              onConfirm();
+              onClose();
+            }}
             className={`rounded-xl px-4 py-2 text-sm font-semibold shadow-sm transition ${btn}`}
           >
             {confirmLabel}
@@ -165,10 +201,16 @@ export function InputModal({
     <ModalShell open={open} onClose={onClose}>
       <div className='p-6'>
         <div className='mb-4 flex items-start justify-between gap-3'>
-          <span className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${iconBg}`}>
+          <span
+            className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${iconBg}`}
+          >
             <Icon className={`h-5 w-5 ${iconColor}`} />
           </span>
-          <button type='button' onClick={onClose} className='rounded-lg p-1 text-gray-400 hover:bg-gray-100 transition'>
+          <button
+            type='button'
+            onClick={onClose}
+            className='rounded-lg p-1 text-gray-400 hover:bg-gray-100 transition'
+          >
             <X className='h-4 w-4' />
           </button>
         </div>
@@ -187,10 +229,18 @@ export function InputModal({
           />
         </div>
         <div className='mt-5 flex gap-2.5 justify-end'>
-          <button type='button' onClick={onClose} className='rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition'>
+          <button
+            type='button'
+            onClick={onClose}
+            className='rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition'
+          >
             {cancelLabel}
           </button>
-          <button type='button' onClick={handleConfirm} className={`rounded-xl px-4 py-2 text-sm font-semibold shadow-sm transition ${btn}`}>
+          <button
+            type='button'
+            onClick={handleConfirm}
+            className={`rounded-xl px-4 py-2 text-sm font-semibold shadow-sm transition ${btn}`}
+          >
             {confirmLabel}
           </button>
         </div>
@@ -232,10 +282,16 @@ export function ToggleInputModal({
     <ModalShell open={open} onClose={onClose}>
       <div className='p-6'>
         <div className='mb-4 flex items-start justify-between gap-3'>
-          <span className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${iconBg}`}>
+          <span
+            className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${iconBg}`}
+          >
             <Icon className={`h-5 w-5 ${iconColor}`} />
           </span>
-          <button type='button' onClick={onClose} className='rounded-lg p-1 text-gray-400 hover:bg-gray-100 transition'>
+          <button
+            type='button'
+            onClick={onClose}
+            className='rounded-lg p-1 text-gray-400 hover:bg-gray-100 transition'
+          >
             <X className='h-4 w-4' />
           </button>
         </div>
@@ -264,20 +320,32 @@ export function ToggleInputModal({
             role='switch'
             aria-checked={toggled}
             onClick={() => setToggled(!toggled)}
-            className={`relative h-5 w-9 rounded-full transition-colors duration-200 focus:outline-none ${toggled ? 'bg-blue-600' : 'bg-gray-300'}`}
+            className={`relative h-5 w-9 rounded-full transition-colors duration-200 focus:outline-none ${
+              toggled ? 'bg-blue-600' : 'bg-gray-300'
+            }`}
           >
             <span
-              className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform duration-200 ${toggled ? 'translate-x-4' : 'translate-x-0'}`}
+              className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform duration-200 ${
+                toggled ? 'translate-x-4' : 'translate-x-0'
+              }`}
             />
           </button>
           <span className='text-sm font-medium text-gray-700'>{toggleLabel}</span>
         </div>
 
         <div className='mt-5 flex gap-2.5 justify-end'>
-          <button type='button' onClick={onClose} className='rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition'>
+          <button
+            type='button'
+            onClick={onClose}
+            className='rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition'
+          >
             {cancelLabel}
           </button>
-          <button type='button' onClick={handleConfirm} className={`rounded-xl px-4 py-2 text-sm font-semibold shadow-sm transition ${btn}`}>
+          <button
+            type='button'
+            onClick={handleConfirm}
+            className={`rounded-xl px-4 py-2 text-sm font-semibold shadow-sm transition ${btn}`}
+          >
             {confirmLabel}
           </button>
         </div>

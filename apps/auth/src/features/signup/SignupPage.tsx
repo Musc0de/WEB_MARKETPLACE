@@ -86,7 +86,8 @@ export function SignupPage() {
         </h1>
         <p className='text-gray-500 mb-8 max-w-sm mx-auto leading-relaxed'>
           Kami telah mengirimkan tautan verifikasi ke{' '}
-          <strong className='text-gray-900'>{email}</strong>. Silakan periksa kotak masuk Anda untuk mengaktifkan akun.
+          <strong className='text-gray-900'>{email}</strong>. Silakan periksa kotak masuk Anda untuk
+          mengaktifkan akun.
         </p>
         <Link
           to='/login'
@@ -107,7 +108,9 @@ export function SignupPage() {
     >
       <motion.div variants={itemVariants} className='mb-8'>
         <h1 className='text-3xl font-bold text-gray-900 mb-2'>Buat Akun Baru</h1>
-        <p className='text-gray-500 text-sm'>Bergabunglah dengan StarSuperScare hari ini untuk memulai.</p>
+        <p className='text-gray-500 text-sm'>
+          Bergabunglah dengan StarSuperScare hari ini untuk memulai.
+        </p>
       </motion.div>
 
       <form onSubmit={handleSubmit} noValidate className='space-y-5'>

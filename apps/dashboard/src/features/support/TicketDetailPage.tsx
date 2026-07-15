@@ -12,6 +12,7 @@ import { Link, useParams } from 'react-router-dom';
 import { API_URL, client } from '../../lib/api.ts';
 import { toast } from '@starsuperscare/ui';
 import {
+  AlertTriangle,
   ArrowLeft,
   ChevronDown,
   Download,
@@ -25,31 +26,39 @@ import {
   Send,
   User,
   X,
-  AlertTriangle,
 } from 'lucide-react';
 import { formatDate } from '@starsuperscare/ui';
 
 // ─── Status config ────────────────────────────────────────────────────────────
 const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
-  open:        { label: 'Terbuka',   cls: 'bg-blue-100 text-blue-700'      },
-  in_progress: { label: 'Diproses',  cls: 'bg-amber-100 text-amber-700'    },
-  resolved:    { label: 'Selesai',   cls: 'bg-emerald-100 text-emerald-700' },
-  closed:      { label: 'Ditutup',  cls: 'bg-gray-100 text-gray-500'      },
+  open: { label: 'Terbuka', cls: 'bg-blue-100 text-blue-700' },
+  in_progress: { label: 'Diproses', cls: 'bg-amber-100 text-amber-700' },
+  resolved: { label: 'Selesai', cls: 'bg-emerald-100 text-emerald-700' },
+  closed: { label: 'Ditutup', cls: 'bg-gray-100 text-gray-500' },
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function timeStr(iso: string): string {
   try {
-    return new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
-  } catch { return ''; }
+    return new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' }).format(
+      new Date(iso),
+    );
+  } catch {
+    return '';
+  }
 }
 
 function dayStr(iso: string): string {
   try {
     return new Intl.DateTimeFormat('id-ID', {
-      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
     }).format(new Date(iso));
-  } catch { return ''; }
+  } catch {
+    return '';
+  }
 }
 
 function getMediaUrl(key: string | null, publicUrl?: string | null): string | null {
@@ -110,7 +119,11 @@ function MessageBubble({ msg }: { msg: any }) {
                         className='max-w-[260px] rounded-xl object-cover shadow-sm hover:opacity-90 transition'
                         style={{ maxHeight: 220 }}
                       />
-                      <span className={`mt-1 block text-[10px] ${isUser ? 'text-blue-200' : 'text-gray-400'}`}>
+                      <span
+                        className={`mt-1 block text-[10px] ${
+                          isUser ? 'text-blue-200' : 'text-gray-400'
+                        }`}
+                      >
                         {att.fileName}
                       </span>
                     </a>
@@ -158,7 +171,11 @@ function ImagePreview({ file, onRemove }: { file: File; onRemove: () => void }) 
   const url = URL.createObjectURL(file);
   return (
     <div className='relative inline-block'>
-      <img src={url} alt={file.name} className='h-16 w-16 rounded-lg object-cover border border-gray-200' />
+      <img
+        src={url}
+        alt={file.name}
+        className='h-16 w-16 rounded-lg object-cover border border-gray-200'
+      />
       <button
         type='button'
         onClick={onRemove}
@@ -209,7 +226,10 @@ export const TicketDetailPage = () => {
     const files = Array.from(e.target.files ?? []);
     const MAX = 10 * 1024 * 1024;
     const valid = files.filter((f) => {
-      if (f.size > MAX) { toast.error(`${f.name}: ukuran melebihi 10MB`); return false; }
+      if (f.size > MAX) {
+        toast.error(`${f.name}: ukuran melebihi 10MB`);
+        return false;
+      }
       return true;
     });
     setPendingFiles((prev) => [...prev, ...valid].slice(0, 5));
@@ -249,7 +269,11 @@ export const TicketDetailPage = () => {
       // Send message
       const res = await (client.v1 as any).support.tickets[':id'].messages.$post({
         param: { id },
-        json: { content: replyContent.trim() || ' ', isInternal: false, attachments: attachmentIds },
+        json: {
+          content: replyContent.trim() || ' ',
+          isInternal: false,
+          attachments: attachmentIds,
+        },
       });
 
       if (!res.ok) {
@@ -350,7 +374,9 @@ export const TicketDetailPage = () => {
           <div className='flex items-center gap-2'>
             <MessageSquare className='h-4 w-4 text-gray-400' />
             <span className='text-sm font-semibold text-gray-700'>Percakapan</span>
-            <span className='rounded-full bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-700'>{messages.length}</span>
+            <span className='rounded-full bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-700'>
+              {messages.length}
+            </span>
           </div>
           <div className='flex items-center gap-1.5 text-xs text-gray-400'>
             <Lock className='h-3 w-3' /> End-to-end encrypted
@@ -358,110 +384,126 @@ export const TicketDetailPage = () => {
         </div>
 
         {/* Messages */}
-        <div className='flex flex-col gap-4 overflow-y-auto p-5' style={{ maxHeight: 480, minHeight: 160 }}>
-          {messages.length === 0 ? (
-            <div className='flex flex-col items-center py-10 text-center'>
-              <span className='mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gray-100'>
-                <MessageSquare className='h-5 w-5 text-gray-400' />
-              </span>
-              <p className='text-sm font-medium text-gray-600'>Belum ada pesan</p>
-              <p className='text-xs text-gray-400 mt-1'>Tim support kami akan merespons secepatnya.</p>
-            </div>
-          ) : (
-            messages.reduce<JSX.Element[]>((acc, msg, i) => {
-              const prev = messages[i - 1];
-              if (!prev || new Date(msg.createdAt).toDateString() !== new Date(prev.createdAt).toDateString()) {
-                acc.push(<DaySeparator key={`sep-${i}`} date={msg.createdAt} />);
-              }
-              acc.push(<MessageBubble key={msg.id} msg={msg} />);
-              return acc;
-            }, [])
-          )}
+        <div
+          className='flex flex-col gap-4 overflow-y-auto p-5'
+          style={{ maxHeight: 480, minHeight: 160 }}
+        >
+          {messages.length === 0
+            ? (
+              <div className='flex flex-col items-center py-10 text-center'>
+                <span className='mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gray-100'>
+                  <MessageSquare className='h-5 w-5 text-gray-400' />
+                </span>
+                <p className='text-sm font-medium text-gray-600'>Belum ada pesan</p>
+                <p className='text-xs text-gray-400 mt-1'>
+                  Tim support kami akan merespons secepatnya.
+                </p>
+              </div>
+            )
+            : (
+              messages.reduce<JSX.Element[]>((acc, msg, i) => {
+                const prev = messages[i - 1];
+                if (
+                  !prev ||
+                  new Date(msg.createdAt).toDateString() !== new Date(prev.createdAt).toDateString()
+                ) {
+                  acc.push(<DaySeparator key={`sep-${i}`} date={msg.createdAt} />);
+                }
+                acc.push(<MessageBubble key={msg.id} msg={msg} />);
+                return acc;
+              }, [])
+            )}
           <div ref={messagesEndRef} />
         </div>
 
         {/* Reply form */}
-        {isClosed ? (
-          <div className='border-t border-gray-100 p-4 text-center'>
-            <p className='text-sm text-gray-400'>
-              Tiket ini sudah {statusCfg.label.toLowerCase()}. Buat tiket baru jika ada pertanyaan lain.
-            </p>
-          </div>
-        ) : (
-          <form onSubmit={handleReply} className='border-t border-gray-100 p-4 space-y-3'>
-            {/* Pending images preview */}
-            {pendingFiles.length > 0 && (
-              <div className='flex flex-wrap gap-3'>
-                {pendingFiles.map((f, i) => (
-                  <ImagePreview
-                    key={i}
-                    file={f}
-                    onRemove={() => setPendingFiles((prev) => prev.filter((_, idx) => idx !== i))}
-                  />
-                ))}
-              </div>
-            )}
-
-            <div className='flex items-end gap-3 rounded-xl border border-gray-200 bg-gray-50 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-500/15 focus-within:bg-white transition p-3'>
-              <textarea
-                ref={textareaRef}
-                value={replyContent}
-                onChange={handleTextareaInput}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-                    e.preventDefault();
-                    handleReply(e as any);
-                  }
-                }}
-                placeholder='Ketik pesan Anda… (Ctrl+Enter untuk kirim)'
-                rows={2}
-                className='flex-1 resize-none bg-transparent text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none'
-                style={{ minHeight: 44, maxHeight: 180 }}
-              />
-              <div className='flex items-center gap-1.5 flex-shrink-0'>
-                {/* Image upload button */}
-                <button
-                  type='button'
-                  onClick={() => fileInputRef.current?.click()}
-                  className='flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition'
-                  title='Lampirkan gambar (maks 10MB)'
-                >
-                  <ImagePlus className='h-4 w-4' />
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type='file'
-                  accept='image/*,.pdf'
-                  multiple
-                  className='hidden'
-                  onChange={handleFileSelect}
-                />
-                {/* Send button */}
-                <button
-                  type='submit'
-                  disabled={isSubmitting || (!replyContent.trim() && pendingFiles.length === 0)}
-                  className='flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition disabled:opacity-40'
-                >
-                  {isSubmitting
-                    ? <Loader2 className='h-4 w-4 animate-spin' />
-                    : uploadingFiles
-                    ? <RefreshCw className='h-4 w-4 animate-spin' />
-                    : <Send className='h-4 w-4' />}
-                </button>
-              </div>
+        {isClosed
+          ? (
+            <div className='border-t border-gray-100 p-4 text-center'>
+              <p className='text-sm text-gray-400'>
+                Tiket ini sudah{' '}
+                {statusCfg.label.toLowerCase()}. Buat tiket baru jika ada pertanyaan lain.
+              </p>
             </div>
-            <p className='text-right text-[11px] text-gray-400'>
-              Ctrl+Enter untuk kirim · Maks gambar 10MB · <Lock className='inline h-2.5 w-2.5' /> Dienkripsi
-            </p>
-          </form>
-        )}
+          )
+          : (
+            <form onSubmit={handleReply} className='border-t border-gray-100 p-4 space-y-3'>
+              {/* Pending images preview */}
+              {pendingFiles.length > 0 && (
+                <div className='flex flex-wrap gap-3'>
+                  {pendingFiles.map((f, i) => (
+                    <ImagePreview
+                      key={i}
+                      file={f}
+                      onRemove={() => setPendingFiles((prev) => prev.filter((_, idx) => idx !== i))}
+                    />
+                  ))}
+                </div>
+              )}
+
+              <div className='flex items-end gap-3 rounded-xl border border-gray-200 bg-gray-50 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-500/15 focus-within:bg-white transition p-3'>
+                <textarea
+                  ref={textareaRef}
+                  value={replyContent}
+                  onChange={handleTextareaInput}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                      e.preventDefault();
+                      handleReply(e as any);
+                    }
+                  }}
+                  placeholder='Ketik pesan Anda… (Ctrl+Enter untuk kirim)'
+                  rows={2}
+                  className='flex-1 resize-none bg-transparent text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none'
+                  style={{ minHeight: 44, maxHeight: 180 }}
+                />
+                <div className='flex items-center gap-1.5 flex-shrink-0'>
+                  {/* Image upload button */}
+                  <button
+                    type='button'
+                    onClick={() => fileInputRef.current?.click()}
+                    className='flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition'
+                    title='Lampirkan gambar (maks 10MB)'
+                  >
+                    <ImagePlus className='h-4 w-4' />
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type='file'
+                    accept='image/*,.pdf'
+                    multiple
+                    className='hidden'
+                    onChange={handleFileSelect}
+                  />
+                  {/* Send button */}
+                  <button
+                    type='submit'
+                    disabled={isSubmitting || (!replyContent.trim() && pendingFiles.length === 0)}
+                    className='flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition disabled:opacity-40'
+                  >
+                    {isSubmitting
+                      ? <Loader2 className='h-4 w-4 animate-spin' />
+                      : uploadingFiles
+                      ? <RefreshCw className='h-4 w-4 animate-spin' />
+                      : <Send className='h-4 w-4' />}
+                  </button>
+                </div>
+              </div>
+              <p className='text-right text-[11px] text-gray-400'>
+                Ctrl+Enter untuk kirim · Maks gambar 10MB · <Lock className='inline h-2.5 w-2.5' />
+                {' '}
+                Dienkripsi
+              </p>
+            </form>
+          )}
       </div>
 
       {/* ── E2E Footer ── */}
       <div className='flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-3'>
         <Lock className='h-3.5 w-3.5 text-emerald-600 flex-shrink-0' />
         <p className='text-xs text-emerald-700'>
-          Semua pesan dalam percakapan ini dienkripsi end-to-end dan hanya dapat dilihat oleh Anda dan tim support kami.
+          Semua pesan dalam percakapan ini dienkripsi end-to-end dan hanya dapat dilihat oleh Anda
+          dan tim support kami.
         </p>
       </div>
     </div>

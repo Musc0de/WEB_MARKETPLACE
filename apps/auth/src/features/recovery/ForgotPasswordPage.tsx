@@ -82,7 +82,8 @@ export function ForgotPasswordPage() {
           Periksa Email Anda
         </h1>
         <p className='text-gray-500 mb-8 max-w-sm mx-auto leading-relaxed'>
-          Jika akun untuk <strong className='text-gray-900'>{email}</strong> terdaftar, kami telah mengirimkan instruksi atur ulang kata sandi.
+          Jika akun untuk <strong className='text-gray-900'>{email}</strong>{' '}
+          terdaftar, kami telah mengirimkan instruksi atur ulang kata sandi.
         </p>
         <Link
           to='/login'
@@ -111,7 +112,8 @@ export function ForgotPasswordPage() {
         </Link>
         <h1 className='text-3xl font-bold text-gray-900 mb-2'>Lupa Kata Sandi</h1>
         <p className='text-gray-500 text-sm'>
-          Masukkan alamat email Anda dan kami akan mengirimkan tautan untuk mengatur ulang kata sandi Anda.
+          Masukkan alamat email Anda dan kami akan mengirimkan tautan untuk mengatur ulang kata
+          sandi Anda.
         </p>
       </motion.div>
 

@@ -5,14 +5,14 @@ import { api } from '../../lib/api.ts';
 import { formatDate, formatIDR } from '@starsuperscare/ui';
 import { CreditCard, ExternalLink } from 'lucide-react';
 import {
-  PageHeader,
-  SearchBar,
-  StatusPill,
   DataTable,
-  TableSkeleton,
   EmptyState,
   FilterTabs,
+  PageHeader,
   Pagination,
+  SearchBar,
+  StatusPill,
+  TableSkeleton,
 } from '../../components/admin-ui.tsx';
 
 type PayStatus = 'all' | 'paid' | 'pending' | 'failed' | 'refunded';
@@ -60,8 +60,7 @@ export function PaymentsList() {
   const allPayments: any[] = data?.data ?? [];
 
   const filtered = allPayments.filter((p) => {
-    const matchSearch =
-      !search ||
+    const matchSearch = !search ||
       p.orderId?.toLowerCase().includes(search.toLowerCase()) ||
       p.orderNumber?.toLowerCase().includes(search.toLowerCase()) ||
       p.providerTransactionId?.toLowerCase().includes(search.toLowerCase());
@@ -86,7 +85,10 @@ export function PaymentsList() {
         <FilterTabs<PayStatus>
           options={STATUS_TABS}
           value={statusFilter}
-          onChange={(v) => { setStatusFilter(v); setPage(1); }}
+          onChange={(v) => {
+            setStatusFilter(v);
+            setPage(1);
+          }}
         />
         <SearchBar
           value={search}
@@ -99,11 +101,26 @@ export function PaymentsList() {
       <div className='grid grid-cols-2 gap-3 sm:grid-cols-4'>
         {[
           { label: 'Total Transaksi', value: total, color: 'text-gray-900' },
-          { label: 'Berhasil', value: allPayments.filter((p) => p.status === 'paid').length, color: 'text-emerald-600' },
-          { label: 'Menunggu', value: allPayments.filter((p) => p.status === 'pending').length, color: 'text-amber-600' },
-          { label: 'Gagal', value: allPayments.filter((p) => p.status === 'failed').length, color: 'text-red-600' },
+          {
+            label: 'Berhasil',
+            value: allPayments.filter((p) => p.status === 'paid').length,
+            color: 'text-emerald-600',
+          },
+          {
+            label: 'Menunggu',
+            value: allPayments.filter((p) => p.status === 'pending').length,
+            color: 'text-amber-600',
+          },
+          {
+            label: 'Gagal',
+            value: allPayments.filter((p) => p.status === 'failed').length,
+            color: 'text-red-600',
+          },
         ].map(({ label, value, color }) => (
-          <div key={label} className='rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm'>
+          <div
+            key={label}
+            className='rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm'
+          >
             <p className='text-xs font-medium text-gray-500'>{label}</p>
             <p className={`text-2xl font-black tabular-nums ${color}`}>{value}</p>
           </div>
@@ -113,49 +130,55 @@ export function PaymentsList() {
       {/* Table */}
       <div>
         <DataTable headers={TABLE_HEADERS}>
-          {isLoading ? (
-            <TableSkeleton cols={6} />
-          ) : !filtered.length ? (
-            <tr>
-              <td colSpan={6}>
-                <EmptyState
-                  icon={CreditCard}
-                  title='Tidak ada pembayaran'
-                  description='Transaksi akan muncul di sini setelah pelanggan melakukan pembayaran.'
-                />
-              </td>
-            </tr>
-          ) : (
-            filtered.map((payment: any) => (
-              <tr key={payment.id} className='hover:bg-green-50/20 transition-colors'>
-                <td className='px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap'>{formatDate(payment.createdAt)}</td>
-                <td className='px-5 py-3.5'>
-                  <Link
-                    to={`/orders/${payment.orderId}`}
-                    className='inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline'
-                  >
-                    {payment.orderNumber || `#${payment.orderId?.slice(0, 8)}`}
-                    <ExternalLink className='h-3 w-3' />
-                  </Link>
-                </td>
-                <td className='px-5 py-3.5'>
-                  <span className='inline-flex items-center gap-1.5 text-sm text-gray-700 font-medium'>
-                    {PROVIDER_ICON[payment.provider] ?? '💰'}
-                    <span className='capitalize'>{payment.provider?.replace('_', ' ')}</span>
-                  </span>
-                </td>
-                <td className='px-5 py-3.5'>
-                  <span className='font-mono text-xs text-gray-400'>{payment.providerTransactionId || '—'}</span>
-                </td>
-                <td className='px-5 py-3.5 text-right'>
-                  <span className='text-sm font-bold text-gray-900'>{formatIDR(payment.amount)}</span>
-                </td>
-                <td className='px-5 py-3.5'>
-                  <StatusPill status={payment.status} />
+          {isLoading ? <TableSkeleton cols={6} /> : !filtered.length
+            ? (
+              <tr>
+                <td colSpan={6}>
+                  <EmptyState
+                    icon={CreditCard}
+                    title='Tidak ada pembayaran'
+                    description='Transaksi akan muncul di sini setelah pelanggan melakukan pembayaran.'
+                  />
                 </td>
               </tr>
-            ))
-          )}
+            )
+            : (
+              filtered.map((payment: any) => (
+                <tr key={payment.id} className='hover:bg-green-50/20 transition-colors'>
+                  <td className='px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap'>
+                    {formatDate(payment.createdAt)}
+                  </td>
+                  <td className='px-5 py-3.5'>
+                    <Link
+                      to={`/orders/${payment.orderId}`}
+                      className='inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline'
+                    >
+                      {payment.orderNumber || `#${payment.orderId?.slice(0, 8)}`}
+                      <ExternalLink className='h-3 w-3' />
+                    </Link>
+                  </td>
+                  <td className='px-5 py-3.5'>
+                    <span className='inline-flex items-center gap-1.5 text-sm text-gray-700 font-medium'>
+                      {PROVIDER_ICON[payment.provider] ?? '💰'}
+                      <span className='capitalize'>{payment.provider?.replace('_', ' ')}</span>
+                    </span>
+                  </td>
+                  <td className='px-5 py-3.5'>
+                    <span className='font-mono text-xs text-gray-400'>
+                      {payment.providerTransactionId || '—'}
+                    </span>
+                  </td>
+                  <td className='px-5 py-3.5 text-right'>
+                    <span className='text-sm font-bold text-gray-900'>
+                      {formatIDR(payment.amount)}
+                    </span>
+                  </td>
+                  <td className='px-5 py-3.5'>
+                    <StatusPill status={payment.status} />
+                  </td>
+                </tr>
+              ))
+            )}
         </DataTable>
         <Pagination page={page} total={total} limit={limit} onPageChange={setPage} />
       </div>

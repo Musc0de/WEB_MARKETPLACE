@@ -1,9 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../../lib/api.ts';
 import { formatDate } from '@starsuperscare/ui';
 import { Link } from 'react-router-dom';
-import { Search, Users, UserCheck, UserX, Eye, ChevronRight } from 'lucide-react';
+import { ChevronRight, Eye, Search, UserCheck, Users, UserX } from 'lucide-react';
 import { CustomerAvatar, CustomerStatusBadge, getDisplayName } from './shared.tsx';
 import { Pagination } from '../../components/Pagination.tsx';
 
@@ -35,7 +35,7 @@ export function CustomersList() {
   // Stats — use statusCounts from API for accurate global totals
   const stats = useMemo(() => ({
     total: totalCustomers,
-    active:   statusCounts['active']   ?? 0,
+    active: statusCounts['active'] ?? 0,
     inactive: statusCounts['inactive'] ?? customers.filter((c) => c.status !== 'active').length,
   }), [statusCounts, totalCustomers, customers]);
 
@@ -56,11 +56,35 @@ export function CustomersList() {
       {/* Stats Cards */}
       <div className='grid grid-cols-3 gap-4'>
         {[
-          { label: 'Semua Pelanggan', value: totalCustomers, icon: <Users className='w-5 h-5' />,     bg: 'bg-gray-50',    border: 'border-gray-200',   text: 'text-gray-900' },
-          { label: 'Aktif',          value: stats.active,   icon: <UserCheck className='w-5 h-5' />, bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700' },
-          { label: 'Tidak Aktif',    value: stats.inactive, icon: <UserX className='w-5 h-5' />,     bg: 'bg-red-50',     border: 'border-red-200',     text: 'text-red-700' },
+          {
+            label: 'Semua Pelanggan',
+            value: totalCustomers,
+            icon: <Users className='w-5 h-5' />,
+            bg: 'bg-gray-50',
+            border: 'border-gray-200',
+            text: 'text-gray-900',
+          },
+          {
+            label: 'Aktif',
+            value: stats.active,
+            icon: <UserCheck className='w-5 h-5' />,
+            bg: 'bg-emerald-50',
+            border: 'border-emerald-200',
+            text: 'text-emerald-700',
+          },
+          {
+            label: 'Tidak Aktif',
+            value: stats.inactive,
+            icon: <UserX className='w-5 h-5' />,
+            bg: 'bg-red-50',
+            border: 'border-red-200',
+            text: 'text-red-700',
+          },
         ].map((s) => (
-          <div key={s.label} className={`${s.bg} border ${s.border} rounded-xl p-4 flex items-center gap-4`}>
+          <div
+            key={s.label}
+            className={`${s.bg} border ${s.border} rounded-xl p-4 flex items-center gap-4`}
+          >
             <div className={`${s.text} opacity-60`}>{s.icon}</div>
             <div>
               <p className='text-xs font-medium text-gray-500'>{s.label}</p>
@@ -78,7 +102,10 @@ export function CustomersList() {
             type='text'
             placeholder='Cari berdasarkan nama atau email...'
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
             className='w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400'
           />
         </div>
@@ -88,7 +115,10 @@ export function CustomersList() {
             <button
               key={s}
               type='button'
-              onClick={() => { setStatusFilter(s); setPage(1); }}
+              onClick={() => {
+                setStatusFilter(s);
+                setPage(1);
+              }}
               className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all capitalize ${
                 statusFilter === s
                   ? s === 'active'
@@ -133,9 +163,15 @@ export function CustomersList() {
                       </div>
                     </div>
                   </td>
-                  <td className='px-4 py-3.5'><div className='h-5 bg-gray-100 rounded-full w-16' /></td>
-                  <td className='px-4 py-3.5'><div className='h-4 bg-gray-100 rounded w-24' /></td>
-                  <td className='px-4 py-3.5'><div className='h-8 bg-gray-100 rounded w-16' /></td>
+                  <td className='px-4 py-3.5'>
+                    <div className='h-5 bg-gray-100 rounded-full w-16' />
+                  </td>
+                  <td className='px-4 py-3.5'>
+                    <div className='h-4 bg-gray-100 rounded w-24' />
+                  </td>
+                  <td className='px-4 py-3.5'>
+                    <div className='h-8 bg-gray-100 rounded w-16' />
+                  </td>
                 </tr>
               ))
               : filtered.length === 0
@@ -174,7 +210,9 @@ export function CustomersList() {
 
                     {/* Joined */}
                     <td className='px-4 py-3.5'>
-                      <span className='text-sm text-gray-600'>{formatDate(customer.createdAt)}</span>
+                      <span className='text-sm text-gray-600'>
+                        {formatDate(customer.createdAt)}
+                      </span>
                     </td>
 
                     {/* Action */}
@@ -205,4 +243,3 @@ export function CustomersList() {
     </div>
   );
 }
-

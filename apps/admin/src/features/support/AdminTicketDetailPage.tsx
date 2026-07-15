@@ -11,41 +11,41 @@ import { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
 import { Link, useParams } from 'react-router-dom';
 import { API_URL, client } from '../../lib/rpc.ts';
-import { toast, formatDate } from '@starsuperscare/ui';
+import { formatDate, toast } from '@starsuperscare/ui';
 import {
+  AlertTriangle,
   ArrowLeft,
+  CheckCircle2,
+  ChevronDown,
+  Clock,
   Download,
   File,
+  Headphones,
+  Loader2,
+  Lock,
+  MessageSquare,
+  RefreshCw,
   Send,
   ShieldAlert,
-  Lock,
-  Clock,
-  CheckCircle2,
-  AlertTriangle,
-  XCircle,
-  RefreshCw,
   User,
-  Headphones,
-  MessageSquare,
-  ChevronDown,
-  Loader2,
+  XCircle,
 } from 'lucide-react';
 import { StatusPill } from '../../components/admin-ui.tsx';
 
 // ─── Priority config ──────────────────────────────────────────────────────────
 const PRIORITY_CFG: Record<string, { label: string; cls: string; icon: typeof Clock }> = {
-  urgent: { label: 'Darurat',  cls: 'bg-red-100 text-red-700',    icon: AlertTriangle },
-  high:   { label: 'Tinggi',   cls: 'bg-amber-100 text-amber-700', icon: AlertTriangle },
-  normal: { label: 'Normal',   cls: 'bg-blue-100 text-blue-700',   icon: Clock },
-  low:    { label: 'Rendah',   cls: 'bg-gray-100 text-gray-500',   icon: CheckCircle2 },
+  urgent: { label: 'Darurat', cls: 'bg-red-100 text-red-700', icon: AlertTriangle },
+  high: { label: 'Tinggi', cls: 'bg-amber-100 text-amber-700', icon: AlertTriangle },
+  normal: { label: 'Normal', cls: 'bg-blue-100 text-blue-700', icon: Clock },
+  low: { label: 'Rendah', cls: 'bg-gray-100 text-gray-500', icon: CheckCircle2 },
 };
 
 // ─── Status options ───────────────────────────────────────────────────────────
 const STATUS_OPTIONS = [
-  { value: 'open',        label: 'Terbuka',   icon: MessageSquare, color: 'text-blue-600'   },
-  { value: 'in_progress', label: 'Diproses',  icon: RefreshCw,     color: 'text-amber-600'  },
-  { value: 'resolved',    label: 'Selesai',   icon: CheckCircle2,  color: 'text-emerald-600'},
-  { value: 'closed',      label: 'Ditutup',   icon: XCircle,       color: 'text-gray-500'   },
+  { value: 'open', label: 'Terbuka', icon: MessageSquare, color: 'text-blue-600' },
+  { value: 'in_progress', label: 'Diproses', icon: RefreshCw, color: 'text-amber-600' },
+  { value: 'resolved', label: 'Selesai', icon: CheckCircle2, color: 'text-emerald-600' },
+  { value: 'closed', label: 'Ditutup', icon: XCircle, color: 'text-gray-500' },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -56,7 +56,9 @@ function getMediaUrl(key: string | null): string | null {
 
 function timeStr(iso: string): string {
   try {
-    return new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
+    return new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' }).format(
+      new Date(iso),
+    );
   } catch {
     return '';
   }
@@ -64,7 +66,12 @@ function timeStr(iso: string): string {
 
 function dayStr(iso: string): string {
   try {
-    return new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(iso));
+    return new Intl.DateTimeFormat('id-ID', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }).format(new Date(iso));
   } catch {
     return '';
   }
@@ -93,8 +100,14 @@ function MessageBubble({ msg }: { msg: any }) {
 
       <div className={`flex max-w-[75%] flex-col gap-1 ${isUser ? 'items-start' : 'items-end'}`}>
         {/* Sender label */}
-        <div className={`flex items-center gap-1.5 text-[11px] ${isUser ? '' : 'flex-row-reverse'}`}>
-          <span className={`font-semibold ${isUser ? 'text-slate-500' : isInternal ? 'text-yellow-600' : 'text-emerald-600'}`}>
+        <div
+          className={`flex items-center gap-1.5 text-[11px] ${isUser ? '' : 'flex-row-reverse'}`}
+        >
+          <span
+            className={`font-semibold ${
+              isUser ? 'text-slate-500' : isInternal ? 'text-yellow-600' : 'text-emerald-600'
+            }`}
+          >
             {isUser ? 'Pelanggan' : isInternal ? 'Admin (Internal)' : 'Admin'}
           </span>
           {isInternal && (
@@ -226,7 +239,9 @@ export const AdminTicketDetailPage = () => {
         throw new Error((body as any)?.error ?? 'Gagal mengirim balasan');
       }
 
-      toast.success(isInternal ? '📌 Catatan internal disimpan' : '✉️ Balasan terkirim ke pelanggan');
+      toast.success(
+        isInternal ? '📌 Catatan internal disimpan' : '✉️ Balasan terkirim ke pelanggan',
+      );
       setReplyContent('');
       if (textareaRef.current) textareaRef.current.style.height = 'auto';
       mutate();
@@ -276,7 +291,10 @@ export const AdminTicketDetailPage = () => {
           </span>
           <p className='text-base font-semibold text-gray-800'>Tiket tidak ditemukan</p>
           <p className='text-sm text-gray-400'>Tiket mungkin sudah dihapus atau ID tidak valid.</p>
-          <Link to='/support' className='mt-2 inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500 transition'>
+          <Link
+            to='/support'
+            className='mt-2 inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500 transition'
+          >
             <ArrowLeft className='h-4 w-4' /> Kembali
           </Link>
         </div>
@@ -290,7 +308,7 @@ export const AdminTicketDetailPage = () => {
   // Group messages by day
   const messages: any[] = ticket.messages ?? [];
   const sortedMessages = [...messages].sort(
-    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
   );
 
   return (
@@ -326,7 +344,9 @@ export const AdminTicketDetailPage = () => {
               <div>
                 <div className='flex items-center gap-2 mb-2'>
                   <StatusPill status={ticket.status} />
-                  <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${priorityCfg.cls}`}>
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${priorityCfg.cls}`}
+                  >
                     <PrioIcon className='h-3 w-3' /> {priorityCfg.label}
                   </span>
                   {ticket.category && (
@@ -337,7 +357,8 @@ export const AdminTicketDetailPage = () => {
                 </div>
                 <h1 className='text-xl font-black text-gray-900'>{ticket.subject}</h1>
                 <p className='mt-1 text-xs text-gray-400'>
-                  Dibuat {formatDate(ticket.createdAt)} · Tiket <span className='font-mono'>#{ticket.id.slice(0, 8)}</span>
+                  Dibuat {formatDate(ticket.createdAt)} · Tiket{' '}
+                  <span className='font-mono'>#{ticket.id.slice(0, 8)}</span>
                 </p>
               </div>
               <span className='flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600'>
@@ -352,7 +373,9 @@ export const AdminTicketDetailPage = () => {
               <div className='flex items-center gap-2'>
                 <MessageSquare className='h-4 w-4 text-gray-400' />
                 <span className='text-sm font-semibold text-gray-700'>Percakapan</span>
-                <span className='rounded-full bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-700'>{sortedMessages.length}</span>
+                <span className='rounded-full bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-700'>
+                  {sortedMessages.length}
+                </span>
               </div>
               <div className='flex items-center gap-1.5 text-xs text-gray-400'>
                 <Lock className='h-3 w-3' />
@@ -361,29 +384,37 @@ export const AdminTicketDetailPage = () => {
             </div>
 
             {/* Scrollable message area */}
-            <div className='flex flex-col gap-4 overflow-y-auto p-5' style={{ maxHeight: '480px', minHeight: '200px' }}>
-              {sortedMessages.length === 0 ? (
-                <div className='flex flex-col items-center justify-center py-12 text-center'>
-                  <span className='mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100'>
-                    <MessageSquare className='h-6 w-6 text-gray-400' />
-                  </span>
-                  <p className='text-sm font-medium text-gray-600'>Belum ada pesan</p>
-                  <p className='text-xs text-gray-400 mt-1'>Kirim balasan pertama ke pelanggan di bawah.</p>
-                </div>
-              ) : (
-                sortedMessages.reduce<JSX.Element[]>((acc, msg, i) => {
-                  const prevMsg = sortedMessages[i - 1];
-                  const showDaySep = !prevMsg ||
-                    new Date(msg.createdAt).toDateString() !== new Date(prevMsg.createdAt).toDateString();
-                  if (showDaySep) {
-                    acc.push(<DaySeparator key={`sep-${i}`} date={msg.createdAt} />);
-                  }
-                  acc.push(
-                    <MessageBubble key={msg.id} msg={msg} />
-                  );
-                  return acc;
-                }, [])
-              )}
+            <div
+              className='flex flex-col gap-4 overflow-y-auto p-5'
+              style={{ maxHeight: '480px', minHeight: '200px' }}
+            >
+              {sortedMessages.length === 0
+                ? (
+                  <div className='flex flex-col items-center justify-center py-12 text-center'>
+                    <span className='mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100'>
+                      <MessageSquare className='h-6 w-6 text-gray-400' />
+                    </span>
+                    <p className='text-sm font-medium text-gray-600'>Belum ada pesan</p>
+                    <p className='text-xs text-gray-400 mt-1'>
+                      Kirim balasan pertama ke pelanggan di bawah.
+                    </p>
+                  </div>
+                )
+                : (
+                  sortedMessages.reduce<JSX.Element[]>((acc, msg, i) => {
+                    const prevMsg = sortedMessages[i - 1];
+                    const showDaySep = !prevMsg ||
+                      new Date(msg.createdAt).toDateString() !==
+                        new Date(prevMsg.createdAt).toDateString();
+                    if (showDaySep) {
+                      acc.push(<DaySeparator key={`sep-${i}`} date={msg.createdAt} />);
+                    }
+                    acc.push(
+                      <MessageBubble key={msg.id} msg={msg} />,
+                    );
+                    return acc;
+                  }, [])
+                )}
               <div ref={messagesEndRef} />
             </div>
 
@@ -396,24 +427,41 @@ export const AdminTicketDetailPage = () => {
                   role='switch'
                   aria-checked={isInternal}
                   onClick={() => setIsInternal(!isInternal)}
-                  className={`relative h-5 w-9 rounded-full transition-colors duration-200 focus:outline-none ${isInternal ? 'bg-yellow-500' : 'bg-gray-200'}`}
+                  className={`relative h-5 w-9 rounded-full transition-colors duration-200 focus:outline-none ${
+                    isInternal ? 'bg-yellow-500' : 'bg-gray-200'
+                  }`}
                 >
-                  <span className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform duration-200 ${isInternal ? 'translate-x-4' : 'translate-x-0'}`} />
+                  <span
+                    className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform duration-200 ${
+                      isInternal ? 'translate-x-4' : 'translate-x-0'
+                    }`}
+                  />
                 </button>
-                <span className={`text-xs font-semibold ${isInternal ? 'text-yellow-700' : 'text-gray-500'}`}>
-                  {isInternal ? (
-                    <span className='flex items-center gap-1'><ShieldAlert className='h-3 w-3' /> Catatan Internal (tidak terlihat pelanggan)</span>
-                  ) : (
-                    'Balas ke pelanggan'
-                  )}
+                <span
+                  className={`text-xs font-semibold ${
+                    isInternal ? 'text-yellow-700' : 'text-gray-500'
+                  }`}
+                >
+                  {isInternal
+                    ? (
+                      <span className='flex items-center gap-1'>
+                        <ShieldAlert className='h-3 w-3' />{' '}
+                        Catatan Internal (tidak terlihat pelanggan)
+                      </span>
+                    )
+                    : (
+                      'Balas ke pelanggan'
+                    )}
                 </span>
               </div>
 
-              <div className={`flex items-end gap-3 rounded-xl border transition-all ${
-                isInternal
-                  ? 'border-yellow-200 bg-yellow-50/60 focus-within:border-yellow-400 focus-within:ring-2 focus-within:ring-yellow-400/20'
-                  : 'border-gray-200 bg-gray-50 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-500/15'
-              } p-3`}>
+              <div
+                className={`flex items-end gap-3 rounded-xl border transition-all ${
+                  isInternal
+                    ? 'border-yellow-200 bg-yellow-50/60 focus-within:border-yellow-400 focus-within:ring-2 focus-within:ring-yellow-400/20'
+                    : 'border-gray-200 bg-gray-50 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-500/15'
+                } p-3`}
+              >
                 <textarea
                   ref={textareaRef}
                   value={replyContent}
@@ -424,7 +472,9 @@ export const AdminTicketDetailPage = () => {
                       if (replyContent.trim()) handleReply(e as any);
                     }
                   }}
-                  placeholder={isInternal ? 'Ketik catatan internal… (Ctrl+Enter untuk kirim)' : 'Ketik balasan ke pelanggan… (Ctrl+Enter untuk kirim)'}
+                  placeholder={isInternal
+                    ? 'Ketik catatan internal… (Ctrl+Enter untuk kirim)'
+                    : 'Ketik balasan ke pelanggan… (Ctrl+Enter untuk kirim)'}
                   rows={2}
                   className='flex-1 resize-none bg-transparent text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none'
                   style={{ minHeight: '44px', maxHeight: '200px' }}
@@ -439,7 +489,9 @@ export const AdminTicketDetailPage = () => {
                   }`}
                   title='Ctrl+Enter untuk kirim'
                 >
-                  {isSubmitting ? <Loader2 className='h-4 w-4 animate-spin' /> : <Send className='h-4 w-4' />}
+                  {isSubmitting
+                    ? <Loader2 className='h-4 w-4 animate-spin' />
+                    : <Send className='h-4 w-4' />}
                 </button>
               </div>
               <p className='mt-1.5 text-right text-[11px] text-gray-400'>
@@ -469,9 +521,15 @@ export const AdminTicketDetailPage = () => {
                 >
                   {updatingStatus && ticket.status !== value
                     ? <Loader2 className='h-4 w-4 animate-spin' />
-                    : <Icon className={`h-4 w-4 ${ticket.status === value ? 'text-white' : color}`} />}
+                    : (
+                      <Icon
+                        className={`h-4 w-4 ${ticket.status === value ? 'text-white' : color}`}
+                      />
+                    )}
                   {label}
-                  {ticket.status === value && <span className='ml-auto text-xs opacity-70'>Aktif</span>}
+                  {ticket.status === value && (
+                    <span className='ml-auto text-xs opacity-70'>Aktif</span>
+                  )}
                 </button>
               ))}
             </div>
@@ -482,24 +540,36 @@ export const AdminTicketDetailPage = () => {
             <h3 className='mb-4 text-sm font-bold text-gray-900'>Informasi Tiket</h3>
             <dl className='space-y-3.5'>
               <div>
-                <dt className='text-[11px] font-semibold uppercase tracking-wide text-gray-400'>Kategori</dt>
-                <dd className='mt-1 text-sm font-medium text-gray-800 capitalize'>{ticket.category || '—'}</dd>
+                <dt className='text-[11px] font-semibold uppercase tracking-wide text-gray-400'>
+                  Kategori
+                </dt>
+                <dd className='mt-1 text-sm font-medium text-gray-800 capitalize'>
+                  {ticket.category || '—'}
+                </dd>
               </div>
               <div>
-                <dt className='text-[11px] font-semibold uppercase tracking-wide text-gray-400'>Prioritas</dt>
+                <dt className='text-[11px] font-semibold uppercase tracking-wide text-gray-400'>
+                  Prioritas
+                </dt>
                 <dd className='mt-1'>
-                  <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${priorityCfg.cls}`}>
+                  <span
+                    className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${priorityCfg.cls}`}
+                  >
                     <PrioIcon className='h-3 w-3' /> {priorityCfg.label}
                   </span>
                 </dd>
               </div>
               <div>
-                <dt className='text-[11px] font-semibold uppercase tracking-wide text-gray-400'>Pelanggan (ID)</dt>
+                <dt className='text-[11px] font-semibold uppercase tracking-wide text-gray-400'>
+                  Pelanggan (ID)
+                </dt>
                 <dd className='mt-1 font-mono text-xs text-gray-500 truncate'>{ticket.userId}</dd>
               </div>
               {ticket.orderId && (
                 <div>
-                  <dt className='text-[11px] font-semibold uppercase tracking-wide text-gray-400'>Pesanan Terkait</dt>
+                  <dt className='text-[11px] font-semibold uppercase tracking-wide text-gray-400'>
+                    Pesanan Terkait
+                  </dt>
                   <dd className='mt-1'>
                     <Link
                       to={`/orders/${ticket.orderId}`}
@@ -511,15 +581,21 @@ export const AdminTicketDetailPage = () => {
                 </div>
               )}
               <div>
-                <dt className='text-[11px] font-semibold uppercase tracking-wide text-gray-400'>Dibuat</dt>
+                <dt className='text-[11px] font-semibold uppercase tracking-wide text-gray-400'>
+                  Dibuat
+                </dt>
                 <dd className='mt-1 text-sm text-gray-600'>{formatDate(ticket.createdAt)}</dd>
               </div>
               <div>
-                <dt className='text-[11px] font-semibold uppercase tracking-wide text-gray-400'>Terakhir diperbarui</dt>
+                <dt className='text-[11px] font-semibold uppercase tracking-wide text-gray-400'>
+                  Terakhir diperbarui
+                </dt>
                 <dd className='mt-1 text-sm text-gray-600'>{formatDate(ticket.updatedAt)}</dd>
               </div>
               <div>
-                <dt className='text-[11px] font-semibold uppercase tracking-wide text-gray-400'>Jumlah Pesan</dt>
+                <dt className='text-[11px] font-semibold uppercase tracking-wide text-gray-400'>
+                  Jumlah Pesan
+                </dt>
                 <dd className='mt-1 text-sm font-bold text-gray-900'>{sortedMessages.length}</dd>
               </div>
             </dl>
@@ -532,7 +608,8 @@ export const AdminTicketDetailPage = () => {
               <span className='text-xs font-bold text-emerald-800'>Enkripsi End-to-End</span>
             </div>
             <p className='text-xs text-emerald-700 leading-relaxed'>
-              Semua pesan antara admin dan pelanggan diproteksi. Hanya pihak yang berwenang yang dapat membaca percakapan ini.
+              Semua pesan antara admin dan pelanggan diproteksi. Hanya pihak yang berwenang yang
+              dapat membaca percakapan ini.
             </p>
           </div>
         </div>

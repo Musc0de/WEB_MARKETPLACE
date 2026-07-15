@@ -3,16 +3,16 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { api } from '../../lib/api.ts';
 import { formatDate, formatIDR, toast } from '@starsuperscare/ui';
-import { FileText, Mail, ExternalLink, Send } from 'lucide-react';
+import { ExternalLink, FileText, Mail, Send } from 'lucide-react';
 import {
-  PageHeader,
-  SearchBar,
-  StatusPill,
   DataTable,
-  TableSkeleton,
   EmptyState,
   FilterTabs,
+  PageHeader,
   Pagination,
+  SearchBar,
+  StatusPill,
+  TableSkeleton,
 } from '../../components/admin-ui.tsx';
 
 type InvStatus = 'all' | 'paid' | 'unpaid' | 'overdue';
@@ -62,8 +62,7 @@ export function InvoicesList() {
   const total: number = data?.total ?? 0;
 
   const filtered = allInvoices.filter((inv) => {
-    const matchSearch =
-      !search ||
+    const matchSearch = !search ||
       inv.invoiceNumber?.toLowerCase().includes(search.toLowerCase()) ||
       inv.orderNumber?.toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter === 'all' || inv.status === statusFilter;
@@ -85,7 +84,10 @@ export function InvoicesList() {
         <FilterTabs<InvStatus>
           options={STATUS_TABS}
           value={statusFilter}
-          onChange={(v) => { setStatusFilter(v); setPage(1); }}
+          onChange={(v) => {
+            setStatusFilter(v);
+            setPage(1);
+          }}
         />
         <SearchBar
           value={search}
@@ -100,65 +102,77 @@ export function InvoicesList() {
           headers={TABLE_HEADERS}
           summary={`${filtered.length} invoice dari total ${total}`}
         >
-          {isLoading ? (
-            <TableSkeleton cols={7} />
-          ) : !filtered.length ? (
-            <tr>
-              <td colSpan={7}>
-                <EmptyState
-                  icon={FileText}
-                  title='Tidak ada invoice'
-                  description='Invoice akan muncul secara otomatis setelah pesanan dibuat.'
-                />
-              </td>
-            </tr>
-          ) : (
-            filtered.map((inv: any) => (
-              <tr key={inv.id} className='hover:bg-blue-50/20 transition-colors'>
-                <td className='px-5 py-3.5'>
-                  <span className='font-mono text-sm font-bold text-gray-900'>
-                    {inv.invoiceNumber || `INV-${inv.id.slice(0, 8)}`}
-                  </span>
-                </td>
-                <td className='px-5 py-3.5'>
-                  <Link
-                    to={`/orders/${inv.orderId}`}
-                    className='inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:underline'
-                  >
-                    {inv.orderNumber || `#${inv.orderId?.slice(0, 8)}`}
-                    <ExternalLink className='h-3 w-3' />
-                  </Link>
-                </td>
-                <td className='px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap'>{formatDate(inv.issuedAt ?? inv.createdAt)}</td>
-                <td className='px-5 py-3.5'>
-                  {inv.dueAt ? (
-                    <span className={`text-sm ${inv.status === 'overdue' ? 'text-red-600 font-semibold' : 'text-gray-500'}`}>
-                      {formatDate(inv.dueAt)}
-                    </span>
-                  ) : <span className='text-gray-400 text-sm'>—</span>}
-                </td>
-                <td className='px-5 py-3.5 text-right'>
-                  <span className='text-sm font-bold text-gray-900'>{formatIDR(inv.totalAmount ?? inv.amount ?? 0)}</span>
-                </td>
-                <td className='px-5 py-3.5'><StatusPill status={inv.status} /></td>
-                <td className='px-5 py-3.5'>
-                  <button
-                    type='button'
-                    onClick={() => resendInvoice.mutate(inv.id)}
-                    disabled={resendInvoice.isPending}
-                    className='inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition disabled:opacity-50'
-                  >
-                    {resendInvoice.isPending ? (
-                      <Mail className='h-3 w-3 animate-bounce' />
-                    ) : (
-                      <Send className='h-3 w-3' />
-                    )}
-                    Kirim Ulang
-                  </button>
+          {isLoading ? <TableSkeleton cols={7} /> : !filtered.length
+            ? (
+              <tr>
+                <td colSpan={7}>
+                  <EmptyState
+                    icon={FileText}
+                    title='Tidak ada invoice'
+                    description='Invoice akan muncul secara otomatis setelah pesanan dibuat.'
+                  />
                 </td>
               </tr>
-            ))
-          )}
+            )
+            : (
+              filtered.map((inv: any) => (
+                <tr key={inv.id} className='hover:bg-blue-50/20 transition-colors'>
+                  <td className='px-5 py-3.5'>
+                    <span className='font-mono text-sm font-bold text-gray-900'>
+                      {inv.invoiceNumber || `INV-${inv.id.slice(0, 8)}`}
+                    </span>
+                  </td>
+                  <td className='px-5 py-3.5'>
+                    <Link
+                      to={`/orders/${inv.orderId}`}
+                      className='inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:underline'
+                    >
+                      {inv.orderNumber || `#${inv.orderId?.slice(0, 8)}`}
+                      <ExternalLink className='h-3 w-3' />
+                    </Link>
+                  </td>
+                  <td className='px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap'>
+                    {formatDate(inv.issuedAt ?? inv.createdAt)}
+                  </td>
+                  <td className='px-5 py-3.5'>
+                    {inv.dueAt
+                      ? (
+                        <span
+                          className={`text-sm ${
+                            inv.status === 'overdue'
+                              ? 'text-red-600 font-semibold'
+                              : 'text-gray-500'
+                          }`}
+                        >
+                          {formatDate(inv.dueAt)}
+                        </span>
+                      )
+                      : <span className='text-gray-400 text-sm'>—</span>}
+                  </td>
+                  <td className='px-5 py-3.5 text-right'>
+                    <span className='text-sm font-bold text-gray-900'>
+                      {formatIDR(inv.totalAmount ?? inv.amount ?? 0)}
+                    </span>
+                  </td>
+                  <td className='px-5 py-3.5'>
+                    <StatusPill status={inv.status} />
+                  </td>
+                  <td className='px-5 py-3.5'>
+                    <button
+                      type='button'
+                      onClick={() => resendInvoice.mutate(inv.id)}
+                      disabled={resendInvoice.isPending}
+                      className='inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition disabled:opacity-50'
+                    >
+                      {resendInvoice.isPending
+                        ? <Mail className='h-3 w-3 animate-bounce' />
+                        : <Send className='h-3 w-3' />}
+                      Kirim Ulang
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
         </DataTable>
         <Pagination page={page} total={total} limit={limit} onPageChange={setPage} />
       </div>

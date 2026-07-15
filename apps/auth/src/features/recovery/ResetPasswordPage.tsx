@@ -90,7 +90,8 @@ export function ResetPasswordPage() {
           Kata Sandi Diperbarui
         </h1>
         <p className='text-gray-500 mb-8 max-w-sm mx-auto leading-relaxed'>
-          Kata sandi Anda telah berhasil diatur ulang. Semua sesi sebelumnya telah dibatalkan demi keamanan Anda.
+          Kata sandi Anda telah berhasil diatur ulang. Semua sesi sebelumnya telah dibatalkan demi
+          keamanan Anda.
         </p>
         <Link
           to='/login'
@@ -115,7 +116,8 @@ export function ResetPasswordPage() {
         </div>
         <h1 className='text-3xl font-bold text-gray-900 mb-4'>Permintaan Tidak Valid</h1>
         <p className='text-gray-500 mb-8 max-w-sm mx-auto leading-relaxed'>
-          Token atur ulang kata sandi tidak ditemukan atau tidak valid. Silakan minta tautan atur ulang kata sandi yang baru.
+          Token atur ulang kata sandi tidak ditemukan atau tidak valid. Silakan minta tautan atur
+          ulang kata sandi yang baru.
         </p>
         <Link
           to='/forgot-password'

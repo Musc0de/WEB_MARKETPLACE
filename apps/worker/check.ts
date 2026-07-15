@@ -1,4 +1,4 @@
-import { db, users, outboxEvents } from '@starsuperscare/database';
+import { db, outboxEvents, users } from '@starsuperscare/database';
 import { eq } from 'drizzle-orm';
 
 async function main() {
@@ -10,9 +10,9 @@ async function main() {
 
   if (user) {
     const events = await db.query.outboxEvents.findMany({
-      where: eq(outboxEvents.type, 'password_reset_requested')
+      where: eq(outboxEvents.type, 'password_reset_requested'),
     });
-    const userEvents = events.filter(e => (e.payload as any)?.email === email);
+    const userEvents = events.filter((e) => (e.payload as any)?.email === email);
     console.log(`Password Reset Events for ${email}:`, userEvents);
   }
   Deno.exit(0);

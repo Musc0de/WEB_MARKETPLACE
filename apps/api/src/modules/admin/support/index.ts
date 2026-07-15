@@ -56,10 +56,10 @@ app.get('/tickets/:id', async (c) => {
   const msgIds = messages.map((m) => m.id);
   const attachmentsList = msgIds.length > 0
     ? (await Promise.all(
-        msgIds.map((mid) =>
-          db.query.attachments.findMany({ where: eq(attachments.referenceId, mid) })
-        ),
-      )).flat()
+      msgIds.map((mid) =>
+        db.query.attachments.findMany({ where: eq(attachments.referenceId, mid) })
+      ),
+    )).flat()
     : [];
 
   // Reconstruct publicUrl per attachment
@@ -73,8 +73,8 @@ app.get('/tickets/:id', async (c) => {
     senderType: (msg.isInternal === 'admin' || msg.isInternal === 'true')
       ? 'admin'
       : msg.senderId !== ticket.userId
-        ? 'admin'
-        : 'user',
+      ? 'admin'
+      : 'user',
     attachments: attachmentsList
       .filter((a) => a.referenceId === msg.id)
       .map((a) => ({

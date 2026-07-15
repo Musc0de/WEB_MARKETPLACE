@@ -92,7 +92,8 @@ export function ClaimOrderPage() {
         </div>
         <h1 className='text-3xl font-bold text-gray-900 mb-4'>Permintaan Tidak Valid</h1>
         <p className='text-gray-500 mb-8 max-w-sm mx-auto leading-relaxed'>
-          Tautan klaim tidak valid atau token tidak ditemukan. Silakan gunakan tautan persis yang dikirimkan ke email Anda.
+          Tautan klaim tidak valid atau token tidak ditemukan. Silakan gunakan tautan persis yang
+          dikirimkan ke email Anda.
         </p>
       </motion.div>
     );

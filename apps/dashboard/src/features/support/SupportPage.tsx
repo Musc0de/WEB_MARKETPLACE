@@ -3,29 +3,29 @@ import useSWR from 'swr';
 import { client } from '../../lib/api.ts';
 import { Link } from 'react-router-dom';
 import {
-  HelpCircle,
-  MessageSquare,
-  Plus,
+  AlertTriangle,
+  ArrowRight,
+  CheckCircle2,
   ChevronDown,
   ChevronRight,
   Clock,
-  CheckCircle2,
-  AlertTriangle,
-  RefreshCw,
   Headphones,
+  HelpCircle,
   Loader2,
-  ArrowRight,
   Lock,
+  MessageSquare,
+  Plus,
+  RefreshCw,
 } from 'lucide-react';
 import { SupportTicketModal } from './SupportTicketModal.tsx';
 import { formatDate } from '@starsuperscare/ui';
 
 // ─── Status config ────────────────────────────────────────────────────────────
 const TICKET_STATUS: Record<string, { label: string; cls: string; icon: typeof Clock }> = {
-  open:        { label: 'Terbuka',  cls: 'bg-blue-100 text-blue-700',    icon: MessageSquare },
-  in_progress: { label: 'Diproses', cls: 'bg-amber-100 text-amber-700',   icon: RefreshCw    },
-  resolved:    { label: 'Selesai',  cls: 'bg-emerald-100 text-emerald-700', icon: CheckCircle2 },
-  closed:      { label: 'Ditutup', cls: 'bg-gray-100 text-gray-500',    icon: AlertTriangle },
+  open: { label: 'Terbuka', cls: 'bg-blue-100 text-blue-700', icon: MessageSquare },
+  in_progress: { label: 'Diproses', cls: 'bg-amber-100 text-amber-700', icon: RefreshCw },
+  resolved: { label: 'Selesai', cls: 'bg-emerald-100 text-emerald-700', icon: CheckCircle2 },
+  closed: { label: 'Ditutup', cls: 'bg-gray-100 text-gray-500', icon: AlertTriangle },
 };
 
 // ─── FAQ Accordion ────────────────────────────────────────────────────────────
@@ -33,7 +33,9 @@ function FaqItem({ faq }: { faq: any }) {
   const [open, setOpen] = useState(false);
   return (
     <div
-      className={`rounded-2xl border transition-all duration-200 ${open ? 'border-blue-200 bg-blue-50/40' : 'border-gray-200 bg-white'}`}
+      className={`rounded-2xl border transition-all duration-200 ${
+        open ? 'border-blue-200 bg-blue-50/40' : 'border-gray-200 bg-white'
+      }`}
     >
       <button
         type='button'
@@ -67,7 +69,9 @@ function TicketCard({ ticket }: { ticket: any }) {
     <Link to={`/support/${ticket.id}`} className='block group'>
       <div className='flex items-center justify-between rounded-2xl border border-gray-200 bg-white px-5 py-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-blue-200 group-hover:bg-blue-50/30'>
         <div className='flex items-start gap-4 min-w-0'>
-          <span className={`mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl ${cfg.cls}`}>
+          <span
+            className={`mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl ${cfg.cls}`}
+          >
             <Icon className='h-4 w-4' />
           </span>
           <div className='min-w-0'>
@@ -117,7 +121,9 @@ export const SupportPage = () => {
     },
   );
 
-  const openCount = (tickets as any[])?.filter((t) => t.status === 'open' || t.status === 'in_progress').length ?? 0;
+  const openCount =
+    (tickets as any[])?.filter((t) => t.status === 'open' || t.status === 'in_progress').length ??
+      0;
 
   return (
     <div className='mx-auto max-w-3xl space-y-8 py-2'>
@@ -146,11 +152,24 @@ export const SupportPage = () => {
       {/* ── Stats bar ── */}
       <div className='grid grid-cols-3 gap-3'>
         {[
-          { label: 'FAQ Tersedia', value: faqs?.length ?? '—', color: 'text-blue-700', bg: 'bg-blue-50' },
-          { label: 'Tiket Saya', value: tickets?.length ?? '—', color: 'text-gray-900', bg: 'bg-gray-50' },
+          {
+            label: 'FAQ Tersedia',
+            value: faqs?.length ?? '—',
+            color: 'text-blue-700',
+            bg: 'bg-blue-50',
+          },
+          {
+            label: 'Tiket Saya',
+            value: tickets?.length ?? '—',
+            color: 'text-gray-900',
+            bg: 'bg-gray-50',
+          },
           { label: 'Perlu Respons', value: openCount, color: 'text-amber-700', bg: 'bg-amber-50' },
         ].map(({ label, value, color, bg }) => (
-          <div key={label} className={`rounded-xl border border-gray-200 ${bg} px-4 py-3 text-center shadow-sm`}>
+          <div
+            key={label}
+            className={`rounded-xl border border-gray-200 ${bg} px-4 py-3 text-center shadow-sm`}
+          >
             <p className={`text-xl font-black ${color}`}>{value}</p>
             <p className='text-xs text-gray-500 mt-0.5'>{label}</p>
           </div>
@@ -160,14 +179,17 @@ export const SupportPage = () => {
       {/* ── E2E notice ── */}
       <div className='flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-2.5'>
         <Lock className='h-3.5 w-3.5 text-emerald-600 flex-shrink-0' />
-        <p className='text-xs text-emerald-700'>Semua percakapan support dienkripsi end-to-end dan hanya dapat dilihat oleh Anda dan tim support kami.</p>
+        <p className='text-xs text-emerald-700'>
+          Semua percakapan support dienkripsi end-to-end dan hanya dapat dilihat oleh Anda dan tim
+          support kami.
+        </p>
       </div>
 
       {/* ── Tabs ── */}
       <div className='flex gap-1 rounded-xl border border-gray-200 bg-gray-100/60 p-1'>
         {[
-          { key: 'faq',     label: 'FAQ',        icon: HelpCircle    },
-          { key: 'tickets', label: 'Tiket Saya',  icon: MessageSquare },
+          { key: 'faq', label: 'FAQ', icon: HelpCircle },
+          { key: 'tickets', label: 'Tiket Saya', icon: MessageSquare },
         ].map(({ key, label, icon: Icon }) => (
           <button
             key={key}
@@ -192,48 +214,60 @@ export const SupportPage = () => {
       {/* ── Content ── */}
       {activeTab === 'faq' && (
         <div className='space-y-3'>
-          {isLoadingFaqs ? (
-            <div className='flex items-center justify-center py-12'>
-              <Loader2 className='h-6 w-6 animate-spin text-blue-500' />
-            </div>
-          ) : faqs?.length > 0 ? (
-            faqs.map((faq: any) => <FaqItem key={faq.id} faq={faq} />)
-          ) : (
-            <div className='flex flex-col items-center py-12 text-center'>
-              <span className='mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100'>
-                <HelpCircle className='h-6 w-6 text-gray-400' />
-              </span>
-              <p className='text-sm font-medium text-gray-600'>Belum ada FAQ</p>
-              <p className='text-xs text-gray-400 mt-1'>FAQ akan ditampilkan di sini ketika tersedia.</p>
-            </div>
-          )}
+          {isLoadingFaqs
+            ? (
+              <div className='flex items-center justify-center py-12'>
+                <Loader2 className='h-6 w-6 animate-spin text-blue-500' />
+              </div>
+            )
+            : faqs?.length > 0
+            ? (
+              faqs.map((faq: any) => <FaqItem key={faq.id} faq={faq} />)
+            )
+            : (
+              <div className='flex flex-col items-center py-12 text-center'>
+                <span className='mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100'>
+                  <HelpCircle className='h-6 w-6 text-gray-400' />
+                </span>
+                <p className='text-sm font-medium text-gray-600'>Belum ada FAQ</p>
+                <p className='text-xs text-gray-400 mt-1'>
+                  FAQ akan ditampilkan di sini ketika tersedia.
+                </p>
+              </div>
+            )}
         </div>
       )}
 
       {activeTab === 'tickets' && (
         <div className='space-y-3'>
-          {isLoadingTickets ? (
-            <div className='flex items-center justify-center py-12'>
-              <Loader2 className='h-6 w-6 animate-spin text-blue-500' />
-            </div>
-          ) : (tickets as any[])?.length > 0 ? (
-            (tickets as any[]).map((ticket) => <TicketCard key={ticket.id} ticket={ticket} />)
-          ) : (
-            <div className='flex flex-col items-center py-12 text-center'>
-              <span className='mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100'>
-                <MessageSquare className='h-6 w-6 text-gray-400' />
-              </span>
-              <p className='text-sm font-medium text-gray-600'>Belum ada tiket</p>
-              <p className='text-xs text-gray-400 mt-1'>Buat tiket baru jika ada masalah yang perlu diselesaikan.</p>
-              <button
-                type='button'
-                onClick={() => setIsModalOpen(true)}
-                className='mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-500 transition'
-              >
-                <Plus className='h-4 w-4' /> Buat Tiket Pertama
-              </button>
-            </div>
-          )}
+          {isLoadingTickets
+            ? (
+              <div className='flex items-center justify-center py-12'>
+                <Loader2 className='h-6 w-6 animate-spin text-blue-500' />
+              </div>
+            )
+            : (tickets as any[])?.length > 0
+            ? (
+              (tickets as any[]).map((ticket) => <TicketCard key={ticket.id} ticket={ticket} />)
+            )
+            : (
+              <div className='flex flex-col items-center py-12 text-center'>
+                <span className='mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100'>
+                  <MessageSquare className='h-6 w-6 text-gray-400' />
+                </span>
+                <p className='text-sm font-medium text-gray-600'>Belum ada tiket</p>
+                <p className='text-xs text-gray-400 mt-1'>
+                  Buat tiket baru jika ada masalah yang perlu diselesaikan.
+                </p>
+                <button
+                  type='button'
+                  onClick={() => setIsModalOpen(true)}
+                  className='mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-500 transition'
+                >
+                  <Plus className='h-4 w-4' /> Buat Tiket Pertama
+                </button>
+              </div>
+            )}
         </div>
       )}
 

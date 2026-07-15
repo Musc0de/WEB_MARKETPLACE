@@ -61,8 +61,6 @@ async function validateCheckout(
   return res.data;
 }
 
-
-
 async function createOrder(
   url: string,
   { arg }: { arg: CreateOrderRequest & { _cartToken?: string | null } },
@@ -100,7 +98,7 @@ export function useShippingOptions(province?: string | null, city?: string | nul
         body: JSON.stringify({ destinationProvince: p, destinationCity: c }),
       });
       return res.data;
-    }
+    },
   );
 }
 

@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
-import { desc, eq, sql, and, isNull, ne } from 'drizzle-orm';
+import { and, desc, eq, isNull, ne, sql } from 'drizzle-orm';
 import {
   db,
   inventoryLevels,
@@ -19,7 +19,7 @@ const routes = app
   .use('*', authMiddleware)
   .get('/', requirePermission('catalog.read'), async (c) => {
     const productId = c.req.query('productId');
-    
+
     // In MVP, we just return all levels (or filter by productId). In reality, add pagination.
     let query = db
       .select({
@@ -37,7 +37,10 @@ const routes = app
           name: products.name,
         },
         optionValues: productVariants.optionValues,
-        initialStock: sql<number>`COALESCE((SELECT quantity FROM sss_inventory_movements WHERE variant_id = ${inventoryLevels.variantId} AND type = 'initial' LIMIT 1), 0)`.as('initial_stock'),
+        initialStock: sql<
+          number
+        >`COALESCE((SELECT quantity FROM sss_inventory_movements WHERE variant_id = ${inventoryLevels.variantId} AND type = 'initial' LIMIT 1), 0)`
+          .as('initial_stock'),
       })
       .from(inventoryLevels)
       .innerJoin(productVariants, eq(inventoryLevels.variantId, productVariants.id))
@@ -46,7 +49,13 @@ const routes = app
       .$dynamic();
 
     if (productId) {
-      query = query.where(and(isNull(productVariants.deletedAt), ne(products.status, 'archived'), eq(products.id, productId)));
+      query = query.where(
+        and(
+          isNull(productVariants.deletedAt),
+          ne(products.status, 'archived'),
+          eq(products.id, productId),
+        ),
+      );
     }
 
     const levelsRaw = await query;
@@ -55,7 +64,7 @@ const routes = app
       variant: {
         ...lvl.variant,
         size: (lvl.optionValues as any)?.size || null,
-      }
+      },
     }));
     return c.json({ data: levels }, 200);
   })

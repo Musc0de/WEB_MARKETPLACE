@@ -1,18 +1,18 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api.ts';
 import { formatDate } from '@starsuperscare/ui';
 import {
-  Search,
-  Package,
-  FileText,
-  Trash2,
-  Edit2,
-  Plus,
-  ChevronRight,
-  Globe,
   AlertTriangle,
+  ChevronRight,
+  Edit2,
+  FileText,
+  Globe,
+  Package,
+  Plus,
+  Search,
+  Trash2,
 } from 'lucide-react';
 import { Pagination } from '../../components/Pagination.tsx';
 
@@ -31,16 +31,17 @@ type Product = {
 // ─── Status badge ─────────────────────────────────────────────────────────────
 function ProductStatusBadge({ status }: { status: string }) {
   const s = status?.toLowerCase();
-  const cfg =
-    s === 'published'
-      ? { dot: 'bg-emerald-500', cls: 'bg-emerald-50 text-emerald-700', label: 'published' }
-      : s === 'draft'
-      ? { dot: 'bg-amber-400', cls: 'bg-amber-50 text-amber-700', label: 'draft' }
-      : s === 'archived'
-      ? { dot: 'bg-gray-400', cls: 'bg-gray-100 text-gray-500', label: 'archived' }
-      : { dot: 'bg-gray-400', cls: 'bg-gray-100 text-gray-600', label: s || 'unknown' };
+  const cfg = s === 'published'
+    ? { dot: 'bg-emerald-500', cls: 'bg-emerald-50 text-emerald-700', label: 'published' }
+    : s === 'draft'
+    ? { dot: 'bg-amber-400', cls: 'bg-amber-50 text-amber-700', label: 'draft' }
+    : s === 'archived'
+    ? { dot: 'bg-gray-400', cls: 'bg-gray-100 text-gray-500', label: 'archived' }
+    : { dot: 'bg-gray-400', cls: 'bg-gray-100 text-gray-600', label: s || 'unknown' };
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${cfg.cls}`}>
+    <span
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${cfg.cls}`}
+    >
       <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
       {cfg.label}
     </span>
@@ -51,9 +52,11 @@ function ProductStatusBadge({ status }: { status: string }) {
 function ProductTypeBadge({ type }: { type: string }) {
   const t = type?.toLowerCase();
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-      t === 'digital' ? 'bg-purple-50 text-purple-700' : 'bg-sky-50 text-sky-700'
-    }`}>
+    <span
+      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+        t === 'digital' ? 'bg-purple-50 text-purple-700' : 'bg-sky-50 text-sky-700'
+      }`}
+    >
       {t || 'physical'}
     </span>
   );
@@ -111,12 +114,12 @@ export function ProductsList() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const [search, setSearch]             = useState('');
-  const [page, setPage]                 = useState(1);
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
-  const [selectedIds, setSelectedIds]   = useState<Set<string>>(new Set());
-  const [showConfirm, setShowConfirm]   = useState(false);
-  const [isDeleting, setIsDeleting]     = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const limit = 10;
 
   // ── Fetch all products ──────────────────────────────────────────────────────
@@ -135,8 +138,10 @@ export function ProductsList() {
   // Stats — use API's statusCounts (server-side, excludes soft-deleted)
   // After DB migration: only 'published' (live) and 'draft' are the main statuses
   const stats = useMemo(() => ({
-    published: apiStatusCounts['published'] ?? allProducts.filter((p) => p.status?.toLowerCase() === 'published').length,
-    draft:     apiStatusCounts['draft']     ?? allProducts.filter((p) => p.status?.toLowerCase() === 'draft').length,
+    published: apiStatusCounts['published'] ??
+      allProducts.filter((p) => p.status?.toLowerCase() === 'published').length,
+    draft: apiStatusCounts['draft'] ??
+      allProducts.filter((p) => p.status?.toLowerCase() === 'draft').length,
   }), [apiStatusCounts, allProducts]);
 
   // ── Filters ─────────────────────────────────────────────────────────────────
@@ -179,7 +184,8 @@ export function ProductsList() {
   const toggleSelectOne = (id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   };
@@ -199,12 +205,19 @@ export function ProductsList() {
     }
   };
 
-  const handleSearchChange = (val: string) => { setSearch(val); setPage(1); setSelectedIds(new Set()); };
-  const handleFilterChange = (val: typeof statusFilter) => { setStatusFilter(val); setPage(1); setSelectedIds(new Set()); };
+  const handleSearchChange = (val: string) => {
+    setSearch(val);
+    setPage(1);
+    setSelectedIds(new Set());
+  };
+  const handleFilterChange = (val: typeof statusFilter) => {
+    setStatusFilter(val);
+    setPage(1);
+    setSelectedIds(new Set());
+  };
 
   return (
     <div className='space-y-5 p-4 px-6'>
-
       {/* Confirm dialog */}
       {showConfirm && (
         <ConfirmDialog
@@ -241,9 +254,13 @@ export function ProductsList() {
       <div className='grid grid-cols-3 gap-4'>
         {/* Published Live */}
         <div className='bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-center gap-4'>
-          <div className='text-emerald-600 opacity-70'><Globe className='w-5 h-5' /></div>
+          <div className='text-emerald-600 opacity-70'>
+            <Globe className='w-5 h-5' />
+          </div>
           <div className='min-w-0'>
-            <p className='text-xs font-medium text-gray-500 leading-tight'>Total Produk Published</p>
+            <p className='text-xs font-medium text-gray-500 leading-tight'>
+              Total Produk Published
+            </p>
             <p className='text-2xl font-bold text-emerald-700'>{stats.published}</p>
             <p className='text-[10px] text-gray-400 mt-0.5'>live — tampil di storefront</p>
           </div>
@@ -251,7 +268,9 @@ export function ProductsList() {
 
         {/* Draft */}
         <div className='bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-4'>
-          <div className='text-amber-600 opacity-70'><FileText className='w-5 h-5' /></div>
+          <div className='text-amber-600 opacity-70'>
+            <FileText className='w-5 h-5' />
+          </div>
           <div className='min-w-0'>
             <p className='text-xs font-medium text-gray-500 leading-tight'>Total Produk Draft</p>
             <p className='text-2xl font-bold text-amber-700'>{stats.draft}</p>
@@ -261,7 +280,9 @@ export function ProductsList() {
 
         {/* Total Keseluruhan */}
         <div className='bg-gray-50 border border-gray-200 rounded-xl p-4 flex items-center gap-4'>
-          <div className='text-gray-500 opacity-70'><Package className='w-5 h-5' /></div>
+          <div className='text-gray-500 opacity-70'>
+            <Package className='w-5 h-5' />
+          </div>
           <div className='min-w-0'>
             <p className='text-xs font-medium text-gray-500 leading-tight'>Total Semua Produk</p>
             <p className='text-2xl font-bold text-gray-700'>{totalAll}</p>
@@ -315,9 +336,11 @@ export function ProductsList() {
               onClick={() => handleFilterChange(s)}
               className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
                 statusFilter === s
-                  ? s === 'published' ? 'bg-emerald-600 text-white'
-                  : s === 'draft'     ? 'bg-amber-500 text-white'
-                  : 'bg-gray-900 text-white'
+                  ? s === 'published'
+                    ? 'bg-emerald-600 text-white'
+                    : s === 'draft'
+                    ? 'bg-amber-500 text-white'
+                    : 'bg-gray-900 text-white'
                   : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
               }`}
             >
@@ -337,13 +360,18 @@ export function ProductsList() {
                 <input
                   type='checkbox'
                   checked={allOnPageSelected}
-                  ref={(el) => { if (el) el.indeterminate = someOnPageSelected && !allOnPageSelected; }}
+                  ref={(el) => {
+                    if (el) el.indeterminate = someOnPageSelected && !allOnPageSelected;
+                  }}
                   onChange={toggleSelectAll}
                   className='w-4 h-4 rounded border-gray-300 text-gray-900 accent-gray-900 cursor-pointer'
                 />
               </th>
               {['Produk', 'Status', 'Tipe', 'Tanggal', 'Actions'].map((h) => (
-                <th key={h} className='px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider'>
+                <th
+                  key={h}
+                  className='px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider'
+                >
                   {h}
                 </th>
               ))}
@@ -353,12 +381,27 @@ export function ProductsList() {
             {isLoading
               ? Array.from({ length: 5 }).map((_, i) => (
                 <tr key={i} className='animate-pulse'>
-                  <td className='px-4 py-3.5'><div className='w-4 h-4 bg-gray-100 rounded' /></td>
-                  <td className='px-4 py-3.5'><div className='space-y-1'><div className='h-3.5 bg-gray-100 rounded w-36' /><div className='h-3 bg-gray-100 rounded w-48' /></div></td>
-                  <td className='px-4 py-3.5'><div className='h-5 bg-gray-100 rounded-full w-16' /></td>
-                  <td className='px-4 py-3.5'><div className='h-5 bg-gray-100 rounded w-14' /></td>
-                  <td className='px-4 py-3.5'><div className='h-4 bg-gray-100 rounded w-24' /></td>
-                  <td className='px-4 py-3.5'><div className='h-8 bg-gray-100 rounded w-16' /></td>
+                  <td className='px-4 py-3.5'>
+                    <div className='w-4 h-4 bg-gray-100 rounded' />
+                  </td>
+                  <td className='px-4 py-3.5'>
+                    <div className='space-y-1'>
+                      <div className='h-3.5 bg-gray-100 rounded w-36' />
+                      <div className='h-3 bg-gray-100 rounded w-48' />
+                    </div>
+                  </td>
+                  <td className='px-4 py-3.5'>
+                    <div className='h-5 bg-gray-100 rounded-full w-16' />
+                  </td>
+                  <td className='px-4 py-3.5'>
+                    <div className='h-5 bg-gray-100 rounded w-14' />
+                  </td>
+                  <td className='px-4 py-3.5'>
+                    <div className='h-4 bg-gray-100 rounded w-24' />
+                  </td>
+                  <td className='px-4 py-3.5'>
+                    <div className='h-8 bg-gray-100 rounded w-16' />
+                  </td>
                 </tr>
               ))
               : paginated.length === 0
@@ -368,7 +411,9 @@ export function ProductsList() {
                     <Package className='w-10 h-10 text-gray-300 mx-auto mb-3' />
                     <p className='text-sm font-medium text-gray-500'>Tidak ada produk ditemukan</p>
                     <p className='text-xs text-gray-400 mt-1'>
-                      {search ? 'Coba ubah kata kunci pencarian' : 'Mulai dengan membuat produk baru'}
+                      {search
+                        ? 'Coba ubah kata kunci pencarian'
+                        : 'Mulai dengan membuat produk baru'}
                     </p>
                     {!search && (
                       <button
@@ -388,7 +433,9 @@ export function ProductsList() {
                 return (
                   <tr
                     key={product.id}
-                    className={`transition-colors group ${isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
+                    className={`transition-colors group ${
+                      isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'
+                    }`}
                   >
                     {/* Checkbox */}
                     <td className='w-10 px-4 py-3.5'>
@@ -402,7 +449,9 @@ export function ProductsList() {
                     {/* Produk */}
                     <td className='px-4 py-3.5'>
                       <div className='min-w-0'>
-                        <p className='text-sm font-semibold text-gray-900 truncate'>{product.name}</p>
+                        <p className='text-sm font-semibold text-gray-900 truncate'>
+                          {product.name}
+                        </p>
                         <p className='text-xs text-gray-400 truncate'>{product.slug}</p>
                       </div>
                     </td>
@@ -447,7 +496,10 @@ export function ProductsList() {
           page={page}
           limit={limit}
           total={totalFiltered}
-          onPageChange={(p) => { setPage(p); setSelectedIds(new Set()); }}
+          onPageChange={(p) => {
+            setPage(p);
+            setSelectedIds(new Set());
+          }}
         />
       )}
     </div>

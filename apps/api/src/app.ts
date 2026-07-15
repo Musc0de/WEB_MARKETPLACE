@@ -120,7 +120,14 @@ app.use(
       if (allowedOrigins.includes(origin)) return origin;
       return null; // reject
     },
-    allowHeaders: ['X-Custom-Header', 'Upgrade-Insecure-Requests', 'Content-Type', 'Authorization', 'X-Cart-Token', 'X-Direct-Buy-Token'],
+    allowHeaders: [
+      'X-Custom-Header',
+      'Upgrade-Insecure-Requests',
+      'Content-Type',
+      'Authorization',
+      'X-Cart-Token',
+      'X-Direct-Buy-Token',
+    ],
     allowMethods: ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE', 'PATCH'],
     exposeHeaders: ['Content-Length', 'X-Request-Id'],
     maxAge: 600,

@@ -149,9 +149,7 @@ export const ProductCard = (
           disabled={isOutOfStock || isLoading}
           aria-label={isOutOfStock ? 'Stok habis' : 'Tambah ke Keranjang'}
         >
-          {isLoading
-            ? <Loader2 className='w-4 h-4 animate-spin' />
-            : cartSuccess
+          {isLoading ? <Loader2 className='w-4 h-4 animate-spin' /> : cartSuccess
             ? (
               <>
                 <CheckCircle className='w-4 h-4' />

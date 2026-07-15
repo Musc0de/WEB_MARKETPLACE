@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { ProductDetail, ProductVariant } from '@starsuperscare/contracts';
 import { Badge, Button, formatIndonesianSold, H1, H3, Text } from '@starsuperscare/ui';
 import { toast } from '@starsuperscare/ui';
-import { ShieldCheck, ShoppingCart, Star, Check, Loader2 } from 'lucide-react';
+import { Check, Loader2, ShieldCheck, ShoppingCart, Star } from 'lucide-react';
 import { WishlistButton } from '../../wishlist/components/WishlistButton.tsx';
 import { useCart } from '../../cart/api/useCart.ts';
 import { createDirectBuyCart } from '../../cart/api/createDirectBuyCart.ts';
@@ -126,7 +126,8 @@ export const ProductSummary = ({ product }: { product: ProductDetail }) => {
                     : 'border-gray-300 bg-white text-gray-700 hover:border-blue-400'
                 }`}
               >
-                {v.sku}{v.size ? ` - ${v.size}` : ''}
+                {v.sku}
+                {v.size ? ` - ${v.size}` : ''}
               </button>
             ))}
           </div>

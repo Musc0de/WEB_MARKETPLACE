@@ -4,8 +4,14 @@
 
 // ─── Avatar ─────────────────────────────────────────────────────────────────
 const AVATAR_COLORS = [
-  'bg-violet-500', 'bg-blue-500', 'bg-emerald-500',
-  'bg-orange-500', 'bg-pink-500', 'bg-cyan-500', 'bg-rose-500', 'bg-teal-500',
+  'bg-violet-500',
+  'bg-blue-500',
+  'bg-emerald-500',
+  'bg-orange-500',
+  'bg-pink-500',
+  'bg-cyan-500',
+  'bg-rose-500',
+  'bg-teal-500',
 ];
 
 export function getAvatarColor(name: string): string {
@@ -57,10 +63,12 @@ export function CustomerAvatar({
 }) {
   const initials = getInitials(firstName, lastName, email);
   const color = getAvatarColor(firstName || email || '');
-  const dim =
-    size === 'xl' ? 'w-16 h-16 text-xl'
-    : size === 'lg' ? 'w-12 h-12 text-base'
-    : size === 'md' ? 'w-9 h-9 text-sm'
+  const dim = size === 'xl'
+    ? 'w-16 h-16 text-xl'
+    : size === 'lg'
+    ? 'w-12 h-12 text-base'
+    : size === 'md'
+    ? 'w-9 h-9 text-sm'
     : 'w-7 h-7 text-xs';
   return (
     <div

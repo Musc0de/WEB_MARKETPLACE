@@ -15,14 +15,18 @@ const routes = app.post(
   async (c) => {
     const data = c.req.valid('json');
     const ext = data.filename.split('.').pop() || 'bin';
-    const rawFilename = data.filename.replace(`.${ext}`, '').replace(/[^a-zA-Z0-9]/g, '-').substring(0, 50);
+    const rawFilename = data.filename.replace(`.${ext}`, '').replace(/[^a-zA-Z0-9]/g, '-')
+      .substring(0, 50);
     const uniqueName = `${rawFilename}-${crypto.randomUUID().substring(0, 8)}.${ext}`;
-    
+
     let objectKey = `misc/${uniqueName}`;
 
     if (data.productName) {
       // Sanitize product name to be safe for URLs/S3 keys
-      const slug = data.productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const slug = data.productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(
+        /(^-|-$)/g,
+        '',
+      );
       objectKey = `${slug}/assets/img/${uniqueName}`;
     }
 

@@ -9,10 +9,10 @@ import {
   CheckCircle2,
   Loader2,
   Package,
+  Plus,
   RefreshCw,
   ShoppingCart,
   Timer,
-  Plus,
   Zap,
 } from 'lucide-react';
 
@@ -87,7 +87,9 @@ const STATUS_CFG: Record<string, string> = {
 function StatusPill({ status }: { status: string }) {
   const cls = STATUS_CFG[status] ?? 'bg-gray-100 text-gray-600';
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wide ${cls}`}>
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wide ${cls}`}
+    >
       {status.toUpperCase()}
     </span>
   );
@@ -131,7 +133,9 @@ function StatCard({ card }: { card: MetricCard }) {
         <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${card.iconBg}`}>
           <Icon className={`h-5 w-5 ${card.iconColor}`} aria-hidden />
         </span>
-        <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ${card.badgeClass}`}>
+        <span
+          className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ${card.badgeClass}`}
+        >
           {card.badge}
         </span>
       </div>
@@ -200,7 +204,9 @@ export function DashboardCards() {
     }
   }, []);
 
-  useEffect(() => { void fetchMetrics(); }, [fetchMetrics]);
+  useEffect(() => {
+    void fetchMetrics();
+  }, [fetchMetrics]);
 
   const cards: MetricCard[] = [
     {
@@ -264,8 +270,15 @@ export function DashboardCards() {
   if (isLoading) return <LoadingSkeleton />;
 
   const now = lastUpdated ?? new Date();
-  const timeStr = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' }).format(now);
-  const dateStr = new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
+  const timeStr = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' }).format(
+    now,
+  );
+  const dateStr = new Intl.DateTimeFormat('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date());
 
   return (
     <>
@@ -291,7 +304,9 @@ export function DashboardCards() {
             >
               Selamat datang kembali, Admin 👋
             </h1>
-            <p className='mt-1 text-sm text-gray-500'>Ringkasan kondisi operasional toko Anda — terakhir diperbarui pukul {timeStr}.</p>
+            <p className='mt-1 text-sm text-gray-500'>
+              Ringkasan kondisi operasional toko Anda — terakhir diperbarui pukul {timeStr}.
+            </p>
           </div>
 
           {/* Refresh */}
@@ -301,20 +316,29 @@ export function DashboardCards() {
             disabled={isRefreshing}
             className='inline-flex h-9 flex-shrink-0 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 hover:shadow disabled:opacity-60'
           >
-            {isRefreshing ? <Loader2 className='h-4 w-4 animate-spin' /> : <RefreshCw className='h-4 w-4' />}
+            {isRefreshing
+              ? <Loader2 className='h-4 w-4 animate-spin' />
+              : <RefreshCw className='h-4 w-4' />}
             Perbarui
           </button>
         </div>
 
         {/* ── Error banner ─────────────────────────────────────────────────── */}
         {error && (
-          <div role='alert' className='flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3.5 shadow-sm'>
+          <div
+            role='alert'
+            className='flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3.5 shadow-sm'
+          >
             <AlertCircle className='mt-0.5 h-5 w-5 shrink-0 text-red-500' />
             <div className='flex-1 min-w-0'>
               <p className='text-sm font-semibold text-red-800'>Gagal memuat dashboard</p>
               <p className='mt-0.5 text-sm text-red-600'>{error}</p>
             </div>
-            <button type='button' onClick={() => void fetchMetrics(true)} className='text-sm font-semibold text-red-700 hover:underline flex-shrink-0'>
+            <button
+              type='button'
+              onClick={() => void fetchMetrics(true)}
+              className='text-sm font-semibold text-red-700 hover:underline flex-shrink-0'
+            >
               Coba lagi
             </button>
           </div>
@@ -327,20 +351,27 @@ export function DashboardCards() {
 
         {/* ── Main content 2-col ───────────────────────────────────────────── */}
         <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
-
           {/* Left column */}
           <div className='lg:col-span-2 flex flex-col gap-6'>
-
             {/* Chart block */}
             <div className='rounded-2xl border border-gray-200 bg-white p-6 shadow-sm'>
               <div className='mb-5 flex items-start justify-between'>
                 <div>
                   <h2 className='text-base font-bold text-gray-900'>Ringkasan Penjualan</h2>
-                  <p className='text-xs text-gray-500 mt-0.5'>Performa 7 hari terakhir (ilustrasi)</p>
+                  <p className='text-xs text-gray-500 mt-0.5'>
+                    Performa 7 hari terakhir (ilustrasi)
+                  </p>
                 </div>
                 <div className='flex gap-1 rounded-lg bg-gray-100 p-1'>
                   {['7H', '30H', '90H'].map((l) => (
-                    <span key={l} className={`rounded-md px-2.5 py-1 text-xs font-semibold transition ${l === '7H' ? 'bg-white shadow text-gray-900' : 'text-gray-500'}`}>{l}</span>
+                    <span
+                      key={l}
+                      className={`rounded-md px-2.5 py-1 text-xs font-semibold transition ${
+                        l === '7H' ? 'bg-white shadow text-gray-900' : 'text-gray-500'
+                      }`}
+                    >
+                      {l}
+                    </span>
                   ))}
                 </div>
               </div>
@@ -361,7 +392,9 @@ export function DashboardCards() {
                       className='w-full rounded-t-lg bg-gradient-to-t from-blue-600 to-indigo-400 opacity-80 group-hover:opacity-100 transition-all duration-300'
                       style={{ height: `${h}%`, animationDelay: `${i * 60}ms` }}
                     />
-                    <span className='text-[9px] text-gray-400 font-medium'>{['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'][i]}</span>
+                    <span className='text-[9px] text-gray-400 font-medium'>
+                      {['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'][i]}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -389,48 +422,63 @@ export function DashboardCards() {
                   <thead>
                     <tr className='bg-gray-50/80'>
                       {['No. Pesanan', 'Pelanggan', 'Status', 'Total'].map((h, i) => (
-                        <th key={h} className={`px-5 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider ${i === 3 ? 'text-right' : ''}`}>
+                        <th
+                          key={h}
+                          className={`px-5 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider ${
+                            i === 3 ? 'text-right' : ''
+                          }`}
+                        >
                           {h}
                         </th>
                       ))}
                     </tr>
                   </thead>
                   <tbody className='divide-y divide-gray-50'>
-                    {recentOrders.length === 0 ? (
-                      <tr>
-                        <td colSpan={4} className='px-5 py-10 text-center text-sm text-gray-400'>
-                          Belum ada pesanan terbaru
-                        </td>
-                      </tr>
-                    ) : recentOrders.map((order, idx) => (
-                      <tr
-                        key={order.id}
-                        className='hover:bg-blue-50/30 transition-colors cursor-default'
-                        style={{ animationDelay: `${idx * 50}ms` }}
-                      >
-                        <td className='px-5 py-3.5'>
-                          <p className='text-sm font-semibold text-gray-900 font-mono'>{order.orderNumber ?? `#${order.id.slice(0, 8)}`}</p>
-                          <p className='text-[11px] text-gray-400'>{formatDate(order.createdAt)}</p>
-                        </td>
-                        <td className='px-5 py-3.5'>
-                          <div className='flex items-center gap-2.5'>
-                            <span className='flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 text-[11px] font-bold text-white'>
-                              {order.customerName ? order.customerName[0].toUpperCase() : 'G'}
-                            </span>
-                            <div>
-                              <p className='text-sm font-medium text-gray-800'>{order.customerName || 'Guest'}</p>
-                              <p className='text-[11px] text-gray-400 truncate max-w-[120px]'>{order.customerEmail || ''}</p>
+                    {recentOrders.length === 0
+                      ? (
+                        <tr>
+                          <td colSpan={4} className='px-5 py-10 text-center text-sm text-gray-400'>
+                            Belum ada pesanan terbaru
+                          </td>
+                        </tr>
+                      )
+                      : recentOrders.map((order, idx) => (
+                        <tr
+                          key={order.id}
+                          className='hover:bg-blue-50/30 transition-colors cursor-default'
+                          style={{ animationDelay: `${idx * 50}ms` }}
+                        >
+                          <td className='px-5 py-3.5'>
+                            <p className='text-sm font-semibold text-gray-900 font-mono'>
+                              {order.orderNumber ?? `#${order.id.slice(0, 8)}`}
+                            </p>
+                            <p className='text-[11px] text-gray-400'>
+                              {formatDate(order.createdAt)}
+                            </p>
+                          </td>
+                          <td className='px-5 py-3.5'>
+                            <div className='flex items-center gap-2.5'>
+                              <span className='flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 text-[11px] font-bold text-white'>
+                                {order.customerName ? order.customerName[0].toUpperCase() : 'G'}
+                              </span>
+                              <div>
+                                <p className='text-sm font-medium text-gray-800'>
+                                  {order.customerName || 'Guest'}
+                                </p>
+                                <p className='text-[11px] text-gray-400 truncate max-w-[120px]'>
+                                  {order.customerEmail || ''}
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className='px-5 py-3.5'>
-                          <StatusPill status={order.status} />
-                        </td>
-                        <td className='px-5 py-3.5 text-right text-sm font-bold text-gray-900'>
-                          {formatIDR(order.totalAmount)}
-                        </td>
-                      </tr>
-                    ))}
+                          </td>
+                          <td className='px-5 py-3.5'>
+                            <StatusPill status={order.status} />
+                          </td>
+                          <td className='px-5 py-3.5 text-right text-sm font-bold text-gray-900'>
+                            {formatIDR(order.totalAmount)}
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>
@@ -439,7 +487,6 @@ export function DashboardCards() {
 
           {/* Right column */}
           <div className='flex flex-col gap-6'>
-
             {/* Pipeline */}
             <div className='rounded-2xl border border-gray-200 bg-white p-6 shadow-sm'>
               <h2 className='text-base font-bold text-gray-900 mb-5'>Pipeline Operasional</h2>
@@ -448,12 +495,22 @@ export function DashboardCards() {
                 <div>
                   <div className='flex items-center justify-between text-sm mb-1.5'>
                     <span className='font-medium text-gray-700'>Perlu Dikirim</span>
-                    <span className='font-bold text-amber-600 tabular-nums'>{metrics.waitingToShip}</span>
+                    <span className='font-bold text-amber-600 tabular-nums'>
+                      {metrics.waitingToShip}
+                    </span>
                   </div>
                   <div className='h-2 w-full rounded-full bg-gray-100 overflow-hidden'>
                     <div
                       className='h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-700'
-                      style={{ width: `${Math.max(4, (metrics.waitingToShip / (metrics.totalSold + metrics.waitingToShip || 1)) * 100)}%` }}
+                      style={{
+                        width: `${
+                          Math.max(
+                            4,
+                            (metrics.waitingToShip /
+                              (metrics.totalSold + metrics.waitingToShip || 1)) * 100,
+                          )
+                        }%`,
+                      }}
                     />
                   </div>
                 </div>
@@ -461,7 +518,9 @@ export function DashboardCards() {
                 <div>
                   <div className='flex items-center justify-between text-sm mb-1.5'>
                     <span className='font-medium text-gray-700'>Menunggu Bayar</span>
-                    <span className='font-bold text-rose-600 tabular-nums'>{metrics.waitingPayment}</span>
+                    <span className='font-bold text-rose-600 tabular-nums'>
+                      {metrics.waitingPayment}
+                    </span>
                   </div>
                   <div className='h-2 w-full rounded-full bg-gray-100 overflow-hidden'>
                     <div
@@ -493,10 +552,34 @@ export function DashboardCards() {
               </div>
               <div className='grid grid-cols-2 gap-2.5'>
                 {[
-                  { label: 'Tambah Produk', icon: Plus, color: 'text-emerald-600', bg: 'bg-emerald-50 hover:bg-emerald-100', to: '/catalog' },
-                  { label: 'Update Stok', icon: RefreshCw, color: 'text-blue-600', bg: 'bg-blue-50 hover:bg-blue-100', to: '/inventory' },
-                  { label: 'Proses Order', icon: Package, color: 'text-amber-600', bg: 'bg-amber-50 hover:bg-amber-100', to: '/orders' },
-                  { label: 'Laporan', icon: BarChart3, color: 'text-purple-600', bg: 'bg-purple-50 hover:bg-purple-100', to: '/reports' },
+                  {
+                    label: 'Tambah Produk',
+                    icon: Plus,
+                    color: 'text-emerald-600',
+                    bg: 'bg-emerald-50 hover:bg-emerald-100',
+                    to: '/catalog',
+                  },
+                  {
+                    label: 'Update Stok',
+                    icon: RefreshCw,
+                    color: 'text-blue-600',
+                    bg: 'bg-blue-50 hover:bg-blue-100',
+                    to: '/inventory',
+                  },
+                  {
+                    label: 'Proses Order',
+                    icon: Package,
+                    color: 'text-amber-600',
+                    bg: 'bg-amber-50 hover:bg-amber-100',
+                    to: '/orders',
+                  },
+                  {
+                    label: 'Laporan',
+                    icon: BarChart3,
+                    color: 'text-purple-600',
+                    bg: 'bg-purple-50 hover:bg-purple-100',
+                    to: '/reports',
+                  },
                 ].map(({ label, icon: Icon, color, bg, to }) => (
                   <button
                     key={label}
@@ -515,30 +598,40 @@ export function DashboardCards() {
             <div className='rounded-2xl border border-gray-200 bg-white p-6 shadow-sm flex-1'>
               <h2 className='text-base font-bold text-gray-900 mb-4'>Aktivitas Terbaru</h2>
 
-              {recentActivities.length === 0 ? (
-                <p className='text-sm text-gray-400 text-center py-4'>Belum ada aktivitas</p>
-              ) : (
-                <div className='relative pl-5 space-y-5 before:absolute before:inset-y-0 before:left-1.5 before:w-px before:bg-gradient-to-b before:from-blue-200 before:via-gray-200 before:to-transparent'>
-                  {recentActivities.map((activity, i) => {
-                    const action = String(activity.action ?? '');
-                    const dotColor = action.includes('create') ? 'bg-emerald-500 ring-emerald-100'
-                      : action.includes('update') ? 'bg-blue-500 ring-blue-100'
-                      : action.includes('delete') ? 'bg-red-500 ring-red-100'
-                      : 'bg-gray-400 ring-gray-100';
-                    return (
-                      <div key={activity.id ?? i} className='dash-activity-row relative flex items-start gap-3'>
-                        <span className={`absolute -left-5 mt-0.5 flex h-3 w-3 rounded-full ring-4 ${dotColor} flex-shrink-0`} />
-                        <div className='min-w-0 pl-1'>
-                          <p className='text-sm font-semibold text-gray-800 capitalize leading-tight'>
-                            {action.replace(/_/g, ' ')} {activity.entityType}
-                          </p>
-                          <p className='text-[11px] text-gray-400 mt-0.5'>{formatDate(activity.createdAt)}</p>
+              {recentActivities.length === 0
+                ? <p className='text-sm text-gray-400 text-center py-4'>Belum ada aktivitas</p>
+                : (
+                  <div className='relative pl-5 space-y-5 before:absolute before:inset-y-0 before:left-1.5 before:w-px before:bg-gradient-to-b before:from-blue-200 before:via-gray-200 before:to-transparent'>
+                    {recentActivities.map((activity, i) => {
+                      const action = String(activity.action ?? '');
+                      const dotColor = action.includes('create')
+                        ? 'bg-emerald-500 ring-emerald-100'
+                        : action.includes('update')
+                        ? 'bg-blue-500 ring-blue-100'
+                        : action.includes('delete')
+                        ? 'bg-red-500 ring-red-100'
+                        : 'bg-gray-400 ring-gray-100';
+                      return (
+                        <div
+                          key={activity.id ?? i}
+                          className='dash-activity-row relative flex items-start gap-3'
+                        >
+                          <span
+                            className={`absolute -left-5 mt-0.5 flex h-3 w-3 rounded-full ring-4 ${dotColor} flex-shrink-0`}
+                          />
+                          <div className='min-w-0 pl-1'>
+                            <p className='text-sm font-semibold text-gray-800 capitalize leading-tight'>
+                              {action.replace(/_/g, ' ')} {activity.entityType}
+                            </p>
+                            <p className='text-[11px] text-gray-400 mt-0.5'>
+                              {formatDate(activity.createdAt)}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+                      );
+                    })}
+                  </div>
+                )}
             </div>
           </div>
         </div>

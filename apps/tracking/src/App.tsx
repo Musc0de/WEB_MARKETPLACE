@@ -7,7 +7,10 @@ import { PackageSearch } from 'lucide-react';
 import { useState } from 'react';
 
 const Fallback = ({ error }: { error: Error }) => (
-  <div role='alert' className='p-6 bg-red-50 text-red-900 rounded-lg max-w-xl mx-auto shadow-sm border border-red-100'>
+  <div
+    role='alert'
+    className='p-6 bg-red-50 text-red-900 rounded-lg max-w-xl mx-auto shadow-sm border border-red-100'
+  >
     <h1 className='font-bold text-lg mb-2'>Kesalahan Aplikasi</h1>
     <pre className='text-sm bg-red-100 p-3 rounded mb-4 overflow-auto'>{error.message}</pre>
     <button
@@ -28,10 +31,10 @@ const Home = () => {
     e.preventDefault();
     const cleanToken = token
       .split(/[\n,]+/)
-      .map(t => t.trim())
+      .map((t) => t.trim())
       .filter(Boolean)
       .join(',');
-    
+
     if (cleanToken) {
       navigate(`/track/${cleanToken}`);
     }
@@ -44,7 +47,8 @@ const Home = () => {
       </div>
       <h1 className='text-3xl font-bold text-gray-900 mb-4'>Lacak Paket Anda</h1>
       <p className='text-gray-500 mb-8 max-w-md mx-auto'>
-        Masukkan nomor pelacakan Anda untuk melihat status pengiriman paket secara real-time. Anda dapat melacak hingga 10 resi sekaligus (pisahkan dengan koma).
+        Masukkan nomor pelacakan Anda untuk melihat status pengiriman paket secara real-time. Anda
+        dapat melacak hingga 10 resi sekaligus (pisahkan dengan koma).
       </p>
 
       <form onSubmit={handleSearch} className='w-full max-w-lg mx-auto flex flex-col gap-3'>
@@ -66,7 +70,8 @@ const Home = () => {
         </div>
         <div className='text-left px-1 mt-1'>
           <span className='text-xs text-gray-400'>
-            * Gunakan baris baru (Enter) atau tanda koma (,) untuk memisahkan resi. Maksimal 10 resi.
+            * Gunakan baris baru (Enter) atau tanda koma (,) untuk memisahkan resi. Maksimal 10
+            resi.
           </span>
         </div>
       </form>
@@ -81,7 +86,7 @@ const NotFound = () => (
     <p className='text-gray-500 mb-8 max-w-md mx-auto'>
       Maaf, halaman yang Anda cari tidak ada atau telah dipindahkan.
     </p>
-    <a 
+    <a
       href='/'
       className='px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors'
     >

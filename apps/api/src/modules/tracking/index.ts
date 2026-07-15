@@ -87,7 +87,8 @@ app.get('/:token', async (c) => {
     console.warn('DB lookup for tracking failed, falling back to external API:', err.message);
   }
 
-  const externalApiUrl = process.env.EXTERNAL_TRACKING_API_URL || Deno.env.get('EXTERNAL_TRACKING_API_URL');
+  const externalApiUrl = process.env.EXTERNAL_TRACKING_API_URL ||
+    Deno.env.get('EXTERNAL_TRACKING_API_URL');
   let events: any[] = [];
 
   let externalEvents = false;
@@ -100,22 +101,24 @@ app.get('/:token', async (c) => {
         const apiData = await res.json();
         if (apiData.status === 200 && apiData.data?.valid) {
           const externalData = apiData.data.data;
-          
+
           if (!shipment) {
-             shipment = {
-               courier: externalData.expedisi || 'Unknown',
-               trackingNumber: trackingNo,
-               status: externalData.status ? externalData.status.toLowerCase().replace(/\s+/g, '_') : 'unknown',
-               estimatedDeliveryAt: null,
-             };
-             orderStatus = 'PENGIRIMAN_EKSTERNAL'; // Mock order status since it's external
+            shipment = {
+              courier: externalData.expedisi || 'Unknown',
+              trackingNumber: trackingNo,
+              status: externalData.status
+                ? externalData.status.toLowerCase().replace(/\s+/g, '_')
+                : 'unknown',
+              estimatedDeliveryAt: null,
+            };
+            orderStatus = 'PENGIRIMAN_EKSTERNAL'; // Mock order status since it's external
           } else {
-             if (externalData.status) {
-               shipment.status = externalData.status.toLowerCase().replace(/\s+/g, '_');
-             }
-             if (externalData.expedisi) {
-               shipment.courier = externalData.expedisi;
-             }
+            if (externalData.status) {
+              shipment.status = externalData.status.toLowerCase().replace(/\s+/g, '_');
+            }
+            if (externalData.expedisi) {
+              shipment.courier = externalData.expedisi;
+            }
           }
 
           if (externalData.perjalanan && Array.isArray(externalData.perjalanan)) {

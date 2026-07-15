@@ -25,11 +25,18 @@ function zodMessage(issues: any[]): string {
 }
 
 /** zValidator wrapper that returns a plain string error instead of a ZodError object */
-function validate<T extends import('zod').ZodTypeAny>(target: 'json' | 'form' | 'query' | 'param', schema: T) {
+function validate<T extends import('zod').ZodTypeAny>(
+  target: 'json' | 'form' | 'query' | 'param',
+  schema: T,
+) {
   return zValidator(target, schema, (result, c): Response | undefined => {
     if (!result.success) {
       return c.json(
-        { data: null, error: { code: 'VALIDATION_ERROR', message: zodMessage(result.error.issues) }, meta: {} },
+        {
+          data: null,
+          error: { code: 'VALIDATION_ERROR', message: zodMessage(result.error.issues) },
+          meta: {},
+        },
         400,
       ) as unknown as Response;
     }
@@ -64,7 +71,9 @@ function _sha256(data: string | Uint8Array): Promise<ArrayBuffer> {
   return crypto.subtle.digest('SHA-256', typeof data === 'string' ? _enc.encode(data) : data);
 }
 async function _hmac(key: ArrayBuffer | Uint8Array, data: string): Promise<ArrayBuffer> {
-  const k = await crypto.subtle.importKey('raw', key, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const k = await crypto.subtle.importKey('raw', key, { name: 'HMAC', hash: 'SHA-256' }, false, [
+    'sign',
+  ]);
   return crypto.subtle.sign('HMAC', k, _enc.encode(data));
 }
 function _hex(buf: ArrayBuffer): string {
@@ -94,9 +103,17 @@ async function buildSigV4Headers(
     ...extraHeaders,
   };
 
-  const canonicalHeaders = Object.entries(hdr).map(([k, v]) => `${k.toLowerCase()}:${v}`).sort().join('\n') + '\n';
+  const canonicalHeaders =
+    Object.entries(hdr).map(([k, v]) => `${k.toLowerCase()}:${v}`).sort().join('\n') + '\n';
   const signedHeaders = Object.keys(hdr).map((k) => k.toLowerCase()).sort().join(';');
-  const canonicalRequest = [method, `/${bucket}/${objectKey}`, '', canonicalHeaders, signedHeaders, 'UNSIGNED-PAYLOAD'].join('\n');
+  const canonicalRequest = [
+    method,
+    `/${bucket}/${objectKey}`,
+    '',
+    canonicalHeaders,
+    signedHeaders,
+    'UNSIGNED-PAYLOAD',
+  ].join('\n');
 
   const canonicalHash = _hex(await _sha256(canonicalRequest));
   const stringToSign = ['AWS4-HMAC-SHA256', timeStr, credentialScope, canonicalHash].join('\n');
@@ -109,7 +126,8 @@ async function buildSigV4Headers(
 
   return {
     ...hdr,
-    Authorization: `AWS4-HMAC-SHA256 Credential=${cfg.accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`,
+    Authorization:
+      `AWS4-HMAC-SHA256 Credential=${cfg.accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`,
   };
 }
 
@@ -127,7 +145,11 @@ function buildPublicUrl(objectKey: string): string {
 }
 
 /** Upload file to R2 with SigV4 PUT. Returns objectKey on success, throws on failure. */
-async function uploadToR2(fileBuffer: Uint8Array, contentType: string, fileName: string): Promise<string> {
+async function uploadToR2(
+  fileBuffer: Uint8Array,
+  contentType: string,
+  fileName: string,
+): Promise<string> {
   const cfg = getR2Config();
   const folderUUID = crypto.randomUUID();
   const safeFileName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
@@ -201,8 +223,12 @@ app.get('/images/*', async (c) => {
     const file = await Deno.open(filePath, { read: true });
     const ext = objectKey.split('.').pop()?.toLowerCase() ?? '';
     const mimeMap: Record<string, string> = {
-      jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png',
-      gif: 'image/gif', webp: 'image/webp', pdf: 'application/pdf',
+      jpg: 'image/jpeg',
+      jpeg: 'image/jpeg',
+      png: 'image/png',
+      gif: 'image/gif',
+      webp: 'image/webp',
+      pdf: 'application/pdf',
     };
     c.header('Content-Type', mimeMap[ext] ?? 'application/octet-stream');
     c.header('Cache-Control', 'public, max-age=86400');
@@ -277,8 +303,10 @@ app.get('/tickets/:id', async (c) => {
   const msgIds = messages.map((m) => m.id);
   const attachmentsList = msgIds.length > 0
     ? (await Promise.all(
-        msgIds.map((mid) => db.query.attachments.findMany({ where: eq(attachments.referenceId, mid) })),
-      )).flat()
+      msgIds.map((mid) =>
+        db.query.attachments.findMany({ where: eq(attachments.referenceId, mid) })
+      ),
+    )).flat()
     : [];
 
   const messagesWithAttachments = messages.map((msg) => ({
@@ -286,8 +314,8 @@ app.get('/tickets/:id', async (c) => {
     senderType: (msg.isInternal === 'admin' || msg.isInternal === 'true')
       ? 'admin'
       : msg.senderId !== ticket.userId
-        ? 'admin'
-        : 'user',
+      ? 'admin'
+      : 'user',
     attachments: attachmentsList
       .filter((a) => a.referenceId === msg.id)
       .map((a) => ({ ...a, publicUrl: buildPublicUrl(a.objectKey ?? '') })),
@@ -346,7 +374,13 @@ app.post('/tickets/:id/messages', validate('json', createMessageRequestSchema), 
 // ─── Upload Attachment ────────────────────────────────────────────────────────
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
+const ALLOWED_MIME_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'application/pdf',
+];
 
 app.post('/attachments', async (c) => {
   const user = c.get('user');
@@ -356,11 +390,16 @@ app.post('/attachments', async (c) => {
   if (!file) return c.json({ error: 'No file uploaded' }, 400);
 
   if (file.size > MAX_FILE_SIZE) {
-    return c.json({ error: `Ukuran file melebihi batas 10MB (${(file.size / 1024 / 1024).toFixed(1)}MB)` }, 400);
+    return c.json({
+      error: `Ukuran file melebihi batas 10MB (${(file.size / 1024 / 1024).toFixed(1)}MB)`,
+    }, 400);
   }
 
   if (!ALLOWED_MIME_TYPES.includes(file.type)) {
-    return c.json({ error: 'Tipe file tidak didukung. Gunakan JPG, PNG, GIF, WebP, atau PDF.' }, 400);
+    return c.json(
+      { error: 'Tipe file tidak didukung. Gunakan JPG, PNG, GIF, WebP, atau PDF.' },
+      400,
+    );
   }
 
   const arrayBuffer = await file.arrayBuffer();

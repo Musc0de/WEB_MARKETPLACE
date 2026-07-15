@@ -2,15 +2,15 @@ import { useState } from 'react';
 import useSWR from 'swr';
 import { client } from '../../lib/rpc.ts';
 import { toast } from '@starsuperscare/ui';
-import { CreditCard, Banknote, Loader2 } from 'lucide-react';
+import { Banknote, CreditCard, Loader2 } from 'lucide-react';
 import {
+  DataTable,
+  EmptyState,
+  FilterTabs,
   PageHeader,
   SearchBar,
   StatusPill,
-  DataTable,
   TableSkeleton,
-  EmptyState,
-  FilterTabs,
 } from '../../components/admin-ui.tsx';
 import { ToggleInputModal, useModalState } from '../../components/modal.tsx';
 import { formatDate, formatIDR } from '@starsuperscare/ui';
@@ -69,7 +69,10 @@ export const RefundsList = () => {
         mutate();
       } else {
         const err = await res.json();
-        toast.error(err.error || 'Gagal memproses refund');
+        const errMsg = typeof err.error === 'string'
+          ? err.error
+          : err.error?.message ?? 'Gagal memproses refund';
+        toast.error(errMsg);
       }
     } catch {
       toast.error('Kesalahan jaringan, coba lagi');
@@ -79,8 +82,7 @@ export const RefundsList = () => {
   };
 
   const filtered = refunds?.filter((r: any) => {
-    const matchSearch =
-      !search ||
+    const matchSearch = !search ||
       r.id.toLowerCase().includes(search.toLowerCase()) ||
       r.orderId?.toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter === 'all' || r.status === statusFilter;
@@ -116,66 +118,78 @@ export const RefundsList = () => {
         headers={TABLE_HEADERS}
         summary={`${filtered?.length ?? 0} refund ditemukan`}
       >
-        {isLoading ? (
-          <TableSkeleton cols={7} />
-        ) : !filtered?.length ? (
-          <tr>
-            <td colSpan={7}>
-              <EmptyState
-                icon={CreditCard}
-                title='Tidak ada data refund'
-                description='Semua proses pengembalian dana akan ditampilkan di sini.'
-              />
-            </td>
-          </tr>
-        ) : (
-          filtered.map((refund: any) => (
-            <tr key={refund.id} className='hover:bg-amber-50/20 transition-colors'>
-              <td className='px-5 py-3.5'>
-                <span className='font-mono text-sm font-semibold text-amber-600'>
-                  {refund.id.slice(0, 8)}…
-                </span>
-              </td>
-              <td className='px-5 py-3.5'>
-                <p className='text-sm font-medium text-gray-700'>
-                  Order: <span className='font-mono text-xs text-gray-500'>{refund.orderId?.slice(0, 8)}…</span>
-                </p>
-                {refund.returnId && (
-                  <p className='text-xs text-gray-400'>
-                    Retur: <span className='font-mono'>{refund.returnId?.slice(0, 8)}…</span>
-                  </p>
-                )}
-              </td>
-              <td className='px-5 py-3.5'>
-                <span className='text-sm font-bold text-gray-900'>{formatIDR(refund.amount ?? 0)}</span>
-              </td>
-              <td className='px-5 py-3.5'>
-                <span className='text-xs font-mono text-gray-400'>{refund.providerReference || '—'}</span>
-              </td>
-              <td className='px-5 py-3.5'>
-                <StatusPill status={refund.status} />
-              </td>
-              <td className='px-5 py-3.5 text-sm text-gray-400'>{formatDate(refund.createdAt)}</td>
-              <td className='px-5 py-3.5'>
-                {refund.status === 'pending' ? (
-                  <button
-                    type='button'
-                    disabled={processing === refund.id}
-                    onClick={() => { setActiveRefundId(refund.id); processModal.show(); }}
-                    className='inline-flex items-center gap-1.5 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-amber-500 transition disabled:opacity-60'
-                  >
-                    {processing === refund.id
-                      ? <Loader2 className='h-3 w-3 animate-spin' />
-                      : <CreditCard className='h-3 w-3' />}
-                    Proses
-                  </button>
-                ) : (
-                  <span className='text-xs text-gray-400'>—</span>
-                )}
+        {isLoading ? <TableSkeleton cols={7} /> : !filtered?.length
+          ? (
+            <tr>
+              <td colSpan={7}>
+                <EmptyState
+                  icon={CreditCard}
+                  title='Tidak ada data refund'
+                  description='Semua proses pengembalian dana akan ditampilkan di sini.'
+                />
               </td>
             </tr>
-          ))
-        )}
+          )
+          : (
+            filtered.map((refund: any) => (
+              <tr key={refund.id} className='hover:bg-amber-50/20 transition-colors'>
+                <td className='px-5 py-3.5'>
+                  <span className='font-mono text-sm font-semibold text-amber-600'>
+                    {refund.id.slice(0, 8)}…
+                  </span>
+                </td>
+                <td className='px-5 py-3.5'>
+                  <p className='text-sm font-medium text-gray-700'>
+                    Order:{' '}
+                    <span className='font-mono text-xs text-gray-500'>
+                      {refund.orderId?.slice(0, 8)}…
+                    </span>
+                  </p>
+                  {refund.returnId && (
+                    <p className='text-xs text-gray-400'>
+                      Retur: <span className='font-mono'>{refund.returnId?.slice(0, 8)}…</span>
+                    </p>
+                  )}
+                </td>
+                <td className='px-5 py-3.5'>
+                  <span className='text-sm font-bold text-gray-900'>
+                    {formatIDR(refund.amount ?? 0)}
+                  </span>
+                </td>
+                <td className='px-5 py-3.5'>
+                  <span className='text-xs font-mono text-gray-400'>
+                    {refund.providerReference || '—'}
+                  </span>
+                </td>
+                <td className='px-5 py-3.5'>
+                  <StatusPill status={refund.status} />
+                </td>
+                <td className='px-5 py-3.5 text-sm text-gray-400'>
+                  {formatDate(refund.createdAt)}
+                </td>
+                <td className='px-5 py-3.5'>
+                  {refund.status === 'pending'
+                    ? (
+                      <button
+                        type='button'
+                        disabled={processing === refund.id}
+                        onClick={() => {
+                          setActiveRefundId(refund.id);
+                          processModal.show();
+                        }}
+                        className='inline-flex items-center gap-1.5 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-amber-500 transition disabled:opacity-60'
+                      >
+                        {processing === refund.id
+                          ? <Loader2 className='h-3 w-3 animate-spin' />
+                          : <CreditCard className='h-3 w-3' />}
+                        Proses
+                      </button>
+                    )
+                    : <span className='text-xs text-gray-400'>—</span>}
+                </td>
+              </tr>
+            ))
+          )}
       </DataTable>
 
       {/* ── Process Refund Modal ── */}

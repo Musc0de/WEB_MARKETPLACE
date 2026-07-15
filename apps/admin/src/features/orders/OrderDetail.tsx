@@ -292,62 +292,65 @@ export function OrderDetail() {
           {/* Customer */}
           <SectionCard title='Customer' icon={<User className='w-4 h-4' />}>
             {/* Name with avatar */}
-            {ship?.fullName ? (
-              <div className='flex items-center gap-3 mb-4'>
-                <div className='w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0'>
-                  <span className='text-sm font-bold text-violet-600'>
-                    {ship.fullName.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase()}
-                  </span>
+            {ship?.fullName
+              ? (
+                <div className='flex items-center gap-3 mb-4'>
+                  <div className='w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0'>
+                    <span className='text-sm font-bold text-violet-600'>
+                      {ship.fullName.split(' ').map((n: string) => n[0]).slice(0, 2).join('')
+                        .toUpperCase()}
+                    </span>
+                  </div>
+                  <div>
+                    <p className='text-sm font-semibold text-gray-900'>{ship.fullName}</p>
+                    {order.userId && (
+                      <Link
+                        to={`/customers/${order.userId}`}
+                        className='text-xs text-blue-600 hover:underline flex items-center gap-1 mt-0.5'
+                      >
+                        <ExternalLink className='w-3 h-3' />
+                        Lihat Profil
+                      </Link>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <p className='text-sm font-semibold text-gray-900'>{ship.fullName}</p>
-                  {order.userId && (
-                    <Link
-                      to={`/customers/${order.userId}`}
-                      className='text-xs text-blue-600 hover:underline flex items-center gap-1 mt-0.5'
-                    >
-                      <ExternalLink className='w-3 h-3' />
-                      Lihat Profil
-                    </Link>
-                  )}
+              )
+              : (
+                <div className='flex items-center gap-3 mb-4'>
+                  <div className='w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0'>
+                    <User className='w-5 h-5 text-gray-400' />
+                  </div>
+                  <p className='text-sm font-medium text-gray-500 italic'>Guest</p>
                 </div>
-              </div>
-            ) : (
-              <div className='flex items-center gap-3 mb-4'>
-                <div className='w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0'>
-                  <User className='w-5 h-5 text-gray-400' />
-                </div>
-                <p className='text-sm font-medium text-gray-500 italic'>Guest</p>
-              </div>
-            )}
+              )}
 
             {/* Shipping address + phone */}
-            {ship ? (
-              <div className='bg-gray-50 rounded-lg p-3 border border-gray-100'>
-                <div className='flex items-center gap-1.5 mb-2'>
-                  <MapPin className='w-3.5 h-3.5 text-gray-400' />
-                  <span className='text-xs font-semibold text-gray-500 uppercase tracking-wide'>
-                    Alamat Pengiriman
-                  </span>
-                </div>
-                <div className='text-sm text-gray-700 leading-relaxed space-y-0.5'>
-                  {ship.streetAddress && <p>{ship.streetAddress}</p>}
-                  <p>{[ship.city, ship.province, ship.postalCode].filter(Boolean).join(', ')}</p>
-                  {ship.country && <p>{ship.country}</p>}
-                  {ship.notes && (
-                    <p className='text-xs text-gray-400 italic mt-1'>Catatan: {ship.notes}</p>
+            {ship
+              ? (
+                <div className='bg-gray-50 rounded-lg p-3 border border-gray-100'>
+                  <div className='flex items-center gap-1.5 mb-2'>
+                    <MapPin className='w-3.5 h-3.5 text-gray-400' />
+                    <span className='text-xs font-semibold text-gray-500 uppercase tracking-wide'>
+                      Alamat Pengiriman
+                    </span>
+                  </div>
+                  <div className='text-sm text-gray-700 leading-relaxed space-y-0.5'>
+                    {ship.streetAddress && <p>{ship.streetAddress}</p>}
+                    <p>{[ship.city, ship.province, ship.postalCode].filter(Boolean).join(', ')}</p>
+                    {ship.country && <p>{ship.country}</p>}
+                    {ship.notes && (
+                      <p className='text-xs text-gray-400 italic mt-1'>Catatan: {ship.notes}</p>
+                    )}
+                  </div>
+                  {ship.phoneNumber && (
+                    <div className='mt-2 pt-2 border-t border-gray-200 flex items-center gap-1.5 text-sm text-gray-700'>
+                      <Phone className='w-3.5 h-3.5 text-gray-400 flex-shrink-0' />
+                      <span className='font-medium'>{ship.phoneNumber}</span>
+                    </div>
                   )}
                 </div>
-                {ship.phoneNumber && (
-                  <div className='mt-2 pt-2 border-t border-gray-200 flex items-center gap-1.5 text-sm text-gray-700'>
-                    <Phone className='w-3.5 h-3.5 text-gray-400 flex-shrink-0' />
-                    <span className='font-medium'>{ship.phoneNumber}</span>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <p className='text-sm text-gray-400 italic'>Tidak ada alamat pengiriman</p>
-            )}
+              )
+              : <p className='text-sm text-gray-400 italic'>Tidak ada alamat pengiriman</p>}
           </SectionCard>
 
           {/* Actions */}

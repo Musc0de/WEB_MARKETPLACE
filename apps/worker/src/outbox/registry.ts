@@ -26,7 +26,11 @@ export class HandlerRegistry {
 export const defaultRegistry = new HandlerRegistry();
 
 import { handleOrderPaid } from '../handlers/invoice.ts';
-import { handleEmailSend, handleEmailVerificationRequested, handlePasswordResetRequested } from '../handlers/email.ts';
+import {
+  handleEmailSend,
+  handleEmailVerificationRequested,
+  handlePasswordResetRequested,
+} from '../handlers/email.ts';
 import { handleProvisionAccount } from '../jobs/provision-account.ts';
 import { handleNotificationCreate } from '../jobs/notifications.ts';
 

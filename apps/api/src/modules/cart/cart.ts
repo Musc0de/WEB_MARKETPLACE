@@ -63,7 +63,7 @@ export async function resolveActiveCart(c: any, createIfMissing = false, isDirec
       .from(carts)
       .where(and(
         eq(carts.guestTokenHash, digest),
-        eq(carts.status, 'active')
+        eq(carts.status, 'active'),
       ))
       .limit(1);
 

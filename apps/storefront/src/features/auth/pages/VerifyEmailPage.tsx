@@ -79,7 +79,7 @@ export function VerifyEmailPage() {
             setStatus('success');
             toast.success('Email Anda berhasil diverifikasi. Tunggu sebentar...');
           }
-          
+
           setTimeout(async () => {
             try {
               const meRes = await client.v1.auth.me.$get();

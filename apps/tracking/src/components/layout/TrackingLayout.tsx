@@ -23,7 +23,7 @@ export const TrackingLayout: React.FC<{ children: React.ReactNode }> = ({ childr
   if (!storefrontUrl) {
     throw new Error('VITE_STOREFRONT_URL environment variable is missing.');
   }
-  
+
   if (!dashboardUrl) {
     throw new Error('VITE_DASHBOARD_URL environment variable is missing.');
   }
