@@ -1,14 +1,14 @@
 import {
   require_jsx_runtime
-} from "./chunk-HIGNLTFM.js";
+} from "./chunk-JVJ5NBPZ.js";
 import {
-  require_react
-} from "./chunk-BX5ISVL4.js";
+  require_react_dom
+} from "./chunk-ZXNCFGEL.js";
 import {
   __commonJS,
-  __export,
-  __toESM
-} from "./chunk-DC5AMYBS.js";
+  __toESM,
+  require_react
+} from "./chunk-56ZPLTIM.js";
 
 // optional-peer-dep:__vite-optional-peer-dep:@emotion/is-prop-valid:framer-motion
 var require_is_prop_valid_framer_motion = __commonJS({
@@ -17,18 +17,1105 @@ var require_is_prop_valid_framer_motion = __commonJS({
   }
 });
 
+// ../../node_modules/.deno/goey-toast@0.5.0/node_modules/goey-toast/dist/index.js
+var import_react49 = __toESM(require_react());
+
+// ../../node_modules/.deno/sonner@2.0.7/node_modules/sonner/dist/index.mjs
+var import_react = __toESM(require_react(), 1);
+var import_react_dom = __toESM(require_react_dom(), 1);
+function __insertCSS(code) {
+  if (!code || typeof document == "undefined") return;
+  let head = document.head || document.getElementsByTagName("head")[0];
+  let style = document.createElement("style");
+  style.type = "text/css";
+  head.appendChild(style);
+  style.styleSheet ? style.styleSheet.cssText = code : style.appendChild(document.createTextNode(code));
+}
+var getAsset = (type) => {
+  switch (type) {
+    case "success":
+      return SuccessIcon;
+    case "info":
+      return InfoIcon;
+    case "warning":
+      return WarningIcon;
+    case "error":
+      return ErrorIcon;
+    default:
+      return null;
+  }
+};
+var bars = Array(12).fill(0);
+var Loader = ({ visible, className }) => {
+  return import_react.default.createElement("div", {
+    className: [
+      "sonner-loading-wrapper",
+      className
+    ].filter(Boolean).join(" "),
+    "data-visible": visible
+  }, import_react.default.createElement("div", {
+    className: "sonner-spinner"
+  }, bars.map((_, i) => import_react.default.createElement("div", {
+    className: "sonner-loading-bar",
+    key: `spinner-bar-${i}`
+  }))));
+};
+var SuccessIcon = import_react.default.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  viewBox: "0 0 20 20",
+  fill: "currentColor",
+  height: "20",
+  width: "20"
+}, import_react.default.createElement("path", {
+  fillRule: "evenodd",
+  d: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z",
+  clipRule: "evenodd"
+}));
+var WarningIcon = import_react.default.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  viewBox: "0 0 24 24",
+  fill: "currentColor",
+  height: "20",
+  width: "20"
+}, import_react.default.createElement("path", {
+  fillRule: "evenodd",
+  d: "M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z",
+  clipRule: "evenodd"
+}));
+var InfoIcon = import_react.default.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  viewBox: "0 0 20 20",
+  fill: "currentColor",
+  height: "20",
+  width: "20"
+}, import_react.default.createElement("path", {
+  fillRule: "evenodd",
+  d: "M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z",
+  clipRule: "evenodd"
+}));
+var ErrorIcon = import_react.default.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  viewBox: "0 0 20 20",
+  fill: "currentColor",
+  height: "20",
+  width: "20"
+}, import_react.default.createElement("path", {
+  fillRule: "evenodd",
+  d: "M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z",
+  clipRule: "evenodd"
+}));
+var CloseIcon = import_react.default.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "12",
+  height: "12",
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: "1.5",
+  strokeLinecap: "round",
+  strokeLinejoin: "round"
+}, import_react.default.createElement("line", {
+  x1: "18",
+  y1: "6",
+  x2: "6",
+  y2: "18"
+}), import_react.default.createElement("line", {
+  x1: "6",
+  y1: "6",
+  x2: "18",
+  y2: "18"
+}));
+var useIsDocumentHidden = () => {
+  const [isDocumentHidden, setIsDocumentHidden] = import_react.default.useState(document.hidden);
+  import_react.default.useEffect(() => {
+    const callback = () => {
+      setIsDocumentHidden(document.hidden);
+    };
+    document.addEventListener("visibilitychange", callback);
+    return () => window.removeEventListener("visibilitychange", callback);
+  }, []);
+  return isDocumentHidden;
+};
+var toastsCounter = 1;
+var Observer = class {
+  constructor() {
+    this.subscribe = (subscriber) => {
+      this.subscribers.push(subscriber);
+      return () => {
+        const index = this.subscribers.indexOf(subscriber);
+        this.subscribers.splice(index, 1);
+      };
+    };
+    this.publish = (data) => {
+      this.subscribers.forEach((subscriber) => subscriber(data));
+    };
+    this.addToast = (data) => {
+      this.publish(data);
+      this.toasts = [
+        ...this.toasts,
+        data
+      ];
+    };
+    this.create = (data) => {
+      var _data_id;
+      const { message, ...rest } = data;
+      const id3 = typeof (data == null ? void 0 : data.id) === "number" || ((_data_id = data.id) == null ? void 0 : _data_id.length) > 0 ? data.id : toastsCounter++;
+      const alreadyExists = this.toasts.find((toast2) => {
+        return toast2.id === id3;
+      });
+      const dismissible = data.dismissible === void 0 ? true : data.dismissible;
+      if (this.dismissedToasts.has(id3)) {
+        this.dismissedToasts.delete(id3);
+      }
+      if (alreadyExists) {
+        this.toasts = this.toasts.map((toast2) => {
+          if (toast2.id === id3) {
+            this.publish({
+              ...toast2,
+              ...data,
+              id: id3,
+              title: message
+            });
+            return {
+              ...toast2,
+              ...data,
+              id: id3,
+              dismissible,
+              title: message
+            };
+          }
+          return toast2;
+        });
+      } else {
+        this.addToast({
+          title: message,
+          ...rest,
+          dismissible,
+          id: id3
+        });
+      }
+      return id3;
+    };
+    this.dismiss = (id3) => {
+      if (id3) {
+        this.dismissedToasts.add(id3);
+        requestAnimationFrame(() => this.subscribers.forEach((subscriber) => subscriber({
+          id: id3,
+          dismiss: true
+        })));
+      } else {
+        this.toasts.forEach((toast2) => {
+          this.subscribers.forEach((subscriber) => subscriber({
+            id: toast2.id,
+            dismiss: true
+          }));
+        });
+      }
+      return id3;
+    };
+    this.message = (message, data) => {
+      return this.create({
+        ...data,
+        message
+      });
+    };
+    this.error = (message, data) => {
+      return this.create({
+        ...data,
+        message,
+        type: "error"
+      });
+    };
+    this.success = (message, data) => {
+      return this.create({
+        ...data,
+        type: "success",
+        message
+      });
+    };
+    this.info = (message, data) => {
+      return this.create({
+        ...data,
+        type: "info",
+        message
+      });
+    };
+    this.warning = (message, data) => {
+      return this.create({
+        ...data,
+        type: "warning",
+        message
+      });
+    };
+    this.loading = (message, data) => {
+      return this.create({
+        ...data,
+        type: "loading",
+        message
+      });
+    };
+    this.promise = (promise, data) => {
+      if (!data) {
+        return;
+      }
+      let id3 = void 0;
+      if (data.loading !== void 0) {
+        id3 = this.create({
+          ...data,
+          promise,
+          type: "loading",
+          message: data.loading,
+          description: typeof data.description !== "function" ? data.description : void 0
+        });
+      }
+      const p = Promise.resolve(promise instanceof Function ? promise() : promise);
+      let shouldDismiss = id3 !== void 0;
+      let result;
+      const originalPromise = p.then(async (response) => {
+        result = [
+          "resolve",
+          response
+        ];
+        const isReactElementResponse = import_react.default.isValidElement(response);
+        if (isReactElementResponse) {
+          shouldDismiss = false;
+          this.create({
+            id: id3,
+            type: "default",
+            message: response
+          });
+        } else if (isHttpResponse(response) && !response.ok) {
+          shouldDismiss = false;
+          const promiseData = typeof data.error === "function" ? await data.error(`HTTP error! status: ${response.status}`) : data.error;
+          const description = typeof data.description === "function" ? await data.description(`HTTP error! status: ${response.status}`) : data.description;
+          const isExtendedResult = typeof promiseData === "object" && !import_react.default.isValidElement(promiseData);
+          const toastSettings = isExtendedResult ? promiseData : {
+            message: promiseData
+          };
+          this.create({
+            id: id3,
+            type: "error",
+            description,
+            ...toastSettings
+          });
+        } else if (response instanceof Error) {
+          shouldDismiss = false;
+          const promiseData = typeof data.error === "function" ? await data.error(response) : data.error;
+          const description = typeof data.description === "function" ? await data.description(response) : data.description;
+          const isExtendedResult = typeof promiseData === "object" && !import_react.default.isValidElement(promiseData);
+          const toastSettings = isExtendedResult ? promiseData : {
+            message: promiseData
+          };
+          this.create({
+            id: id3,
+            type: "error",
+            description,
+            ...toastSettings
+          });
+        } else if (data.success !== void 0) {
+          shouldDismiss = false;
+          const promiseData = typeof data.success === "function" ? await data.success(response) : data.success;
+          const description = typeof data.description === "function" ? await data.description(response) : data.description;
+          const isExtendedResult = typeof promiseData === "object" && !import_react.default.isValidElement(promiseData);
+          const toastSettings = isExtendedResult ? promiseData : {
+            message: promiseData
+          };
+          this.create({
+            id: id3,
+            type: "success",
+            description,
+            ...toastSettings
+          });
+        }
+      }).catch(async (error) => {
+        result = [
+          "reject",
+          error
+        ];
+        if (data.error !== void 0) {
+          shouldDismiss = false;
+          const promiseData = typeof data.error === "function" ? await data.error(error) : data.error;
+          const description = typeof data.description === "function" ? await data.description(error) : data.description;
+          const isExtendedResult = typeof promiseData === "object" && !import_react.default.isValidElement(promiseData);
+          const toastSettings = isExtendedResult ? promiseData : {
+            message: promiseData
+          };
+          this.create({
+            id: id3,
+            type: "error",
+            description,
+            ...toastSettings
+          });
+        }
+      }).finally(() => {
+        if (shouldDismiss) {
+          this.dismiss(id3);
+          id3 = void 0;
+        }
+        data.finally == null ? void 0 : data.finally.call(data);
+      });
+      const unwrap = () => new Promise((resolve, reject) => originalPromise.then(() => result[0] === "reject" ? reject(result[1]) : resolve(result[1])).catch(reject));
+      if (typeof id3 !== "string" && typeof id3 !== "number") {
+        return {
+          unwrap
+        };
+      } else {
+        return Object.assign(id3, {
+          unwrap
+        });
+      }
+    };
+    this.custom = (jsx13, data) => {
+      const id3 = (data == null ? void 0 : data.id) || toastsCounter++;
+      this.create({
+        jsx: jsx13(id3),
+        id: id3,
+        ...data
+      });
+      return id3;
+    };
+    this.getActiveToasts = () => {
+      return this.toasts.filter((toast2) => !this.dismissedToasts.has(toast2.id));
+    };
+    this.subscribers = [];
+    this.toasts = [];
+    this.dismissedToasts = /* @__PURE__ */ new Set();
+  }
+};
+var ToastState = new Observer();
+var toastFunction = (message, data) => {
+  const id3 = (data == null ? void 0 : data.id) || toastsCounter++;
+  ToastState.addToast({
+    title: message,
+    ...data,
+    id: id3
+  });
+  return id3;
+};
+var isHttpResponse = (data) => {
+  return data && typeof data === "object" && "ok" in data && typeof data.ok === "boolean" && "status" in data && typeof data.status === "number";
+};
+var basicToast = toastFunction;
+var getHistory = () => ToastState.toasts;
+var getToasts = () => ToastState.getActiveToasts();
+var toast = Object.assign(basicToast, {
+  success: ToastState.success,
+  info: ToastState.info,
+  warning: ToastState.warning,
+  error: ToastState.error,
+  custom: ToastState.custom,
+  message: ToastState.message,
+  promise: ToastState.promise,
+  dismiss: ToastState.dismiss,
+  loading: ToastState.loading
+}, {
+  getHistory,
+  getToasts
+});
+__insertCSS("[data-sonner-toaster][dir=ltr],html[dir=ltr]{--toast-icon-margin-start:-3px;--toast-icon-margin-end:4px;--toast-svg-margin-start:-1px;--toast-svg-margin-end:0px;--toast-button-margin-start:auto;--toast-button-margin-end:0;--toast-close-button-start:0;--toast-close-button-end:unset;--toast-close-button-transform:translate(-35%, -35%)}[data-sonner-toaster][dir=rtl],html[dir=rtl]{--toast-icon-margin-start:4px;--toast-icon-margin-end:-3px;--toast-svg-margin-start:0px;--toast-svg-margin-end:-1px;--toast-button-margin-start:0;--toast-button-margin-end:auto;--toast-close-button-start:unset;--toast-close-button-end:0;--toast-close-button-transform:translate(35%, -35%)}[data-sonner-toaster]{position:fixed;width:var(--width);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;--gray1:hsl(0, 0%, 99%);--gray2:hsl(0, 0%, 97.3%);--gray3:hsl(0, 0%, 95.1%);--gray4:hsl(0, 0%, 93%);--gray5:hsl(0, 0%, 90.9%);--gray6:hsl(0, 0%, 88.7%);--gray7:hsl(0, 0%, 85.8%);--gray8:hsl(0, 0%, 78%);--gray9:hsl(0, 0%, 56.1%);--gray10:hsl(0, 0%, 52.3%);--gray11:hsl(0, 0%, 43.5%);--gray12:hsl(0, 0%, 9%);--border-radius:8px;box-sizing:border-box;padding:0;margin:0;list-style:none;outline:0;z-index:999999999;transition:transform .4s ease}@media (hover:none) and (pointer:coarse){[data-sonner-toaster][data-lifted=true]{transform:none}}[data-sonner-toaster][data-x-position=right]{right:var(--offset-right)}[data-sonner-toaster][data-x-position=left]{left:var(--offset-left)}[data-sonner-toaster][data-x-position=center]{left:50%;transform:translateX(-50%)}[data-sonner-toaster][data-y-position=top]{top:var(--offset-top)}[data-sonner-toaster][data-y-position=bottom]{bottom:var(--offset-bottom)}[data-sonner-toast]{--y:translateY(100%);--lift-amount:calc(var(--lift) * var(--gap));z-index:var(--z-index);position:absolute;opacity:0;transform:var(--y);touch-action:none;transition:transform .4s,opacity .4s,height .4s,box-shadow .2s;box-sizing:border-box;outline:0;overflow-wrap:anywhere}[data-sonner-toast][data-styled=true]{padding:16px;background:var(--normal-bg);border:1px solid var(--normal-border);color:var(--normal-text);border-radius:var(--border-radius);box-shadow:0 4px 12px rgba(0,0,0,.1);width:var(--width);font-size:13px;display:flex;align-items:center;gap:6px}[data-sonner-toast]:focus-visible{box-shadow:0 4px 12px rgba(0,0,0,.1),0 0 0 2px rgba(0,0,0,.2)}[data-sonner-toast][data-y-position=top]{top:0;--y:translateY(-100%);--lift:1;--lift-amount:calc(1 * var(--gap))}[data-sonner-toast][data-y-position=bottom]{bottom:0;--y:translateY(100%);--lift:-1;--lift-amount:calc(var(--lift) * var(--gap))}[data-sonner-toast][data-styled=true] [data-description]{font-weight:400;line-height:1.4;color:#3f3f3f}[data-rich-colors=true][data-sonner-toast][data-styled=true] [data-description]{color:inherit}[data-sonner-toaster][data-sonner-theme=dark] [data-description]{color:#e8e8e8}[data-sonner-toast][data-styled=true] [data-title]{font-weight:500;line-height:1.5;color:inherit}[data-sonner-toast][data-styled=true] [data-icon]{display:flex;height:16px;width:16px;position:relative;justify-content:flex-start;align-items:center;flex-shrink:0;margin-left:var(--toast-icon-margin-start);margin-right:var(--toast-icon-margin-end)}[data-sonner-toast][data-promise=true] [data-icon]>svg{opacity:0;transform:scale(.8);transform-origin:center;animation:sonner-fade-in .3s ease forwards}[data-sonner-toast][data-styled=true] [data-icon]>*{flex-shrink:0}[data-sonner-toast][data-styled=true] [data-icon] svg{margin-left:var(--toast-svg-margin-start);margin-right:var(--toast-svg-margin-end)}[data-sonner-toast][data-styled=true] [data-content]{display:flex;flex-direction:column;gap:2px}[data-sonner-toast][data-styled=true] [data-button]{border-radius:4px;padding-left:8px;padding-right:8px;height:24px;font-size:12px;color:var(--normal-bg);background:var(--normal-text);margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end);border:none;font-weight:500;cursor:pointer;outline:0;display:flex;align-items:center;flex-shrink:0;transition:opacity .4s,box-shadow .2s}[data-sonner-toast][data-styled=true] [data-button]:focus-visible{box-shadow:0 0 0 2px rgba(0,0,0,.4)}[data-sonner-toast][data-styled=true] [data-button]:first-of-type{margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end)}[data-sonner-toast][data-styled=true] [data-cancel]{color:var(--normal-text);background:rgba(0,0,0,.08)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast][data-styled=true] [data-cancel]{background:rgba(255,255,255,.3)}[data-sonner-toast][data-styled=true] [data-close-button]{position:absolute;left:var(--toast-close-button-start);right:var(--toast-close-button-end);top:0;height:20px;width:20px;display:flex;justify-content:center;align-items:center;padding:0;color:var(--gray12);background:var(--normal-bg);border:1px solid var(--gray4);transform:var(--toast-close-button-transform);border-radius:50%;cursor:pointer;z-index:1;transition:opacity .1s,background .2s,border-color .2s}[data-sonner-toast][data-styled=true] [data-close-button]:focus-visible{box-shadow:0 4px 12px rgba(0,0,0,.1),0 0 0 2px rgba(0,0,0,.2)}[data-sonner-toast][data-styled=true] [data-disabled=true]{cursor:not-allowed}[data-sonner-toast][data-styled=true]:hover [data-close-button]:hover{background:var(--gray2);border-color:var(--gray5)}[data-sonner-toast][data-swiping=true]::before{content:'';position:absolute;left:-100%;right:-100%;height:100%;z-index:-1}[data-sonner-toast][data-y-position=top][data-swiping=true]::before{bottom:50%;transform:scaleY(3) translateY(50%)}[data-sonner-toast][data-y-position=bottom][data-swiping=true]::before{top:50%;transform:scaleY(3) translateY(-50%)}[data-sonner-toast][data-swiping=false][data-removed=true]::before{content:'';position:absolute;inset:0;transform:scaleY(2)}[data-sonner-toast][data-expanded=true]::after{content:'';position:absolute;left:0;height:calc(var(--gap) + 1px);bottom:100%;width:100%}[data-sonner-toast][data-mounted=true]{--y:translateY(0);opacity:1}[data-sonner-toast][data-expanded=false][data-front=false]{--scale:var(--toasts-before) * 0.05 + 1;--y:translateY(calc(var(--lift-amount) * var(--toasts-before))) scale(calc(-1 * var(--scale)));height:var(--front-toast-height)}[data-sonner-toast]>*{transition:opacity .4s}[data-sonner-toast][data-x-position=right]{right:0}[data-sonner-toast][data-x-position=left]{left:0}[data-sonner-toast][data-expanded=false][data-front=false][data-styled=true]>*{opacity:0}[data-sonner-toast][data-visible=false]{opacity:0;pointer-events:none}[data-sonner-toast][data-mounted=true][data-expanded=true]{--y:translateY(calc(var(--lift) * var(--offset)));height:var(--initial-height)}[data-sonner-toast][data-removed=true][data-front=true][data-swipe-out=false]{--y:translateY(calc(var(--lift) * -100%));opacity:0}[data-sonner-toast][data-removed=true][data-front=false][data-swipe-out=false][data-expanded=true]{--y:translateY(calc(var(--lift) * var(--offset) + var(--lift) * -100%));opacity:0}[data-sonner-toast][data-removed=true][data-front=false][data-swipe-out=false][data-expanded=false]{--y:translateY(40%);opacity:0;transition:transform .5s,opacity .2s}[data-sonner-toast][data-removed=true][data-front=false]::before{height:calc(var(--initial-height) + 20%)}[data-sonner-toast][data-swiping=true]{transform:var(--y) translateY(var(--swipe-amount-y,0)) translateX(var(--swipe-amount-x,0));transition:none}[data-sonner-toast][data-swiped=true]{user-select:none}[data-sonner-toast][data-swipe-out=true][data-y-position=bottom],[data-sonner-toast][data-swipe-out=true][data-y-position=top]{animation-duration:.2s;animation-timing-function:ease-out;animation-fill-mode:forwards}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=left]{animation-name:swipe-out-left}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=right]{animation-name:swipe-out-right}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=up]{animation-name:swipe-out-up}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=down]{animation-name:swipe-out-down}@keyframes swipe-out-left{from{transform:var(--y) translateX(var(--swipe-amount-x));opacity:1}to{transform:var(--y) translateX(calc(var(--swipe-amount-x) - 100%));opacity:0}}@keyframes swipe-out-right{from{transform:var(--y) translateX(var(--swipe-amount-x));opacity:1}to{transform:var(--y) translateX(calc(var(--swipe-amount-x) + 100%));opacity:0}}@keyframes swipe-out-up{from{transform:var(--y) translateY(var(--swipe-amount-y));opacity:1}to{transform:var(--y) translateY(calc(var(--swipe-amount-y) - 100%));opacity:0}}@keyframes swipe-out-down{from{transform:var(--y) translateY(var(--swipe-amount-y));opacity:1}to{transform:var(--y) translateY(calc(var(--swipe-amount-y) + 100%));opacity:0}}@media (max-width:600px){[data-sonner-toaster]{position:fixed;right:var(--mobile-offset-right);left:var(--mobile-offset-left);width:100%}[data-sonner-toaster][dir=rtl]{left:calc(var(--mobile-offset-left) * -1)}[data-sonner-toaster] [data-sonner-toast]{left:0;right:0;width:calc(100% - var(--mobile-offset-left) * 2)}[data-sonner-toaster][data-x-position=left]{left:var(--mobile-offset-left)}[data-sonner-toaster][data-y-position=bottom]{bottom:var(--mobile-offset-bottom)}[data-sonner-toaster][data-y-position=top]{top:var(--mobile-offset-top)}[data-sonner-toaster][data-x-position=center]{left:var(--mobile-offset-left);right:var(--mobile-offset-right);transform:none}}[data-sonner-toaster][data-sonner-theme=light]{--normal-bg:#fff;--normal-border:var(--gray4);--normal-text:var(--gray12);--success-bg:hsl(143, 85%, 96%);--success-border:hsl(145, 92%, 87%);--success-text:hsl(140, 100%, 27%);--info-bg:hsl(208, 100%, 97%);--info-border:hsl(221, 91%, 93%);--info-text:hsl(210, 92%, 45%);--warning-bg:hsl(49, 100%, 97%);--warning-border:hsl(49, 91%, 84%);--warning-text:hsl(31, 92%, 45%);--error-bg:hsl(359, 100%, 97%);--error-border:hsl(359, 100%, 94%);--error-text:hsl(360, 100%, 45%)}[data-sonner-toaster][data-sonner-theme=light] [data-sonner-toast][data-invert=true]{--normal-bg:#000;--normal-border:hsl(0, 0%, 20%);--normal-text:var(--gray1)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast][data-invert=true]{--normal-bg:#fff;--normal-border:var(--gray3);--normal-text:var(--gray12)}[data-sonner-toaster][data-sonner-theme=dark]{--normal-bg:#000;--normal-bg-hover:hsl(0, 0%, 12%);--normal-border:hsl(0, 0%, 20%);--normal-border-hover:hsl(0, 0%, 25%);--normal-text:var(--gray1);--success-bg:hsl(150, 100%, 6%);--success-border:hsl(147, 100%, 12%);--success-text:hsl(150, 86%, 65%);--info-bg:hsl(215, 100%, 6%);--info-border:hsl(223, 43%, 17%);--info-text:hsl(216, 87%, 65%);--warning-bg:hsl(64, 100%, 6%);--warning-border:hsl(60, 100%, 9%);--warning-text:hsl(46, 87%, 65%);--error-bg:hsl(358, 76%, 10%);--error-border:hsl(357, 89%, 16%);--error-text:hsl(358, 100%, 81%)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast] [data-close-button]{background:var(--normal-bg);border-color:var(--normal-border);color:var(--normal-text)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast] [data-close-button]:hover{background:var(--normal-bg-hover);border-color:var(--normal-border-hover)}[data-rich-colors=true][data-sonner-toast][data-type=success]{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}[data-rich-colors=true][data-sonner-toast][data-type=success] [data-close-button]{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}[data-rich-colors=true][data-sonner-toast][data-type=info]{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}[data-rich-colors=true][data-sonner-toast][data-type=info] [data-close-button]{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}[data-rich-colors=true][data-sonner-toast][data-type=warning]{background:var(--warning-bg);border-color:var(--warning-border);color:var(--warning-text)}[data-rich-colors=true][data-sonner-toast][data-type=warning] [data-close-button]{background:var(--warning-bg);border-color:var(--warning-border);color:var(--warning-text)}[data-rich-colors=true][data-sonner-toast][data-type=error]{background:var(--error-bg);border-color:var(--error-border);color:var(--error-text)}[data-rich-colors=true][data-sonner-toast][data-type=error] [data-close-button]{background:var(--error-bg);border-color:var(--error-border);color:var(--error-text)}.sonner-loading-wrapper{--size:16px;height:var(--size);width:var(--size);position:absolute;inset:0;z-index:10}.sonner-loading-wrapper[data-visible=false]{transform-origin:center;animation:sonner-fade-out .2s ease forwards}.sonner-spinner{position:relative;top:50%;left:50%;height:var(--size);width:var(--size)}.sonner-loading-bar{animation:sonner-spin 1.2s linear infinite;background:var(--gray11);border-radius:6px;height:8%;left:-10%;position:absolute;top:-3.9%;width:24%}.sonner-loading-bar:first-child{animation-delay:-1.2s;transform:rotate(.0001deg) translate(146%)}.sonner-loading-bar:nth-child(2){animation-delay:-1.1s;transform:rotate(30deg) translate(146%)}.sonner-loading-bar:nth-child(3){animation-delay:-1s;transform:rotate(60deg) translate(146%)}.sonner-loading-bar:nth-child(4){animation-delay:-.9s;transform:rotate(90deg) translate(146%)}.sonner-loading-bar:nth-child(5){animation-delay:-.8s;transform:rotate(120deg) translate(146%)}.sonner-loading-bar:nth-child(6){animation-delay:-.7s;transform:rotate(150deg) translate(146%)}.sonner-loading-bar:nth-child(7){animation-delay:-.6s;transform:rotate(180deg) translate(146%)}.sonner-loading-bar:nth-child(8){animation-delay:-.5s;transform:rotate(210deg) translate(146%)}.sonner-loading-bar:nth-child(9){animation-delay:-.4s;transform:rotate(240deg) translate(146%)}.sonner-loading-bar:nth-child(10){animation-delay:-.3s;transform:rotate(270deg) translate(146%)}.sonner-loading-bar:nth-child(11){animation-delay:-.2s;transform:rotate(300deg) translate(146%)}.sonner-loading-bar:nth-child(12){animation-delay:-.1s;transform:rotate(330deg) translate(146%)}@keyframes sonner-fade-in{0%{opacity:0;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}@keyframes sonner-fade-out{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.8)}}@keyframes sonner-spin{0%{opacity:1}100%{opacity:.15}}@media (prefers-reduced-motion){.sonner-loading-bar,[data-sonner-toast],[data-sonner-toast]>*{transition:none!important;animation:none!important}}.sonner-loader{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);transform-origin:center;transition:opacity .2s,transform .2s}.sonner-loader[data-visible=false]{opacity:0;transform:scale(.8) translate(-50%,-50%)}");
+function isAction(action) {
+  return action.label !== void 0;
+}
+var VISIBLE_TOASTS_AMOUNT = 3;
+var VIEWPORT_OFFSET = "24px";
+var MOBILE_VIEWPORT_OFFSET = "16px";
+var TOAST_LIFETIME = 4e3;
+var TOAST_WIDTH = 356;
+var GAP = 14;
+var SWIPE_THRESHOLD = 45;
+var TIME_BEFORE_UNMOUNT = 200;
+function cn(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
+function getDefaultSwipeDirections(position) {
+  const [y, x] = position.split("-");
+  const directions = [];
+  if (y) {
+    directions.push(y);
+  }
+  if (x) {
+    directions.push(x);
+  }
+  return directions;
+}
+var Toast = (props) => {
+  var _toast_classNames, _toast_classNames1, _toast_classNames2, _toast_classNames3, _toast_classNames4, _toast_classNames5, _toast_classNames6, _toast_classNames7, _toast_classNames8;
+  const { invert: ToasterInvert, toast: toast2, unstyled, interacting, setHeights, visibleToasts, heights, index, toasts, expanded, removeToast, defaultRichColors, closeButton: closeButtonFromToaster, style, cancelButtonStyle, actionButtonStyle, className = "", descriptionClassName = "", duration: durationFromToaster, position, gap, expandByDefault, classNames, icons, closeButtonAriaLabel = "Close toast" } = props;
+  const [swipeDirection, setSwipeDirection] = import_react.default.useState(null);
+  const [swipeOutDirection, setSwipeOutDirection] = import_react.default.useState(null);
+  const [mounted, setMounted] = import_react.default.useState(false);
+  const [removed, setRemoved] = import_react.default.useState(false);
+  const [swiping, setSwiping] = import_react.default.useState(false);
+  const [swipeOut, setSwipeOut] = import_react.default.useState(false);
+  const [isSwiped, setIsSwiped] = import_react.default.useState(false);
+  const [offsetBeforeRemove, setOffsetBeforeRemove] = import_react.default.useState(0);
+  const [initialHeight, setInitialHeight] = import_react.default.useState(0);
+  const remainingTime = import_react.default.useRef(toast2.duration || durationFromToaster || TOAST_LIFETIME);
+  const dragStartTime = import_react.default.useRef(null);
+  const toastRef = import_react.default.useRef(null);
+  const isFront = index === 0;
+  const isVisible = index + 1 <= visibleToasts;
+  const toastType = toast2.type;
+  const dismissible = toast2.dismissible !== false;
+  const toastClassname = toast2.className || "";
+  const toastDescriptionClassname = toast2.descriptionClassName || "";
+  const heightIndex = import_react.default.useMemo(() => heights.findIndex((height) => height.toastId === toast2.id) || 0, [
+    heights,
+    toast2.id
+  ]);
+  const closeButton = import_react.default.useMemo(() => {
+    var _toast_closeButton;
+    return (_toast_closeButton = toast2.closeButton) != null ? _toast_closeButton : closeButtonFromToaster;
+  }, [
+    toast2.closeButton,
+    closeButtonFromToaster
+  ]);
+  const duration = import_react.default.useMemo(() => toast2.duration || durationFromToaster || TOAST_LIFETIME, [
+    toast2.duration,
+    durationFromToaster
+  ]);
+  const closeTimerStartTimeRef = import_react.default.useRef(0);
+  const offset = import_react.default.useRef(0);
+  const lastCloseTimerStartTimeRef = import_react.default.useRef(0);
+  const pointerStartRef = import_react.default.useRef(null);
+  const [y, x] = position.split("-");
+  const toastsHeightBefore = import_react.default.useMemo(() => {
+    return heights.reduce((prev, curr, reducerIndex) => {
+      if (reducerIndex >= heightIndex) {
+        return prev;
+      }
+      return prev + curr.height;
+    }, 0);
+  }, [
+    heights,
+    heightIndex
+  ]);
+  const isDocumentHidden = useIsDocumentHidden();
+  const invert = toast2.invert || ToasterInvert;
+  const disabled = toastType === "loading";
+  offset.current = import_react.default.useMemo(() => heightIndex * gap + toastsHeightBefore, [
+    heightIndex,
+    toastsHeightBefore
+  ]);
+  import_react.default.useEffect(() => {
+    remainingTime.current = duration;
+  }, [
+    duration
+  ]);
+  import_react.default.useEffect(() => {
+    setMounted(true);
+  }, []);
+  import_react.default.useEffect(() => {
+    const toastNode = toastRef.current;
+    if (toastNode) {
+      const height = toastNode.getBoundingClientRect().height;
+      setInitialHeight(height);
+      setHeights((h) => [
+        {
+          toastId: toast2.id,
+          height,
+          position: toast2.position
+        },
+        ...h
+      ]);
+      return () => setHeights((h) => h.filter((height2) => height2.toastId !== toast2.id));
+    }
+  }, [
+    setHeights,
+    toast2.id
+  ]);
+  import_react.default.useLayoutEffect(() => {
+    if (!mounted) return;
+    const toastNode = toastRef.current;
+    const originalHeight = toastNode.style.height;
+    toastNode.style.height = "auto";
+    const newHeight = toastNode.getBoundingClientRect().height;
+    toastNode.style.height = originalHeight;
+    setInitialHeight(newHeight);
+    setHeights((heights2) => {
+      const alreadyExists = heights2.find((height) => height.toastId === toast2.id);
+      if (!alreadyExists) {
+        return [
+          {
+            toastId: toast2.id,
+            height: newHeight,
+            position: toast2.position
+          },
+          ...heights2
+        ];
+      } else {
+        return heights2.map((height) => height.toastId === toast2.id ? {
+          ...height,
+          height: newHeight
+        } : height);
+      }
+    });
+  }, [
+    mounted,
+    toast2.title,
+    toast2.description,
+    setHeights,
+    toast2.id,
+    toast2.jsx,
+    toast2.action,
+    toast2.cancel
+  ]);
+  const deleteToast = import_react.default.useCallback(() => {
+    setRemoved(true);
+    setOffsetBeforeRemove(offset.current);
+    setHeights((h) => h.filter((height) => height.toastId !== toast2.id));
+    setTimeout(() => {
+      removeToast(toast2);
+    }, TIME_BEFORE_UNMOUNT);
+  }, [
+    toast2,
+    removeToast,
+    setHeights,
+    offset
+  ]);
+  import_react.default.useEffect(() => {
+    if (toast2.promise && toastType === "loading" || toast2.duration === Infinity || toast2.type === "loading") return;
+    let timeoutId;
+    const pauseTimer = () => {
+      if (lastCloseTimerStartTimeRef.current < closeTimerStartTimeRef.current) {
+        const elapsedTime = (/* @__PURE__ */ new Date()).getTime() - closeTimerStartTimeRef.current;
+        remainingTime.current = remainingTime.current - elapsedTime;
+      }
+      lastCloseTimerStartTimeRef.current = (/* @__PURE__ */ new Date()).getTime();
+    };
+    const startTimer = () => {
+      if (remainingTime.current === Infinity) return;
+      closeTimerStartTimeRef.current = (/* @__PURE__ */ new Date()).getTime();
+      timeoutId = setTimeout(() => {
+        toast2.onAutoClose == null ? void 0 : toast2.onAutoClose.call(toast2, toast2);
+        deleteToast();
+      }, remainingTime.current);
+    };
+    if (expanded || interacting || isDocumentHidden) {
+      pauseTimer();
+    } else {
+      startTimer();
+    }
+    return () => clearTimeout(timeoutId);
+  }, [
+    expanded,
+    interacting,
+    toast2,
+    toastType,
+    isDocumentHidden,
+    deleteToast
+  ]);
+  import_react.default.useEffect(() => {
+    if (toast2.delete) {
+      deleteToast();
+      toast2.onDismiss == null ? void 0 : toast2.onDismiss.call(toast2, toast2);
+    }
+  }, [
+    deleteToast,
+    toast2.delete
+  ]);
+  function getLoadingIcon() {
+    var _toast_classNames9;
+    if (icons == null ? void 0 : icons.loading) {
+      var _toast_classNames12;
+      return import_react.default.createElement("div", {
+        className: cn(classNames == null ? void 0 : classNames.loader, toast2 == null ? void 0 : (_toast_classNames12 = toast2.classNames) == null ? void 0 : _toast_classNames12.loader, "sonner-loader"),
+        "data-visible": toastType === "loading"
+      }, icons.loading);
+    }
+    return import_react.default.createElement(Loader, {
+      className: cn(classNames == null ? void 0 : classNames.loader, toast2 == null ? void 0 : (_toast_classNames9 = toast2.classNames) == null ? void 0 : _toast_classNames9.loader),
+      visible: toastType === "loading"
+    });
+  }
+  const icon = toast2.icon || (icons == null ? void 0 : icons[toastType]) || getAsset(toastType);
+  var _toast_richColors, _icons_close;
+  return import_react.default.createElement("li", {
+    tabIndex: 0,
+    ref: toastRef,
+    className: cn(className, toastClassname, classNames == null ? void 0 : classNames.toast, toast2 == null ? void 0 : (_toast_classNames = toast2.classNames) == null ? void 0 : _toast_classNames.toast, classNames == null ? void 0 : classNames.default, classNames == null ? void 0 : classNames[toastType], toast2 == null ? void 0 : (_toast_classNames1 = toast2.classNames) == null ? void 0 : _toast_classNames1[toastType]),
+    "data-sonner-toast": "",
+    "data-rich-colors": (_toast_richColors = toast2.richColors) != null ? _toast_richColors : defaultRichColors,
+    "data-styled": !Boolean(toast2.jsx || toast2.unstyled || unstyled),
+    "data-mounted": mounted,
+    "data-promise": Boolean(toast2.promise),
+    "data-swiped": isSwiped,
+    "data-removed": removed,
+    "data-visible": isVisible,
+    "data-y-position": y,
+    "data-x-position": x,
+    "data-index": index,
+    "data-front": isFront,
+    "data-swiping": swiping,
+    "data-dismissible": dismissible,
+    "data-type": toastType,
+    "data-invert": invert,
+    "data-swipe-out": swipeOut,
+    "data-swipe-direction": swipeOutDirection,
+    "data-expanded": Boolean(expanded || expandByDefault && mounted),
+    "data-testid": toast2.testId,
+    style: {
+      "--index": index,
+      "--toasts-before": index,
+      "--z-index": toasts.length - index,
+      "--offset": `${removed ? offsetBeforeRemove : offset.current}px`,
+      "--initial-height": expandByDefault ? "auto" : `${initialHeight}px`,
+      ...style,
+      ...toast2.style
+    },
+    onDragEnd: () => {
+      setSwiping(false);
+      setSwipeDirection(null);
+      pointerStartRef.current = null;
+    },
+    onPointerDown: (event) => {
+      if (event.button === 2) return;
+      if (disabled || !dismissible) return;
+      dragStartTime.current = /* @__PURE__ */ new Date();
+      setOffsetBeforeRemove(offset.current);
+      event.target.setPointerCapture(event.pointerId);
+      if (event.target.tagName === "BUTTON") return;
+      setSwiping(true);
+      pointerStartRef.current = {
+        x: event.clientX,
+        y: event.clientY
+      };
+    },
+    onPointerUp: () => {
+      var _toastRef_current, _toastRef_current1, _dragStartTime_current;
+      if (swipeOut || !dismissible) return;
+      pointerStartRef.current = null;
+      const swipeAmountX = Number(((_toastRef_current = toastRef.current) == null ? void 0 : _toastRef_current.style.getPropertyValue("--swipe-amount-x").replace("px", "")) || 0);
+      const swipeAmountY = Number(((_toastRef_current1 = toastRef.current) == null ? void 0 : _toastRef_current1.style.getPropertyValue("--swipe-amount-y").replace("px", "")) || 0);
+      const timeTaken = (/* @__PURE__ */ new Date()).getTime() - ((_dragStartTime_current = dragStartTime.current) == null ? void 0 : _dragStartTime_current.getTime());
+      const swipeAmount = swipeDirection === "x" ? swipeAmountX : swipeAmountY;
+      const velocity = Math.abs(swipeAmount) / timeTaken;
+      if (Math.abs(swipeAmount) >= SWIPE_THRESHOLD || velocity > 0.11) {
+        setOffsetBeforeRemove(offset.current);
+        toast2.onDismiss == null ? void 0 : toast2.onDismiss.call(toast2, toast2);
+        if (swipeDirection === "x") {
+          setSwipeOutDirection(swipeAmountX > 0 ? "right" : "left");
+        } else {
+          setSwipeOutDirection(swipeAmountY > 0 ? "down" : "up");
+        }
+        deleteToast();
+        setSwipeOut(true);
+        return;
+      } else {
+        var _toastRef_current2, _toastRef_current3;
+        (_toastRef_current2 = toastRef.current) == null ? void 0 : _toastRef_current2.style.setProperty("--swipe-amount-x", `0px`);
+        (_toastRef_current3 = toastRef.current) == null ? void 0 : _toastRef_current3.style.setProperty("--swipe-amount-y", `0px`);
+      }
+      setIsSwiped(false);
+      setSwiping(false);
+      setSwipeDirection(null);
+    },
+    onPointerMove: (event) => {
+      var _window_getSelection, _toastRef_current, _toastRef_current1;
+      if (!pointerStartRef.current || !dismissible) return;
+      const isHighlighted = ((_window_getSelection = window.getSelection()) == null ? void 0 : _window_getSelection.toString().length) > 0;
+      if (isHighlighted) return;
+      const yDelta = event.clientY - pointerStartRef.current.y;
+      const xDelta = event.clientX - pointerStartRef.current.x;
+      var _props_swipeDirections;
+      const swipeDirections = (_props_swipeDirections = props.swipeDirections) != null ? _props_swipeDirections : getDefaultSwipeDirections(position);
+      if (!swipeDirection && (Math.abs(xDelta) > 1 || Math.abs(yDelta) > 1)) {
+        setSwipeDirection(Math.abs(xDelta) > Math.abs(yDelta) ? "x" : "y");
+      }
+      let swipeAmount = {
+        x: 0,
+        y: 0
+      };
+      const getDampening = (delta) => {
+        const factor = Math.abs(delta) / 20;
+        return 1 / (1.5 + factor);
+      };
+      if (swipeDirection === "y") {
+        if (swipeDirections.includes("top") || swipeDirections.includes("bottom")) {
+          if (swipeDirections.includes("top") && yDelta < 0 || swipeDirections.includes("bottom") && yDelta > 0) {
+            swipeAmount.y = yDelta;
+          } else {
+            const dampenedDelta = yDelta * getDampening(yDelta);
+            swipeAmount.y = Math.abs(dampenedDelta) < Math.abs(yDelta) ? dampenedDelta : yDelta;
+          }
+        }
+      } else if (swipeDirection === "x") {
+        if (swipeDirections.includes("left") || swipeDirections.includes("right")) {
+          if (swipeDirections.includes("left") && xDelta < 0 || swipeDirections.includes("right") && xDelta > 0) {
+            swipeAmount.x = xDelta;
+          } else {
+            const dampenedDelta = xDelta * getDampening(xDelta);
+            swipeAmount.x = Math.abs(dampenedDelta) < Math.abs(xDelta) ? dampenedDelta : xDelta;
+          }
+        }
+      }
+      if (Math.abs(swipeAmount.x) > 0 || Math.abs(swipeAmount.y) > 0) {
+        setIsSwiped(true);
+      }
+      (_toastRef_current = toastRef.current) == null ? void 0 : _toastRef_current.style.setProperty("--swipe-amount-x", `${swipeAmount.x}px`);
+      (_toastRef_current1 = toastRef.current) == null ? void 0 : _toastRef_current1.style.setProperty("--swipe-amount-y", `${swipeAmount.y}px`);
+    }
+  }, closeButton && !toast2.jsx && toastType !== "loading" ? import_react.default.createElement("button", {
+    "aria-label": closeButtonAriaLabel,
+    "data-disabled": disabled,
+    "data-close-button": true,
+    onClick: disabled || !dismissible ? () => {
+    } : () => {
+      deleteToast();
+      toast2.onDismiss == null ? void 0 : toast2.onDismiss.call(toast2, toast2);
+    },
+    className: cn(classNames == null ? void 0 : classNames.closeButton, toast2 == null ? void 0 : (_toast_classNames2 = toast2.classNames) == null ? void 0 : _toast_classNames2.closeButton)
+  }, (_icons_close = icons == null ? void 0 : icons.close) != null ? _icons_close : CloseIcon) : null, (toastType || toast2.icon || toast2.promise) && toast2.icon !== null && ((icons == null ? void 0 : icons[toastType]) !== null || toast2.icon) ? import_react.default.createElement("div", {
+    "data-icon": "",
+    className: cn(classNames == null ? void 0 : classNames.icon, toast2 == null ? void 0 : (_toast_classNames3 = toast2.classNames) == null ? void 0 : _toast_classNames3.icon)
+  }, toast2.promise || toast2.type === "loading" && !toast2.icon ? toast2.icon || getLoadingIcon() : null, toast2.type !== "loading" ? icon : null) : null, import_react.default.createElement("div", {
+    "data-content": "",
+    className: cn(classNames == null ? void 0 : classNames.content, toast2 == null ? void 0 : (_toast_classNames4 = toast2.classNames) == null ? void 0 : _toast_classNames4.content)
+  }, import_react.default.createElement("div", {
+    "data-title": "",
+    className: cn(classNames == null ? void 0 : classNames.title, toast2 == null ? void 0 : (_toast_classNames5 = toast2.classNames) == null ? void 0 : _toast_classNames5.title)
+  }, toast2.jsx ? toast2.jsx : typeof toast2.title === "function" ? toast2.title() : toast2.title), toast2.description ? import_react.default.createElement("div", {
+    "data-description": "",
+    className: cn(descriptionClassName, toastDescriptionClassname, classNames == null ? void 0 : classNames.description, toast2 == null ? void 0 : (_toast_classNames6 = toast2.classNames) == null ? void 0 : _toast_classNames6.description)
+  }, typeof toast2.description === "function" ? toast2.description() : toast2.description) : null), import_react.default.isValidElement(toast2.cancel) ? toast2.cancel : toast2.cancel && isAction(toast2.cancel) ? import_react.default.createElement("button", {
+    "data-button": true,
+    "data-cancel": true,
+    style: toast2.cancelButtonStyle || cancelButtonStyle,
+    onClick: (event) => {
+      if (!isAction(toast2.cancel)) return;
+      if (!dismissible) return;
+      toast2.cancel.onClick == null ? void 0 : toast2.cancel.onClick.call(toast2.cancel, event);
+      deleteToast();
+    },
+    className: cn(classNames == null ? void 0 : classNames.cancelButton, toast2 == null ? void 0 : (_toast_classNames7 = toast2.classNames) == null ? void 0 : _toast_classNames7.cancelButton)
+  }, toast2.cancel.label) : null, import_react.default.isValidElement(toast2.action) ? toast2.action : toast2.action && isAction(toast2.action) ? import_react.default.createElement("button", {
+    "data-button": true,
+    "data-action": true,
+    style: toast2.actionButtonStyle || actionButtonStyle,
+    onClick: (event) => {
+      if (!isAction(toast2.action)) return;
+      toast2.action.onClick == null ? void 0 : toast2.action.onClick.call(toast2.action, event);
+      if (event.defaultPrevented) return;
+      deleteToast();
+    },
+    className: cn(classNames == null ? void 0 : classNames.actionButton, toast2 == null ? void 0 : (_toast_classNames8 = toast2.classNames) == null ? void 0 : _toast_classNames8.actionButton)
+  }, toast2.action.label) : null);
+};
+function getDocumentDirection() {
+  if (typeof window === "undefined") return "ltr";
+  if (typeof document === "undefined") return "ltr";
+  const dirAttribute = document.documentElement.getAttribute("dir");
+  if (dirAttribute === "auto" || !dirAttribute) {
+    return window.getComputedStyle(document.documentElement).direction;
+  }
+  return dirAttribute;
+}
+function assignOffset(defaultOffset2, mobileOffset) {
+  const styles2 = {};
+  [
+    defaultOffset2,
+    mobileOffset
+  ].forEach((offset, index) => {
+    const isMobile = index === 1;
+    const prefix = isMobile ? "--mobile-offset" : "--offset";
+    const defaultValue = isMobile ? MOBILE_VIEWPORT_OFFSET : VIEWPORT_OFFSET;
+    function assignAll(offset2) {
+      [
+        "top",
+        "right",
+        "bottom",
+        "left"
+      ].forEach((key) => {
+        styles2[`${prefix}-${key}`] = typeof offset2 === "number" ? `${offset2}px` : offset2;
+      });
+    }
+    if (typeof offset === "number" || typeof offset === "string") {
+      assignAll(offset);
+    } else if (typeof offset === "object") {
+      [
+        "top",
+        "right",
+        "bottom",
+        "left"
+      ].forEach((key) => {
+        if (offset[key] === void 0) {
+          styles2[`${prefix}-${key}`] = defaultValue;
+        } else {
+          styles2[`${prefix}-${key}`] = typeof offset[key] === "number" ? `${offset[key]}px` : offset[key];
+        }
+      });
+    } else {
+      assignAll(defaultValue);
+    }
+  });
+  return styles2;
+}
+var Toaster = import_react.default.forwardRef(function Toaster2(props, ref) {
+  const { id: id3, invert, position = "bottom-right", hotkey = [
+    "altKey",
+    "KeyT"
+  ], expand, closeButton, className, offset, mobileOffset, theme = "light", richColors, duration, style, visibleToasts = VISIBLE_TOASTS_AMOUNT, toastOptions, dir = getDocumentDirection(), gap = GAP, icons, containerAriaLabel = "Notifications" } = props;
+  const [toasts, setToasts] = import_react.default.useState([]);
+  const filteredToasts = import_react.default.useMemo(() => {
+    if (id3) {
+      return toasts.filter((toast2) => toast2.toasterId === id3);
+    }
+    return toasts.filter((toast2) => !toast2.toasterId);
+  }, [
+    toasts,
+    id3
+  ]);
+  const possiblePositions = import_react.default.useMemo(() => {
+    return Array.from(new Set([
+      position
+    ].concat(filteredToasts.filter((toast2) => toast2.position).map((toast2) => toast2.position))));
+  }, [
+    filteredToasts,
+    position
+  ]);
+  const [heights, setHeights] = import_react.default.useState([]);
+  const [expanded, setExpanded] = import_react.default.useState(false);
+  const [interacting, setInteracting] = import_react.default.useState(false);
+  const [actualTheme, setActualTheme] = import_react.default.useState(theme !== "system" ? theme : typeof window !== "undefined" ? window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light" : "light");
+  const listRef = import_react.default.useRef(null);
+  const hotkeyLabel = hotkey.join("+").replace(/Key/g, "").replace(/Digit/g, "");
+  const lastFocusedElementRef = import_react.default.useRef(null);
+  const isFocusWithinRef = import_react.default.useRef(false);
+  const removeToast = import_react.default.useCallback((toastToRemove) => {
+    setToasts((toasts2) => {
+      var _toasts_find;
+      if (!((_toasts_find = toasts2.find((toast2) => toast2.id === toastToRemove.id)) == null ? void 0 : _toasts_find.delete)) {
+        ToastState.dismiss(toastToRemove.id);
+      }
+      return toasts2.filter(({ id: id4 }) => id4 !== toastToRemove.id);
+    });
+  }, []);
+  import_react.default.useEffect(() => {
+    return ToastState.subscribe((toast2) => {
+      if (toast2.dismiss) {
+        requestAnimationFrame(() => {
+          setToasts((toasts2) => toasts2.map((t) => t.id === toast2.id ? {
+            ...t,
+            delete: true
+          } : t));
+        });
+        return;
+      }
+      setTimeout(() => {
+        import_react_dom.default.flushSync(() => {
+          setToasts((toasts2) => {
+            const indexOfExistingToast = toasts2.findIndex((t) => t.id === toast2.id);
+            if (indexOfExistingToast !== -1) {
+              return [
+                ...toasts2.slice(0, indexOfExistingToast),
+                {
+                  ...toasts2[indexOfExistingToast],
+                  ...toast2
+                },
+                ...toasts2.slice(indexOfExistingToast + 1)
+              ];
+            }
+            return [
+              toast2,
+              ...toasts2
+            ];
+          });
+        });
+      });
+    });
+  }, [
+    toasts
+  ]);
+  import_react.default.useEffect(() => {
+    if (theme !== "system") {
+      setActualTheme(theme);
+      return;
+    }
+    if (theme === "system") {
+      if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        setActualTheme("dark");
+      } else {
+        setActualTheme("light");
+      }
+    }
+    if (typeof window === "undefined") return;
+    const darkMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    try {
+      darkMediaQuery.addEventListener("change", ({ matches }) => {
+        if (matches) {
+          setActualTheme("dark");
+        } else {
+          setActualTheme("light");
+        }
+      });
+    } catch (error) {
+      darkMediaQuery.addListener(({ matches }) => {
+        try {
+          if (matches) {
+            setActualTheme("dark");
+          } else {
+            setActualTheme("light");
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      });
+    }
+  }, [
+    theme
+  ]);
+  import_react.default.useEffect(() => {
+    if (toasts.length <= 1) {
+      setExpanded(false);
+    }
+  }, [
+    toasts
+  ]);
+  import_react.default.useEffect(() => {
+    const handleKeyDown = (event) => {
+      var _listRef_current;
+      const isHotkeyPressed = hotkey.every((key) => event[key] || event.code === key);
+      if (isHotkeyPressed) {
+        var _listRef_current1;
+        setExpanded(true);
+        (_listRef_current1 = listRef.current) == null ? void 0 : _listRef_current1.focus();
+      }
+      if (event.code === "Escape" && (document.activeElement === listRef.current || ((_listRef_current = listRef.current) == null ? void 0 : _listRef_current.contains(document.activeElement)))) {
+        setExpanded(false);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [
+    hotkey
+  ]);
+  import_react.default.useEffect(() => {
+    if (listRef.current) {
+      return () => {
+        if (lastFocusedElementRef.current) {
+          lastFocusedElementRef.current.focus({
+            preventScroll: true
+          });
+          lastFocusedElementRef.current = null;
+          isFocusWithinRef.current = false;
+        }
+      };
+    }
+  }, [
+    listRef.current
+  ]);
+  return (
+    // Remove item from normal navigation flow, only available via hotkey
+    import_react.default.createElement("section", {
+      ref,
+      "aria-label": `${containerAriaLabel} ${hotkeyLabel}`,
+      tabIndex: -1,
+      "aria-live": "polite",
+      "aria-relevant": "additions text",
+      "aria-atomic": "false",
+      suppressHydrationWarning: true
+    }, possiblePositions.map((position2, index) => {
+      var _heights_;
+      const [y, x] = position2.split("-");
+      if (!filteredToasts.length) return null;
+      return import_react.default.createElement("ol", {
+        key: position2,
+        dir: dir === "auto" ? getDocumentDirection() : dir,
+        tabIndex: -1,
+        ref: listRef,
+        className,
+        "data-sonner-toaster": true,
+        "data-sonner-theme": actualTheme,
+        "data-y-position": y,
+        "data-x-position": x,
+        style: {
+          "--front-toast-height": `${((_heights_ = heights[0]) == null ? void 0 : _heights_.height) || 0}px`,
+          "--width": `${TOAST_WIDTH}px`,
+          "--gap": `${gap}px`,
+          ...style,
+          ...assignOffset(offset, mobileOffset)
+        },
+        onBlur: (event) => {
+          if (isFocusWithinRef.current && !event.currentTarget.contains(event.relatedTarget)) {
+            isFocusWithinRef.current = false;
+            if (lastFocusedElementRef.current) {
+              lastFocusedElementRef.current.focus({
+                preventScroll: true
+              });
+              lastFocusedElementRef.current = null;
+            }
+          }
+        },
+        onFocus: (event) => {
+          const isNotDismissible = event.target instanceof HTMLElement && event.target.dataset.dismissible === "false";
+          if (isNotDismissible) return;
+          if (!isFocusWithinRef.current) {
+            isFocusWithinRef.current = true;
+            lastFocusedElementRef.current = event.relatedTarget;
+          }
+        },
+        onMouseEnter: () => setExpanded(true),
+        onMouseMove: () => setExpanded(true),
+        onMouseLeave: () => {
+          if (!interacting) {
+            setExpanded(false);
+          }
+        },
+        onDragEnd: () => setExpanded(false),
+        onPointerDown: (event) => {
+          const isNotDismissible = event.target instanceof HTMLElement && event.target.dataset.dismissible === "false";
+          if (isNotDismissible) return;
+          setInteracting(true);
+        },
+        onPointerUp: () => setInteracting(false)
+      }, filteredToasts.filter((toast2) => !toast2.position && index === 0 || toast2.position === position2).map((toast2, index2) => {
+        var _toastOptions_duration, _toastOptions_closeButton;
+        return import_react.default.createElement(Toast, {
+          key: toast2.id,
+          icons,
+          index: index2,
+          toast: toast2,
+          defaultRichColors: richColors,
+          duration: (_toastOptions_duration = toastOptions == null ? void 0 : toastOptions.duration) != null ? _toastOptions_duration : duration,
+          className: toastOptions == null ? void 0 : toastOptions.className,
+          descriptionClassName: toastOptions == null ? void 0 : toastOptions.descriptionClassName,
+          invert,
+          visibleToasts,
+          closeButton: (_toastOptions_closeButton = toastOptions == null ? void 0 : toastOptions.closeButton) != null ? _toastOptions_closeButton : closeButton,
+          interacting,
+          position: position2,
+          style: toastOptions == null ? void 0 : toastOptions.style,
+          unstyled: toastOptions == null ? void 0 : toastOptions.unstyled,
+          classNames: toastOptions == null ? void 0 : toastOptions.classNames,
+          cancelButtonStyle: toastOptions == null ? void 0 : toastOptions.cancelButtonStyle,
+          actionButtonStyle: toastOptions == null ? void 0 : toastOptions.actionButtonStyle,
+          closeButtonAriaLabel: toastOptions == null ? void 0 : toastOptions.closeButtonAriaLabel,
+          removeToast,
+          toasts: filteredToasts.filter((t) => t.position == toast2.position),
+          heights: heights.filter((h) => h.position == toast2.position),
+          setHeights,
+          expandByDefault: expand,
+          gap,
+          expanded,
+          swipeDirections: props.swipeDirections
+        });
+      }));
+    }))
+  );
+});
+
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/components/AnimatePresence/index.mjs
 var import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
-var import_react10 = __toESM(require_react(), 1);
+var import_react11 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/context/LayoutGroupContext.mjs
-var import_react = __toESM(require_react(), 1);
-var LayoutGroupContext = (0, import_react.createContext)({});
+var import_react2 = __toESM(require_react(), 1);
+var LayoutGroupContext = (0, import_react2.createContext)({});
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/utils/use-constant.mjs
-var import_react2 = __toESM(require_react(), 1);
+var import_react3 = __toESM(require_react(), 1);
 function useConstant(init) {
-  const ref = (0, import_react2.useRef)(null);
+  const ref = (0, import_react3.useRef)(null);
   if (ref.current === null) {
     ref.current = init();
   }
@@ -37,28 +1124,28 @@ function useConstant(init) {
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/components/AnimatePresence/PresenceChild.mjs
 var import_jsx_runtime2 = __toESM(require_jsx_runtime(), 1);
-var React2 = __toESM(require_react(), 1);
-var import_react6 = __toESM(require_react(), 1);
+var React3 = __toESM(require_react(), 1);
+var import_react7 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/context/PresenceContext.mjs
-var import_react3 = __toESM(require_react(), 1);
-var PresenceContext = (0, import_react3.createContext)(null);
+var import_react4 = __toESM(require_react(), 1);
+var PresenceContext = (0, import_react4.createContext)(null);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/components/AnimatePresence/PopChild.mjs
 var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
-var React = __toESM(require_react(), 1);
-var import_react5 = __toESM(require_react(), 1);
+var React2 = __toESM(require_react(), 1);
+var import_react6 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/context/MotionConfigContext.mjs
-var import_react4 = __toESM(require_react(), 1);
-var MotionConfigContext = (0, import_react4.createContext)({
+var import_react5 = __toESM(require_react(), 1);
+var MotionConfigContext = (0, import_react5.createContext)({
   transformPagePoint: (p) => p,
   isStatic: false,
   reducedMotion: "never"
 });
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/components/AnimatePresence/PopChild.mjs
-var PopChildMeasure = class extends React.Component {
+var PopChildMeasure = class extends React2.Component {
   getSnapshotBeforeUpdate(prevProps) {
     const element = this.props.childRef.current;
     if (element && prevProps.isPresent && !this.props.isPresent) {
@@ -79,28 +1166,28 @@ var PopChildMeasure = class extends React.Component {
     return this.props.children;
   }
 };
-function PopChild({ children, isPresent: isPresent2 }) {
-  const id4 = (0, import_react5.useId)();
-  const ref = (0, import_react5.useRef)(null);
-  const size = (0, import_react5.useRef)({
+function PopChild({ children, isPresent }) {
+  const id3 = (0, import_react6.useId)();
+  const ref = (0, import_react6.useRef)(null);
+  const size = (0, import_react6.useRef)({
     width: 0,
     height: 0,
     top: 0,
     left: 0
   });
-  const { nonce } = (0, import_react5.useContext)(MotionConfigContext);
-  (0, import_react5.useInsertionEffect)(() => {
+  const { nonce } = (0, import_react6.useContext)(MotionConfigContext);
+  (0, import_react6.useInsertionEffect)(() => {
     const { width, height, top, left } = size.current;
-    if (isPresent2 || !ref.current || !width || !height)
+    if (isPresent || !ref.current || !width || !height)
       return;
-    ref.current.dataset.motionPopId = id4;
+    ref.current.dataset.motionPopId = id3;
     const style = document.createElement("style");
     if (nonce)
       style.nonce = nonce;
     document.head.appendChild(style);
     if (style.sheet) {
       style.sheet.insertRule(`
-          [data-motion-pop-id="${id4}"] {
+          [data-motion-pop-id="${id3}"] {
             position: absolute !important;
             width: ${width}px !important;
             height: ${height}px !important;
@@ -112,15 +1199,15 @@ function PopChild({ children, isPresent: isPresent2 }) {
     return () => {
       document.head.removeChild(style);
     };
-  }, [isPresent2]);
-  return (0, import_jsx_runtime.jsx)(PopChildMeasure, { isPresent: isPresent2, childRef: ref, sizeRef: size, children: React.cloneElement(children, { ref }) });
+  }, [isPresent]);
+  return (0, import_jsx_runtime.jsx)(PopChildMeasure, { isPresent, childRef: ref, sizeRef: size, children: React2.cloneElement(children, { ref }) });
 }
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/components/AnimatePresence/PresenceChild.mjs
-var PresenceChild = ({ children, initial, isPresent: isPresent2, onExitComplete, custom, presenceAffectsLayout, mode }) => {
+var PresenceChild = ({ children, initial, isPresent, onExitComplete, custom, presenceAffectsLayout, mode }) => {
   const presenceChildren = useConstant(newChildrenMap);
-  const id4 = (0, import_react6.useId)();
-  const memoizedOnExitComplete = (0, import_react6.useCallback)((childId) => {
+  const id3 = (0, import_react7.useId)();
+  const memoizedOnExitComplete = (0, import_react7.useCallback)((childId) => {
     presenceChildren.set(childId, true);
     for (const isComplete of presenceChildren.values()) {
       if (!isComplete)
@@ -128,11 +1215,11 @@ var PresenceChild = ({ children, initial, isPresent: isPresent2, onExitComplete,
     }
     onExitComplete && onExitComplete();
   }, [presenceChildren, onExitComplete]);
-  const context = (0, import_react6.useMemo)(
+  const context = (0, import_react7.useMemo)(
     () => ({
-      id: id4,
+      id: id3,
       initial,
-      isPresent: isPresent2,
+      isPresent,
       custom,
       onExitComplete: memoizedOnExitComplete,
       register: (childId) => {
@@ -145,16 +1232,16 @@ var PresenceChild = ({ children, initial, isPresent: isPresent2, onExitComplete,
      * we want to make a new context value to ensure they get re-rendered
      * so they can detect that layout change.
      */
-    presenceAffectsLayout ? [Math.random(), memoizedOnExitComplete] : [isPresent2, memoizedOnExitComplete]
+    presenceAffectsLayout ? [Math.random(), memoizedOnExitComplete] : [isPresent, memoizedOnExitComplete]
   );
-  (0, import_react6.useMemo)(() => {
+  (0, import_react7.useMemo)(() => {
     presenceChildren.forEach((_, key) => presenceChildren.set(key, false));
-  }, [isPresent2]);
-  React2.useEffect(() => {
-    !isPresent2 && !presenceChildren.size && onExitComplete && onExitComplete();
-  }, [isPresent2]);
+  }, [isPresent]);
+  React3.useEffect(() => {
+    !isPresent && !presenceChildren.size && onExitComplete && onExitComplete();
+  }, [isPresent]);
   if (mode === "popLayout") {
-    children = (0, import_jsx_runtime2.jsx)(PopChild, { isPresent: isPresent2, children });
+    children = (0, import_jsx_runtime2.jsx)(PopChild, { isPresent, children });
   }
   return (0, import_jsx_runtime2.jsx)(PresenceContext.Provider, { value: context, children });
 };
@@ -163,58 +1250,52 @@ function newChildrenMap() {
 }
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/components/AnimatePresence/use-presence.mjs
-var import_react7 = __toESM(require_react(), 1);
+var import_react8 = __toESM(require_react(), 1);
 function usePresence(subscribe = true) {
-  const context = (0, import_react7.useContext)(PresenceContext);
+  const context = (0, import_react8.useContext)(PresenceContext);
   if (context === null)
     return [true, null];
-  const { isPresent: isPresent2, onExitComplete, register } = context;
-  const id4 = (0, import_react7.useId)();
-  (0, import_react7.useEffect)(() => {
+  const { isPresent, onExitComplete, register } = context;
+  const id3 = (0, import_react8.useId)();
+  (0, import_react8.useEffect)(() => {
     if (subscribe)
-      register(id4);
+      register(id3);
   }, [subscribe]);
-  const safeToRemove = (0, import_react7.useCallback)(() => subscribe && onExitComplete && onExitComplete(id4), [id4, onExitComplete, subscribe]);
-  return !isPresent2 && onExitComplete ? [false, safeToRemove] : [true];
-}
-function useIsPresent() {
-  return isPresent((0, import_react7.useContext)(PresenceContext));
-}
-function isPresent(context) {
-  return context === null ? true : context.isPresent;
+  const safeToRemove = (0, import_react8.useCallback)(() => subscribe && onExitComplete && onExitComplete(id3), [id3, onExitComplete, subscribe]);
+  return !isPresent && onExitComplete ? [false, safeToRemove] : [true];
 }
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/components/AnimatePresence/utils.mjs
-var import_react8 = __toESM(require_react(), 1);
+var import_react9 = __toESM(require_react(), 1);
 var getChildKey = (child) => child.key || "";
 function onlyElements(children) {
   const filtered = [];
-  import_react8.Children.forEach(children, (child) => {
-    if ((0, import_react8.isValidElement)(child))
+  import_react9.Children.forEach(children, (child) => {
+    if ((0, import_react9.isValidElement)(child))
       filtered.push(child);
   });
   return filtered;
 }
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/utils/use-isomorphic-effect.mjs
-var import_react9 = __toESM(require_react(), 1);
+var import_react10 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/utils/is-browser.mjs
 var isBrowser = typeof window !== "undefined";
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/utils/use-isomorphic-effect.mjs
-var useIsomorphicLayoutEffect = isBrowser ? import_react9.useLayoutEffect : import_react9.useEffect;
+var useIsomorphicLayoutEffect = isBrowser ? import_react10.useLayoutEffect : import_react10.useEffect;
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/components/AnimatePresence/index.mjs
 var AnimatePresence = ({ children, custom, initial = true, onExitComplete, presenceAffectsLayout = true, mode = "sync", propagate = false }) => {
   const [isParentPresent, safeToRemove] = usePresence(propagate);
-  const presentChildren = (0, import_react10.useMemo)(() => onlyElements(children), [children]);
+  const presentChildren = (0, import_react11.useMemo)(() => onlyElements(children), [children]);
   const presentKeys = propagate && !isParentPresent ? [] : presentChildren.map(getChildKey);
-  const isInitialRender = (0, import_react10.useRef)(true);
-  const pendingPresentChildren = (0, import_react10.useRef)(presentChildren);
+  const isInitialRender = (0, import_react11.useRef)(true);
+  const pendingPresentChildren = (0, import_react11.useRef)(presentChildren);
   const exitComplete = useConstant(() => /* @__PURE__ */ new Map());
-  const [diffedChildren, setDiffedChildren] = (0, import_react10.useState)(presentChildren);
-  const [renderedChildren, setRenderedChildren] = (0, import_react10.useState)(presentChildren);
+  const [diffedChildren, setDiffedChildren] = (0, import_react11.useState)(presentChildren);
+  const [renderedChildren, setRenderedChildren] = (0, import_react11.useState)(presentChildren);
   useIsomorphicLayoutEffect(() => {
     isInitialRender.current = false;
     pendingPresentChildren.current = presentChildren;
@@ -250,10 +1331,10 @@ var AnimatePresence = ({ children, custom, initial = true, onExitComplete, prese
   if (mode === "wait" && renderedChildren.length > 1) {
     console.warn(`You're attempting to animate multiple children within AnimatePresence, but its mode is set to "wait". This will lead to odd visual behaviour.`);
   }
-  const { forceRender } = (0, import_react10.useContext)(LayoutGroupContext);
+  const { forceRender } = (0, import_react11.useContext)(LayoutGroupContext);
   return (0, import_jsx_runtime3.jsx)(import_jsx_runtime3.Fragment, { children: renderedChildren.map((child) => {
     const key = getChildKey(child);
-    const isPresent2 = propagate && !isParentPresent ? false : presentChildren === renderedChildren || presentKeys.includes(key);
+    const isPresent = propagate && !isParentPresent ? false : presentChildren === renderedChildren || presentKeys.includes(key);
     const onExit = () => {
       if (exitComplete.has(key)) {
         exitComplete.set(key, true);
@@ -272,33 +1353,23 @@ var AnimatePresence = ({ children, custom, initial = true, onExitComplete, prese
         onExitComplete && onExitComplete();
       }
     };
-    return (0, import_jsx_runtime3.jsx)(PresenceChild, { isPresent: isPresent2, initial: !isInitialRender.current || initial ? void 0 : false, custom: isPresent2 ? void 0 : custom, presenceAffectsLayout, mode, onExitComplete: isPresent2 ? void 0 : onExit, children: child }, key);
+    return (0, import_jsx_runtime3.jsx)(PresenceChild, { isPresent, initial: !isInitialRender.current || initial ? void 0 : false, custom: isPresent ? void 0 : custom, presenceAffectsLayout, mode, onExitComplete: isPresent ? void 0 : onExit, children: child }, key);
   }) });
 };
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/components/LayoutGroup/index.mjs
 var import_jsx_runtime4 = __toESM(require_jsx_runtime(), 1);
-var import_react14 = __toESM(require_react(), 1);
+var import_react15 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/context/DeprecatedLayoutGroupContext.mjs
-var import_react11 = __toESM(require_react(), 1);
-var DeprecatedLayoutGroupContext = (0, import_react11.createContext)(null);
+var import_react12 = __toESM(require_react(), 1);
+var DeprecatedLayoutGroupContext = (0, import_react12.createContext)(null);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/utils/use-force-update.mjs
-var import_react13 = __toESM(require_react(), 1);
+var import_react14 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/utils/use-is-mounted.mjs
-var import_react12 = __toESM(require_react(), 1);
-function useIsMounted() {
-  const isMounted = (0, import_react12.useRef)(false);
-  useIsomorphicLayoutEffect(() => {
-    isMounted.current = true;
-    return () => {
-      isMounted.current = false;
-    };
-  }, []);
-  return isMounted;
-}
+var import_react13 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/motion-utils@11.18.1/node_modules/motion-utils/dist/es/noop.mjs
 var noop = (any) => any;
@@ -482,70 +1553,13 @@ function createRenderBatcher(scheduleNextBatch, allowKeepAlive) {
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/frameloop/frame.mjs
 var { schedule: frame, cancel: cancelFrame, state: frameData, steps: frameSteps } = createRenderBatcher(typeof requestAnimationFrame !== "undefined" ? requestAnimationFrame : noop, true);
 
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/utils/use-force-update.mjs
-function useForceUpdate() {
-  const isMounted = useIsMounted();
-  const [forcedRenderCount, setForcedRenderCount] = (0, import_react13.useState)(0);
-  const forceRender = (0, import_react13.useCallback)(() => {
-    isMounted.current && setForcedRenderCount(forcedRenderCount + 1);
-  }, [forcedRenderCount]);
-  const deferredForceRender = (0, import_react13.useCallback)(() => frame.postRender(forceRender), [forceRender]);
-  return [deferredForceRender, forcedRenderCount];
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/projection/node/group.mjs
-var notify = (node) => !node.isLayoutDirty && node.willUpdate(false);
-function nodeGroup() {
-  const nodes = /* @__PURE__ */ new Set();
-  const subscriptions = /* @__PURE__ */ new WeakMap();
-  const dirtyAll = () => nodes.forEach(notify);
-  return {
-    add: (node) => {
-      nodes.add(node);
-      subscriptions.set(node, node.addEventListener("willUpdate", dirtyAll));
-    },
-    remove: (node) => {
-      nodes.delete(node);
-      const unsubscribe = subscriptions.get(node);
-      if (unsubscribe) {
-        unsubscribe();
-        subscriptions.delete(node);
-      }
-      dirtyAll();
-    },
-    dirty: dirtyAll
-  };
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/components/LayoutGroup/index.mjs
-var shouldInheritGroup = (inherit) => inherit === true;
-var shouldInheritId = (inherit) => shouldInheritGroup(inherit === true) || inherit === "id";
-var LayoutGroup = ({ children, id: id4, inherit = true }) => {
-  const layoutGroupContext = (0, import_react14.useContext)(LayoutGroupContext);
-  const deprecatedLayoutGroupContext = (0, import_react14.useContext)(DeprecatedLayoutGroupContext);
-  const [forceRender, key] = useForceUpdate();
-  const context = (0, import_react14.useRef)(null);
-  const upstreamId = layoutGroupContext.id || deprecatedLayoutGroupContext;
-  if (context.current === null) {
-    if (shouldInheritId(inherit) && upstreamId) {
-      id4 = id4 ? upstreamId + "-" + id4 : upstreamId;
-    }
-    context.current = {
-      id: id4,
-      group: shouldInheritGroup(inherit) ? layoutGroupContext.group || nodeGroup() : nodeGroup()
-    };
-  }
-  const memoizedContext = (0, import_react14.useMemo)(() => ({ ...context.current, forceRender }), [key]);
-  return (0, import_jsx_runtime4.jsx)(LayoutGroupContext.Provider, { value: memoizedContext, children });
-};
-
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/components/LazyMotion/index.mjs
 var import_jsx_runtime5 = __toESM(require_jsx_runtime(), 1);
-var import_react16 = __toESM(require_react(), 1);
+var import_react17 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/context/LazyContext.mjs
-var import_react15 = __toESM(require_react(), 1);
-var LazyContext = (0, import_react15.createContext)({ strict: false });
+var import_react16 = __toESM(require_react(), 1);
+var LazyContext = (0, import_react16.createContext)({ strict: false });
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/motion/features/definitions.mjs
 var featureProps = {
@@ -585,33 +1599,9 @@ function loadFeatures(features) {
   }
 }
 
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/components/LazyMotion/index.mjs
-function LazyMotion({ children, features, strict = false }) {
-  const [, setIsLoaded] = (0, import_react16.useState)(!isLazyBundle(features));
-  const loadedRenderer = (0, import_react16.useRef)(void 0);
-  if (!isLazyBundle(features)) {
-    const { renderer, ...loadedFeatures } = features;
-    loadedRenderer.current = renderer;
-    loadFeatures(loadedFeatures);
-  }
-  (0, import_react16.useEffect)(() => {
-    if (isLazyBundle(features)) {
-      features().then(({ renderer, ...loadedFeatures }) => {
-        loadFeatures(loadedFeatures);
-        loadedRenderer.current = renderer;
-        setIsLoaded(true);
-      });
-    }
-  }, []);
-  return (0, import_jsx_runtime5.jsx)(LazyContext.Provider, { value: { renderer: loadedRenderer.current, strict }, children });
-}
-function isLazyBundle(features) {
-  return typeof features === "function";
-}
-
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/components/MotionConfig/index.mjs
 var import_jsx_runtime6 = __toESM(require_jsx_runtime(), 1);
-var import_react17 = __toESM(require_react(), 1);
+var import_react18 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/motion/utils/valid-prop.mjs
 var validMotionProps = /* @__PURE__ */ new Set([
@@ -674,19 +1664,6 @@ function filterProps(props, isDom, forwardMotionProps) {
   return filteredProps;
 }
 
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/components/MotionConfig/index.mjs
-function MotionConfig({ children, isValidProp, ...config }) {
-  isValidProp && loadExternalIsValidProp(isValidProp);
-  config = { ...(0, import_react17.useContext)(MotionConfigContext), ...config };
-  config.isStatic = useConstant(() => config.isStatic);
-  const context = (0, import_react17.useMemo)(() => config, [
-    JSON.stringify(config.transition),
-    config.transformPagePoint,
-    config.reducedMotion
-  ]);
-  return (0, import_jsx_runtime6.jsx)(MotionConfigContext.Provider, { value: context, children });
-}
-
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/utils/warn-once.mjs
 var warned = /* @__PURE__ */ new Set();
 function warnOnce(condition, message, element) {
@@ -729,14 +1706,14 @@ function createDOMMotionComponentProxy(componentFactory) {
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/motion/index.mjs
 var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
-var import_react23 = __toESM(require_react(), 1);
+var import_react24 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/context/MotionContext/index.mjs
-var import_react18 = __toESM(require_react(), 1);
-var MotionContext = (0, import_react18.createContext)({});
+var import_react19 = __toESM(require_react(), 1);
+var MotionContext = (0, import_react19.createContext)({});
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/context/MotionContext/create.mjs
-var import_react19 = __toESM(require_react(), 1);
+var import_react20 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/utils/is-variant-label.mjs
 function isVariantLabel(v) {
@@ -782,8 +1759,8 @@ function getCurrentTreeVariants(props, context) {
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/context/MotionContext/create.mjs
 function useCreateMotionContext(props) {
-  const { initial, animate: animate2 } = getCurrentTreeVariants(props, (0, import_react19.useContext)(MotionContext));
-  return (0, import_react19.useMemo)(() => ({ initial, animate: animate2 }), [variantLabelsAsDependency(initial), variantLabelsAsDependency(animate2)]);
+  const { initial, animate: animate2 } = getCurrentTreeVariants(props, (0, import_react20.useContext)(MotionContext));
+  return (0, import_react20.useMemo)(() => ({ initial, animate: animate2 }), [variantLabelsAsDependency(initial), variantLabelsAsDependency(animate2)]);
 }
 function variantLabelsAsDependency(prop) {
   return Array.isArray(prop) ? prop.join(" ") : prop;
@@ -793,7 +1770,7 @@ function variantLabelsAsDependency(prop) {
 var motionComponentSymbol = Symbol.for("motionComponentSymbol");
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/motion/utils/use-motion-ref.mjs
-var import_react20 = __toESM(require_react(), 1);
+var import_react21 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/utils/is-ref-object.mjs
 function isRefObject(ref) {
@@ -802,7 +1779,7 @@ function isRefObject(ref) {
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/motion/utils/use-motion-ref.mjs
 function useMotionRef(visualState, visualElement, externalRef) {
-  return (0, import_react20.useCallback)(
+  return (0, import_react21.useCallback)(
     (instance) => {
       if (instance) {
         visualState.onMount && visualState.onMount(instance);
@@ -832,7 +1809,7 @@ function useMotionRef(visualState, visualElement, externalRef) {
 }
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/motion/utils/use-visual-element.mjs
-var import_react22 = __toESM(require_react(), 1);
+var import_react23 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/dom/utils/camel-to-dash.mjs
 var camelToDash = (str) => str.replace(/([a-z])([A-Z])/gu, "$1-$2").toLowerCase();
@@ -845,20 +1822,20 @@ var optimizedAppearDataAttribute = "data-" + camelToDash(optimizedAppearDataId);
 var { schedule: microtask, cancel: cancelMicrotask } = createRenderBatcher(queueMicrotask, false);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/context/SwitchLayoutGroupContext.mjs
-var import_react21 = __toESM(require_react(), 1);
-var SwitchLayoutGroupContext = (0, import_react21.createContext)({});
+var import_react22 = __toESM(require_react(), 1);
+var SwitchLayoutGroupContext = (0, import_react22.createContext)({});
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/motion/utils/use-visual-element.mjs
-function useVisualElement(Component3, visualState, props, createVisualElement, ProjectionNodeConstructor) {
+function useVisualElement(Component4, visualState, props, createVisualElement, ProjectionNodeConstructor) {
   var _a, _b;
-  const { visualElement: parent } = (0, import_react22.useContext)(MotionContext);
-  const lazyContext = (0, import_react22.useContext)(LazyContext);
-  const presenceContext = (0, import_react22.useContext)(PresenceContext);
-  const reducedMotionConfig = (0, import_react22.useContext)(MotionConfigContext).reducedMotion;
-  const visualElementRef = (0, import_react22.useRef)(null);
+  const { visualElement: parent } = (0, import_react23.useContext)(MotionContext);
+  const lazyContext = (0, import_react23.useContext)(LazyContext);
+  const presenceContext = (0, import_react23.useContext)(PresenceContext);
+  const reducedMotionConfig = (0, import_react23.useContext)(MotionConfigContext).reducedMotion;
+  const visualElementRef = (0, import_react23.useRef)(null);
   createVisualElement = createVisualElement || lazyContext.renderer;
   if (!visualElementRef.current && createVisualElement) {
-    visualElementRef.current = createVisualElement(Component3, {
+    visualElementRef.current = createVisualElement(Component4, {
       visualState,
       parent,
       props,
@@ -868,18 +1845,18 @@ function useVisualElement(Component3, visualState, props, createVisualElement, P
     });
   }
   const visualElement = visualElementRef.current;
-  const initialLayoutGroupConfig = (0, import_react22.useContext)(SwitchLayoutGroupContext);
+  const initialLayoutGroupConfig = (0, import_react23.useContext)(SwitchLayoutGroupContext);
   if (visualElement && !visualElement.projection && ProjectionNodeConstructor && (visualElement.type === "html" || visualElement.type === "svg")) {
     createProjectionNode(visualElementRef.current, props, ProjectionNodeConstructor, initialLayoutGroupConfig);
   }
-  const isMounted = (0, import_react22.useRef)(false);
-  (0, import_react22.useInsertionEffect)(() => {
+  const isMounted = (0, import_react23.useRef)(false);
+  (0, import_react23.useInsertionEffect)(() => {
     if (visualElement && isMounted.current) {
       visualElement.update(props, presenceContext);
     }
   });
   const optimisedAppearId = props[optimizedAppearDataAttribute];
-  const wantsHandoff = (0, import_react22.useRef)(Boolean(optimisedAppearId) && !((_a = window.MotionHandoffIsComplete) === null || _a === void 0 ? void 0 : _a.call(window, optimisedAppearId)) && ((_b = window.MotionHasOptimisedAnimation) === null || _b === void 0 ? void 0 : _b.call(window, optimisedAppearId)));
+  const wantsHandoff = (0, import_react23.useRef)(Boolean(optimisedAppearId) && !((_a = window.MotionHandoffIsComplete) === null || _a === void 0 ? void 0 : _a.call(window, optimisedAppearId)) && ((_b = window.MotionHasOptimisedAnimation) === null || _b === void 0 ? void 0 : _b.call(window, optimisedAppearId)));
   useIsomorphicLayoutEffect(() => {
     if (!visualElement)
       return;
@@ -891,7 +1868,7 @@ function useVisualElement(Component3, visualState, props, createVisualElement, P
       visualElement.animationState.animateChanges();
     }
   });
-  (0, import_react22.useEffect)(() => {
+  (0, import_react23.useEffect)(() => {
     if (!visualElement)
       return;
     if (!wantsHandoff.current && visualElement.animationState) {
@@ -935,13 +1912,13 @@ function getClosestProjectingNode(visualElement) {
 }
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/motion/index.mjs
-function createRendererMotionComponent({ preloadedFeatures, createVisualElement, useRender, useVisualState: useVisualState2, Component: Component3 }) {
+function createRendererMotionComponent({ preloadedFeatures, createVisualElement, useRender, useVisualState: useVisualState2, Component: Component4 }) {
   var _a, _b;
   preloadedFeatures && loadFeatures(preloadedFeatures);
   function MotionComponent(props, externalRef) {
     let MeasureLayout2;
     const configAndProps = {
-      ...(0, import_react23.useContext)(MotionConfigContext),
+      ...(0, import_react24.useContext)(MotionConfigContext),
       ...props,
       layoutId: useLayoutId(props)
     };
@@ -952,21 +1929,21 @@ function createRendererMotionComponent({ preloadedFeatures, createVisualElement,
       useStrictMode(configAndProps, preloadedFeatures);
       const layoutProjection = getProjectionFunctionality(configAndProps);
       MeasureLayout2 = layoutProjection.MeasureLayout;
-      context.visualElement = useVisualElement(Component3, visualState, configAndProps, createVisualElement, layoutProjection.ProjectionNode);
+      context.visualElement = useVisualElement(Component4, visualState, configAndProps, createVisualElement, layoutProjection.ProjectionNode);
     }
-    return (0, import_jsx_runtime7.jsxs)(MotionContext.Provider, { value: context, children: [MeasureLayout2 && context.visualElement ? (0, import_jsx_runtime7.jsx)(MeasureLayout2, { visualElement: context.visualElement, ...configAndProps }) : null, useRender(Component3, props, useMotionRef(visualState, context.visualElement, externalRef), visualState, isStatic, context.visualElement)] });
+    return (0, import_jsx_runtime7.jsxs)(MotionContext.Provider, { value: context, children: [MeasureLayout2 && context.visualElement ? (0, import_jsx_runtime7.jsx)(MeasureLayout2, { visualElement: context.visualElement, ...configAndProps }) : null, useRender(Component4, props, useMotionRef(visualState, context.visualElement, externalRef), visualState, isStatic, context.visualElement)] });
   }
-  MotionComponent.displayName = `motion.${typeof Component3 === "string" ? Component3 : `create(${(_b = (_a = Component3.displayName) !== null && _a !== void 0 ? _a : Component3.name) !== null && _b !== void 0 ? _b : ""})`}`;
-  const ForwardRefMotionComponent = (0, import_react23.forwardRef)(MotionComponent);
-  ForwardRefMotionComponent[motionComponentSymbol] = Component3;
+  MotionComponent.displayName = `motion.${typeof Component4 === "string" ? Component4 : `create(${(_b = (_a = Component4.displayName) !== null && _a !== void 0 ? _a : Component4.name) !== null && _b !== void 0 ? _b : ""})`}`;
+  const ForwardRefMotionComponent = (0, import_react24.forwardRef)(MotionComponent);
+  ForwardRefMotionComponent[motionComponentSymbol] = Component4;
   return ForwardRefMotionComponent;
 }
 function useLayoutId({ layoutId }) {
-  const layoutGroupId = (0, import_react23.useContext)(LayoutGroupContext).id;
+  const layoutGroupId = (0, import_react24.useContext)(LayoutGroupContext).id;
   return layoutGroupId && layoutId !== void 0 ? layoutGroupId + "-" + layoutId : layoutId;
 }
 function useStrictMode(configAndProps, preloadedFeatures) {
-  const isStrict = (0, import_react23.useContext)(LazyContext).strict;
+  const isStrict = (0, import_react24.useContext)(LazyContext).strict;
   if (preloadedFeatures && isStrict) {
     const strictMessage = "You have rendered a `motion` component within a `LazyMotion` component. This will break tree shaking. Import and render a `m` component instead.";
     configAndProps.ignoreStrict ? warning(false, strictMessage) : invariant(false, strictMessage);
@@ -1013,26 +1990,26 @@ var lowercaseSVGElements = [
 ];
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/dom/utils/is-svg-component.mjs
-function isSVGComponent(Component3) {
+function isSVGComponent(Component4) {
   if (
     /**
      * If it's not a string, it's a custom React component. Currently we only support
      * HTML custom React components.
      */
-    typeof Component3 !== "string" || /**
+    typeof Component4 !== "string" || /**
      * If it contains a dash, the element is a custom HTML webcomponent.
      */
-    Component3.includes("-")
+    Component4.includes("-")
   ) {
     return false;
   } else if (
     /**
      * If it's in our list of lowercase SVG tags, it's an SVG component
      */
-    lowercaseSVGElements.indexOf(Component3) > -1 || /**
+    lowercaseSVGElements.indexOf(Component4) > -1 || /**
      * If it contains a capital letter, it's an SVG component
      */
-    /[A-Z]/u.test(Component3)
+    /[A-Z]/u.test(Component4)
   ) {
     return true;
   }
@@ -1040,7 +2017,7 @@ function isSVGComponent(Component3) {
 }
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/motion/utils/use-visual-state.mjs
-var import_react24 = __toESM(require_react(), 1);
+var import_react25 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/utils/resolve-variants.mjs
 function getValueState(visualElement) {
@@ -1101,8 +2078,8 @@ function makeState({ scrapeMotionValuesFromProps: scrapeMotionValuesFromProps3, 
   return state2;
 }
 var makeUseVisualState = (config) => (props, isStatic) => {
-  const context = (0, import_react24.useContext)(MotionContext);
-  const presenceContext = (0, import_react24.useContext)(PresenceContext);
+  const context = (0, import_react25.useContext)(MotionContext);
+  const presenceContext = (0, import_react25.useContext)(PresenceContext);
   const make = () => makeState(config, props, context, presenceContext);
   return isStatic ? make() : useConstant(make);
 };
@@ -1404,11 +2381,11 @@ var camelKeys = {
 };
 function buildSVGPath(attrs, length, spacing = 1, offset = 0, useDashCase = true) {
   attrs.pathLength = 1;
-  const keys2 = useDashCase ? dashKeys : camelKeys;
-  attrs[keys2.offset] = px.transform(-offset);
+  const keys = useDashCase ? dashKeys : camelKeys;
+  attrs[keys.offset] = px.transform(-offset);
   const pathLength = px.transform(length);
   const pathSpacing = px.transform(spacing);
-  attrs[keys2.array] = `${pathLength} ${pathSpacing}`;
+  attrs[keys.array] = `${pathLength} ${pathSpacing}`;
 }
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/svg/utils/transform-origin.mjs
@@ -1622,10 +2599,10 @@ var htmlMotionConfig = {
 };
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/dom/use-render.mjs
-var import_react27 = __toESM(require_react(), 1);
+var import_react28 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/html/use-props.mjs
-var import_react25 = __toESM(require_react(), 1);
+var import_react26 = __toESM(require_react(), 1);
 function copyRawValuesOnly(target, source, props) {
   for (const key in source) {
     if (!isMotionValue(source[key]) && !isForcedMotionValue(key, props)) {
@@ -1634,7 +2611,7 @@ function copyRawValuesOnly(target, source, props) {
   }
 }
 function useInitialMotionValues({ transformTemplate }, visualState) {
-  return (0, import_react25.useMemo)(() => {
+  return (0, import_react26.useMemo)(() => {
     const state2 = createHtmlRenderState();
     buildHTMLStyles(state2, visualState, transformTemplate);
     return Object.assign({}, state2.vars, state2.style);
@@ -1663,11 +2640,11 @@ function useHTMLProps(props, visualState) {
 }
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/svg/use-props.mjs
-var import_react26 = __toESM(require_react(), 1);
-function useSVGProps(props, visualState, _isStatic, Component3) {
-  const visualProps = (0, import_react26.useMemo)(() => {
+var import_react27 = __toESM(require_react(), 1);
+function useSVGProps(props, visualState, _isStatic, Component4) {
+  const visualProps = (0, import_react27.useMemo)(() => {
     const state2 = createSvgRenderState();
-    buildSVGAttrs(state2, visualState, isSVGTag(Component3), props.transformTemplate);
+    buildSVGAttrs(state2, visualState, isSVGTag(Component4), props.transformTemplate);
     return {
       ...state2.attrs,
       style: { ...state2.style }
@@ -1683,14 +2660,14 @@ function useSVGProps(props, visualState, _isStatic, Component3) {
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/dom/use-render.mjs
 function createUseRender(forwardMotionProps = false) {
-  const useRender = (Component3, props, ref, { latestValues }, isStatic) => {
-    const useVisualProps = isSVGComponent(Component3) ? useSVGProps : useHTMLProps;
-    const visualProps = useVisualProps(props, latestValues, isStatic, Component3);
-    const filteredProps = filterProps(props, typeof Component3 === "string", forwardMotionProps);
-    const elementProps = Component3 !== import_react27.Fragment ? { ...filteredProps, ...visualProps, ref } : {};
+  const useRender = (Component4, props, ref, { latestValues }, isStatic) => {
+    const useVisualProps = isSVGComponent(Component4) ? useSVGProps : useHTMLProps;
+    const visualProps = useVisualProps(props, latestValues, isStatic, Component4);
+    const filteredProps = filterProps(props, typeof Component4 === "string", forwardMotionProps);
+    const elementProps = Component4 !== import_react28.Fragment ? { ...filteredProps, ...visualProps, ref } : {};
     const { children } = props;
-    const renderedChildren = (0, import_react27.useMemo)(() => isMotionValue(children) ? children.get() : children, [children]);
-    return (0, import_react27.createElement)(Component3, {
+    const renderedChildren = (0, import_react28.useMemo)(() => isMotionValue(children) ? children.get() : children, [children]);
+    return (0, import_react28.createElement)(Component4, {
       ...elementProps,
       children: renderedChildren
     });
@@ -1700,14 +2677,14 @@ function createUseRender(forwardMotionProps = false) {
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/components/create-factory.mjs
 function createMotionComponentFactory(preloadedFeatures, createVisualElement) {
-  return function createMotionComponent2(Component3, { forwardMotionProps } = { forwardMotionProps: false }) {
-    const baseConfig = isSVGComponent(Component3) ? svgMotionConfig : htmlMotionConfig;
+  return function createMotionComponent2(Component4, { forwardMotionProps } = { forwardMotionProps: false }) {
+    const baseConfig = isSVGComponent(Component4) ? svgMotionConfig : htmlMotionConfig;
     const config = {
       ...baseConfig,
       preloadedFeatures,
       useRender: createUseRender(forwardMotionProps),
       createVisualElement,
-      Component: Component3
+      Component: Component4
     };
     return createRendererMotionComponent(config);
   };
@@ -3660,8 +4637,8 @@ function calcAngularFreq(undampedFreq, dampingRatio) {
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/animation/generators/spring/index.mjs
 var durationKeys = ["duration", "bounce"];
 var physicsKeys = ["stiffness", "damping", "mass"];
-function isSpringType(options, keys2) {
-  return keys2.some((key) => options[key] !== void 0);
+function isSpringType(options, keys) {
+  return keys.some((key) => options[key] !== void 0);
 }
 function getSpringOptions(options) {
   let springOptions = {
@@ -4231,9 +5208,6 @@ var MainThreadAnimation = class extends BaseAnimation {
     return this.tick(time2, true);
   }
 };
-function animateValue(options) {
-  return new MainThreadAnimation(options);
-}
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/animation/animators/utils/accelerated-values.mjs
 var acceleratedValues = /* @__PURE__ */ new Set([
@@ -4974,13 +5948,13 @@ var ExitAnimationFeature = class extends Feature {
   update() {
     if (!this.node.presenceContext)
       return;
-    const { isPresent: isPresent2, onExitComplete } = this.node.presenceContext;
+    const { isPresent, onExitComplete } = this.node.presenceContext;
     const { isPresent: prevIsPresent } = this.node.prevPresenceContext || {};
-    if (!this.node.animationState || isPresent2 === prevIsPresent) {
+    if (!this.node.animationState || isPresent === prevIsPresent) {
       return;
     }
-    const exitAnimation = this.node.animationState.setActive("exit", !isPresent2);
-    if (onExitComplete && !isPresent2) {
+    const exitAnimation = this.node.animationState.setActive("exit", !isPresent);
+    if (onExitComplete && !isPresent) {
       exitAnimation.then(() => onExitComplete(this.id));
     }
   }
@@ -5052,9 +6026,9 @@ var PanSession = class {
       const isDistancePastThreshold = distance2D(info2.offset, { x: 0, y: 0 }) >= 3;
       if (!isPanStarted && !isDistancePastThreshold)
         return;
-      const { point: point3 } = info2;
+      const { point: point2 } = info2;
       const { timestamp: timestamp2 } = frameData;
-      this.history.push({ ...point3, timestamp: timestamp2 });
+      this.history.push({ ...point2, timestamp: timestamp2 });
       const { onStart, onMove } = this.handlers;
       if (!isPanStarted) {
         onStart && onStart(this.lastMoveEvent, info2);
@@ -5088,9 +6062,9 @@ var PanSession = class {
     this.contextWindow = contextWindow || window;
     const info = extractEventInfo(event);
     const initialInfo = transformPoint(info, this.transformPagePoint);
-    const { point: point2 } = initialInfo;
+    const { point } = initialInfo;
     const { timestamp } = frameData;
-    this.history = [{ ...point2, timestamp }];
+    this.history = [{ ...point, timestamp }];
     const { onSessionStart } = handlers;
     onSessionStart && onSessionStart(event, getPanInfo(initialInfo, this.history));
     this.removeListeners = pipe(addPointerEvent(this.contextWindow, "pointermove", this.handlePointerMove), addPointerEvent(this.contextWindow, "pointerup", this.handlePointerUp), addPointerEvent(this.contextWindow, "pointercancel", this.handlePointerUp));
@@ -5109,11 +6083,11 @@ function transformPoint(info, transformPagePoint) {
 function subtractPoint(a, b) {
   return { x: a.x - b.x, y: a.y - b.y };
 }
-function getPanInfo({ point: point2 }, history) {
+function getPanInfo({ point }, history) {
   return {
-    point: point2,
-    delta: subtractPoint(point2, lastDevicePoint(history)),
-    offset: subtractPoint(point2, startDevicePoint(history)),
+    point,
+    delta: subtractPoint(point, lastDevicePoint(history)),
+    offset: subtractPoint(point, startDevicePoint(history)),
     velocity: getVelocity(history, 0.1)
   };
 }
@@ -5204,13 +6178,13 @@ function calcRelativePosition(target, layout2, parent) {
 }
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/gestures/drag/utils/constraints.mjs
-function applyConstraints(point2, { min, max }, elastic) {
-  if (min !== void 0 && point2 < min) {
-    point2 = elastic ? mixNumber(min, point2, elastic.min) : Math.max(point2, min);
-  } else if (max !== void 0 && point2 > max) {
-    point2 = elastic ? mixNumber(max, point2, elastic.max) : Math.min(point2, max);
+function applyConstraints(point, { min, max }, elastic) {
+  if (min !== void 0 && point < min) {
+    point = elastic ? mixNumber(min, point, elastic.min) : Math.max(point, min);
+  } else if (max !== void 0 && point > max) {
+    point = elastic ? mixNumber(max, point, elastic.max) : Math.min(point, max);
   }
-  return point2;
+  return point;
 }
 function calcRelativeAxisConstraints(axis, min, max) {
   return {
@@ -5313,11 +6287,11 @@ function convertBoundingBoxToBox({ top, left, right, bottom }) {
 function convertBoxToBoundingBox({ x, y }) {
   return { top: y.min, right: x.max, bottom: y.max, left: x.min };
 }
-function transformBoxPoints(point2, transformPoint2) {
+function transformBoxPoints(point, transformPoint2) {
   if (!transformPoint2)
-    return point2;
-  const topLeft = transformPoint2({ x: point2.left, y: point2.top });
-  const bottomRight = transformPoint2({ x: point2.right, y: point2.bottom });
+    return point;
+  const topLeft = transformPoint2({ x: point.left, y: point.top });
+  const bottomRight = transformPoint2({ x: point.right, y: point.bottom });
   return {
     top: topLeft.y,
     left: topLeft.x,
@@ -5344,16 +6318,16 @@ function is2DTranslate(value) {
 }
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/projection/geometry/delta-apply.mjs
-function scalePoint(point2, scale2, originPoint) {
-  const distanceFromOrigin = point2 - originPoint;
+function scalePoint(point, scale2, originPoint) {
+  const distanceFromOrigin = point - originPoint;
   const scaled = scale2 * distanceFromOrigin;
   return originPoint + scaled;
 }
-function applyPointDelta(point2, translate, scale2, originPoint, boxScale) {
+function applyPointDelta(point, translate, scale2, originPoint, boxScale) {
   if (boxScale !== void 0) {
-    point2 = scalePoint(point2, boxScale, originPoint);
+    point = scalePoint(point, boxScale, originPoint);
   }
-  return scalePoint(point2, scale2, originPoint) + translate;
+  return scalePoint(point, scale2, originPoint) + translate;
 }
 function applyAxisDelta(axis, translate = 0, scale2 = 1, originPoint, boxScale) {
   axis.min = applyPointDelta(axis.min, translate, scale2, originPoint, boxScale);
@@ -5669,7 +6643,7 @@ var VisualElementDragControls = class {
     const externalMotionValue = props[dragKey];
     return externalMotionValue ? externalMotionValue : this.visualElement.getValue(axis, (props.initial ? props.initial[axis] : void 0) || 0);
   }
-  snapToCursor(point2) {
+  snapToCursor(point) {
     eachAxis((axis) => {
       const { drag: drag2 } = this.getProps();
       if (!shouldDrag(axis, drag2, this.currentDirection))
@@ -5678,7 +6652,7 @@ var VisualElementDragControls = class {
       const axisValue = this.getAxisMotionValue(axis);
       if (projection && projection.layout) {
         const { min, max } = projection.layout.layoutBox[axis];
-        axisValue.set(point2[axis] - mixNumber(min, max, 0.5));
+        axisValue.set(point[axis] - mixNumber(min, max, 0.5));
       }
     });
   }
@@ -5851,7 +6825,7 @@ var PanGesture = class extends Feature {
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/motion/features/layout/MeasureLayout.mjs
 var import_jsx_runtime8 = __toESM(require_jsx_runtime(), 1);
-var import_react28 = __toESM(require_react(), 1);
+var import_react29 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/projection/node/state.mjs
 var globalProjectionState = {
@@ -5913,7 +6887,7 @@ var correctBoxShadow = {
 };
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/motion/features/layout/MeasureLayout.mjs
-var MeasureLayoutWithContext = class extends import_react28.Component {
+var MeasureLayoutWithContext = class extends import_react29.Component {
   /**
    * This only mounts projection nodes for components that
    * need measuring, we might want to do it for all components
@@ -5941,18 +6915,18 @@ var MeasureLayoutWithContext = class extends import_react28.Component {
     globalProjectionState.hasEverUpdated = true;
   }
   getSnapshotBeforeUpdate(prevProps) {
-    const { layoutDependency, visualElement, drag: drag2, isPresent: isPresent2 } = this.props;
+    const { layoutDependency, visualElement, drag: drag2, isPresent } = this.props;
     const projection = visualElement.projection;
     if (!projection)
       return null;
-    projection.isPresent = isPresent2;
+    projection.isPresent = isPresent;
     if (drag2 || prevProps.layoutDependency !== layoutDependency || layoutDependency === void 0) {
       projection.willUpdate();
     } else {
       this.safeToRemove();
     }
-    if (prevProps.isPresent !== isPresent2) {
-      if (isPresent2) {
+    if (prevProps.isPresent !== isPresent) {
+      if (isPresent) {
         projection.promote();
       } else if (!projection.relegate()) {
         frame.postRender(() => {
@@ -5996,9 +6970,9 @@ var MeasureLayoutWithContext = class extends import_react28.Component {
   }
 };
 function MeasureLayout(props) {
-  const [isPresent2, safeToRemove] = usePresence();
-  const layoutGroup = (0, import_react28.useContext)(LayoutGroupContext);
-  return (0, import_jsx_runtime8.jsx)(MeasureLayoutWithContext, { ...props, layoutGroup, switchLayoutGroup: (0, import_react28.useContext)(SwitchLayoutGroupContext), isPresent: isPresent2, safeToRemove });
+  const [isPresent, safeToRemove] = usePresence();
+  const layoutGroup = (0, import_react29.useContext)(LayoutGroupContext);
+  return (0, import_jsx_runtime8.jsx)(MeasureLayoutWithContext, { ...props, layoutGroup, switchLayoutGroup: (0, import_react29.useContext)(SwitchLayoutGroupContext), isPresent, safeToRemove });
 }
 var defaultScaleCorrectors = {
   borderRadius: {
@@ -6138,13 +7112,13 @@ function copyAxisDeltaInto(delta, originDelta) {
 }
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/projection/geometry/delta-remove.mjs
-function removePointDelta(point2, translate, scale2, originPoint, boxScale) {
-  point2 -= translate;
-  point2 = scalePoint(point2, 1 / scale2, originPoint);
+function removePointDelta(point, translate, scale2, originPoint, boxScale) {
+  point -= translate;
+  point = scalePoint(point, 1 / scale2, originPoint);
   if (boxScale !== void 0) {
-    point2 = scalePoint(point2, 1 / boxScale, originPoint);
+    point = scalePoint(point, 1 / boxScale, originPoint);
   }
-  return point2;
+  return point;
 }
 function removeAxisDelta(axis, translate = 0, scale2 = 1, origin = 0.5, boxScale, originAxis = axis, sourceAxis = axis) {
   if (percent.test(translate)) {
@@ -6939,10 +7913,10 @@ function createProjectionNode2({ attachResizeListener, defaultParent, measureScr
     show() {
       this.isVisible = true;
     }
-    scheduleRender(notifyAll2 = true) {
+    scheduleRender(notifyAll = true) {
       var _a;
       (_a = this.options.visualElement) === null || _a === void 0 ? void 0 : _a.scheduleRender();
-      if (notifyAll2) {
+      if (notifyAll) {
         const stack = this.getStack();
         stack && stack.scheduleRender();
       }
@@ -7147,16 +8121,16 @@ function createProjectionNode2({ attachResizeListener, defaultParent, measureScr
       if (!this.isVisible) {
         return hiddenVisibility;
       }
-      const styles = {
+      const styles2 = {
         visibility: ""
       };
       const transformTemplate = this.getTransformTemplate();
       if (this.needsReset) {
         this.needsReset = false;
-        styles.opacity = "";
-        styles.pointerEvents = resolveMotionValue(styleProp === null || styleProp === void 0 ? void 0 : styleProp.pointerEvents) || "";
-        styles.transform = transformTemplate ? transformTemplate(this.latestValues, "") : "none";
-        return styles;
+        styles2.opacity = "";
+        styles2.pointerEvents = resolveMotionValue(styleProp === null || styleProp === void 0 ? void 0 : styleProp.pointerEvents) || "";
+        styles2.transform = transformTemplate ? transformTemplate(this.latestValues, "") : "none";
+        return styles2;
       }
       const lead = this.getLead();
       if (!this.projectionDelta || !this.layout || !lead.target) {
@@ -7173,35 +8147,35 @@ function createProjectionNode2({ attachResizeListener, defaultParent, measureScr
       }
       const valuesToRender = lead.animationValues || lead.latestValues;
       this.applyTransformsToTarget();
-      styles.transform = buildProjectionTransform(this.projectionDeltaWithTransform, this.treeScale, valuesToRender);
+      styles2.transform = buildProjectionTransform(this.projectionDeltaWithTransform, this.treeScale, valuesToRender);
       if (transformTemplate) {
-        styles.transform = transformTemplate(valuesToRender, styles.transform);
+        styles2.transform = transformTemplate(valuesToRender, styles2.transform);
       }
       const { x, y } = this.projectionDelta;
-      styles.transformOrigin = `${x.origin * 100}% ${y.origin * 100}% 0`;
+      styles2.transformOrigin = `${x.origin * 100}% ${y.origin * 100}% 0`;
       if (lead.animationValues) {
-        styles.opacity = lead === this ? (_b = (_a = valuesToRender.opacity) !== null && _a !== void 0 ? _a : this.latestValues.opacity) !== null && _b !== void 0 ? _b : 1 : this.preserveOpacity ? this.latestValues.opacity : valuesToRender.opacityExit;
+        styles2.opacity = lead === this ? (_b = (_a = valuesToRender.opacity) !== null && _a !== void 0 ? _a : this.latestValues.opacity) !== null && _b !== void 0 ? _b : 1 : this.preserveOpacity ? this.latestValues.opacity : valuesToRender.opacityExit;
       } else {
-        styles.opacity = lead === this ? valuesToRender.opacity !== void 0 ? valuesToRender.opacity : "" : valuesToRender.opacityExit !== void 0 ? valuesToRender.opacityExit : 0;
+        styles2.opacity = lead === this ? valuesToRender.opacity !== void 0 ? valuesToRender.opacity : "" : valuesToRender.opacityExit !== void 0 ? valuesToRender.opacityExit : 0;
       }
       for (const key in scaleCorrectors) {
         if (valuesToRender[key] === void 0)
           continue;
         const { correct, applyTo } = scaleCorrectors[key];
-        const corrected = styles.transform === "none" ? valuesToRender[key] : correct(valuesToRender[key], lead);
+        const corrected = styles2.transform === "none" ? valuesToRender[key] : correct(valuesToRender[key], lead);
         if (applyTo) {
           const num = applyTo.length;
           for (let i = 0; i < num; i++) {
-            styles[applyTo[i]] = corrected;
+            styles2[applyTo[i]] = corrected;
           }
         } else {
-          styles[key] = corrected;
+          styles2[key] = corrected;
         }
       }
       if (this.options.layoutId) {
-        styles.pointerEvents = lead === this ? resolveMotionValue(styleProp === null || styleProp === void 0 ? void 0 : styleProp.pointerEvents) || "" : "none";
+        styles2.pointerEvents = lead === this ? resolveMotionValue(styleProp === null || styleProp === void 0 ? void 0 : styleProp.pointerEvents) || "" : "none";
       }
-      return styles;
+      return styles2;
     }
     clearSnapshot() {
       this.resumeFrom = this.snapshot = void 0;
@@ -7378,7 +8352,7 @@ function checkNodeWasScrollRoot(node) {
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/projection/node/DocumentProjectionNode.mjs
 var DocumentProjectionNode = createProjectionNode2({
-  attachResizeListener: (ref, notify2) => addDomEvent(ref, "resize", notify2),
+  attachResizeListener: (ref, notify) => addDomEvent(ref, "resize", notify),
   measureScroll: () => ({
     x: document.documentElement.scrollLeft || document.body.scrollLeft,
     y: document.documentElement.scrollTop || document.body.scrollTop
@@ -7620,7 +8594,7 @@ var layout = {
 };
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/dom/create-visual-element.mjs
-var import_react29 = __toESM(require_react(), 1);
+var import_react30 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/utils/reduced-motion/state.mjs
 var prefersReducedMotion = { current: null };
@@ -8131,9 +9105,9 @@ var SVGVisualElement = class extends DOMVisualElement {
 };
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/dom/create-visual-element.mjs
-var createDomVisualElement = (Component3, options) => {
-  return isSVGComponent(Component3) ? new SVGVisualElement(options) : new HTMLVisualElement(options, {
-    allowProjection: Component3 !== import_react29.Fragment
+var createDomVisualElement = (Component4, options) => {
+  return isSVGComponent(Component4) ? new SVGVisualElement(options) : new HTMLVisualElement(options, {
+    allowProjection: Component4 !== import_react30.Fragment
   });
 };
 
@@ -8169,526 +9143,19 @@ var domMin = {
 };
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/utils/use-motion-value-event.mjs
-var import_react30 = __toESM(require_react(), 1);
-function useMotionValueEvent(value, event, callback) {
-  (0, import_react30.useInsertionEffect)(() => value.on(event, callback), [value, event, callback]);
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/value/use-scroll.mjs
 var import_react31 = __toESM(require_react(), 1);
 
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/dom/scroll/observe.mjs
-function observeTimeline(update, timeline) {
-  let prevProgress;
-  const onFrame = () => {
-    const { currentTime } = timeline;
-    const percentage = currentTime === null ? 0 : currentTime.value;
-    const progress2 = percentage / 100;
-    if (prevProgress !== progress2) {
-      update(progress2);
-    }
-    prevProgress = progress2;
-  };
-  frame.update(onFrame, true);
-  return () => cancelFrame(onFrame);
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/dom/resize/handle-element.mjs
-var resizeHandlers = /* @__PURE__ */ new WeakMap();
-var observer;
-function getElementSize(target, borderBoxSize) {
-  if (borderBoxSize) {
-    const { inlineSize, blockSize } = borderBoxSize[0];
-    return { width: inlineSize, height: blockSize };
-  } else if (target instanceof SVGElement && "getBBox" in target) {
-    return target.getBBox();
-  } else {
-    return {
-      width: target.offsetWidth,
-      height: target.offsetHeight
-    };
-  }
-}
-function notifyTarget({ target, contentRect, borderBoxSize }) {
-  var _a;
-  (_a = resizeHandlers.get(target)) === null || _a === void 0 ? void 0 : _a.forEach((handler) => {
-    handler({
-      target,
-      contentSize: contentRect,
-      get size() {
-        return getElementSize(target, borderBoxSize);
-      }
-    });
-  });
-}
-function notifyAll(entries) {
-  entries.forEach(notifyTarget);
-}
-function createResizeObserver() {
-  if (typeof ResizeObserver === "undefined")
-    return;
-  observer = new ResizeObserver(notifyAll);
-}
-function resizeElement(target, handler) {
-  if (!observer)
-    createResizeObserver();
-  const elements = resolveElements(target);
-  elements.forEach((element) => {
-    let elementHandlers = resizeHandlers.get(element);
-    if (!elementHandlers) {
-      elementHandlers = /* @__PURE__ */ new Set();
-      resizeHandlers.set(element, elementHandlers);
-    }
-    elementHandlers.add(handler);
-    observer === null || observer === void 0 ? void 0 : observer.observe(element);
-  });
-  return () => {
-    elements.forEach((element) => {
-      const elementHandlers = resizeHandlers.get(element);
-      elementHandlers === null || elementHandlers === void 0 ? void 0 : elementHandlers.delete(handler);
-      if (!(elementHandlers === null || elementHandlers === void 0 ? void 0 : elementHandlers.size)) {
-        observer === null || observer === void 0 ? void 0 : observer.unobserve(element);
-      }
-    });
-  };
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/dom/resize/handle-window.mjs
-var windowCallbacks = /* @__PURE__ */ new Set();
-var windowResizeHandler;
-function createWindowResizeHandler() {
-  windowResizeHandler = () => {
-    const size = {
-      width: window.innerWidth,
-      height: window.innerHeight
-    };
-    const info = {
-      target: window,
-      size,
-      contentSize: size
-    };
-    windowCallbacks.forEach((callback) => callback(info));
-  };
-  window.addEventListener("resize", windowResizeHandler);
-}
-function resizeWindow(callback) {
-  windowCallbacks.add(callback);
-  if (!windowResizeHandler)
-    createWindowResizeHandler();
-  return () => {
-    windowCallbacks.delete(callback);
-    if (!windowCallbacks.size && windowResizeHandler) {
-      windowResizeHandler = void 0;
-    }
-  };
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/dom/resize/index.mjs
-function resize(a, b) {
-  return typeof a === "function" ? resizeWindow(a) : resizeElement(a, b);
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/dom/scroll/info.mjs
-var maxElapsed2 = 50;
-var createAxisInfo = () => ({
-  current: 0,
-  offset: [],
-  progress: 0,
-  scrollLength: 0,
-  targetOffset: 0,
-  targetLength: 0,
-  containerLength: 0,
-  velocity: 0
-});
-var createScrollInfo = () => ({
-  time: 0,
-  x: createAxisInfo(),
-  y: createAxisInfo()
-});
-var keys = {
-  x: {
-    length: "Width",
-    position: "Left"
-  },
-  y: {
-    length: "Height",
-    position: "Top"
-  }
-};
-function updateAxisInfo(element, axisName, info, time2) {
-  const axis = info[axisName];
-  const { length, position } = keys[axisName];
-  const prev = axis.current;
-  const prevTime = info.time;
-  axis.current = element[`scroll${position}`];
-  axis.scrollLength = element[`scroll${length}`] - element[`client${length}`];
-  axis.offset.length = 0;
-  axis.offset[0] = 0;
-  axis.offset[1] = axis.scrollLength;
-  axis.progress = progress(0, axis.scrollLength, axis.current);
-  const elapsed = time2 - prevTime;
-  axis.velocity = elapsed > maxElapsed2 ? 0 : velocityPerSecond(axis.current - prev, elapsed);
-}
-function updateScrollInfo(element, info, time2) {
-  updateAxisInfo(element, "x", info, time2);
-  updateAxisInfo(element, "y", info, time2);
-  info.time = time2;
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/dom/scroll/offsets/inset.mjs
-function calcInset(element, container) {
-  const inset = { x: 0, y: 0 };
-  let current = element;
-  while (current && current !== container) {
-    if (current instanceof HTMLElement) {
-      inset.x += current.offsetLeft;
-      inset.y += current.offsetTop;
-      current = current.offsetParent;
-    } else if (current.tagName === "svg") {
-      const svgBoundingBox = current.getBoundingClientRect();
-      current = current.parentElement;
-      const parentBoundingBox = current.getBoundingClientRect();
-      inset.x += svgBoundingBox.left - parentBoundingBox.left;
-      inset.y += svgBoundingBox.top - parentBoundingBox.top;
-    } else if (current instanceof SVGGraphicsElement) {
-      const { x, y } = current.getBBox();
-      inset.x += x;
-      inset.y += y;
-      let svg = null;
-      let parent = current.parentNode;
-      while (!svg) {
-        if (parent.tagName === "svg") {
-          svg = parent;
-        }
-        parent = current.parentNode;
-      }
-      current = svg;
-    } else {
-      break;
-    }
-  }
-  return inset;
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/dom/scroll/offsets/edge.mjs
-var namedEdges = {
-  start: 0,
-  center: 0.5,
-  end: 1
-};
-function resolveEdge(edge, length, inset = 0) {
-  let delta = 0;
-  if (edge in namedEdges) {
-    edge = namedEdges[edge];
-  }
-  if (typeof edge === "string") {
-    const asNumber2 = parseFloat(edge);
-    if (edge.endsWith("px")) {
-      delta = asNumber2;
-    } else if (edge.endsWith("%")) {
-      edge = asNumber2 / 100;
-    } else if (edge.endsWith("vw")) {
-      delta = asNumber2 / 100 * document.documentElement.clientWidth;
-    } else if (edge.endsWith("vh")) {
-      delta = asNumber2 / 100 * document.documentElement.clientHeight;
-    } else {
-      edge = asNumber2;
-    }
-  }
-  if (typeof edge === "number") {
-    delta = length * edge;
-  }
-  return inset + delta;
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/dom/scroll/offsets/offset.mjs
-var defaultOffset2 = [0, 0];
-function resolveOffset(offset, containerLength, targetLength, targetInset) {
-  let offsetDefinition = Array.isArray(offset) ? offset : defaultOffset2;
-  let targetPoint = 0;
-  let containerPoint = 0;
-  if (typeof offset === "number") {
-    offsetDefinition = [offset, offset];
-  } else if (typeof offset === "string") {
-    offset = offset.trim();
-    if (offset.includes(" ")) {
-      offsetDefinition = offset.split(" ");
-    } else {
-      offsetDefinition = [offset, namedEdges[offset] ? offset : `0`];
-    }
-  }
-  targetPoint = resolveEdge(offsetDefinition[0], targetLength, targetInset);
-  containerPoint = resolveEdge(offsetDefinition[1], containerLength);
-  return targetPoint - containerPoint;
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/dom/scroll/offsets/presets.mjs
-var ScrollOffset = {
-  Enter: [
-    [0, 1],
-    [1, 1]
-  ],
-  Exit: [
-    [0, 0],
-    [1, 0]
-  ],
-  Any: [
-    [1, 0],
-    [0, 1]
-  ],
-  All: [
-    [0, 0],
-    [1, 1]
-  ]
-};
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/dom/scroll/offsets/index.mjs
-var point = { x: 0, y: 0 };
-function getTargetSize(target) {
-  return "getBBox" in target && target.tagName !== "svg" ? target.getBBox() : { width: target.clientWidth, height: target.clientHeight };
-}
-function resolveOffsets(container, info, options) {
-  const { offset: offsetDefinition = ScrollOffset.All } = options;
-  const { target = container, axis = "y" } = options;
-  const lengthLabel = axis === "y" ? "height" : "width";
-  const inset = target !== container ? calcInset(target, container) : point;
-  const targetSize = target === container ? { width: container.scrollWidth, height: container.scrollHeight } : getTargetSize(target);
-  const containerSize = {
-    width: container.clientWidth,
-    height: container.clientHeight
-  };
-  info[axis].offset.length = 0;
-  let hasChanged = !info[axis].interpolate;
-  const numOffsets = offsetDefinition.length;
-  for (let i = 0; i < numOffsets; i++) {
-    const offset = resolveOffset(offsetDefinition[i], containerSize[lengthLabel], targetSize[lengthLabel], inset[axis]);
-    if (!hasChanged && offset !== info[axis].interpolatorOffsets[i]) {
-      hasChanged = true;
-    }
-    info[axis].offset[i] = offset;
-  }
-  if (hasChanged) {
-    info[axis].interpolate = interpolate(info[axis].offset, defaultOffset(offsetDefinition), { clamp: false });
-    info[axis].interpolatorOffsets = [...info[axis].offset];
-  }
-  info[axis].progress = clamp(0, 1, info[axis].interpolate(info[axis].current));
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/dom/scroll/on-scroll-handler.mjs
-function measure(container, target = container, info) {
-  info.x.targetOffset = 0;
-  info.y.targetOffset = 0;
-  if (target !== container) {
-    let node = target;
-    while (node && node !== container) {
-      info.x.targetOffset += node.offsetLeft;
-      info.y.targetOffset += node.offsetTop;
-      node = node.offsetParent;
-    }
-  }
-  info.x.targetLength = target === container ? target.scrollWidth : target.clientWidth;
-  info.y.targetLength = target === container ? target.scrollHeight : target.clientHeight;
-  info.x.containerLength = container.clientWidth;
-  info.y.containerLength = container.clientHeight;
-  if (true) {
-    if (container && target && target !== container) {
-      warnOnce(getComputedStyle(container).position !== "static", "Please ensure that the container has a non-static position, like 'relative', 'fixed', or 'absolute' to ensure scroll offset is calculated correctly.");
-    }
-  }
-}
-function createOnScrollHandler(element, onScroll, info, options = {}) {
-  return {
-    measure: () => measure(element, options.target, info),
-    update: (time2) => {
-      updateScrollInfo(element, info, time2);
-      if (options.offset || options.target) {
-        resolveOffsets(element, info, options);
-      }
-    },
-    notify: () => onScroll(info)
-  };
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/dom/scroll/track.mjs
-var scrollListeners = /* @__PURE__ */ new WeakMap();
-var resizeListeners = /* @__PURE__ */ new WeakMap();
-var onScrollHandlers = /* @__PURE__ */ new WeakMap();
-var getEventTarget = (element) => element === document.documentElement ? window : element;
-function scrollInfo(onScroll, { container = document.documentElement, ...options } = {}) {
-  let containerHandlers = onScrollHandlers.get(container);
-  if (!containerHandlers) {
-    containerHandlers = /* @__PURE__ */ new Set();
-    onScrollHandlers.set(container, containerHandlers);
-  }
-  const info = createScrollInfo();
-  const containerHandler = createOnScrollHandler(container, onScroll, info, options);
-  containerHandlers.add(containerHandler);
-  if (!scrollListeners.has(container)) {
-    const measureAll = () => {
-      for (const handler of containerHandlers)
-        handler.measure();
-    };
-    const updateAll = () => {
-      for (const handler of containerHandlers) {
-        handler.update(frameData.timestamp);
-      }
-    };
-    const notifyAll2 = () => {
-      for (const handler of containerHandlers)
-        handler.notify();
-    };
-    const listener2 = () => {
-      frame.read(measureAll, false, true);
-      frame.read(updateAll, false, true);
-      frame.update(notifyAll2, false, true);
-    };
-    scrollListeners.set(container, listener2);
-    const target = getEventTarget(container);
-    window.addEventListener("resize", listener2, { passive: true });
-    if (container !== document.documentElement) {
-      resizeListeners.set(container, resize(container, listener2));
-    }
-    target.addEventListener("scroll", listener2, { passive: true });
-  }
-  const listener = scrollListeners.get(container);
-  frame.read(listener, false, true);
-  return () => {
-    var _a;
-    cancelFrame(listener);
-    const currentHandlers = onScrollHandlers.get(container);
-    if (!currentHandlers)
-      return;
-    currentHandlers.delete(containerHandler);
-    if (currentHandlers.size)
-      return;
-    const scrollListener = scrollListeners.get(container);
-    scrollListeners.delete(container);
-    if (scrollListener) {
-      getEventTarget(container).removeEventListener("scroll", scrollListener);
-      (_a = resizeListeners.get(container)) === null || _a === void 0 ? void 0 : _a();
-      window.removeEventListener("resize", scrollListener);
-    }
-  };
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/dom/scroll/index.mjs
-function scrollTimelineFallback({ source, container, axis = "y" }) {
-  if (source)
-    container = source;
-  const currentTime = { value: 0 };
-  const cancel = scrollInfo((info) => {
-    currentTime.value = info[axis].progress * 100;
-  }, { container, axis });
-  return { currentTime, cancel };
-}
-var timelineCache = /* @__PURE__ */ new Map();
-function getTimeline({ source, container = document.documentElement, axis = "y" } = {}) {
-  if (source)
-    container = source;
-  if (!timelineCache.has(container)) {
-    timelineCache.set(container, {});
-  }
-  const elementCache = timelineCache.get(container);
-  if (!elementCache[axis]) {
-    elementCache[axis] = supportsScrollTimeline() ? new ScrollTimeline({ source: container, axis }) : scrollTimelineFallback({ source: container, axis });
-  }
-  return elementCache[axis];
-}
-function isOnScrollWithInfo(onScroll) {
-  return onScroll.length === 2;
-}
-function needsElementTracking(options) {
-  return options && (options.target || options.offset);
-}
-function scrollFunction(onScroll, options) {
-  if (isOnScrollWithInfo(onScroll) || needsElementTracking(options)) {
-    return scrollInfo((info) => {
-      onScroll(info[options.axis].progress, info);
-    }, options);
-  } else {
-    return observeTimeline(onScroll, getTimeline(options));
-  }
-}
-function scrollAnimation(animation, options) {
-  animation.flatten();
-  if (needsElementTracking(options)) {
-    animation.pause();
-    return scrollInfo((info) => {
-      animation.time = animation.duration * info[options.axis].progress;
-    }, options);
-  } else {
-    const timeline = getTimeline(options);
-    if (animation.attachTimeline) {
-      return animation.attachTimeline(timeline, (valueAnimation) => {
-        valueAnimation.pause();
-        return observeTimeline((progress2) => {
-          valueAnimation.time = valueAnimation.duration * progress2;
-        }, timeline);
-      });
-    } else {
-      return noop;
-    }
-  }
-}
-function scroll(onScroll, { axis = "y", ...options } = {}) {
-  const optionsWithDefaults = { axis, ...options };
-  return typeof onScroll === "function" ? scrollFunction(onScroll, optionsWithDefaults) : scrollAnimation(onScroll, optionsWithDefaults);
-}
-
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/value/use-scroll.mjs
-function refWarning(name, ref) {
-  warning(Boolean(!ref || ref.current), `You have defined a ${name} options but the provided ref is not yet hydrated, probably because it's defined higher up the tree. Try calling useScroll() in the same component as the ref, or setting its \`layoutEffect: false\` option.`);
-}
-var createScrollMotionValues = () => ({
-  scrollX: motionValue(0),
-  scrollY: motionValue(0),
-  scrollXProgress: motionValue(0),
-  scrollYProgress: motionValue(0)
-});
-function useScroll({ container, target, layoutEffect = true, ...options } = {}) {
-  const values = useConstant(createScrollMotionValues);
-  const useLifecycleEffect = layoutEffect ? useIsomorphicLayoutEffect : import_react31.useEffect;
-  useLifecycleEffect(() => {
-    refWarning("target", target);
-    refWarning("container", container);
-    return scroll((_progress, { x, y }) => {
-      values.scrollX.set(x.current);
-      values.scrollXProgress.set(x.progress);
-      values.scrollY.set(y.current);
-      values.scrollYProgress.set(y.progress);
-    }, {
-      ...options,
-      container: (container === null || container === void 0 ? void 0 : container.current) || void 0,
-      target: (target === null || target === void 0 ? void 0 : target.current) || void 0
-    });
-  }, [container, target, JSON.stringify(options.offset)]);
-  return values;
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/value/scroll/use-element-scroll.mjs
-function useElementScroll(ref) {
-  if (true) {
-    warnOnce(false, "useElementScroll is deprecated. Convert to useScroll({ container: ref }).");
-  }
-  return useScroll({ container: ref });
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/value/scroll/use-viewport-scroll.mjs
-function useViewportScroll() {
-  if (true) {
-    warnOnce(false, "useViewportScroll is deprecated. Convert to useScroll().");
-  }
-  return useScroll();
-}
+var import_react32 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/value/use-motion-value.mjs
-var import_react32 = __toESM(require_react(), 1);
+var import_react33 = __toESM(require_react(), 1);
 function useMotionValue(initial) {
   const value = useConstant(() => motionValue(initial));
-  const { isStatic } = (0, import_react32.useContext)(MotionConfigContext);
+  const { isStatic } = (0, import_react33.useContext)(MotionConfigContext);
   if (isStatic) {
-    const [, setLatest] = (0, import_react32.useState)(initial);
-    (0, import_react32.useEffect)(() => value.on("change", setLatest), []);
+    const [, setLatest] = (0, import_react33.useState)(initial);
+    (0, import_react33.useEffect)(() => value.on("change", setLatest), []);
   }
   return value;
 }
@@ -8709,100 +9176,11 @@ function useCombineMotionValues(values, combineValues) {
   return value;
 }
 
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/value/use-motion-template.mjs
-function useMotionTemplate(fragments, ...values) {
-  const numFragments = fragments.length;
-  function buildValue() {
-    let output = ``;
-    for (let i = 0; i < numFragments; i++) {
-      output += fragments[i];
-      const value = values[i];
-      if (value) {
-        output += isMotionValue(value) ? value.get() : value;
-      }
-    }
-    return output;
-  }
-  return useCombineMotionValues(values.filter(isMotionValue), buildValue);
-}
-
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/value/use-spring.mjs
-var import_react33 = __toESM(require_react(), 1);
-function toNumber(v) {
-  if (typeof v === "number")
-    return v;
-  return parseFloat(v);
-}
-function useSpring(source, config = {}) {
-  const { isStatic } = (0, import_react33.useContext)(MotionConfigContext);
-  const activeSpringAnimation = (0, import_react33.useRef)(null);
-  const value = useMotionValue(isMotionValue(source) ? toNumber(source.get()) : source);
-  const latestValue = (0, import_react33.useRef)(value.get());
-  const latestSetter = (0, import_react33.useRef)(() => {
-  });
-  const startAnimation = () => {
-    const animation = activeSpringAnimation.current;
-    if (animation && animation.time === 0) {
-      animation.sample(frameData.delta);
-    }
-    stopAnimation2();
-    activeSpringAnimation.current = animateValue({
-      keyframes: [value.get(), latestValue.current],
-      velocity: value.getVelocity(),
-      type: "spring",
-      restDelta: 1e-3,
-      restSpeed: 0.01,
-      ...config,
-      onUpdate: latestSetter.current
-    });
-  };
-  const stopAnimation2 = () => {
-    if (activeSpringAnimation.current) {
-      activeSpringAnimation.current.stop();
-    }
-  };
-  (0, import_react33.useInsertionEffect)(() => {
-    return value.attach((v, set) => {
-      if (isStatic)
-        return set(v);
-      latestValue.current = v;
-      latestSetter.current = set;
-      frame.update(startAnimation);
-      return value.get();
-    }, stopAnimation2);
-  }, [JSON.stringify(config)]);
-  useIsomorphicLayoutEffect(() => {
-    if (isMotionValue(source)) {
-      return source.on("change", (v) => value.set(toNumber(v)));
-    }
-  }, [value]);
-  return value;
-}
+var import_react34 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/utils/use-animation-frame.mjs
-var import_react34 = __toESM(require_react(), 1);
-function useAnimationFrame(callback) {
-  const initialTimestamp = (0, import_react34.useRef)(0);
-  const { isStatic } = (0, import_react34.useContext)(MotionConfigContext);
-  (0, import_react34.useEffect)(() => {
-    if (isStatic)
-      return;
-    const provideTimeSinceStart = ({ timestamp, delta }) => {
-      if (!initialTimestamp.current)
-        initialTimestamp.current = timestamp;
-      callback(timestamp - initialTimestamp.current, delta);
-    };
-    frame.update(provideTimeSinceStart, true);
-    return () => cancelFrame(provideTimeSinceStart);
-  }, [callback]);
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/value/use-time.mjs
-function useTime() {
-  const time2 = useMotionValue(0);
-  useAnimationFrame((t) => time2.set(t));
-  return time2;
-}
+var import_react35 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/utils/transform.mjs
 var isCustomValueType = (v) => {
@@ -8852,148 +9230,14 @@ function useListTransform(values, transformer) {
   });
 }
 
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/value/use-velocity.mjs
-function useVelocity(value) {
-  const velocity = useMotionValue(value.getVelocity());
-  const updateVelocity = () => {
-    const latest = value.getVelocity();
-    velocity.set(latest);
-    if (latest)
-      frame.update(updateVelocity);
-  };
-  useMotionValueEvent(value, "change", () => {
-    frame.update(updateVelocity, false, true);
-  });
-  return velocity;
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/value/use-will-change/get-will-change-name.mjs
-function getWillChangeName(name) {
-  if (transformProps.has(name)) {
-    return "transform";
-  } else if (acceleratedValues.has(name)) {
-    return camelToDash(name);
-  }
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/value/use-will-change/WillChangeMotionValue.mjs
-var WillChangeMotionValue = class extends MotionValue {
-  constructor() {
-    super(...arguments);
-    this.values = [];
-  }
-  add(name) {
-    const styleName = getWillChangeName(name);
-    if (styleName) {
-      addUniqueItem(this.values, styleName);
-      this.update();
-    }
-  }
-  update() {
-    this.set(this.values.length ? this.values.join(", ") : "auto");
-  }
-};
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/value/use-will-change/index.mjs
-function useWillChange() {
-  return useConstant(() => new WillChangeMotionValue("auto"));
-}
-
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/utils/reduced-motion/use-reduced-motion.mjs
-var import_react35 = __toESM(require_react(), 1);
-function useReducedMotion() {
-  !hasReducedMotionListener.current && initPrefersReducedMotion();
-  const [shouldReduceMotion] = (0, import_react35.useState)(prefersReducedMotion.current);
-  if (true) {
-    warnOnce(shouldReduceMotion !== true, "You have Reduced Motion enabled on your device. Animations may not appear as expected.");
-  }
-  return shouldReduceMotion;
-}
+var import_react36 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/utils/reduced-motion/use-reduced-motion-config.mjs
-var import_react36 = __toESM(require_react(), 1);
-function useReducedMotionConfig() {
-  const reducedMotionPreference = useReducedMotion();
-  const { reducedMotion } = (0, import_react36.useContext)(MotionConfigContext);
-  if (reducedMotion === "never") {
-    return false;
-  } else if (reducedMotion === "always") {
-    return true;
-  } else {
-    return reducedMotionPreference;
-  }
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/animation/hooks/animation-controls.mjs
-function stopAnimation(visualElement) {
-  visualElement.values.forEach((value) => value.stop());
-}
-function setVariants(visualElement, variantLabels) {
-  const reversedLabels = [...variantLabels].reverse();
-  reversedLabels.forEach((key) => {
-    const variant = visualElement.getVariant(key);
-    variant && setTarget(visualElement, variant);
-    if (visualElement.variantChildren) {
-      visualElement.variantChildren.forEach((child) => {
-        setVariants(child, variantLabels);
-      });
-    }
-  });
-}
-function setValues(visualElement, definition) {
-  if (Array.isArray(definition)) {
-    return setVariants(visualElement, definition);
-  } else if (typeof definition === "string") {
-    return setVariants(visualElement, [definition]);
-  } else {
-    setTarget(visualElement, definition);
-  }
-}
-function animationControls() {
-  let hasMounted = false;
-  const subscribers = /* @__PURE__ */ new Set();
-  const controls = {
-    subscribe(visualElement) {
-      subscribers.add(visualElement);
-      return () => void subscribers.delete(visualElement);
-    },
-    start(definition, transitionOverride) {
-      invariant(hasMounted, "controls.start() should only be called after a component has mounted. Consider calling within a useEffect hook.");
-      const animations2 = [];
-      subscribers.forEach((visualElement) => {
-        animations2.push(animateVisualElement(visualElement, definition, {
-          transitionOverride
-        }));
-      });
-      return Promise.all(animations2);
-    },
-    set(definition) {
-      invariant(hasMounted, "controls.set() should only be called after a component has mounted. Consider calling within a useEffect hook.");
-      return subscribers.forEach((visualElement) => {
-        setValues(visualElement, definition);
-      });
-    },
-    stop() {
-      subscribers.forEach((visualElement) => {
-        stopAnimation(visualElement);
-      });
-    },
-    mount() {
-      hasMounted = true;
-      return () => {
-        hasMounted = false;
-        controls.stop();
-      };
-    }
-  };
-  return controls;
-}
+var import_react37 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/utils/use-unmount-effect.mjs
-var import_react37 = __toESM(require_react(), 1);
-function useUnmountEffect(callback) {
-  return (0, import_react37.useEffect)(() => () => callback(), []);
-}
+var import_react38 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/utils/wrap.mjs
 var wrap = (min, max, v) => {
@@ -9376,20 +9620,6 @@ function createScopedAnimate(scope) {
 }
 var animate = createScopedAnimate();
 
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/animation/hooks/use-animate.mjs
-function useAnimate() {
-  const scope = useConstant(() => ({
-    current: null,
-    // Will be hydrated by React
-    animations: []
-  }));
-  const animate2 = useConstant(() => createScopedAnimate(scope));
-  useUnmountEffect(() => {
-    scope.animations.forEach((animation) => animation.stop());
-  });
-  return [scope, animate2];
-}
-
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/animation/animators/waapi/utils/style.mjs
 function setCSSVar(element, name, value) {
   element.style.setProperty(`--${name}`, value);
@@ -9537,476 +9767,43 @@ var createScopedWaapiAnimate = (scope) => {
 };
 var animateMini = createScopedWaapiAnimate();
 
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/animation/hooks/use-animate-style.mjs
-function useAnimateMini() {
-  const scope = useConstant(() => ({
-    current: null,
-    // Will be hydrated by React
-    animations: []
-  }));
-  const animate2 = useConstant(() => createScopedWaapiAnimate(scope));
-  useUnmountEffect(() => {
-    scope.animations.forEach((animation) => animation.stop());
-  });
-  return [scope, animate2];
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/animation/hooks/use-animation.mjs
-function useAnimationControls() {
-  const controls = useConstant(animationControls);
-  useIsomorphicLayoutEffect(controls.mount, []);
-  return controls;
-}
-var useAnimation = useAnimationControls;
-
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/events/use-dom-event.mjs
-var import_react38 = __toESM(require_react(), 1);
-function useDomEvent(ref, eventName, handler, options) {
-  (0, import_react38.useEffect)(() => {
-    const element = ref.current;
-    if (handler && element) {
-      return addDomEvent(element, eventName, handler, options);
-    }
-  }, [ref, eventName, handler, options]);
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/gestures/drag/use-drag-controls.mjs
-var DragControls = class {
-  constructor() {
-    this.componentControls = /* @__PURE__ */ new Set();
-  }
-  /**
-   * Subscribe a component's internal `VisualElementDragControls` to the user-facing API.
-   *
-   * @internal
-   */
-  subscribe(controls) {
-    this.componentControls.add(controls);
-    return () => this.componentControls.delete(controls);
-  }
-  /**
-   * Start a drag gesture on every `motion` component that has this set of drag controls
-   * passed into it via the `dragControls` prop.
-   *
-   * ```jsx
-   * dragControls.start(e, {
-   *   snapToCursor: true
-   * })
-   * ```
-   *
-   * @param event - PointerEvent
-   * @param options - Options
-   *
-   * @public
-   */
-  start(event, options) {
-    this.componentControls.forEach((controls) => {
-      controls.start(event.nativeEvent || event, options);
-    });
-  }
-};
-var createDragControls = () => new DragControls();
-function useDragControls() {
-  return useConstant(createDragControls);
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/motion/utils/is-motion-component.mjs
-function isMotionComponent(component) {
-  return component !== null && typeof component === "object" && motionComponentSymbol in component;
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/motion/utils/unwrap-motion-component.mjs
-function unwrapMotionComponent(component) {
-  if (isMotionComponent(component)) {
-    return component[motionComponentSymbol];
-  }
-  return void 0;
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/projection/use-instant-layout-transition.mjs
-function useInstantLayoutTransition() {
-  return startTransition;
-}
-function startTransition(callback) {
-  if (!rootProjectionNode.current)
-    return;
-  rootProjectionNode.current.isUpdating = false;
-  rootProjectionNode.current.blockUpdate();
-  callback && callback();
-}
+var import_react39 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/projection/use-reset-projection.mjs
-var import_react39 = __toESM(require_react(), 1);
-function useResetProjection() {
-  const reset = (0, import_react39.useCallback)(() => {
-    const root = rootProjectionNode.current;
-    if (!root)
-      return;
-    root.resetTree();
-  }, []);
-  return reset;
-}
+var import_react40 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/utils/use-cycle.mjs
-var import_react40 = __toESM(require_react(), 1);
-function useCycle(...items) {
-  const index = (0, import_react40.useRef)(0);
-  const [item, setItem] = (0, import_react40.useState)(items[index.current]);
-  const runCycle = (0, import_react40.useCallback)(
-    (next) => {
-      index.current = typeof next !== "number" ? wrap(0, items.length, index.current + 1) : next;
-      setItem(items[index.current]);
-    },
-    // The array will change on each call, but by putting items.length at
-    // the front of this array, we guarantee the dependency comparison will match up
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [items.length, ...items]
-  );
-  return [item, runCycle];
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/utils/use-in-view.mjs
 var import_react41 = __toESM(require_react(), 1);
 
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/render/dom/viewport/index.mjs
-var thresholds = {
-  some: 0,
-  all: 1
-};
-function inView(elementOrSelector, onStart, { root, margin: rootMargin, amount = "some" } = {}) {
-  const elements = resolveElements(elementOrSelector);
-  const activeIntersections = /* @__PURE__ */ new WeakMap();
-  const onIntersectionChange = (entries) => {
-    entries.forEach((entry) => {
-      const onEnd = activeIntersections.get(entry.target);
-      if (entry.isIntersecting === Boolean(onEnd))
-        return;
-      if (entry.isIntersecting) {
-        const newOnEnd = onStart(entry);
-        if (typeof newOnEnd === "function") {
-          activeIntersections.set(entry.target, newOnEnd);
-        } else {
-          observer2.unobserve(entry.target);
-        }
-      } else if (typeof onEnd === "function") {
-        onEnd(entry);
-        activeIntersections.delete(entry.target);
-      }
-    });
-  };
-  const observer2 = new IntersectionObserver(onIntersectionChange, {
-    root,
-    rootMargin,
-    threshold: typeof amount === "number" ? amount : thresholds[amount]
-  });
-  elements.forEach((element) => observer2.observe(element));
-  return () => observer2.disconnect();
-}
-
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/utils/use-in-view.mjs
-function useInView(ref, { root, margin, amount, once = false } = {}) {
-  const [isInView, setInView] = (0, import_react41.useState)(false);
-  (0, import_react41.useEffect)(() => {
-    if (!ref.current || once && isInView)
-      return;
-    const onEnter = () => {
-      setInView(true);
-      return once ? void 0 : () => setInView(false);
-    };
-    const options = {
-      root: root && root.current || void 0,
-      margin,
-      amount
-    };
-    return inView(ref.current, onEnter, options);
-  }, [root, ref, margin, once, amount]);
-  return isInView;
-}
+var import_react42 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/utils/use-instant-transition.mjs
-var import_react42 = __toESM(require_react(), 1);
-function useInstantTransition() {
-  const [forceUpdate, forcedRenderCount] = useForceUpdate();
-  const startInstantLayoutTransition = useInstantLayoutTransition();
-  const unlockOnFrameRef = (0, import_react42.useRef)(-1);
-  (0, import_react42.useEffect)(() => {
-    frame.postRender(() => frame.postRender(() => {
-      if (forcedRenderCount !== unlockOnFrameRef.current)
-        return;
-      instantAnimationState.current = false;
-    }));
-  }, [forcedRenderCount]);
-  return (callback) => {
-    startInstantLayoutTransition(() => {
-      instantAnimationState.current = true;
-      forceUpdate();
-      callback();
-      unlockOnFrameRef.current = forcedRenderCount + 1;
-    });
-  };
-}
-function disableInstantTransitions() {
-  instantAnimationState.current = false;
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/animation/optimized-appear/store-id.mjs
-var appearStoreId = (elementId, valueName) => {
-  const key = transformProps.has(valueName) ? "transform" : valueName;
-  return `${elementId}: ${key}`;
-};
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/animation/optimized-appear/store.mjs
-var appearAnimationStore = /* @__PURE__ */ new Map();
-var appearComplete = /* @__PURE__ */ new Map();
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/animation/optimized-appear/handoff.mjs
-function handoffOptimizedAppearAnimation(elementId, valueName, frame2) {
-  var _a;
-  const storeId = appearStoreId(elementId, valueName);
-  const optimisedAnimation = appearAnimationStore.get(storeId);
-  if (!optimisedAnimation) {
-    return null;
-  }
-  const { animation, startTime } = optimisedAnimation;
-  function cancelAnimation() {
-    var _a2;
-    (_a2 = window.MotionCancelOptimisedAnimation) === null || _a2 === void 0 ? void 0 : _a2.call(window, elementId, valueName, frame2);
-  }
-  animation.onfinish = cancelAnimation;
-  if (startTime === null || ((_a = window.MotionHandoffIsComplete) === null || _a === void 0 ? void 0 : _a.call(window, elementId))) {
-    cancelAnimation();
-    return null;
-  } else {
-    return startTime;
-  }
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/animation/optimized-appear/start.mjs
-var startFrameTime;
-var readyAnimation;
-var suspendedAnimations = /* @__PURE__ */ new Set();
-function resumeSuspendedAnimations() {
-  suspendedAnimations.forEach((data) => {
-    data.animation.play();
-    data.animation.startTime = data.startTime;
-  });
-  suspendedAnimations.clear();
-}
-function startOptimizedAppearAnimation(element, name, keyframes2, options, onReady) {
-  if (window.MotionIsMounted) {
-    return;
-  }
-  const id4 = element.dataset[optimizedAppearDataId];
-  if (!id4)
-    return;
-  window.MotionHandoffAnimation = handoffOptimizedAppearAnimation;
-  const storeId = appearStoreId(id4, name);
-  if (!readyAnimation) {
-    readyAnimation = startWaapiAnimation(
-      element,
-      name,
-      [keyframes2[0], keyframes2[0]],
-      /**
-       * 10 secs is basically just a super-safe duration to give Chrome
-       * long enough to get the animation ready.
-       */
-      { duration: 1e4, ease: "linear" }
-    );
-    appearAnimationStore.set(storeId, {
-      animation: readyAnimation,
-      startTime: null
-    });
-    window.MotionHandoffAnimation = handoffOptimizedAppearAnimation;
-    window.MotionHasOptimisedAnimation = (elementId, valueName) => {
-      if (!elementId)
-        return false;
-      if (!valueName) {
-        return appearComplete.has(elementId);
-      }
-      const animationId = appearStoreId(elementId, valueName);
-      return Boolean(appearAnimationStore.get(animationId));
-    };
-    window.MotionHandoffMarkAsComplete = (elementId) => {
-      if (appearComplete.has(elementId)) {
-        appearComplete.set(elementId, true);
-      }
-    };
-    window.MotionHandoffIsComplete = (elementId) => {
-      return appearComplete.get(elementId) === true;
-    };
-    window.MotionCancelOptimisedAnimation = (elementId, valueName, frame2, canResume) => {
-      const animationId = appearStoreId(elementId, valueName);
-      const data = appearAnimationStore.get(animationId);
-      if (!data)
-        return;
-      if (frame2 && canResume === void 0) {
-        frame2.postRender(() => {
-          frame2.postRender(() => {
-            data.animation.cancel();
-          });
-        });
-      } else {
-        data.animation.cancel();
-      }
-      if (frame2 && canResume) {
-        suspendedAnimations.add(data);
-        frame2.render(resumeSuspendedAnimations);
-      } else {
-        appearAnimationStore.delete(animationId);
-        if (!appearAnimationStore.size) {
-          window.MotionCancelOptimisedAnimation = void 0;
-        }
-      }
-    };
-    window.MotionCheckAppearSync = (visualElement, valueName, value) => {
-      var _a, _b;
-      const appearId = getOptimisedAppearId(visualElement);
-      if (!appearId)
-        return;
-      const valueIsOptimised = (_a = window.MotionHasOptimisedAnimation) === null || _a === void 0 ? void 0 : _a.call(window, appearId, valueName);
-      const externalAnimationValue = (_b = visualElement.props.values) === null || _b === void 0 ? void 0 : _b[valueName];
-      if (!valueIsOptimised || !externalAnimationValue)
-        return;
-      const removeSyncCheck = value.on("change", (latestValue) => {
-        var _a2;
-        if (externalAnimationValue.get() !== latestValue) {
-          (_a2 = window.MotionCancelOptimisedAnimation) === null || _a2 === void 0 ? void 0 : _a2.call(window, appearId, valueName);
-          removeSyncCheck();
-        }
-      });
-      return removeSyncCheck;
-    };
-  }
-  const startAnimation = () => {
-    readyAnimation.cancel();
-    const appearAnimation = startWaapiAnimation(element, name, keyframes2, options);
-    if (startFrameTime === void 0) {
-      startFrameTime = performance.now();
-    }
-    appearAnimation.startTime = startFrameTime;
-    appearAnimationStore.set(storeId, {
-      animation: appearAnimation,
-      startTime: startFrameTime
-    });
-    if (onReady)
-      onReady(appearAnimation);
-  };
-  appearComplete.set(id4, false);
-  if (readyAnimation.ready) {
-    readyAnimation.ready.then(startAnimation).catch(noop);
-  } else {
-    startAnimation();
-  }
-}
+var import_react43 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/animation/hooks/use-animated-state.mjs
-var import_react43 = __toESM(require_react(), 1);
+var import_react44 = __toESM(require_react(), 1);
 var createObject = () => ({});
-var StateVisualElement = class extends VisualElement {
-  constructor() {
-    super(...arguments);
-    this.measureInstanceViewportBox = createBox;
-  }
-  build() {
-  }
-  resetTransform() {
-  }
-  restoreTransform() {
-  }
-  removeValueFromRenderState() {
-  }
-  renderInstance() {
-  }
-  scrapeMotionValuesFromProps() {
-    return createObject();
-  }
-  getBaseTargetFromProps() {
-    return void 0;
-  }
-  readValueFromInstance(_state, key, options) {
-    return options.initialState[key] || 0;
-  }
-  sortInstanceNodePosition() {
-    return 0;
-  }
-};
 var useVisualState = makeUseVisualState({
   scrapeMotionValuesFromProps: createObject,
   createRenderState: createObject
 });
-function useAnimatedState(initialState) {
-  const [animationState, setAnimationState] = (0, import_react43.useState)(initialState);
-  const visualState = useVisualState({}, false);
-  const element = useConstant(() => {
-    return new StateVisualElement({
-      props: {
-        onUpdate: (v) => {
-          setAnimationState({ ...v });
-        }
-      },
-      visualState,
-      presenceContext: null
-    }, { initialState });
-  });
-  (0, import_react43.useLayoutEffect)(() => {
-    element.mount({});
-    return () => element.unmount();
-  }, [element]);
-  const startAnimation = useConstant(() => (animationDefinition) => {
-    return animateVisualElement(element, animationDefinition);
-  });
-  return [animationState, startAnimation];
-}
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/components/AnimateSharedLayout.mjs
 var import_jsx_runtime9 = __toESM(require_jsx_runtime(), 1);
-var React3 = __toESM(require_react(), 1);
-var id3 = 0;
-var AnimateSharedLayout = ({ children }) => {
-  React3.useEffect(() => {
-    invariant(false, "AnimateSharedLayout is deprecated: https://www.framer.com/docs/guide-upgrade/##shared-layout-animations");
-  }, []);
-  return (0, import_jsx_runtime9.jsx)(LayoutGroup, { id: useConstant(() => `asl-${id3++}`), children });
-};
+var React4 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/value/use-inverted-scale.mjs
-var import_react44 = __toESM(require_react(), 1);
-var maxScale = 1e5;
-var invertScale = (scale2) => scale2 > 1e-3 ? 1 / scale2 : maxScale;
-var hasWarned = false;
-function useInvertedScale(scale2) {
-  let parentScaleX = useMotionValue(1);
-  let parentScaleY = useMotionValue(1);
-  const { visualElement } = (0, import_react44.useContext)(MotionContext);
-  invariant(!!(scale2 || visualElement), "If no scale values are provided, useInvertedScale must be used within a child of another motion component.");
-  warning(hasWarned, "useInvertedScale is deprecated and will be removed in 3.0. Use the layout prop instead.");
-  hasWarned = true;
-  if (scale2) {
-    parentScaleX = scale2.scaleX || parentScaleX;
-    parentScaleY = scale2.scaleY || parentScaleY;
-  } else if (visualElement) {
-    parentScaleX = visualElement.getValue("scaleX", 1);
-    parentScaleY = visualElement.getValue("scaleY", 1);
-  }
-  const scaleX = useTransform(parentScaleX, invertScale);
-  const scaleY = useTransform(parentScaleY, invertScale);
-  return { scaleX, scaleY };
-}
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/components/Reorder/namespace.mjs
-var namespace_exports = {};
-__export(namespace_exports, {
-  Group: () => ReorderGroup,
-  Item: () => ReorderItem
-});
+var import_react45 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/components/Reorder/Group.mjs
 var import_jsx_runtime10 = __toESM(require_jsx_runtime(), 1);
-var import_react46 = __toESM(require_react(), 1);
+var import_react47 = __toESM(require_react(), 1);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/context/ReorderContext.mjs
-var import_react45 = __toESM(require_react(), 1);
-var ReorderContext = (0, import_react45.createContext)(null);
+var import_react46 = __toESM(require_react(), 1);
+var ReorderContext = (0, import_react46.createContext)(null);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/components/Reorder/utils/check-reorder.mjs
 function checkReorder(order, value, offset, velocity) {
@@ -10030,9 +9827,9 @@ function checkReorder(order, value, offset, velocity) {
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/components/Reorder/Group.mjs
 function ReorderGroupComponent({ children, as = "ul", axis = "y", onReorder, values, ...props }, externalRef) {
-  const Component3 = useConstant(() => motion[as]);
+  const Component4 = useConstant(() => motion[as]);
   const order = [];
-  const isReordering = (0, import_react46.useRef)(false);
+  const isReordering = (0, import_react47.useRef)(false);
   invariant(Boolean(values), "Reorder.Group must be provided a values prop");
   const context = {
     axis,
@@ -10055,12 +9852,12 @@ function ReorderGroupComponent({ children, as = "ul", axis = "y", onReorder, val
       }
     }
   };
-  (0, import_react46.useEffect)(() => {
+  (0, import_react47.useEffect)(() => {
     isReordering.current = false;
   });
-  return (0, import_jsx_runtime10.jsx)(Component3, { ...props, ref: externalRef, ignoreStrict: true, children: (0, import_jsx_runtime10.jsx)(ReorderContext.Provider, { value: context, children }) });
+  return (0, import_jsx_runtime10.jsx)(Component4, { ...props, ref: externalRef, ignoreStrict: true, children: (0, import_jsx_runtime10.jsx)(ReorderContext.Provider, { value: context, children }) });
 }
-var ReorderGroup = (0, import_react46.forwardRef)(ReorderGroupComponent);
+var ReorderGroup = (0, import_react47.forwardRef)(ReorderGroupComponent);
 function getValue(item) {
   return item.value;
 }
@@ -10070,195 +9867,1952 @@ function compareMin(a, b) {
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/components/Reorder/Item.mjs
 var import_jsx_runtime11 = __toESM(require_jsx_runtime(), 1);
-var import_react47 = __toESM(require_react(), 1);
+var import_react48 = __toESM(require_react(), 1);
 function useDefaultMotionValue(value, defaultValue = 0) {
   return isMotionValue(value) ? value : useMotionValue(defaultValue);
 }
 function ReorderItemComponent({ children, style = {}, value, as = "li", onDrag, layout: layout2 = true, ...props }, externalRef) {
-  const Component3 = useConstant(() => motion[as]);
-  const context = (0, import_react47.useContext)(ReorderContext);
-  const point2 = {
+  const Component4 = useConstant(() => motion[as]);
+  const context = (0, import_react48.useContext)(ReorderContext);
+  const point = {
     x: useDefaultMotionValue(style.x),
     y: useDefaultMotionValue(style.y)
   };
-  const zIndex = useTransform([point2.x, point2.y], ([latestX, latestY]) => latestX || latestY ? 1 : "unset");
+  const zIndex = useTransform([point.x, point.y], ([latestX, latestY]) => latestX || latestY ? 1 : "unset");
   invariant(Boolean(context), "Reorder.Item must be a child of Reorder.Group");
   const { axis, registerItem, updateOrder } = context;
-  return (0, import_jsx_runtime11.jsx)(Component3, { drag: axis, ...props, dragSnapToOrigin: true, style: { ...style, x: point2.x, y: point2.y, zIndex }, layout: layout2, onDrag: (event, gesturePoint) => {
+  return (0, import_jsx_runtime11.jsx)(Component4, { drag: axis, ...props, dragSnapToOrigin: true, style: { ...style, x: point.x, y: point.y, zIndex }, layout: layout2, onDrag: (event, gesturePoint) => {
     const { velocity } = gesturePoint;
-    velocity[axis] && updateOrder(value, point2[axis].get(), velocity[axis]);
+    velocity[axis] && updateOrder(value, point[axis].get(), velocity[axis]);
     onDrag && onDrag(event, gesturePoint);
   }, onLayoutMeasure: (measured) => registerItem(value, measured), ref: externalRef, ignoreStrict: true, children });
 }
-var ReorderItem = (0, import_react47.forwardRef)(ReorderItemComponent);
-
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/animation/utils/stagger.mjs
-function getOriginIndex(from, total) {
-  if (from === "first") {
-    return 0;
-  } else {
-    const lastIndex = total - 1;
-    return from === "last" ? lastIndex : lastIndex / 2;
-  }
-}
-function stagger(duration = 0.1, { startDelay = 0, from = 0, ease: ease2 } = {}) {
-  return (i, total) => {
-    const fromIndex = typeof from === "number" ? from : getOriginIndex(from, total);
-    const distance2 = Math.abs(fromIndex - i);
-    let delay2 = duration * distance2;
-    if (ease2) {
-      const maxDelay = total * duration;
-      const easingFunction = easingDefinitionToFunction(ease2);
-      delay2 = easingFunction(delay2 / maxDelay) * maxDelay;
-    }
-    return startDelay + delay2;
-  };
-}
+var ReorderItem = (0, import_react48.forwardRef)(ReorderItemComponent);
 
 // ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/frameloop/index-legacy.mjs
-var sync = frame;
 var cancelSync = stepsOrder.reduce((acc, key) => {
   acc[key] = (process2) => cancelFrame(process2);
   return acc;
 }, {});
 
-// ../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/easing/steps.mjs
-function steps(numSteps, direction = "end") {
-  return (progress2) => {
-    progress2 = direction === "end" ? Math.min(progress2, 0.999) : Math.max(progress2, 1e-3);
-    const expanded = progress2 * numSteps;
-    const rounded = direction === "end" ? Math.floor(expanded) : Math.ceil(expanded);
-    return clamp(0, 1, rounded / numSteps);
+// ../../node_modules/.deno/goey-toast@0.5.0/node_modules/goey-toast/dist/index.js
+var import_jsx_runtime12 = __toESM(require_jsx_runtime());
+var animationPresets = {
+  smooth: { bounce: 0.1, spring: true },
+  bouncy: { bounce: 0.6, spring: true },
+  subtle: { bounce: 0.05, spring: true },
+  snappy: { bounce: 0.4, spring: true }
+};
+var _position = "bottom-right";
+var _dir = "ltr";
+var _spring = true;
+var _bounce = void 0;
+var _theme = "light";
+function setGooeyTheme(theme) {
+  _theme = theme;
+}
+function getGooeyTheme() {
+  return _theme;
+}
+function setGooeyPosition(position) {
+  _position = position;
+}
+function getGooeyPosition() {
+  return _position;
+}
+function setGooeyDir(dir) {
+  _dir = dir;
+}
+function getGooeyDir() {
+  return _dir;
+}
+function setGooeySpring(spring2) {
+  _spring = spring2;
+}
+function getGooeySpring() {
+  return _spring;
+}
+function setGooeyBounce(bounce) {
+  _bounce = bounce;
+}
+function getGooeyBounce() {
+  return _bounce;
+}
+var _visibleToasts = 3;
+function setGooeyVisibleToasts(n) {
+  _visibleToasts = n;
+}
+function getGooeyVisibleToasts() {
+  return _visibleToasts;
+}
+var _swipeToDismiss = true;
+function setGooeySwipeToDismiss(enabled) {
+  _swipeToDismiss = enabled;
+}
+function getGooeySwipeToDismiss() {
+  return _swipeToDismiss;
+}
+var _maxQueue = Infinity;
+function setGooeyMaxQueue(n) {
+  _maxQueue = n;
+}
+function getGooeyMaxQueue() {
+  return _maxQueue;
+}
+var _queueOverflow = "drop-oldest";
+function setGooeyQueueOverflow(strategy) {
+  _queueOverflow = strategy;
+}
+function getGooeyQueueOverflow() {
+  return _queueOverflow;
+}
+var _showProgress = false;
+function setGooeyShowProgress(show) {
+  _showProgress = show;
+}
+function getGooeyShowProgress() {
+  return _showProgress;
+}
+var _showTimestamp = true;
+function setGooeyShowTimestamp(show) {
+  _showTimestamp = show;
+}
+function getGooeyShowTimestamp() {
+  return _showTimestamp;
+}
+var _closeButton = false;
+function setGooeyCloseButton(value) {
+  _closeButton = value;
+}
+function getGooeyCloseButton() {
+  return _closeButton;
+}
+var _containerHovered = false;
+var _hoverSubs = /* @__PURE__ */ new Set();
+function setContainerHovered(hovered) {
+  if (_containerHovered === hovered) return;
+  _containerHovered = hovered;
+  _hoverSubs.forEach((cb) => cb(hovered));
+}
+function getContainerHovered() {
+  return _containerHovered;
+}
+function subscribeContainerHovered(cb) {
+  _hoverSubs.add(cb);
+  return () => {
+    _hoverSubs.delete(cb);
   };
 }
-
-export {
-  LayoutGroupContext,
-  PresenceContext,
-  MotionConfigContext,
-  usePresence,
-  useIsPresent,
-  isBrowser,
-  useIsomorphicLayoutEffect,
-  AnimatePresence,
-  DeprecatedLayoutGroupContext,
-  noop,
-  invariant,
-  progress,
-  MotionGlobalConfig,
-  frame,
-  cancelFrame,
-  frameData,
-  frameSteps,
-  useForceUpdate,
-  LayoutGroup,
-  LazyMotion,
-  isValidMotionProp,
-  filterProps,
-  MotionConfig,
-  MotionContext,
-  optimizedAppearDataAttribute,
-  SwitchLayoutGroupContext,
-  createRendererMotionComponent,
-  isMotionValue,
-  resolveMotionValue,
-  makeUseVisualState,
-  clamp,
-  px,
-  buildTransform,
-  addScaleCorrector,
-  m,
-  isDragActive,
-  time,
-  MotionValue,
-  motionValue,
-  cubicBezier,
-  mirrorEasing,
-  reverseEasing,
-  backOut,
-  backIn,
-  backInOut,
-  anticipate,
-  circIn,
-  circOut,
-  circInOut,
-  color,
-  complex,
-  pipe,
-  mix,
-  findSpring,
-  spring,
-  inertia,
-  easeIn,
-  easeOut,
-  easeInOut,
-  interpolate,
-  keyframes,
-  animateValue,
-  AcceleratedAnimation,
-  animateVisualElement,
-  animations,
-  addPointerInfo,
-  addPointerEvent,
-  distance,
-  distance2D,
-  calcLength,
-  createBox,
-  FlatTree,
-  delay,
-  visualElementStore,
-  VisualElement,
-  motion,
-  domAnimation,
-  domMax,
-  domMin,
-  useMotionValueEvent,
-  scrollInfo,
-  scroll,
-  useScroll,
-  useElementScroll,
-  useViewportScroll,
-  useMotionValue,
-  useMotionTemplate,
-  useSpring,
-  useAnimationFrame,
-  useTime,
-  transform,
-  useTransform,
-  useVelocity,
-  useWillChange,
-  useReducedMotion,
-  useReducedMotionConfig,
-  animationControls,
-  useUnmountEffect,
-  wrap,
-  createScopedAnimate,
-  animate,
-  useAnimate,
-  animateMini,
-  useAnimateMini,
-  useAnimationControls,
-  useAnimation,
-  useDomEvent,
-  DragControls,
-  useDragControls,
-  isMotionComponent,
-  unwrapMotionComponent,
-  useInstantLayoutTransition,
-  useResetProjection,
-  useCycle,
-  inView,
-  useInView,
-  useInstantTransition,
-  disableInstantTransitions,
-  startOptimizedAppearAnimation,
-  useAnimatedState,
-  AnimateSharedLayout,
-  useInvertedScale,
-  namespace_exports,
-  stagger,
-  sync,
-  cancelSync,
-  steps
+var _announceSubs = /* @__PURE__ */ new Set();
+function announce(message, politeness = "polite") {
+  _announceSubs.forEach((cb) => cb({ message, politeness }));
+}
+function subscribeAnnouncements(cb) {
+  _announceSubs.add(cb);
+  return () => {
+    _announceSubs.delete(cb);
+  };
+}
+var DefaultIcon = ({ size = 20, className }) => (0, import_jsx_runtime12.jsxs)(
+  "svg",
+  {
+    xmlns: "http://www.w3.org/2000/svg",
+    width: size,
+    height: size,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 2,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    className,
+    children: [
+      (0, import_jsx_runtime12.jsx)("path", { d: "M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" }),
+      (0, import_jsx_runtime12.jsx)("path", { d: "M13.73 21a2 2 0 0 1-3.46 0" })
+    ]
+  }
+);
+var SuccessIcon2 = ({ size = 20, className }) => (0, import_jsx_runtime12.jsxs)(
+  "svg",
+  {
+    xmlns: "http://www.w3.org/2000/svg",
+    width: size,
+    height: size,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 2,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    className,
+    children: [
+      (0, import_jsx_runtime12.jsx)("circle", { cx: "12", cy: "12", r: "10" }),
+      (0, import_jsx_runtime12.jsx)("path", { d: "M9 12l2 2 4-4" })
+    ]
+  }
+);
+var ErrorIcon2 = ({ size = 20, className }) => (0, import_jsx_runtime12.jsxs)(
+  "svg",
+  {
+    xmlns: "http://www.w3.org/2000/svg",
+    width: size,
+    height: size,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 2,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    className,
+    children: [
+      (0, import_jsx_runtime12.jsx)("circle", { cx: "12", cy: "12", r: "10" }),
+      (0, import_jsx_runtime12.jsx)("path", { d: "M15 9l-6 6" }),
+      (0, import_jsx_runtime12.jsx)("path", { d: "M9 9l6 6" })
+    ]
+  }
+);
+var WarningIcon2 = ({ size = 20, className }) => (0, import_jsx_runtime12.jsxs)(
+  "svg",
+  {
+    xmlns: "http://www.w3.org/2000/svg",
+    width: size,
+    height: size,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 2,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    className,
+    children: [
+      (0, import_jsx_runtime12.jsx)("circle", { cx: "12", cy: "12", r: "10" }),
+      (0, import_jsx_runtime12.jsx)("line", { x1: "12", y1: "8", x2: "12", y2: "12" }),
+      (0, import_jsx_runtime12.jsx)("line", { x1: "12", y1: "16", x2: "12.01", y2: "16" })
+    ]
+  }
+);
+var InfoIcon2 = ({ size = 20, className }) => (0, import_jsx_runtime12.jsxs)(
+  "svg",
+  {
+    xmlns: "http://www.w3.org/2000/svg",
+    width: size,
+    height: size,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 2,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    className,
+    children: [
+      (0, import_jsx_runtime12.jsx)("circle", { cx: "12", cy: "12", r: "10" }),
+      (0, import_jsx_runtime12.jsx)("line", { x1: "12", y1: "16", x2: "12", y2: "12" }),
+      (0, import_jsx_runtime12.jsx)("line", { x1: "12", y1: "8", x2: "12.01", y2: "8" })
+    ]
+  }
+);
+var SpinnerIcon = ({ size = 20, className }) => (0, import_jsx_runtime12.jsx)(
+  "svg",
+  {
+    xmlns: "http://www.w3.org/2000/svg",
+    width: size,
+    height: size,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 2,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    className,
+    children: (0, import_jsx_runtime12.jsx)("path", { d: "M21 12a9 9 0 1 1-6.219-8.56" })
+  }
+);
+var QUERY = "(prefers-reduced-motion: reduce)";
+function getInitialState() {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+    return false;
+  }
+  return window.matchMedia(QUERY).matches;
+}
+function usePrefersReducedMotion() {
+  const [prefersReducedMotion2, setPrefersReducedMotion] = (0, import_react49.useState)(getInitialState);
+  (0, import_react49.useEffect)(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+      return;
+    }
+    const mql = window.matchMedia(QUERY);
+    const handler = (event) => {
+      setPrefersReducedMotion(event.matches);
+    };
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, []);
+  return prefersReducedMotion2;
+}
+var styles = {
+  spinnerSpin: "gooey-spinnerSpin",
+  wrapper: "gooey-wrapper",
+  blobSvg: "gooey-blobSvg",
+  content: "gooey-content",
+  contentCompact: "gooey-contentCompact",
+  contentExpanded: "gooey-contentExpanded",
+  header: "gooey-header",
+  iconWrapper: "gooey-iconWrapper",
+  title: "gooey-title",
+  titleDefault: "gooey-titleDefault",
+  titleSuccess: "gooey-titleSuccess",
+  titleError: "gooey-titleError",
+  titleWarning: "gooey-titleWarning",
+  titleInfo: "gooey-titleInfo",
+  titleLoading: "gooey-titleLoading",
+  description: "gooey-description",
+  actionWrapper: "gooey-actionWrapper",
+  actionButton: "gooey-actionButton",
+  actionDefault: "gooey-actionDefault",
+  actionSuccess: "gooey-actionSuccess",
+  actionError: "gooey-actionError",
+  actionWarning: "gooey-actionWarning",
+  actionInfo: "gooey-actionInfo",
+  progressWrapper: "gooey-progressWrapper",
+  progressBar: "gooey-progressBar",
+  progressDefault: "gooey-progressDefault",
+  progressSuccess: "gooey-progressSuccess",
+  progressError: "gooey-progressError",
+  progressWarning: "gooey-progressWarning",
+  progressInfo: "gooey-progressInfo",
+  progressPaused: "gooey-progressPaused",
+  timestamp: "gooey-timestamp",
+  closeButton: "gooey-closeButton",
+  closeButtonRight: "gooey-closeButtonRight"
 };
-//# sourceMappingURL=chunk-Q4KJIZEK.js.map
+var useIsomorphicLayoutEffect2 = typeof window !== "undefined" ? import_react49.useLayoutEffect : import_react49.useEffect;
+var phaseIconMap = {
+  default: DefaultIcon,
+  success: SuccessIcon2,
+  error: ErrorIcon2,
+  warning: WarningIcon2,
+  info: InfoIcon2
+};
+var titleColorMap = {
+  loading: styles.titleLoading,
+  default: styles.titleDefault,
+  success: styles.titleSuccess,
+  error: styles.titleError,
+  warning: styles.titleWarning,
+  info: styles.titleInfo
+};
+var actionColorMap = {
+  loading: styles.actionInfo,
+  default: styles.actionDefault,
+  success: styles.actionSuccess,
+  error: styles.actionError,
+  warning: styles.actionWarning,
+  info: styles.actionInfo
+};
+var progressColorMap = {
+  loading: styles.progressInfo,
+  default: styles.progressDefault,
+  success: styles.progressSuccess,
+  error: styles.progressError,
+  warning: styles.progressWarning,
+  info: styles.progressInfo
+};
+var PH = 34;
+var DEFAULT_DISPLAY_DURATION = 4e3;
+var DEFAULT_EXPAND_DUR = 0.6;
+var DEFAULT_COLLAPSE_DUR = 0.9;
+function squishSpring(durationSec, defaultDur, bounce = 0.4) {
+  const scale2 = durationSec / defaultDur;
+  const stiffness = 200 + bounce * 437.5;
+  const damping = 24 - bounce * 20;
+  const mass = 0.7 * scale2;
+  return { type: "spring", stiffness, damping, mass };
+}
+var observerRegistry = /* @__PURE__ */ new Map();
+function registerSonnerObserver(ol, callback) {
+  let entry = observerRegistry.get(ol);
+  if (!entry) {
+    const callbacks = /* @__PURE__ */ new Set();
+    const observeOptions = {
+      attributes: true,
+      attributeFilter: ["style", "data-visible"],
+      subtree: true,
+      childList: true
+    };
+    const observer = new MutationObserver(() => {
+      observer.disconnect();
+      try {
+        for (const cb of callbacks) {
+          cb();
+        }
+      } finally {
+        observer.observe(ol, observeOptions);
+      }
+    });
+    observer.observe(ol, observeOptions);
+    entry = { observer, callbacks };
+    observerRegistry.set(ol, entry);
+  }
+  entry.callbacks.add(callback);
+  return () => {
+    entry.callbacks.delete(callback);
+    if (entry.callbacks.size === 0) {
+      entry.observer.disconnect();
+      observerRegistry.delete(ol);
+    }
+  };
+}
+function syncSonnerHeights(wrapperEl, includeOffsets = false) {
+  if (!wrapperEl) return;
+  const li = wrapperEl.closest("[data-sonner-toast]");
+  if (!(li == null ? void 0 : li.parentElement)) return;
+  const ol = li.parentElement;
+  const toasts = Array.from(
+    ol.querySelectorAll(":scope > [data-sonner-toast]")
+  );
+  if (toasts.length === 0) return;
+  const heights = toasts.map((t) => {
+    if (t.getAttribute("data-visible") === "false") return 0;
+    const content = t.firstElementChild;
+    const h = content ? content.getBoundingClientRect().height : 0;
+    return h > 0 ? h : PH;
+  });
+  for (let i = 0; i < toasts.length; i++) {
+    toasts[i].style.setProperty("--initial-height", `${heights[i]}px`);
+  }
+  if (!includeOffsets) {
+    return;
+  }
+  const gapStr = getComputedStyle(ol).getPropertyValue("--gap").trim();
+  const gap = parseFloat(gapStr) || 14;
+  let runningOffset = 0;
+  for (let i = toasts.length - 1; i >= 0; i--) {
+    if (toasts[i].getAttribute("data-visible") === "false") {
+      toasts[i].style.setProperty("--offset", "0px");
+      continue;
+    }
+    toasts[i].style.setProperty("--offset", `${runningOffset}px`);
+    if (i > 0) {
+      runningOffset += heights[i] + gap;
+    }
+  }
+}
+function memoizePath(fn) {
+  let lastArgs = null;
+  let lastResult = "";
+  return (pw, bw, th, t) => {
+    if (lastArgs && lastArgs[0] === pw && lastArgs[1] === bw && lastArgs[2] === th && lastArgs[3] === t) {
+      return lastResult;
+    }
+    lastResult = fn(pw, bw, th, t);
+    lastArgs = [pw, bw, th, t];
+    return lastResult;
+  };
+}
+function morphPathRaw(pw, bw, th, t) {
+  const pr = PH / 2;
+  const pillW = Math.min(pw, bw);
+  const bodyH = PH + (th - PH) * t;
+  if (t <= 0 || bodyH - PH < 8) {
+    return [
+      `M 0,${pr}`,
+      `A ${pr},${pr} 0 0 1 ${pr},0`,
+      `H ${pillW - pr}`,
+      `A ${pr},${pr} 0 0 1 ${pillW},${pr}`,
+      `A ${pr},${pr} 0 0 1 ${pillW - pr},${PH}`,
+      `H ${pr}`,
+      `A ${pr},${pr} 0 0 1 0,${pr}`,
+      `Z`
+    ].join(" ");
+  }
+  const curve = 14 * t;
+  const cr = Math.min(16, (bodyH - PH) * 0.45);
+  const bodyW = pillW + (bw - pillW) * t;
+  const bodyTop = PH - curve;
+  const qEndX = Math.min(pillW + curve, bodyW - cr);
+  return [
+    `M 0,${pr}`,
+    `A ${pr},${pr} 0 0 1 ${pr},0`,
+    `H ${pillW - pr}`,
+    `A ${pr},${pr} 0 0 1 ${pillW},${pr}`,
+    `L ${pillW},${bodyTop}`,
+    `Q ${pillW},${bodyTop + curve} ${qEndX},${bodyTop + curve}`,
+    `H ${bodyW - cr}`,
+    `A ${cr},${cr} 0 0 1 ${bodyW},${bodyTop + curve + cr}`,
+    `L ${bodyW},${bodyH - cr}`,
+    `A ${cr},${cr} 0 0 1 ${bodyW - cr},${bodyH}`,
+    `H ${cr}`,
+    `A ${cr},${cr} 0 0 1 0,${bodyH - cr}`,
+    `Z`
+  ].join(" ");
+}
+function morphPathCenterRaw(pw, bw, th, t) {
+  const pr = PH / 2;
+  const pillW = Math.min(pw, bw);
+  const pillOffset = (bw - pillW) / 2;
+  if (t <= 0 || PH + (th - PH) * t - PH < 8) {
+    return [
+      `M ${pillOffset},${pr}`,
+      `A ${pr},${pr} 0 0 1 ${pillOffset + pr},0`,
+      `H ${pillOffset + pillW - pr}`,
+      `A ${pr},${pr} 0 0 1 ${pillOffset + pillW},${pr}`,
+      `A ${pr},${pr} 0 0 1 ${pillOffset + pillW - pr},${PH}`,
+      `H ${pillOffset + pr}`,
+      `A ${pr},${pr} 0 0 1 ${pillOffset},${pr}`,
+      `Z`
+    ].join(" ");
+  }
+  const bodyH = PH + (th - PH) * t;
+  const curve = 14 * t;
+  const cr = Math.min(16, (bodyH - PH) * 0.45);
+  const bodyTop = PH - curve;
+  const bodyCenter = bw / 2;
+  const halfBodyW = pillW / 2 + (bw - pillW) / 2 * t;
+  const bodyLeft = bodyCenter - halfBodyW;
+  const bodyRight = bodyCenter + halfBodyW;
+  const qLeftX = Math.max(bodyLeft + cr, pillOffset - curve);
+  const qRightX = Math.min(bodyRight - cr, pillOffset + pillW + curve);
+  return [
+    // Start at left side of pill
+    `M ${pillOffset},${pr}`,
+    // Pill top-left arc
+    `A ${pr},${pr} 0 0 1 ${pillOffset + pr},0`,
+    // Top edge of pill
+    `H ${pillOffset + pillW - pr}`,
+    // Pill top-right arc
+    `A ${pr},${pr} 0 0 1 ${pillOffset + pillW},${pr}`,
+    // Right side down to body junction
+    `L ${pillOffset + pillW},${bodyTop}`,
+    // Right organic curve from pill to body
+    `Q ${pillOffset + pillW},${bodyTop + curve} ${qRightX},${bodyTop + curve}`,
+    // Right side of body
+    `H ${bodyRight - cr}`,
+    // Body top-right corner
+    `A ${cr},${cr} 0 0 1 ${bodyRight},${bodyTop + curve + cr}`,
+    // Right edge down
+    `L ${bodyRight},${bodyH - cr}`,
+    // Body bottom-right corner
+    `A ${cr},${cr} 0 0 1 ${bodyRight - cr},${bodyH}`,
+    // Bottom edge
+    `H ${bodyLeft + cr}`,
+    // Body bottom-left corner
+    `A ${cr},${cr} 0 0 1 ${bodyLeft},${bodyH - cr}`,
+    // Left edge up
+    `L ${bodyLeft},${bodyTop + curve + cr}`,
+    // Body top-left corner
+    `A ${cr},${cr} 0 0 1 ${bodyLeft + cr},${bodyTop + curve}`,
+    // Left side of body
+    `H ${qLeftX}`,
+    // Left organic curve from body to pill
+    `Q ${pillOffset},${bodyTop + curve} ${pillOffset},${bodyTop}`,
+    // Close back to start
+    `Z`
+  ].join(" ");
+}
+var morphPath = memoizePath(morphPathRaw);
+var morphPathCenter = memoizePath(morphPathCenterRaw);
+var SMOOTH_EASE = [0.4, 0, 0.2, 1];
+var GooeyToast = ({
+  title,
+  description,
+  action,
+  icon,
+  phase,
+  classNames,
+  fillColor: fillColorProp,
+  borderColor,
+  borderWidth,
+  timing,
+  preset,
+  spring: springProp,
+  bounce: bounceProp,
+  showTimestamp: showTimestampProp,
+  showProgress: showProgressProp,
+  toastId
+}) => {
+  const theme = getGooeyTheme();
+  const closeButtonSetting = getGooeyCloseButton();
+  const showCloseButton = closeButtonSetting !== false;
+  const fillColor = fillColorProp ?? (theme === "dark" ? "#1a1a1a" : "#ffffff");
+  const position = getGooeyPosition();
+  const dir = getGooeyDir();
+  const posIsRight = (position == null ? void 0 : position.includes("right")) ?? false;
+  const isCenter = (position == null ? void 0 : position.includes("center")) ?? false;
+  const isRight = dir === "rtl" ? isCenter ? false : !posIsRight : posIsRight;
+  const prefersReducedMotion2 = usePrefersReducedMotion();
+  const presetConfig = preset ? animationPresets[preset] : void 0;
+  const useSpring2 = springProp ?? (presetConfig == null ? void 0 : presetConfig.spring) ?? getGooeySpring();
+  const bounceVal = bounceProp ?? (presetConfig == null ? void 0 : presetConfig.bounce) ?? getGooeyBounce() ?? 0.4;
+  const showProgress = showProgressProp ?? getGooeyShowProgress();
+  const showTimestamp = showTimestampProp ?? getGooeyShowTimestamp();
+  const [actionSuccess, setActionSuccess] = (0, import_react49.useState)(null);
+  const [dismissing, setDismissing] = (0, import_react49.useState)(false);
+  const [progressKey, setProgressKey] = (0, import_react49.useState)(0);
+  const [hovered, setHovered] = (0, import_react49.useState)(false);
+  const hoveredRef = (0, import_react49.useRef)(false);
+  const containerHoveredRef = (0, import_react49.useRef)(getContainerHovered());
+  const [containerHovered, setContainerHoveredState] = (0, import_react49.useState)(getContainerHovered());
+  const collapsingRef = (0, import_react49.useRef)(false);
+  const preDismissRef = (0, import_react49.useRef)(false);
+  const collapseEndTime = (0, import_react49.useRef)(0);
+  const expandedDimsRef = (0, import_react49.useRef)({ pw: 0, bw: 0, th: 0 });
+  const dismissTimerRef = (0, import_react49.useRef)(null);
+  const effectiveTitle = actionSuccess ?? title;
+  const effectivePhase = actionSuccess ? "success" : phase;
+  const effectiveDescription = actionSuccess ? void 0 : description;
+  const effectiveAction = actionSuccess ? void 0 : action;
+  const isLoading = effectivePhase === "loading";
+  const hasDescription = Boolean(effectiveDescription);
+  const hasAction = Boolean(effectiveAction);
+  const isExpanded = (hasDescription || hasAction) && !dismissing;
+  const [showBody, setShowBody] = (0, import_react49.useState)(false);
+  const wrapperRef = (0, import_react49.useRef)(null);
+  const pathRef = (0, import_react49.useRef)(null);
+  const headerRef = (0, import_react49.useRef)(null);
+  const contentRef = (0, import_react49.useRef)(null);
+  const morphCtrl = (0, import_react49.useRef)(null);
+  const pillResizeCtrl = (0, import_react49.useRef)(null);
+  const headerSquishCtrl = (0, import_react49.useRef)(null);
+  const morphTRef = (0, import_react49.useRef)(0);
+  const aDims = (0, import_react49.useRef)({ pw: 0, bw: 0, th: 0 });
+  const dimsRef = (0, import_react49.useRef)({ pw: 0, bw: 0, th: 0 });
+  const [dims, setDims] = (0, import_react49.useState)({ pw: 0, bw: 0, th: 0 });
+  (0, import_react49.useEffect)(() => {
+    dimsRef.current = dims;
+  }, [dims]);
+  (0, import_react49.useEffect)(() => {
+    return subscribeContainerHovered((h) => {
+      containerHoveredRef.current = h;
+      setContainerHoveredState(h);
+    });
+  }, []);
+  const flush = (0, import_react49.useCallback)(() => {
+    var _a, _b;
+    const { pw: p, bw: b, th: h } = aDims.current;
+    if (p <= 0 || b <= 0 || h <= 0) return;
+    const t = Math.max(0, Math.min(1, morphTRef.current));
+    const pos = getGooeyPosition();
+    const d = getGooeyDir();
+    const centerPos = (pos == null ? void 0 : pos.includes("center")) ?? false;
+    const posRight = (pos == null ? void 0 : pos.includes("right")) ?? false;
+    const rightSide = d === "rtl" ? centerPos ? false : !posRight : posRight;
+    if (centerPos) {
+      const centerBw = Math.max(dimsRef.current.bw, expandedDimsRef.current.bw, p);
+      (_a = pathRef.current) == null ? void 0 : _a.setAttribute("d", morphPathCenter(p, centerBw, h, t));
+    } else {
+      (_b = pathRef.current) == null ? void 0 : _b.setAttribute("d", morphPath(p, b, h, t));
+    }
+    if (t >= 1) {
+      if (wrapperRef.current) {
+        wrapperRef.current.style.width = "";
+      }
+      if (contentRef.current) {
+        contentRef.current.style.width = "";
+        contentRef.current.style.overflow = "";
+        contentRef.current.style.maxHeight = "";
+        contentRef.current.style.clipPath = "";
+      }
+    } else if (t > 0) {
+      const targetBw = dimsRef.current.bw;
+      const targetTh = dimsRef.current.th;
+      const pillW = Math.min(p, b);
+      const currentW = pillW + (b - pillW) * t;
+      const currentH = PH + (targetTh - PH) * t;
+      const centerFullW = centerPos ? Math.max(dimsRef.current.bw, expandedDimsRef.current.bw, p) : 0;
+      if (wrapperRef.current) {
+        wrapperRef.current.style.width = (centerPos ? centerFullW : currentW) + "px";
+      }
+      if (contentRef.current) {
+        contentRef.current.style.width = (centerPos ? centerFullW : targetBw) + "px";
+        contentRef.current.style.overflow = "hidden";
+        contentRef.current.style.maxHeight = currentH + "px";
+        if (centerPos) {
+          const clip = (centerFullW - currentW) / 2;
+          contentRef.current.style.clipPath = `inset(0 ${clip}px 0 ${clip}px)`;
+        } else {
+          const clip = targetBw - currentW;
+          contentRef.current.style.clipPath = rightSide ? `inset(0 0 0 ${clip}px)` : `inset(0 ${clip}px 0 0)`;
+        }
+      }
+    } else {
+      const pillW = Math.min(p, b);
+      if (wrapperRef.current) {
+        const centerBw = centerPos ? Math.max(dimsRef.current.bw, expandedDimsRef.current.bw, p) : pillW;
+        wrapperRef.current.style.width = centerBw + "px";
+      }
+      if (contentRef.current) {
+        if (centerPos) {
+          const centerBwVal = Math.max(dimsRef.current.bw, expandedDimsRef.current.bw, p);
+          contentRef.current.style.width = centerBwVal + "px";
+          const clip = (centerBwVal - pillW) / 2;
+          contentRef.current.style.clipPath = `inset(0 ${clip}px 0 ${clip}px)`;
+        } else {
+          contentRef.current.style.width = "";
+          contentRef.current.style.clipPath = "";
+        }
+        contentRef.current.style.overflow = "hidden";
+        contentRef.current.style.maxHeight = PH + "px";
+      }
+    }
+  }, []);
+  const measure = (0, import_react49.useCallback)(() => {
+    if (!headerRef.current || !contentRef.current) return;
+    const wr = wrapperRef.current;
+    const savedW = (wr == null ? void 0 : wr.style.width) ?? "";
+    const savedOv = contentRef.current.style.overflow;
+    const savedMH = contentRef.current.style.maxHeight;
+    const savedCW = contentRef.current.style.width;
+    if (wr) {
+      wr.style.width = "";
+    }
+    contentRef.current.style.overflow = "";
+    contentRef.current.style.maxHeight = "";
+    contentRef.current.style.width = "";
+    const cs = getComputedStyle(contentRef.current);
+    const paddingX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+    const pw2 = headerRef.current.offsetWidth + paddingX;
+    const bw2 = contentRef.current.offsetWidth;
+    const th2 = contentRef.current.offsetHeight;
+    if (wr) {
+      wr.style.width = savedW;
+    }
+    contentRef.current.style.overflow = savedOv;
+    contentRef.current.style.maxHeight = savedMH;
+    contentRef.current.style.width = savedCW;
+    dimsRef.current = { pw: pw2, bw: bw2, th: th2 };
+    setDims({ pw: pw2, bw: bw2, th: th2 });
+  }, []);
+  useIsomorphicLayoutEffect2(() => {
+    measure();
+    const t = setTimeout(measure, 100);
+    return () => clearTimeout(t);
+  }, [effectiveTitle, effectivePhase, isExpanded, showBody, effectiveDescription, effectiveAction, measure]);
+  (0, import_react49.useEffect)(() => {
+    if (!contentRef.current) return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(contentRef.current);
+    return () => ro.disconnect();
+  }, [measure]);
+  const { pw, bw, th } = dims;
+  const hasDims = pw > 0 && bw > 0 && th > 0;
+  const blobSquishCtrl = (0, import_react49.useRef)(null);
+  const expandDur = DEFAULT_EXPAND_DUR;
+  const collapseDur = DEFAULT_COLLAPSE_DUR;
+  const lastSquishTime = (0, import_react49.useRef)(0);
+  const triggerLandingSquish = (0, import_react49.useCallback)((phase2 = "mount") => {
+    var _a;
+    if (!wrapperRef.current || prefersReducedMotion2) return;
+    if (!useSpring2) return;
+    const now2 = Date.now();
+    if (now2 - lastSquishTime.current < 300) return;
+    lastSquishTime.current = now2;
+    (_a = blobSquishCtrl.current) == null ? void 0 : _a.stop();
+    const el = wrapperRef.current;
+    const springConfig = phase2 === "collapse" ? squishSpring(collapseDur, DEFAULT_COLLAPSE_DUR, bounceVal) : squishSpring(expandDur, DEFAULT_EXPAND_DUR, bounceVal);
+    const bScale = bounceVal / 0.4;
+    const compressY = (phase2 === "collapse" ? 0.035 : 0.12) * bScale;
+    const expandX = (phase2 === "collapse" ? 0.018 : 0.06) * bScale;
+    blobSquishCtrl.current = animate(0, 1, {
+      ...springConfig,
+      onUpdate: (v) => {
+        var _a2;
+        const intensity = Math.sin(v * Math.PI);
+        const sy = 1 - compressY * intensity;
+        const sx = 1 + expandX * intensity;
+        const mirror = ((_a2 = el.style.transform) == null ? void 0 : _a2.includes("scaleX(-1)")) ? "scaleX(-1) " : "";
+        el.style.transformOrigin = "center top";
+        el.style.transform = mirror + `scaleX(${sx}) scaleY(${sy})`;
+      },
+      onComplete: () => {
+        var _a2;
+        const right = (_a2 = el.style.transform) == null ? void 0 : _a2.includes("scaleX(-1)");
+        el.style.transform = right ? "scaleX(-1)" : "";
+        el.style.transformOrigin = "";
+      }
+    });
+  }, [prefersReducedMotion2, expandDur, collapseDur, useSpring2, bounceVal]);
+  useIsomorphicLayoutEffect2(() => {
+    var _a;
+    if (!hasDims || collapsingRef.current) return;
+    const prev = { ...aDims.current };
+    const target = { pw, bw, th };
+    if (prev.bw <= 0) {
+      aDims.current = target;
+      flush();
+      return;
+    }
+    if (morphTRef.current > 0 && morphTRef.current < 1) {
+      aDims.current = target;
+      flush();
+      return;
+    }
+    if (showBody) {
+      aDims.current = target;
+      flush();
+      return;
+    }
+    if (prev.bw === target.bw && prev.pw === target.pw && prev.th === target.th) return;
+    if (prefersReducedMotion2) {
+      aDims.current = target;
+      flush();
+      return;
+    }
+    (_a = pillResizeCtrl.current) == null ? void 0 : _a.stop();
+    if (Date.now() - collapseEndTime.current > 500 && !isExpanded) {
+      triggerLandingSquish("expand");
+    }
+    const pillResizeTransition = useSpring2 ? { type: "spring", duration: 0.5, bounce: bounceVal * 0.875 } : { duration: 0.4, ease: SMOOTH_EASE };
+    pillResizeCtrl.current = animate(0, 1, {
+      ...pillResizeTransition,
+      onUpdate: (t) => {
+        aDims.current = {
+          pw: prev.pw + (target.pw - prev.pw) * t,
+          bw: prev.bw + (target.bw - prev.bw) * t,
+          th: prev.th + (target.th - prev.th) * t
+        };
+        flush();
+      }
+    });
+  }, [pw, bw, th, hasDims, showBody, flush, prefersReducedMotion2, triggerLandingSquish, useSpring2]);
+  const squishDelayMs = 45;
+  const mountSquished = (0, import_react49.useRef)(false);
+  (0, import_react49.useEffect)(() => {
+    if (hasDims && !mountSquished.current && !isExpanded) {
+      mountSquished.current = true;
+      const t = setTimeout(triggerLandingSquish, squishDelayMs);
+      return () => clearTimeout(t);
+    }
+  }, [hasDims, squishDelayMs, triggerLandingSquish]);
+  const prevShowBody = (0, import_react49.useRef)(false);
+  useIsomorphicLayoutEffect2(() => {
+    if (!prevShowBody.current && showBody && !hoveredRef.current) {
+      const t = setTimeout(() => triggerLandingSquish("expand"), 80);
+      return () => clearTimeout(t);
+    }
+    prevShowBody.current = showBody;
+  }, [showBody, triggerLandingSquish]);
+  const shakeCtrl = (0, import_react49.useRef)(null);
+  const prevPhase = (0, import_react49.useRef)(phase);
+  (0, import_react49.useEffect)(() => {
+    var _a, _b;
+    if (phase === "error" && prevPhase.current !== "error" && !dismissing && wrapperRef.current && !prefersReducedMotion2) {
+      (_a = shakeCtrl.current) == null ? void 0 : _a.stop();
+      const el = wrapperRef.current;
+      const mirror = ((_b = el.style.transform) == null ? void 0 : _b.includes("scaleX(-1)")) ? "scaleX(-1) " : "";
+      shakeCtrl.current = animate(0, 1, {
+        duration: 0.4,
+        ease: "easeOut",
+        onUpdate: (v) => {
+          const decay = 1 - v;
+          const shake = Math.sin(v * Math.PI * 6) * decay * 3;
+          el.style.transform = mirror + `translateX(${shake}px)`;
+        },
+        onComplete: () => {
+          el.style.transform = mirror.trim() || "";
+        }
+      });
+    }
+    prevPhase.current = phase;
+    return () => {
+      var _a2;
+      (_a2 = shakeCtrl.current) == null ? void 0 : _a2.stop();
+    };
+  }, [phase, dismissing, prefersReducedMotion2]);
+  (0, import_react49.useEffect)(() => {
+    var _a, _b;
+    if (isExpanded) {
+      const delay2 = prefersReducedMotion2 ? 0 : 330;
+      const t1 = setTimeout(() => setShowBody(true), delay2);
+      return () => clearTimeout(t1);
+    }
+    (_a = morphCtrl.current) == null ? void 0 : _a.stop();
+    (_b = pillResizeCtrl.current) == null ? void 0 : _b.stop();
+    if (morphTRef.current > 0) {
+      const csPad = contentRef.current ? getComputedStyle(contentRef.current) : null;
+      const padX = csPad ? parseFloat(csPad.paddingLeft) + parseFloat(csPad.paddingRight) : 20;
+      const targetPw = headerRef.current ? headerRef.current.offsetWidth + padX : aDims.current.pw;
+      const targetDims = { pw: targetPw, bw: targetPw, th: PH };
+      if (prefersReducedMotion2) {
+        morphTRef.current = 0;
+        collapsingRef.current = false;
+        preDismissRef.current = false;
+        setShowBody(false);
+        aDims.current = { ...targetDims };
+        flush();
+        return;
+      }
+      const savedDims = expandedDimsRef.current.bw > 0 ? { ...expandedDimsRef.current } : { ...aDims.current };
+      const isPreDismiss = preDismissRef.current;
+      const collapseDur2 = 0.9;
+      const collapseTransition = isPreDismiss || !useSpring2 ? { duration: collapseDur2, ease: SMOOTH_EASE } : { type: "spring", duration: collapseDur2, bounce: bounceVal * 0.875 };
+      triggerLandingSquish("collapse");
+      morphCtrl.current = animate(morphTRef.current, 0, {
+        ...collapseTransition,
+        onUpdate: (t) => {
+          morphTRef.current = t;
+          aDims.current = {
+            pw: targetDims.pw + (savedDims.pw - targetDims.pw) * t,
+            bw: targetDims.bw + (savedDims.bw - targetDims.bw) * t,
+            th: targetDims.th + (savedDims.th - targetDims.th) * t
+          };
+          flush();
+          syncSonnerHeights(wrapperRef.current, true);
+        },
+        onComplete: () => {
+          morphTRef.current = 0;
+          collapsingRef.current = false;
+          preDismissRef.current = false;
+          collapseEndTime.current = Date.now();
+          aDims.current = { ...targetDims };
+          flush();
+          syncSonnerHeights(wrapperRef.current, true);
+          setShowBody(false);
+        }
+      });
+      return () => {
+        var _a2;
+        (_a2 = morphCtrl.current) == null ? void 0 : _a2.stop();
+      };
+    }
+    setShowBody(false);
+    morphTRef.current = 0;
+    flush();
+  }, [isExpanded, flush, prefersReducedMotion2, useSpring2, triggerLandingSquish]);
+  const remainingRef = (0, import_react49.useRef)(null);
+  const timerStartRef = (0, import_react49.useRef)(0);
+  const progressDelayRef = (0, import_react49.useRef)(0);
+  (0, import_react49.useEffect)(() => {
+    if (!showBody || actionSuccess || dismissing) return;
+    const expandDelayMs = prefersReducedMotion2 ? 0 : 330;
+    const collapseMs = prefersReducedMotion2 ? 10 : 0.9 * 1e3;
+    const displayMs = (timing == null ? void 0 : timing.displayDuration) ?? DEFAULT_DISPLAY_DURATION;
+    const fullDelay = displayMs - expandDelayMs - collapseMs;
+    progressDelayRef.current = Math.max(fullDelay, 0);
+    if (fullDelay <= 0) return;
+    if (hoveredRef.current || containerHoveredRef.current) return;
+    const delay2 = remainingRef.current ?? fullDelay;
+    timerStartRef.current = Date.now();
+    const timer = setTimeout(() => {
+      if (hoveredRef.current || containerHoveredRef.current) {
+        const elapsed = Date.now() - timerStartRef.current;
+        remainingRef.current = Math.max(0, delay2 - elapsed);
+        return;
+      }
+      remainingRef.current = null;
+      expandedDimsRef.current = { ...aDims.current };
+      collapsingRef.current = true;
+      preDismissRef.current = true;
+      setDismissing(true);
+    }, delay2);
+    dismissTimerRef.current = timer;
+    return () => {
+      clearTimeout(timer);
+      const elapsed = Date.now() - timerStartRef.current;
+      const remaining = delay2 - elapsed;
+      if (remaining > 0 && (hoveredRef.current || containerHoveredRef.current)) {
+        remainingRef.current = remaining;
+      }
+    };
+  }, [showBody, actionSuccess, dismissing, prefersReducedMotion2, hovered, containerHovered]);
+  const canExpand = hasDescription || hasAction;
+  const reExpandingRef = (0, import_react49.useRef)(false);
+  (0, import_react49.useEffect)(() => {
+    var _a;
+    if (!hovered && !containerHovered || !canExpand || !dismissing) return;
+    (_a = morphCtrl.current) == null ? void 0 : _a.stop();
+    collapsingRef.current = false;
+    preDismissRef.current = false;
+    remainingRef.current = null;
+    reExpandingRef.current = true;
+    setDismissing(false);
+    setShowBody(true);
+    if (showProgress) setProgressKey((k) => k + 1);
+    const currentT = morphTRef.current;
+    const startDims = { ...aDims.current };
+    const morphExpandTransition = useSpring2 ? { type: "spring", duration: 0.9, bounce: bounceVal } : { duration: 0.6, ease: SMOOTH_EASE };
+    requestAnimationFrame(() => {
+      morphCtrl.current = animate(currentT, 1, {
+        ...morphExpandTransition,
+        onUpdate: (t) => {
+          morphTRef.current = t;
+          const target = dimsRef.current;
+          aDims.current = {
+            pw: startDims.pw + (target.pw - startDims.pw) * t,
+            bw: startDims.bw + (target.bw - startDims.bw) * t,
+            th: startDims.th + (target.th - startDims.th) * t
+          };
+          flush();
+          syncSonnerHeights(wrapperRef.current, true);
+        },
+        onComplete: () => {
+          morphTRef.current = 1;
+          aDims.current = { ...dimsRef.current };
+          reExpandingRef.current = false;
+          flush();
+          syncSonnerHeights(wrapperRef.current, true);
+        }
+      });
+    });
+    return () => {
+      var _a2;
+      (_a2 = morphCtrl.current) == null ? void 0 : _a2.stop();
+    };
+  }, [hovered, containerHovered, dismissing, canExpand]);
+  (0, import_react49.useEffect)(() => {
+    if (!toastId || !dismissing || showBody) return;
+    const t = setTimeout(() => {
+      if (!hoveredRef.current && !containerHoveredRef.current) {
+        toast.dismiss(toastId);
+      }
+    }, 800);
+    return () => clearTimeout(t);
+  }, [dismissing, showBody, toastId]);
+  (0, import_react49.useEffect)(() => {
+    if (!toastId || !actionSuccess || showBody) return;
+    const t = setTimeout(() => toast.dismiss(toastId), 1200);
+    return () => clearTimeout(t);
+  }, [toastId, actionSuccess, showBody]);
+  (0, import_react49.useEffect)(() => {
+    var _a, _b, _c;
+    if (reExpandingRef.current) return;
+    if (!showBody) {
+      morphTRef.current = 0;
+      (_a = morphCtrl.current) == null ? void 0 : _a.stop();
+      flush();
+      return;
+    }
+    if (prefersReducedMotion2) {
+      (_b = pillResizeCtrl.current) == null ? void 0 : _b.stop();
+      (_c = morphCtrl.current) == null ? void 0 : _c.stop();
+      morphTRef.current = 1;
+      aDims.current = { ...dimsRef.current };
+      flush();
+      syncSonnerHeights(wrapperRef.current, true);
+      return;
+    }
+    const raf = requestAnimationFrame(() => {
+      var _a2, _b2;
+      (_a2 = pillResizeCtrl.current) == null ? void 0 : _a2.stop();
+      (_b2 = morphCtrl.current) == null ? void 0 : _b2.stop();
+      const startDims = { ...aDims.current };
+      const morphExpandTransition = useSpring2 ? { type: "spring", duration: 0.9, bounce: bounceVal } : { duration: 0.6, ease: SMOOTH_EASE };
+      morphCtrl.current = animate(0, 1, {
+        ...morphExpandTransition,
+        onUpdate: (t) => {
+          morphTRef.current = t;
+          const target = dimsRef.current;
+          aDims.current = {
+            pw: startDims.pw + (target.pw - startDims.pw) * t,
+            bw: startDims.bw + (target.bw - startDims.bw) * t,
+            th: startDims.th + (target.th - startDims.th) * t
+          };
+          flush();
+          syncSonnerHeights(wrapperRef.current, true);
+        },
+        onComplete: () => {
+          morphTRef.current = 1;
+          aDims.current = { ...dimsRef.current };
+          flush();
+          syncSonnerHeights(wrapperRef.current, true);
+        }
+      });
+    });
+    return () => {
+      var _a2;
+      cancelAnimationFrame(raf);
+      (_a2 = morphCtrl.current) == null ? void 0 : _a2.stop();
+    };
+  }, [showBody, flush, prefersReducedMotion2, useSpring2]);
+  const headerSquished = (0, import_react49.useRef)(false);
+  (0, import_react49.useEffect)(() => {
+    var _a;
+    if (!headerRef.current || prefersReducedMotion2) return;
+    (_a = headerSquishCtrl.current) == null ? void 0 : _a.stop();
+    const el = headerRef.current;
+    if (showBody && !dismissing && !actionSuccess) {
+      if (!useSpring2) return;
+      headerSquished.current = true;
+      headerSquishCtrl.current = animate(0, 1, {
+        ...squishSpring(expandDur, DEFAULT_EXPAND_DUR, bounceVal),
+        onUpdate: (v) => {
+          const scale2 = 1 - 0.05 * v;
+          const pushY = v * 1;
+          el.style.transform = `scale(${scale2}) translateY(${pushY}px)`;
+        }
+      });
+    } else if (headerSquished.current) {
+      headerSquished.current = false;
+      const isSpringCollapse = !preDismissRef.current && useSpring2;
+      const transition = isSpringCollapse ? squishSpring(collapseDur, DEFAULT_COLLAPSE_DUR, bounceVal) : { duration: collapseDur * 0.5, ease: SMOOTH_EASE };
+      headerSquishCtrl.current = animate(1, 0, {
+        ...transition,
+        onUpdate: (v) => {
+          const scale2 = 1 - 0.05 * v;
+          const pushY = v * 1;
+          el.style.transform = `scale(${scale2}) translateY(${pushY}px)`;
+        },
+        onComplete: () => {
+          el.style.transform = "";
+        }
+      });
+    }
+    return () => {
+      var _a2;
+      (_a2 = headerSquishCtrl.current) == null ? void 0 : _a2.stop();
+    };
+  }, [showBody, dismissing, actionSuccess, prefersReducedMotion2, expandDur, collapseDur, useSpring2]);
+  (0, import_react49.useEffect)(() => {
+    var _a;
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+    const ol = (_a = wrapper.closest("[data-sonner-toast]")) == null ? void 0 : _a.parentElement;
+    if (!ol) return;
+    const unregister = registerSonnerObserver(ol, () => {
+      syncSonnerHeights(wrapper, true);
+    });
+    const expandObs = new MutationObserver((mutations) => {
+      for (const m2 of mutations) {
+        if (m2.type === "attributes" && m2.attributeName === "data-expanded" && m2.target.getAttribute("data-expanded") === "true") {
+          syncSonnerHeights(wrapper, true);
+          break;
+        }
+      }
+    });
+    expandObs.observe(ol, {
+      attributes: true,
+      attributeFilter: ["data-expanded"],
+      subtree: true
+    });
+    return () => {
+      unregister();
+      expandObs.disconnect();
+    };
+  }, []);
+  const handleActionClick = (0, import_react49.useCallback)(() => {
+    if (!effectiveAction) return;
+    if (effectiveAction.successLabel) {
+      expandedDimsRef.current = { ...aDims.current };
+      collapsingRef.current = true;
+      setActionSuccess(effectiveAction.successLabel);
+    }
+    try {
+      effectiveAction.onClick();
+    } catch {
+    }
+  }, [effectiveAction]);
+  const SWIPE_THRESHOLD2 = 100;
+  const swipeStartRef = (0, import_react49.useRef)(null);
+  const [swipeOffsetX, setSwipeOffsetX] = (0, import_react49.useState)(0);
+  const isSwipingRef = (0, import_react49.useRef)(false);
+  const handleTouchStart = (0, import_react49.useCallback)((e) => {
+    if (!getGooeySwipeToDismiss()) return;
+    const touch = e.touches[0];
+    swipeStartRef.current = { x: touch.clientX, y: touch.clientY };
+    isSwipingRef.current = false;
+  }, []);
+  const handleTouchMove = (0, import_react49.useCallback)((e) => {
+    if (!swipeStartRef.current || !getGooeySwipeToDismiss()) return;
+    const touch = e.touches[0];
+    const dx = touch.clientX - swipeStartRef.current.x;
+    const dy = touch.clientY - swipeStartRef.current.y;
+    if (!isSwipingRef.current && Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 10) {
+      swipeStartRef.current = null;
+      return;
+    }
+    if (!isSwipingRef.current && Math.abs(dx) > 10) {
+      isSwipingRef.current = true;
+    }
+    if (isSwipingRef.current) {
+      setSwipeOffsetX(dx);
+    }
+  }, []);
+  const handleTouchEnd = (0, import_react49.useCallback)(() => {
+    if (!getGooeySwipeToDismiss()) {
+      swipeStartRef.current = null;
+      return;
+    }
+    if (isSwipingRef.current && Math.abs(swipeOffsetX) >= SWIPE_THRESHOLD2 && toastId) {
+      toast.dismiss(toastId);
+    }
+    swipeStartRef.current = null;
+    isSwipingRef.current = false;
+    setSwipeOffsetX(0);
+  }, [swipeOffsetX, toastId]);
+  const swipeOpacity = swipeOffsetX !== 0 ? Math.max(0, 1 - Math.abs(swipeOffsetX) / (SWIPE_THRESHOLD2 * 1.5)) : 1;
+  const swipeTranslate = swipeOffsetX !== 0 ? `translateX(${swipeOffsetX}px)` : "";
+  const renderIcon = () => {
+    if (!actionSuccess && icon) return icon;
+    if (isLoading) return (0, import_jsx_runtime12.jsx)(SpinnerIcon, { size: 18, className: styles.spinnerSpin });
+    const IconComponent = phaseIconMap[effectivePhase];
+    return (0, import_jsx_runtime12.jsx)(IconComponent, { size: 18 });
+  };
+  const iconTransition = (0, import_react49.useMemo)(
+    () => prefersReducedMotion2 ? { duration: 0.01 } : { duration: 0.2 },
+    [prefersReducedMotion2]
+  );
+  const iconEl = (0, import_jsx_runtime12.jsx)("div", { className: `${styles.iconWrapper}${(classNames == null ? void 0 : classNames.icon) ? ` ${classNames.icon}` : ""}`, children: (0, import_jsx_runtime12.jsx)(AnimatePresence, { mode: "wait", children: (0, import_jsx_runtime12.jsx)(
+    motion.div,
+    {
+      initial: prefersReducedMotion2 ? false : { opacity: 0, scale: 0.5 },
+      animate: { opacity: 1, scale: 1 },
+      exit: { opacity: 0, scale: 0.5 },
+      transition: iconTransition,
+      children: renderIcon()
+    },
+    isLoading ? "spinner" : effectivePhase
+  ) }) });
+  const titleEl = (0, import_jsx_runtime12.jsx)("span", { className: `${styles.title}${(classNames == null ? void 0 : classNames.title) ? ` ${classNames.title}` : ""}`, children: effectiveTitle });
+  const createdAtRef = (0, import_react49.useRef)(/* @__PURE__ */ new Date());
+  const timestampStr = (0, import_react49.useMemo)(
+    () => createdAtRef.current.toLocaleTimeString(void 0, { hour: "numeric", minute: "2-digit", second: "2-digit" }),
+    []
+  );
+  const iconAndTitle = (0, import_jsx_runtime12.jsxs)(import_jsx_runtime12.Fragment, { children: [
+    iconEl,
+    titleEl
+  ] });
+  const basePositionStyle = (0, import_react49.useMemo)(
+    () => isCenter ? { margin: "0 auto" } : isRight ? { marginLeft: "auto", transform: "scaleX(-1)" } : {},
+    [isCenter, isRight]
+  );
+  const wrapperStyle = (0, import_react49.useMemo)(() => {
+    if (swipeTranslate) {
+      return {
+        ...basePositionStyle,
+        transform: (basePositionStyle.transform ? basePositionStyle.transform + " " : "") + swipeTranslate,
+        opacity: swipeOpacity,
+        transition: "none"
+      };
+    }
+    return Object.keys(basePositionStyle).length > 0 ? basePositionStyle : void 0;
+  }, [basePositionStyle, swipeTranslate, swipeOpacity]);
+  const contentStyle = (0, import_react49.useMemo)(
+    () => isCenter ? { textAlign: "center" } : isRight ? { transform: "scaleX(-1)", textAlign: "right" } : { textAlign: "left" },
+    [isCenter, isRight]
+  );
+  const handleMouseEnter = (0, import_react49.useCallback)(() => {
+    hoveredRef.current = true;
+    setHovered(true);
+  }, []);
+  const handleMouseLeave = (0, import_react49.useCallback)(() => {
+    hoveredRef.current = false;
+    setHovered(false);
+  }, []);
+  return (0, import_jsx_runtime12.jsxs)("div", { ref: wrapperRef, className: `${styles.wrapper}${(classNames == null ? void 0 : classNames.wrapper) ? ` ${classNames.wrapper}` : ""}`, style: wrapperStyle, role: effectivePhase === "error" || effectivePhase === "warning" ? "alert" : "status", "aria-live": effectivePhase === "error" || effectivePhase === "warning" ? "assertive" : "polite", "aria-atomic": "true", onMouseEnter: handleMouseEnter, onMouseLeave: handleMouseLeave, onTouchStart: handleTouchStart, onTouchMove: handleTouchMove, onTouchEnd: handleTouchEnd, "data-center": isCenter || void 0, "data-theme": theme, children: [
+    (0, import_jsx_runtime12.jsx)(
+      "svg",
+      {
+        className: styles.blobSvg,
+        "aria-hidden": true,
+        children: (0, import_jsx_runtime12.jsx)(
+          "path",
+          {
+            ref: pathRef,
+            fill: fillColor,
+            stroke: borderColor || "none",
+            strokeWidth: borderColor ? borderWidth ?? 1.5 : 0
+          }
+        )
+      }
+    ),
+    showCloseButton && effectivePhase !== "loading" && (0, import_jsx_runtime12.jsx)(
+      "button",
+      {
+        className: `${styles.closeButton}${(isRight ? closeButtonSetting !== "top-right" : closeButtonSetting === "top-right") ? ` ${styles.closeButtonRight}` : ""}`,
+        "aria-label": "Close toast",
+        type: "button",
+        style: {
+          background: fillColor,
+          borderColor: borderColor || "transparent",
+          borderWidth: borderColor ? borderWidth ?? 1.5 : 0,
+          boxShadow: borderColor ? "none" : "0 1px 4px rgba(0, 0, 0, 0.2)",
+          ...isCenter && closeButtonSetting !== "top-right" ? { top: 6, left: -1 } : {}
+        },
+        onClick: (e) => {
+          e.stopPropagation();
+          const id3 = toastId;
+          if (id3 != null) toast.dismiss(id3);
+        },
+        children: (0, import_jsx_runtime12.jsxs)("svg", { xmlns: "http://www.w3.org/2000/svg", width: "12", height: "12", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+          (0, import_jsx_runtime12.jsx)("line", { x1: "18", y1: "6", x2: "6", y2: "18" }),
+          (0, import_jsx_runtime12.jsx)("line", { x1: "6", y1: "6", x2: "18", y2: "18" })
+        ] })
+      }
+    ),
+    (0, import_jsx_runtime12.jsxs)(
+      "div",
+      {
+        ref: contentRef,
+        className: `${styles.content} ${showBody ? styles.contentExpanded : styles.contentCompact}${(classNames == null ? void 0 : classNames.content) ? ` ${classNames.content}` : ""}`,
+        style: contentStyle,
+        children: [
+          (0, import_jsx_runtime12.jsxs)("div", { ref: headerRef, className: `${styles.header} ${titleColorMap[effectivePhase]}${(classNames == null ? void 0 : classNames.header) ? ` ${classNames.header}` : ""}`, children: [
+            iconAndTitle,
+            !hasDescription && !hasAction && !actionSuccess && showTimestamp && (0, import_jsx_runtime12.jsx)("span", { className: styles.timestamp, children: timestampStr })
+          ] }),
+          (0, import_jsx_runtime12.jsx)(AnimatePresence, { children: showBody && hasDescription && !dismissing && (0, import_jsx_runtime12.jsx)(
+            motion.div,
+            {
+              className: `${styles.description}${(classNames == null ? void 0 : classNames.description) ? ` ${classNames.description}` : ""}`,
+              style: { textAlign: "left" },
+              initial: prefersReducedMotion2 ? false : { opacity: 0 },
+              animate: { opacity: 1 },
+              exit: { opacity: 0 },
+              transition: prefersReducedMotion2 ? { duration: 0.01 } : { duration: 0.35, ease: [0.4, 0, 0.2, 1] },
+              children: (0, import_jsx_runtime12.jsxs)("div", { style: { display: "flex", alignItems: "flex-start", gap: "10px" }, children: [
+                (0, import_jsx_runtime12.jsx)("div", { style: { flex: 1, minWidth: 0 }, children: effectiveDescription }),
+                showTimestamp && (0, import_jsx_runtime12.jsx)("span", { className: styles.timestamp, children: timestampStr })
+              ] })
+            },
+            "description"
+          ) }),
+          (0, import_jsx_runtime12.jsx)(AnimatePresence, { children: showBody && !hasDescription && hasAction && !dismissing && showTimestamp && (0, import_jsx_runtime12.jsx)(
+            motion.div,
+            {
+              className: styles.timestamp,
+              style: { textAlign: "right", marginTop: 8, paddingLeft: 0 },
+              initial: prefersReducedMotion2 ? false : { opacity: 0 },
+              animate: { opacity: 1 },
+              exit: { opacity: 0 },
+              transition: prefersReducedMotion2 ? { duration: 0.01 } : { duration: 0.35, ease: [0.4, 0, 0.2, 1] },
+              children: timestampStr
+            },
+            "timestamp-body"
+          ) }),
+          (0, import_jsx_runtime12.jsx)(AnimatePresence, { children: showBody && hasAction && effectiveAction && !dismissing && (0, import_jsx_runtime12.jsx)(
+            motion.div,
+            {
+              className: `${styles.actionWrapper}${(classNames == null ? void 0 : classNames.actionWrapper) ? ` ${classNames.actionWrapper}` : ""}`,
+              initial: prefersReducedMotion2 ? false : { opacity: 0 },
+              animate: { opacity: 1 },
+              exit: { opacity: 0 },
+              transition: prefersReducedMotion2 ? { duration: 0.01 } : { duration: 0.35, ease: [0.4, 0, 0.2, 1], delay: 0.1 },
+              children: (0, import_jsx_runtime12.jsx)(
+                "button",
+                {
+                  className: `${styles.actionButton} ${actionColorMap[effectivePhase]}${(classNames == null ? void 0 : classNames.actionButton) ? ` ${classNames.actionButton}` : ""}`,
+                  onClick: handleActionClick,
+                  type: "button",
+                  "aria-label": effectiveAction.label,
+                  children: effectiveAction.label
+                }
+              )
+            },
+            "action"
+          ) }),
+          showProgress && (0, import_jsx_runtime12.jsx)(
+            "div",
+            {
+              className: `${styles.progressWrapper}${hovered || containerHovered ? ` ${styles.progressPaused}` : ""}`,
+              style: { opacity: showBody && !actionSuccess ? 1 : 0 },
+              children: (0, import_jsx_runtime12.jsx)(
+                "div",
+                {
+                  className: `${styles.progressBar} ${progressColorMap[effectivePhase]}`,
+                  style: { "--gooey-progress-duration": `${progressDelayRef.current || ((timing == null ? void 0 : timing.displayDuration) ?? DEFAULT_DISPLAY_DURATION)}ms` }
+                }
+              )
+            },
+            progressKey
+          )
+        ]
+      }
+    )
+  ] });
+};
+var ToastErrorBoundary = class extends import_react49.Component {
+  constructor() {
+    super(...arguments);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error, errorInfo) {
+    if (true) {
+      console.error("[GooeyToast] Rendering error:", error, errorInfo);
+    }
+  }
+  render() {
+    if (this.state.hasError) {
+      return null;
+    }
+    return this.props.children;
+  }
+};
+var DEFAULT_EXPANDED_DURATION = 4e3;
+function getAnnouncePoliteness(type) {
+  return type === "error" || type === "warning" ? "assertive" : "polite";
+}
+function buildAnnouncementMessage(title, description) {
+  if (!description || typeof description !== "string") return title;
+  return `${title}: ${description}`;
+}
+var _activeIds = /* @__PURE__ */ new Map();
+var _queue = [];
+var _toastCallbacks = /* @__PURE__ */ new Map();
+var _autoCloseFlags = /* @__PURE__ */ new Set();
+var _manualDismissFlags = /* @__PURE__ */ new Set();
+function _getMostRecentActiveId() {
+  let last;
+  for (const id3 of _activeIds.keys()) last = id3;
+  return last;
+}
+function _processQueue() {
+  const max = getGooeyVisibleToasts();
+  while (_queue.length > 0 && _activeIds.size < max) {
+    const next = _queue.shift();
+    _activeIds.set(next.id, next.type);
+    next.create();
+  }
+}
+function _enqueue(entry) {
+  const maxQueue = getGooeyMaxQueue();
+  const overflow = getGooeyQueueOverflow();
+  if (_queue.length >= maxQueue) {
+    if (overflow === "drop-newest") return false;
+    _queue.shift();
+  }
+  _queue.push(entry);
+  return true;
+}
+function _onToastDismissed(id3) {
+  if (!_activeIds.delete(id3)) return;
+  _toastUpdateListeners.delete(id3);
+  const cbs = _toastCallbacks.get(id3);
+  if (cbs) {
+    const isAutoClose = _autoCloseFlags.has(id3) || !_manualDismissFlags.has(id3);
+    if (isAutoClose && cbs.onAutoClose) {
+      try {
+        cbs.onAutoClose(id3);
+      } catch {
+      }
+    }
+    if (cbs.onDismiss) {
+      try {
+        cbs.onDismiss(id3);
+      } catch {
+      }
+    }
+    _toastCallbacks.delete(id3);
+  }
+  _autoCloseFlags.delete(id3);
+  _manualDismissFlags.delete(id3);
+  _processQueue();
+}
+var _toastUpdateListeners = /* @__PURE__ */ new Map();
+function updateGooeyToast(id3, options) {
+  const listener = _toastUpdateListeners.get(id3);
+  if (listener) {
+    listener(options);
+    if (options.type !== void 0 && _activeIds.has(id3)) {
+      _activeIds.set(id3, options.type);
+    }
+    if (options.title !== void 0) {
+      announce(
+        buildAnnouncementMessage(options.title, options.description),
+        options.type ? getAnnouncePoliteness(options.type) : "polite"
+      );
+    }
+  }
+}
+function GooeyToastWrapper({
+  initialPhase,
+  title: initialTitle,
+  type: initialType,
+  description: initialDescription,
+  action: initialAction,
+  icon,
+  classNames,
+  fillColor,
+  borderColor,
+  borderWidth,
+  timing,
+  preset,
+  spring: spring2,
+  bounce,
+  showProgress,
+  showTimestamp: initialShowTimestamp,
+  toastId,
+  onDismiss,
+  onAutoClose
+}) {
+  (0, import_react49.useEffect)(() => {
+    if (onDismiss || onAutoClose) {
+      _toastCallbacks.set(toastId, { onDismiss, onAutoClose });
+    }
+  }, [toastId, onDismiss, onAutoClose]);
+  const [title, setTitle] = (0, import_react49.useState)(initialTitle);
+  const [type, setType] = (0, import_react49.useState)(initialType);
+  const [phase, setPhase] = (0, import_react49.useState)(initialPhase);
+  const [description, setDescription] = (0, import_react49.useState)(initialDescription);
+  const [action, setAction] = (0, import_react49.useState)(initialAction);
+  const [currentIcon, setCurrentIcon] = (0, import_react49.useState)(icon);
+  const [showTimestamp, setShowTimestamp] = (0, import_react49.useState)(initialShowTimestamp ?? true);
+  (0, import_react49.useEffect)(() => {
+    const handleUpdate = (opts) => {
+      if (opts.title !== void 0) setTitle(opts.title);
+      if (opts.description !== void 0) setDescription(opts.description);
+      if (opts.type !== void 0) {
+        setType(opts.type);
+        setPhase(opts.type);
+      }
+      if (opts.action !== void 0) setAction(opts.action);
+      if ("icon" in opts) setCurrentIcon(opts.icon ?? void 0);
+      if (opts.showTimestamp !== void 0) setShowTimestamp(opts.showTimestamp);
+    };
+    _toastUpdateListeners.set(toastId, handleUpdate);
+    return () => {
+      _toastUpdateListeners.delete(toastId);
+    };
+  }, [toastId]);
+  const mountedRef = (0, import_react49.useRef)(true);
+  (0, import_react49.useEffect)(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      setTimeout(() => {
+        if (!mountedRef.current) _onToastDismissed(toastId);
+      }, 100);
+    };
+  }, [toastId]);
+  return (0, import_jsx_runtime12.jsx)(ToastErrorBoundary, { children: (0, import_jsx_runtime12.jsx)(
+    GooeyToast,
+    {
+      title,
+      description,
+      type,
+      action,
+      icon: currentIcon,
+      phase,
+      classNames,
+      fillColor,
+      borderColor,
+      borderWidth,
+      timing,
+      preset,
+      spring: spring2,
+      bounce,
+      showProgress,
+      showTimestamp,
+      toastId
+    }
+  ) });
+}
+function PromiseToastWrapper({
+  promise,
+  data,
+  toastId
+}) {
+  var _a;
+  const [phase, setPhase] = (0, import_react49.useState)("loading");
+  const [title, setTitle] = (0, import_react49.useState)(data.loading);
+  const [description, setDescription] = (0, import_react49.useState)((_a = data.description) == null ? void 0 : _a.loading);
+  const [action, setAction] = (0, import_react49.useState)(void 0);
+  (0, import_react49.useEffect)(() => {
+    if (data.onDismiss || data.onAutoClose) {
+      _toastCallbacks.set(toastId, { onDismiss: data.onDismiss, onAutoClose: data.onAutoClose });
+    }
+  }, [toastId, data.onDismiss, data.onAutoClose]);
+  const mountedRef = (0, import_react49.useRef)(true);
+  (0, import_react49.useEffect)(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      setTimeout(() => {
+        if (!mountedRef.current) _onToastDismissed(toastId);
+      }, 100);
+    };
+  }, [toastId]);
+  (0, import_react49.useEffect)(() => {
+    const resetDuration = (hasExpandedContent) => {
+      var _a2;
+      const baseDuration = ((_a2 = data.timing) == null ? void 0 : _a2.displayDuration) ?? (hasExpandedContent ? DEFAULT_EXPANDED_DURATION : void 0);
+      const collapseDurMs = 0.9 * 1e3;
+      const duration = baseDuration != null && hasExpandedContent ? baseDuration + collapseDurMs : baseDuration;
+      if (duration != null) {
+        toast.custom(() => (0, import_jsx_runtime12.jsx)(PromiseToastWrapper, { promise, data, toastId }), { id: toastId, duration });
+      }
+    };
+    promise.then((result) => {
+      var _a2, _b, _c, _d;
+      const desc = typeof ((_a2 = data.description) == null ? void 0 : _a2.success) === "function" ? data.description.success(result) : (_b = data.description) == null ? void 0 : _b.success;
+      const resolvedTitle = typeof data.success === "function" ? data.success(result) : data.success;
+      setTitle(resolvedTitle);
+      setDescription(desc);
+      setAction((_c = data.action) == null ? void 0 : _c.success);
+      setPhase("success");
+      resetDuration(Boolean(desc || ((_d = data.action) == null ? void 0 : _d.success)));
+      announce(buildAnnouncementMessage(resolvedTitle, desc), "polite");
+    }).catch((err) => {
+      var _a2, _b, _c, _d;
+      const desc = typeof ((_a2 = data.description) == null ? void 0 : _a2.error) === "function" ? data.description.error(err) : (_b = data.description) == null ? void 0 : _b.error;
+      const resolvedTitle = typeof data.error === "function" ? data.error(err) : data.error;
+      setTitle(resolvedTitle);
+      setDescription(desc);
+      setAction((_c = data.action) == null ? void 0 : _c.error);
+      setPhase("error");
+      resetDuration(Boolean(desc || ((_d = data.action) == null ? void 0 : _d.error)));
+      announce(buildAnnouncementMessage(resolvedTitle, desc), "assertive");
+    });
+  }, []);
+  return (0, import_jsx_runtime12.jsx)(ToastErrorBoundary, { children: (0, import_jsx_runtime12.jsx)(
+    GooeyToast,
+    {
+      title,
+      description,
+      type: phase === "loading" ? "info" : phase,
+      action,
+      phase,
+      classNames: data.classNames,
+      fillColor: data.fillColor,
+      borderColor: data.borderColor,
+      borderWidth: data.borderWidth,
+      timing: data.timing,
+      preset: data.preset,
+      spring: data.spring,
+      bounce: data.bounce,
+      showTimestamp: data.showTimestamp ?? true,
+      toastId
+    }
+  ) });
+}
+function createGooeyToast(title, type, options) {
+  var _a;
+  const hasExpandedContent = Boolean((options == null ? void 0 : options.description) || (options == null ? void 0 : options.action));
+  const baseDuration = ((_a = options == null ? void 0 : options.timing) == null ? void 0 : _a.displayDuration) ?? (options == null ? void 0 : options.duration) ?? ((options == null ? void 0 : options.description) ? DEFAULT_EXPANDED_DURATION : void 0);
+  const duration = hasExpandedContent ? Infinity : baseDuration;
+  const toastId = (options == null ? void 0 : options.id) ?? Math.random().toString(36).slice(2);
+  const create = () => {
+    toast.custom(
+      () => (0, import_jsx_runtime12.jsx)(
+        GooeyToastWrapper,
+        {
+          initialPhase: type,
+          title,
+          type,
+          description: options == null ? void 0 : options.description,
+          action: options == null ? void 0 : options.action,
+          icon: options == null ? void 0 : options.icon,
+          classNames: options == null ? void 0 : options.classNames,
+          fillColor: options == null ? void 0 : options.fillColor,
+          borderColor: options == null ? void 0 : options.borderColor,
+          borderWidth: options == null ? void 0 : options.borderWidth,
+          timing: options == null ? void 0 : options.timing,
+          preset: options == null ? void 0 : options.preset,
+          spring: options == null ? void 0 : options.spring,
+          bounce: options == null ? void 0 : options.bounce,
+          showProgress: options == null ? void 0 : options.showProgress,
+          showTimestamp: options == null ? void 0 : options.showTimestamp,
+          toastId,
+          onDismiss: options == null ? void 0 : options.onDismiss,
+          onAutoClose: options == null ? void 0 : options.onAutoClose
+        }
+      ),
+      {
+        duration,
+        id: toastId
+      }
+    );
+  };
+  if ((options == null ? void 0 : options.onDismiss) || (options == null ? void 0 : options.onAutoClose)) {
+    _toastCallbacks.set(toastId, { onDismiss: options.onDismiss, onAutoClose: options.onAutoClose });
+  }
+  announce(
+    buildAnnouncementMessage(title, options == null ? void 0 : options.description),
+    getAnnouncePoliteness(type)
+  );
+  if (_activeIds.size < getGooeyVisibleToasts()) {
+    _activeIds.set(toastId, type);
+    create();
+  } else {
+    _enqueue({ id: toastId, type, create });
+  }
+  return toastId;
+}
+function dismissGooeyToast(idOrFilter) {
+  if (idOrFilter != null && typeof idOrFilter === "object") {
+    const filterTypes = Array.isArray(idOrFilter.type) ? idOrFilter.type : [idOrFilter.type];
+    const typesSet = new Set(filterTypes);
+    for (let i = _queue.length - 1; i >= 0; i--) {
+      if (typesSet.has(_queue[i].type)) {
+        _queue.splice(i, 1);
+      }
+    }
+    for (const [id3, toastType] of _activeIds) {
+      if (typesSet.has(toastType)) {
+        _manualDismissFlags.add(id3);
+        toast.dismiss(id3);
+      }
+    }
+  } else if (idOrFilter != null) {
+    const idx = _queue.findIndex((q) => q.id === idOrFilter);
+    if (idx !== -1) {
+      _queue.splice(idx, 1);
+      return;
+    }
+    _manualDismissFlags.add(idOrFilter);
+    toast.dismiss(idOrFilter);
+  } else {
+    for (const id3 of _activeIds.keys()) {
+      _manualDismissFlags.add(id3);
+    }
+    _queue.length = 0;
+    _activeIds.clear();
+    toast.dismiss();
+  }
+}
+var gooeyToast = Object.assign(
+  (title, options) => createGooeyToast(title, "default", options),
+  {
+    success: (title, options) => createGooeyToast(title, "success", options),
+    error: (title, options) => createGooeyToast(title, "error", options),
+    warning: (title, options) => createGooeyToast(title, "warning", options),
+    info: (title, options) => createGooeyToast(title, "info", options),
+    promise: (promise, data) => {
+      var _a;
+      const id3 = Math.random().toString(36).slice(2);
+      announce(buildAnnouncementMessage(data.loading, (_a = data.description) == null ? void 0 : _a.loading), "polite");
+      if (data.onDismiss || data.onAutoClose) {
+        _toastCallbacks.set(id3, { onDismiss: data.onDismiss, onAutoClose: data.onAutoClose });
+      }
+      const create = () => {
+        var _a2;
+        toast.custom(() => (0, import_jsx_runtime12.jsx)(PromiseToastWrapper, { promise, data, toastId: id3 }), {
+          id: id3,
+          duration: ((_a2 = data.timing) == null ? void 0 : _a2.displayDuration) != null || data.description ? Infinity : void 0
+        });
+      };
+      if (_activeIds.size < getGooeyVisibleToasts()) {
+        _activeIds.set(id3, "info");
+        create();
+      } else {
+        _enqueue({ id: id3, type: "info", create });
+      }
+      return id3;
+    },
+    dismiss: dismissGooeyToast,
+    update: updateGooeyToast
+  }
+);
+function AriaLiveAnnouncer() {
+  const [politeMessage, setPoliteMessage] = (0, import_react49.useState)("");
+  const [assertiveMessage, setAssertiveMessage] = (0, import_react49.useState)("");
+  const handleAnnouncement = (0, import_react49.useCallback)(({ message, politeness }) => {
+    if (politeness === "assertive") {
+      setAssertiveMessage("");
+      requestAnimationFrame(() => setAssertiveMessage(message));
+    } else {
+      setPoliteMessage("");
+      requestAnimationFrame(() => setPoliteMessage(message));
+    }
+  }, []);
+  (0, import_react49.useEffect)(() => {
+    return subscribeAnnouncements(handleAnnouncement);
+  }, [handleAnnouncement]);
+  (0, import_react49.useEffect)(() => {
+    if (!politeMessage) return;
+    const t = setTimeout(() => setPoliteMessage(""), 7e3);
+    return () => clearTimeout(t);
+  }, [politeMessage]);
+  (0, import_react49.useEffect)(() => {
+    if (!assertiveMessage) return;
+    const t = setTimeout(() => setAssertiveMessage(""), 7e3);
+    return () => clearTimeout(t);
+  }, [assertiveMessage]);
+  const visuallyHidden = {
+    position: "absolute",
+    width: "1px",
+    height: "1px",
+    padding: 0,
+    margin: "-1px",
+    overflow: "hidden",
+    clip: "rect(0, 0, 0, 0)",
+    whiteSpace: "nowrap",
+    border: 0
+  };
+  return (0, import_jsx_runtime12.jsxs)(import_jsx_runtime12.Fragment, { children: [
+    (0, import_jsx_runtime12.jsx)(
+      "div",
+      {
+        role: "status",
+        "aria-live": "polite",
+        "aria-atomic": "true",
+        style: visuallyHidden,
+        children: politeMessage
+      }
+    ),
+    (0, import_jsx_runtime12.jsx)(
+      "div",
+      {
+        role: "alert",
+        "aria-live": "assertive",
+        "aria-atomic": "true",
+        style: visuallyHidden,
+        children: assertiveMessage
+      }
+    )
+  ] });
+}
+function GooeyToaster({
+  position = "bottom-right",
+  duration,
+  gap = 14,
+  offset = "24px",
+  theme = "light",
+  toastOptions,
+  expand,
+  closeButton,
+  richColors,
+  visibleToasts,
+  dir,
+  preset,
+  spring: spring2,
+  bounce,
+  swipeToDismiss = true,
+  closeOnEscape = true,
+  maxQueue = Infinity,
+  queueOverflow = "drop-oldest",
+  showProgress = false,
+  showTimestamp = true
+}) {
+  const presetConfig = preset ? animationPresets[preset] : void 0;
+  const resolvedSpring = spring2 ?? (presetConfig == null ? void 0 : presetConfig.spring) ?? true;
+  const resolvedBounce = bounce ?? (presetConfig == null ? void 0 : presetConfig.bounce);
+  (0, import_react49.useEffect)(() => {
+    setGooeyPosition(position);
+  }, [position]);
+  (0, import_react49.useEffect)(() => {
+    setGooeyDir(dir ?? "ltr");
+  }, [dir]);
+  (0, import_react49.useEffect)(() => {
+    setGooeyTheme(theme);
+  }, [theme]);
+  (0, import_react49.useEffect)(() => {
+    setGooeySpring(resolvedSpring);
+  }, [resolvedSpring]);
+  (0, import_react49.useEffect)(() => {
+    setGooeyBounce(resolvedBounce);
+  }, [resolvedBounce]);
+  (0, import_react49.useEffect)(() => {
+    setGooeySwipeToDismiss(swipeToDismiss);
+  }, [swipeToDismiss]);
+  (0, import_react49.useEffect)(() => {
+  }, [closeOnEscape]);
+  (0, import_react49.useEffect)(() => {
+    if (!closeOnEscape) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        const recentId = _getMostRecentActiveId();
+        if (recentId != null) {
+          gooeyToast.dismiss(recentId);
+        }
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [closeOnEscape]);
+  (0, import_react49.useEffect)(() => {
+    setGooeyVisibleToasts(visibleToasts ?? 3);
+  }, [visibleToasts]);
+  (0, import_react49.useEffect)(() => {
+    setGooeyMaxQueue(maxQueue);
+  }, [maxQueue]);
+  (0, import_react49.useEffect)(() => {
+    setGooeyQueueOverflow(queueOverflow);
+  }, [queueOverflow]);
+  (0, import_react49.useEffect)(() => {
+    setGooeyShowProgress(showProgress);
+  }, [showProgress]);
+  (0, import_react49.useEffect)(() => {
+    setGooeyCloseButton(closeButton ?? false);
+  }, [closeButton]);
+  (0, import_react49.useEffect)(() => {
+    setGooeyShowTimestamp(showTimestamp);
+  }, [showTimestamp]);
+  (0, import_react49.useEffect)(() => {
+    let expandObs = null;
+    let currentOl = null;
+    const syncFromExpanded = (ol) => {
+      const anyExpanded = ol.querySelector('[data-sonner-toast][data-expanded="true"]') !== null;
+      setContainerHovered(anyExpanded);
+    };
+    const attach = (ol) => {
+      if (ol === currentOl) return;
+      expandObs == null ? void 0 : expandObs.disconnect();
+      currentOl = ol;
+      expandObs = new MutationObserver(() => syncFromExpanded(ol));
+      expandObs.observe(ol, { attributes: true, attributeFilter: ["data-expanded"], subtree: true });
+      syncFromExpanded(ol);
+    };
+    const el = document.querySelector("[data-sonner-toaster]");
+    if (el) attach(el);
+    let bodyRafId = 0;
+    const bodyObs = new MutationObserver(() => {
+      if (bodyRafId) return;
+      bodyRafId = requestAnimationFrame(() => {
+        bodyRafId = 0;
+        const found = document.querySelector("[data-sonner-toaster]");
+        if (found) {
+          attach(found);
+        } else if (currentOl) {
+          expandObs == null ? void 0 : expandObs.disconnect();
+          currentOl = null;
+          setContainerHovered(false);
+        }
+      });
+    });
+    bodyObs.observe(document.body, { childList: true, subtree: true });
+    return () => {
+      if (bodyRafId) cancelAnimationFrame(bodyRafId);
+      bodyObs.disconnect();
+      expandObs == null ? void 0 : expandObs.disconnect();
+      setContainerHovered(false);
+    };
+  }, []);
+  (0, import_react49.useEffect)(() => {
+    if (false) return;
+    const el = document.createElement("div");
+    el.setAttribute("data-gooey-toast-css", "");
+    el.style.position = "absolute";
+    el.style.width = "0";
+    el.style.height = "0";
+    el.style.overflow = "hidden";
+    el.style.pointerEvents = "none";
+    document.body.appendChild(el);
+    const value = getComputedStyle(el).getPropertyValue("--gooey-toast");
+    document.body.removeChild(el);
+    if (!value) {
+      console.warn(
+        '[gooey-toast] Styles not found. Make sure to import the CSS:\n\n  import "goey-toast/styles.css";\n'
+      );
+    }
+  }, []);
+  return (0, import_jsx_runtime12.jsxs)(import_jsx_runtime12.Fragment, { children: [
+    (0, import_jsx_runtime12.jsx)(
+      Toaster,
+      {
+        position,
+        duration,
+        gap,
+        offset,
+        theme,
+        toastOptions: { unstyled: true, ...toastOptions },
+        expand,
+        closeButton: false,
+        richColors,
+        visibleToasts: 99,
+        dir
+      }
+    ),
+    (0, import_jsx_runtime12.jsx)(AriaLiveAnnouncer, {})
+  ] });
+}
+export {
+  GooeyToaster as GoeyToaster,
+  GooeyToaster,
+  animationPresets,
+  gooeyToast as goeyToast,
+  gooeyToast
+};
+//# sourceMappingURL=goey-toast.js.map

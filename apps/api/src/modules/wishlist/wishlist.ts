@@ -17,6 +17,7 @@ import {
   MergeWishlistRequestSchema,
   RemoveWishlistRequestSchema,
 } from '@starsuperscare/contracts';
+import { storageAdapter } from '../../adapters/storage.ts';
 
 type AppContext = {
   Variables: AuthContext['Variables'] & {
@@ -76,19 +77,29 @@ const routes = router
       )
       .orderBy(wishlists.createdAt);
 
-    return c.json({
-      data: items.map(({ minPrice, maxPrice, totalAvailableStock, ...item }) => ({
+    const formattedItems = await Promise.all(items.map(async ({ minPrice, maxPrice, totalAvailableStock, ...item }) => {
+      let primaryImage = null;
+      if (item.product?.primaryImage) {
+        primaryImage = await storageAdapter.generatePresignedDownloadUrl(item.product.primaryImage);
+      }
+
+      return {
         ...item,
         product: item.product
           ? {
             ...item.product,
+            primaryImage,
             variantsSummary: { minPrice, maxPrice, totalAvailableStock },
           }
           : null,
         createdAt: item.createdAt instanceof Date
           ? item.createdAt.toISOString()
           : new Date(item.createdAt as any).toISOString(),
-      })),
+      };
+    }));
+
+    return c.json({
+      data: formattedItems,
       meta: { request_id: c.get('requestId') },
       error: null,
     });

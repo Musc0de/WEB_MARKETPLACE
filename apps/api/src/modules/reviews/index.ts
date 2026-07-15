@@ -11,6 +11,7 @@ import {
 } from '@starsuperscare/database';
 import { and, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
 import { createReviewRequestSchema, updateReviewRequestSchema } from '@starsuperscare/contracts';
+import { storageAdapter } from '../../adapters/storage.ts';
 
 type AppContext = {
   Variables: AuthContext['Variables'] & {
@@ -55,8 +56,16 @@ app.get('/eligible', async (c) => {
     )
     .orderBy(desc(orders.createdAt));
 
+  const formattedItems = await Promise.all(items.map(async (item) => {
+    let primaryImage = null;
+    if (item.primaryImage) {
+      primaryImage = await storageAdapter.generatePresignedDownloadUrl(item.primaryImage);
+    }
+    return { ...item, primaryImage };
+  }));
+
   return c.json({
-    data: items,
+    data: formattedItems,
     meta: { request_id: c.get('requestId') },
     error: null,
   });

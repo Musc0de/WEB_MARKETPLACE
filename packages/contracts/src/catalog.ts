@@ -21,6 +21,7 @@ export interface ProductVariant {
   price: number;
   comparePrice?: number | null | undefined;
   availableStock: number;
+  size?: string | null | undefined;
 }
 
 export interface ProductListVariantSummary {
@@ -125,6 +126,7 @@ export const ProductVariantSchema: z.ZodType<ProductVariant> = z.object({
   price: z.number(),
   comparePrice: z.number().nullable().optional(),
   availableStock: z.number().default(0),
+  size: z.string().nullable().optional(),
 });
 
 export const ProductListVariantSummarySchema: z.ZodType<ProductListVariantSummary> = z.object({

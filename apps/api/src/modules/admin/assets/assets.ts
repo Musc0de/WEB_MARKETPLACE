@@ -15,9 +15,18 @@ const routes = app.post(
   async (c) => {
     const data = c.req.valid('json');
     const ext = data.filename.split('.').pop() || 'bin';
-    const objectKey = `products/${crypto.randomUUID()}.${ext}`;
+    const rawFilename = data.filename.replace(`.${ext}`, '').replace(/[^a-zA-Z0-9]/g, '-').substring(0, 50);
+    const uniqueName = `${rawFilename}-${crypto.randomUUID().substring(0, 8)}.${ext}`;
+    
+    let objectKey = `misc/${uniqueName}`;
 
-    const { uploadUrl, expiresAt } = await storageAdapter.generatePresignedUploadUrl(
+    if (data.productName) {
+      // Sanitize product name to be safe for URLs/S3 keys
+      const slug = data.productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      objectKey = `${slug}/assets/img/${uniqueName}`;
+    }
+
+    const { uploadUrl, expiresAt, publicUrl } = await storageAdapter.generatePresignedUploadUrl(
       objectKey,
       data.contentType,
       data.size,
@@ -26,36 +35,10 @@ const routes = app.post(
     return c.json({
       uploadUrl,
       objectKey,
+      publicUrl,
       expiresAt: expiresAt.toISOString(),
     });
   },
-)
-  // Local development specific upload handler (Simulating S3 PUT request)
-  // In production, the client uploads directly to S3, bypassing our API completely.
-  .put('/upload-local/:folder/:filename', async (c) => {
-    const folder = c.req.param('folder');
-    const filename = c.req.param('filename');
-
-    // Security check: Only allow products folder for now
-    if (folder !== 'products') {
-      return c.json({ error: 'Invalid folder' }, 400);
-    }
-
-    try {
-      const bodyBuffer = await c.req.arrayBuffer();
-
-      // Ensure public/uploads folder exists
-      const uploadsDir = `${Deno.cwd()}/apps/api/public/uploads/${folder}`;
-      await Deno.mkdir(uploadsDir, { recursive: true });
-
-      const filePath = `${uploadsDir}/${filename}`;
-      await Deno.writeFile(filePath, new Uint8Array(bodyBuffer));
-
-      return c.text('OK', 200);
-    } catch (err) {
-      console.error('Local upload error:', err);
-      return c.json({ error: 'Failed to write file' }, 500);
-    }
-  });
+);
 
 export default routes;

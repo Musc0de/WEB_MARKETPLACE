@@ -1,12 +1,13 @@
 import { z } from 'zod';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif', 'image/tiff'];
 
 export interface AssetUploadRequest {
   filename: string;
   contentType: string;
   size: number;
+  productName?: string | undefined;
 }
 
 export const AssetUploadRequestSchema: z.ZodType<AssetUploadRequest> = z.object({
@@ -17,6 +18,7 @@ export const AssetUploadRequestSchema: z.ZodType<AssetUploadRequest> = z.object(
   size: z.number().max(MAX_FILE_SIZE, {
     message: 'File size must be less than 5 MB',
   }),
+  productName: z.string().optional(),
 });
 
 export interface AssetUploadResponse {

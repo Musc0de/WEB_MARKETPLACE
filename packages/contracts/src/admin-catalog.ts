@@ -4,7 +4,7 @@ import { ProductDetailSchema } from './catalog.ts';
 
 // We reuse the basic Product schemas but define specific mutations
 const _AdminProductCreateSchema = z.object({
-  storeId: z.string().uuid(),
+  storeId: z.string().uuid().optional(),
   name: z.string().min(2),
   type: z.enum(['physical', 'digital', 'service']),
   description: z.string().optional(),
@@ -33,6 +33,7 @@ const _AdminProductVariantCreateSchema = z.object({
   comparePrice: z.number().min(0).optional(),
   weight: z.number().min(0).optional(),
   dimension: z.any().optional(),
+  size: z.string().optional(),
 });
 export type AdminProductVariantCreate = z.infer<typeof _AdminProductVariantCreateSchema>;
 export const AdminProductVariantCreateSchema: z.ZodType<AdminProductVariantCreate> =
@@ -44,10 +45,19 @@ const _AdminProductVariantUpdateSchema = z.object({
   price: z.number().min(0).optional(),
   comparePrice: z.number().min(0).nullable().optional(),
   weight: z.number().min(0).nullable().optional(),
+  size: z.string().nullable().optional(),
 });
 export type AdminProductVariantUpdate = z.infer<typeof _AdminProductVariantUpdateSchema>;
 export const AdminProductVariantUpdateSchema: z.ZodType<AdminProductVariantUpdate> =
   _AdminProductVariantUpdateSchema;
+
+const _AdminProductImageAddSchema = z.object({
+  objectKey: z.string().min(1),
+  isPrimary: z.boolean().default(false),
+});
+export type AdminProductImageAdd = z.infer<typeof _AdminProductImageAddSchema>;
+export const AdminProductImageAddSchema: z.ZodType<AdminProductImageAdd> = _AdminProductImageAddSchema;
+
 
 // Admin Responses
 const _AdminProductMutationResponse = z.object({

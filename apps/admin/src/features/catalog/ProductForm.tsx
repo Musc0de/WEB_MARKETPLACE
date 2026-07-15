@@ -5,7 +5,6 @@ import { goeyToast as toast } from 'goey-toast';
 import { AdminProductCreateSchema } from '@starsuperscare/contracts';
 import { ImageUploader } from './ImageUploader.tsx';
 import { VariantsForm } from './VariantsForm.tsx';
-import { ProductInventory } from './ProductInventory.tsx';
 
 // ─── Status badge ──────────────────────────────────────────────────────────────
 function StatusBadge({ status }: { status?: string | undefined }) {
@@ -160,9 +159,8 @@ export function ProductForm() {
         toast.success('Produk berhasil disimpan!');
         setFormData((prev) => ({ ...prev, version: prev.version + 1 }));
       } else {
-        const storeId = formData.storeId || crypto.randomUUID();
         const payload = {
-          storeId,
+          storeId: formData.storeId || undefined,
           name: formData.name,
           type: formData.type as 'physical' | 'digital' | 'service',
           description: formData.description,
@@ -543,15 +541,20 @@ export function ProductForm() {
 
       {/* Variants & Pricing — only when editing */}
       {isEditing && id && (
-        <SectionCard title='Varian & Harga' icon={
-          <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' />
-          </svg>
-        }>
+        <SectionCard
+          title='Varian & Harga'
+          icon={
+            <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'
+              />
+            </svg>
+          }
+        >
           <VariantsForm productId={id} />
-          <div className="mt-8">
-            <ProductInventory productId={id} />
-          </div>
         </SectionCard>
       )}
 
@@ -573,7 +576,20 @@ export function ProductForm() {
         >
           <ImageUploader
             productId={id}
-            onUploadSuccess={() => toast.success('Gambar tersimpan!')}
+            productName={formData.name}
+            onUploadSuccess={async (objectKey) => {
+              try {
+                // First image becomes primary by default if it's the only one (handled logic if needed, passing true for now)
+                await client.v1.admin.catalog.products[':id'].images.$post({
+                  param: { id },
+                  json: { objectKey, isPrimary: true },
+                });
+                toast.success('Gambar berhasil ditautkan ke produk!');
+              } catch (e) {
+                console.error(e);
+                toast.error('Gagal menautkan gambar ke produk');
+              }
+            }}
           />
         </SectionCard>
       )}

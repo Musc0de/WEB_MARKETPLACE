@@ -36,6 +36,7 @@ const routes = app
         product: {
           name: products.name,
         },
+        optionValues: productVariants.optionValues,
         initialStock: sql<number>`COALESCE((SELECT quantity FROM sss_inventory_movements WHERE variant_id = ${inventoryLevels.variantId} AND type = 'initial' LIMIT 1), 0)`.as('initial_stock'),
       })
       .from(inventoryLevels)
@@ -48,7 +49,14 @@ const routes = app
       query = query.where(and(isNull(productVariants.deletedAt), ne(products.status, 'archived'), eq(products.id, productId)));
     }
 
-    const levels = await query;
+    const levelsRaw = await query;
+    const levels = levelsRaw.map((lvl) => ({
+      ...lvl,
+      variant: {
+        ...lvl.variant,
+        size: (lvl.optionValues as any)?.size || null,
+      }
+    }));
     return c.json({ data: levels }, 200);
   })
   .get(

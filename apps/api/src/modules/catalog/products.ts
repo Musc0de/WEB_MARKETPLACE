@@ -14,6 +14,7 @@ import {
 } from '@starsuperscare/database';
 import { and, asc, desc, eq, ilike, isNull, sql } from 'drizzle-orm';
 import { ProductListQuerySchema } from '@starsuperscare/contracts';
+import { storageAdapter } from '../../adapters/storage.ts';
 // no zod
 import { HTTPException } from 'hono/http-exception';
 
@@ -185,22 +186,29 @@ const routes = productsRouter
 
       const items = await finalQuery.limit(limit).offset(offset);
 
-      const mappedItems = items.map((item) => ({
-        id: item.id,
-        name: item.name,
-        slug: item.slug,
-        brandId: item.brandId,
-        type: item.type,
-        status: item.status,
-        netSold: item.netSold ?? 0,
-        averageRating: item.averageRating ?? 0,
-        reviewCount: item.reviewCount ?? 0,
-        primaryImage: item.primaryImage,
-        variantsSummary: {
-          minPrice: Number(item.minPrice),
-          maxPrice: Number(item.maxPrice),
-          totalAvailableStock: Number(item.totalAvailableStock),
-        },
+      const mappedItems = await Promise.all(items.map(async (item) => {
+        let primaryImage = null;
+        if (item.primaryImage) {
+          primaryImage = await storageAdapter.generatePresignedDownloadUrl(item.primaryImage);
+        }
+        
+        return {
+          id: item.id,
+          name: item.name,
+          slug: item.slug,
+          brandId: item.brandId,
+          type: item.type,
+          status: item.status,
+          netSold: item.netSold ?? 0,
+          averageRating: item.averageRating ?? 0,
+          reviewCount: item.reviewCount ?? 0,
+          primaryImage,
+          variantsSummary: {
+            minPrice: Number(item.minPrice),
+            maxPrice: Number(item.maxPrice),
+            totalAvailableStock: Number(item.totalAvailableStock),
+          },
+        };
       }));
 
       return c.json({
@@ -233,16 +241,28 @@ const routes = productsRouter
         throw new HTTPException(404, { message: 'Product not found' });
       }
 
-      const variantsData = await db.select({
+      const variantsDataRaw = await db.select({
         id: productVariants.id,
         sku: productVariants.sku,
         price: productVariants.price,
         comparePrice: productVariants.comparePrice,
         availableStock: inventoryLevels.available,
+        optionValues: productVariants.optionValues,
       })
         .from(productVariants)
-        .leftJoin(inventoryLevels, eq(inventoryLevels.variantId, productVariants.id))
-        .where(eq(productVariants.productId, product.id));
+        .leftJoin(inventoryLevels, eq(productVariants.id, inventoryLevels.variantId))
+        .where(
+          and(
+            eq(productVariants.productId, product.id),
+            isNull(productVariants.deletedAt),
+          ),
+        );
+
+      const variantsData = variantsDataRaw.map((v) => ({
+        ...v,
+        availableStock: v.availableStock || 0,
+        size: (v.optionValues as any)?.size || null,
+      }));
 
       const imagesData = await db.select({ objectKey: productImages.objectKey })
         .from(productImages)
@@ -286,6 +306,12 @@ const routes = productsRouter
         0,
       );
 
+      const images = await Promise.all(
+        imagesData.map((i) => storageAdapter.generatePresignedDownloadUrl(i.objectKey))
+      );
+      
+      const primaryImage = images.length > 0 ? images[0] : null;
+
       const responseData = {
         id: product.id,
         name: product.name,
@@ -298,7 +324,7 @@ const routes = productsRouter
         netSold: salesStats?.netSold ?? 0,
         averageRating: ratingStats?.averageRating ?? 0,
         reviewCount: ratingStats?.reviewCount ?? 0,
-        primaryImage: imagesData.length > 0 ? imagesData[0].objectKey : null,
+        primaryImage,
         variantsSummary: {
           minPrice,
           maxPrice,
@@ -312,7 +338,7 @@ const routes = productsRouter
           comparePrice: v.comparePrice ? Number(v.comparePrice) : null,
           availableStock: Number(v.availableStock ?? 0),
         })),
-        images: imagesData.map((i) => i.objectKey),
+        images,
       };
 
       return c.json({

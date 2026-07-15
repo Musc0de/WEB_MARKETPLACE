@@ -4,69 +4,112 @@ import { goeyToast as toast } from 'goey-toast';
 
 interface ImageUploaderProps {
   productId: string;
+  productName?: string;
   onUploadSuccess?: (objectKey: string) => void;
 }
 
 // Accepted image types
-const ACCEPTED = 'image/jpeg,image/png,image/webp';
+const ACCEPTED = 'image/jpeg,image/png,image/webp,image/heic,image/heif,image/tiff';
 const MAX_MB = 5;
+const MAX_FILES = 10;
 
-export function ImageUploader({ productId: _productId, onUploadSuccess }: ImageUploaderProps) {
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+export function ImageUploader({ productId: _productId, productName, onUploadSuccess }: ImageUploaderProps) {
+  const [files, setFiles] = useState<{ file: File; preview: string }[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const processFile = (f: File) => {
-    if (!f.type.startsWith('image/')) {
-      toast.error('Hanya file gambar (JPG, PNG, WebP) yang diizinkan');
+  const processFiles = (newFiles: FileList | File[]) => {
+    const validFiles = Array.from(newFiles).filter((f) => {
+      if (!f.type.startsWith('image/')) {
+        toast.error(`"${f.name}" ditolak: Hanya file gambar yang diizinkan`);
+        return false;
+      }
+      if (f.size > MAX_MB * 1024 * 1024) {
+        toast.error(`"${f.name}" ditolak: Ukuran maksimum ${MAX_MB}MB`);
+        return false;
+      }
+      return true;
+    });
+
+    if (files.length + validFiles.length > MAX_FILES) {
+      toast.error(`Maksimal hanya dapat mengunggah ${MAX_FILES} gambar sekaligus`);
       return;
     }
-    if (f.size > MAX_MB * 1024 * 1024) {
-      toast.error(`Ukuran file maksimum ${MAX_MB}MB`);
-      return;
-    }
-    setFile(f);
-    setPreview(URL.createObjectURL(f));
+
+    const mapped = validFiles.map((f) => ({
+      file: f,
+      preview: URL.createObjectURL(f),
+    }));
+
+    setFiles((prev) => [...prev, ...mapped]);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) processFile(e.target.files[0]);
+    if (e.target.files?.length) processFiles(e.target.files);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    if (e.dataTransfer.files?.[0]) processFile(e.dataTransfer.files[0]);
+    if (e.dataTransfer.files?.length) processFiles(e.dataTransfer.files);
+  };
+
+  const removeFile = (index: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleUpload = async () => {
-    if (!file) { toast.error('Pilih gambar terlebih dahulu'); return; }
+    if (!files.length) { toast.error('Pilih gambar terlebih dahulu'); return; }
     setIsUploading(true);
     setProgress(10);
     try {
-      const res = await client.v1.admin.assets['upload-url'].$post({
-        json: { filename: file.name, contentType: file.type, size: file.size },
-      });
-      if (!res.ok) throw new Error('Gagal mendapatkan URL upload');
-      const { uploadUrl, objectKey } = (await res.json()) as any;
+      // 1. Get presigned URLs for all files
+      const urlPromises = files.map(f => 
+        client.v1.admin.assets['upload-url'].$post({
+          json: { filename: f.file.name, contentType: f.file.type, size: f.file.size, productName },
+        })
+      );
+      
+      const urlResponses = await Promise.all(urlPromises);
+      const urlData = await Promise.all(urlResponses.map(async (res, index) => {
+        if (!res.ok) throw new Error(`Gagal mendapatkan URL upload untuk gambar ${index + 1}`);
+        const data = await res.json();
+        return data as any;
+      }));
+      
       setProgress(40);
 
-      const uploadRes = await fetch(uploadUrl, {
-        method: 'PUT',
-        headers: { 'Content-Type': file.type },
-        body: file,
+      // 2. Upload all files to R2 simultaneously
+      const uploadPromises = files.map((f, i) => 
+        fetch(urlData[i].uploadUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': f.file.type },
+          body: f.file,
+        })
+      );
+
+      const uploadResponses = await Promise.all(uploadPromises);
+      uploadResponses.forEach((res, i) => {
+        if (!res.ok) throw new Error(`Gagal mengunggah gambar ${i + 1}`);
       });
-      if (!uploadRes.ok) throw new Error('Gagal mengunggah file');
+      
       setProgress(90);
 
-      toast.success('Gambar berhasil diunggah!');
-      setFile(null);
-      setPreview(null);
+      toast.success(`${files.length} gambar berhasil diunggah!`);
+      
+      // Cleanup previews
+      files.forEach(f => URL.revokeObjectURL(f.preview));
+      setFiles([]);
       setProgress(100);
-      onUploadSuccess?.(objectKey);
+      
+      // Call success for each object key (or just the first one if the parent expects one)
+      // Ideally parent handles multiple, but we loop for backward compatibility
+      urlData.forEach(d => {
+        onUploadSuccess?.(d.objectKey);
+      });
+      
       setTimeout(() => setProgress(0), 1500);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Gagal mengunggah');
@@ -76,9 +119,9 @@ export function ImageUploader({ productId: _productId, onUploadSuccess }: ImageU
     }
   };
 
-  const clearFile = () => {
-    setFile(null);
-    setPreview(null);
+  const clearFiles = () => {
+    files.forEach(f => URL.revokeObjectURL(f.preview));
+    setFiles([]);
     if (inputRef.current) inputRef.current.value = '';
   };
 
@@ -89,28 +132,42 @@ export function ImageUploader({ productId: _productId, onUploadSuccess }: ImageU
         onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
-        onClick={() => !file && inputRef.current?.click()}
+        onClick={() => inputRef.current?.click()}
         className={`relative border-2 border-dashed rounded-xl transition-all cursor-pointer
           ${isDragging ? 'border-blue-400 bg-blue-50' : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'}
-          ${file ? 'cursor-default' : ''}
         `}
         style={{ minHeight: 180 }}
       >
-        {preview ? (
-          <div className='relative flex items-center justify-center p-4' style={{ minHeight: 180 }}>
-            <img
-              src={preview}
-              alt='Preview'
-              className='max-h-40 max-w-full rounded-lg object-contain shadow-sm'
-            />
-            <button
-              type='button'
-              onClick={(e) => { e.stopPropagation(); clearFile(); }}
-              className='absolute top-2 right-2 w-7 h-7 bg-red-500 text-white rounded-full text-sm flex items-center justify-center hover:bg-red-600 transition'
-              title='Hapus'
-            >
-              ×
-            </button>
+        {files.length > 0 ? (
+          <div className='p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4' onClick={(e) => e.stopPropagation()}>
+            {files.map((f, i) => (
+              <div key={i} className='relative group aspect-square rounded-lg overflow-hidden bg-gray-100 border border-gray-200 shadow-sm'>
+                <img
+                  src={f.preview}
+                  alt={`Preview ${i}`}
+                  className='w-full h-full object-cover'
+                />
+                <button
+                  type='button'
+                  onClick={(e) => { e.stopPropagation(); removeFile(i); }}
+                  className='absolute top-1.5 right-1.5 w-6 h-6 bg-red-500/90 hover:bg-red-600 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity'
+                  title='Hapus'
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            {files.length < MAX_FILES && (
+              <div 
+                onClick={() => inputRef.current?.click()}
+                className='flex flex-col items-center justify-center aspect-square rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-400 hover:bg-blue-50 cursor-pointer text-gray-400 hover:text-blue-500 transition-colors'
+              >
+                <svg className='w-6 h-6 mb-1' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 6v6m0 0v6m0-6h6m-6 0H6' />
+                </svg>
+                <span className='text-xs font-medium'>Tambah</span>
+              </div>
+            )}
           </div>
         ) : (
           <div className='flex flex-col items-center justify-center gap-3 py-10 text-center px-4' style={{ minHeight: 180 }}>
@@ -121,10 +178,10 @@ export function ImageUploader({ productId: _productId, onUploadSuccess }: ImageU
             </div>
             <div>
               <p className='text-sm font-semibold text-gray-700'>
-                Seret & lepas gambar di sini
+                Seret & lepas gambar di sini (Bisa &gt; 1)
               </p>
               <p className='text-xs text-gray-400 mt-1'>atau klik untuk memilih file</p>
-              <p className='text-xs text-gray-400 mt-0.5'>JPG, PNG, WebP — maks. {MAX_MB}MB</p>
+              <p className='text-xs text-gray-400 mt-0.5'>JPG, PNG, WebP — maks. {MAX_MB}MB — maksimal {MAX_FILES} file sekaligus</p>
             </div>
           </div>
         )}
@@ -136,6 +193,7 @@ export function ImageUploader({ productId: _productId, onUploadSuccess }: ImageU
         accept={ACCEPTED}
         onChange={handleFileChange}
         disabled={isUploading}
+        multiple
         className='hidden'
       />
 
@@ -150,7 +208,7 @@ export function ImageUploader({ productId: _productId, onUploadSuccess }: ImageU
       )}
 
       {/* Upload button */}
-      {file && (
+      {files.length > 0 && (
         <div className='flex items-center gap-3'>
           <button
             type='button'
@@ -171,13 +229,13 @@ export function ImageUploader({ productId: _productId, onUploadSuccess }: ImageU
                 <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12' />
                 </svg>
-                Unggah Gambar
+                Unggah {files.length} Gambar
               </>
             )}
           </button>
           <button
             type='button'
-            onClick={clearFile}
+            onClick={clearFiles}
             disabled={isUploading}
             className='px-4 py-2.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all disabled:opacity-50'
           >

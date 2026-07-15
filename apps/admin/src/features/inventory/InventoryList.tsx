@@ -14,6 +14,7 @@ type InventoryLevel = {
   initialStock?: number;
   variant: {
     sku: string;
+    size?: string | null;
   };
   product: {
     name: string;
@@ -42,6 +43,11 @@ export function InventoryList() {
   useEffect(() => {
     fetchInventory();
   }, []);
+
+  const totalInitial = levels.reduce((sum, l) => sum + (l.initialStock ?? 0), 0);
+  const totalAvailable = levels.reduce((sum, l) => sum + l.available, 0);
+  const totalReserved = levels.reduce((sum, l) => sum + l.reserved, 0);
+  const totalDamaged = levels.reduce((sum, l) => sum + l.damaged, 0);
 
   return (
     <div className='max-w-6xl mx-auto space-y-6 pb-16 px-4 md:px-0'>
@@ -73,6 +79,26 @@ export function InventoryList() {
         </div>
       </div>
 
+      {/* ── Summary Cards ───────────────────────────────────────────────────── */}
+      <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
+        <div className='bg-white border border-gray-200 rounded-xl p-4 shadow-sm'>
+          <p className='text-xs font-semibold text-gray-500 uppercase tracking-wide'>Total Stok Awal</p>
+          <p className='text-2xl font-bold text-gray-900 mt-1'>{totalInitial}</p>
+        </div>
+        <div className='bg-white border border-gray-200 rounded-xl p-4 shadow-sm'>
+          <p className='text-xs font-semibold text-gray-500 uppercase tracking-wide'>Total Tersedia</p>
+          <p className='text-2xl font-bold text-emerald-600 mt-1'>{totalAvailable}</p>
+        </div>
+        <div className='bg-white border border-gray-200 rounded-xl p-4 shadow-sm'>
+          <p className='text-xs font-semibold text-gray-500 uppercase tracking-wide'>Total Di Pesan</p>
+          <p className='text-2xl font-bold text-amber-600 mt-1'>{totalReserved}</p>
+        </div>
+        <div className='bg-white border border-gray-200 rounded-xl p-4 shadow-sm'>
+          <p className='text-xs font-semibold text-gray-500 uppercase tracking-wide'>Total Rusak</p>
+          <p className='text-2xl font-bold text-rose-600 mt-1'>{totalDamaged}</p>
+        </div>
+      </div>
+
       {/* ── Inventory Table ─────────────────────────────────────────────────── */}
       <div className='bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden'>
         {isLoading ? (
@@ -90,17 +116,18 @@ export function InventoryList() {
                 <tr>
                   <th className='px-6 py-4'>Produk</th>
                   <th className='px-6 py-4'>SKU</th>
-                  <th className='px-6 py-4 text-right'>Stok Awal</th>
-                  <th className='px-6 py-4 text-right'>Tersedia</th>
-                  <th className='px-6 py-4 text-right'>Dipesan (Reserved)</th>
-                  <th className='px-6 py-4 text-right'>Rusak (Damaged)</th>
+                  <th className='px-6 py-4'>Ukuran</th>
+                  <th className='px-6 py-4'>Stok Awal</th>
+                  <th className='px-6 py-4'>Tersedia</th>
+                  <th className='px-6 py-4'>Di Pesan</th>
+                  <th className='px-6 py-4'>Rusak</th>
                   <th className='px-6 py-4 text-right'>Aksi</th>
                 </tr>
               </thead>
               <tbody className='divide-y divide-gray-100'>
                 {levels.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className='px-6 py-12 text-center text-gray-500'>
+                    <td colSpan={8} className='px-6 py-12 text-center text-gray-500'>
                       <div className='flex flex-col items-center gap-2'>
                         <svg className='w-8 h-8 text-gray-300' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                           <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.5} d='M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4' />
@@ -118,20 +145,23 @@ export function InventoryList() {
                       <td className='px-6 py-4 font-mono text-xs text-gray-600'>
                         {level.variant.sku}
                       </td>
-                      <td className='px-6 py-4 text-right font-medium text-gray-500'>
+                      <td className='px-6 py-4 text-xs font-medium text-gray-700'>
+                        {level.variant.size || '—'}
+                      </td>
+                      <td className='px-6 py-4 font-medium text-gray-500'>
                         {level.initialStock ?? 0}
                       </td>
-                      <td className='px-6 py-4 text-right'>
+                      <td className='px-6 py-4'>
                         <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
                           level.available > 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
                         }`}>
                           {level.available} unit
                         </span>
                       </td>
-                      <td className='px-6 py-4 text-right text-amber-600 font-medium'>
+                      <td className='px-6 py-4 text-amber-600 font-medium'>
                         {level.reserved}
                       </td>
-                      <td className='px-6 py-4 text-right text-rose-600 font-medium'>
+                      <td className='px-6 py-4 text-rose-600 font-medium'>
                         {level.damaged}
                       </td>
                       <td className='px-6 py-4 text-right'>

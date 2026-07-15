@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { zValidator } from '../../middleware/validator.ts';
 import { AuthContext, optionalAuthMiddleware } from '../../middleware/auth.ts';
+import { storageAdapter } from '../../adapters/storage.ts';
 import { computeSha256 } from '../../utils/crypto.ts';
 import {
   cartItems,
@@ -154,7 +155,7 @@ const routes = router
     const idsToDelete: string[] = [];
     const updates: { id: string; quantity?: number; priceObservation?: number }[] = [];
 
-    const formattedItems = items.map((item) => {
+    const formattedItems = await Promise.all(items.map(async (item) => {
       let status: CartItemStatus = 'available';
       let finalQuantity = item.quantity;
 
@@ -187,6 +188,11 @@ const routes = router
         }
       }
 
+      let primaryImage = null;
+      if (item.product.primaryImage) {
+        primaryImage = await storageAdapter.generatePresignedDownloadUrl(item.product.primaryImage);
+      }
+
       return {
         id: item.id,
         variantId: item.variantId,
@@ -205,10 +211,11 @@ const routes = router
         },
         product: {
           ...item.product,
+          primaryImage,
           variantsSummary: { minPrice: 0, totalAvailableStock: 0 },
         },
       };
-    });
+    }));
 
     // Background cleanup (Fire and forget, but wrapped in try/catch)
     // For transactional safety, we execute them immediately.

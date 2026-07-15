@@ -1,9 +1,7 @@
 import {
+  __commonJS,
   require_react
-} from "./chunk-BX5ISVL4.js";
-import {
-  __commonJS
-} from "./chunk-DC5AMYBS.js";
+} from "./chunk-56ZPLTIM.js";
 
 // ../../node_modules/.deno/react@18.3.1/node_modules/react/cjs/react-jsx-runtime.development.js
 var require_react_jsx_runtime_development = __commonJS({
@@ -925,4 +923,4 @@ react/cjs/react-jsx-runtime.development.js:
    * LICENSE file in the root directory of this source tree.
    *)
 */
-//# sourceMappingURL=chunk-HIGNLTFM.js.map
+//# sourceMappingURL=chunk-JVJ5NBPZ.js.map

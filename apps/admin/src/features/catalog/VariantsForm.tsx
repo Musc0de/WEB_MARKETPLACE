@@ -9,6 +9,7 @@ interface Variant {
   comparePrice?: number | null;
   availableStock?: number;
   initialStock?: number;
+  size?: string | null;
 }
 
 export function VariantsForm({ productId }: { productId: string }) {
@@ -23,6 +24,7 @@ export function VariantsForm({ productId }: { productId: string }) {
   const [price, setPrice] = useState('');
   const [comparePrice, setComparePrice] = useState('');
   const [initialStock, setInitialStock] = useState('');
+  const [size, setSize] = useState('');
 
   const fetchVariants = async () => {
     try {
@@ -43,9 +45,6 @@ export function VariantsForm({ productId }: { productId: string }) {
 
   useEffect(() => { 
     fetchVariants(); 
-    const handleFocus = () => fetchVariants();
-    globalThis.addEventListener('focus', handleFocus);
-    return () => globalThis.removeEventListener('focus', handleFocus);
   }, [productId]);
 
   const handleEditClick = (v: Variant) => {
@@ -53,6 +52,7 @@ export function VariantsForm({ productId }: { productId: string }) {
     setSku(v.sku);
     setPrice(v.price.toString());
     setComparePrice(v.comparePrice ? v.comparePrice.toString() : '');
+    setSize(v.size || '');
     setShowForm(true);
   };
 
@@ -63,6 +63,7 @@ export function VariantsForm({ productId }: { productId: string }) {
     setPrice('');
     setComparePrice('');
     setInitialStock('');
+    setSize('');
   };
 
   const handleDelete = async (variantId: string) => {
@@ -89,6 +90,7 @@ export function VariantsForm({ productId }: { productId: string }) {
     try {
       const payload: any = { sku: sku.trim(), price: priceNum };
       if (comparePrice && Number(comparePrice) > 0) payload.comparePrice = Number(comparePrice);
+      if (size.trim()) payload.size = size.trim();
       if (!editingId && initialStock && parseInt(initialStock, 10) > 0) payload.initialStock = parseInt(initialStock, 10);
 
       if (editingId) {
@@ -148,6 +150,7 @@ export function VariantsForm({ productId }: { productId: string }) {
             <thead>
               <tr className='bg-gray-50 border-b border-gray-200'>
                 <th className='text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-3'>SKU</th>
+                <th className='text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-3'>Ukuran</th>
                 <th className='text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-3'>Harga Jual</th>
                 <th className='text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-3'>Harga Coret</th>
                 <th className='text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-3'>Stok Awal</th>
@@ -159,6 +162,7 @@ export function VariantsForm({ productId }: { productId: string }) {
               {variants.map((v) => (
                 <tr key={v.id} className='hover:bg-gray-50 transition-colors'>
                   <td className='px-4 py-3 font-mono text-xs text-gray-700 font-medium'>{v.sku}</td>
+                  <td className='px-4 py-3 text-xs text-gray-700 font-medium'>{v.size || '—'}</td>
                   <td className='px-4 py-3 text-gray-900 font-semibold'>{formatRupiah(v.price)}</td>
                   <td className='px-4 py-3 text-gray-400 line-through text-xs'>
                     {v.comparePrice ? formatRupiah(v.comparePrice) : '—'}
@@ -250,6 +254,17 @@ export function VariantsForm({ productId }: { productId: string }) {
                 onChange={(e) => setComparePrice(e.target.value)}
                 placeholder='cth: 200000'
                 min={0}
+                className='w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white'
+              />
+            </div>
+            {/* Size */}
+            <div className='space-y-1'>
+              <label className='text-xs font-semibold text-gray-600'>Ukuran (opsional)</label>
+              <input
+                type='text'
+                value={size}
+                onChange={(e) => setSize(e.target.value)}
+                placeholder='cth: XL, L, 42'
                 className='w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white'
               />
             </div>

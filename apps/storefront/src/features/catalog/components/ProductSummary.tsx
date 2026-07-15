@@ -126,7 +126,7 @@ export const ProductSummary = ({ product }: { product: ProductDetail }) => {
                     : 'border-gray-300 bg-white text-gray-700 hover:border-blue-400'
                 }`}
               >
-                {v.sku}
+                {v.sku}{v.size ? ` - ${v.size}` : ''}
               </button>
             ))}
           </div>

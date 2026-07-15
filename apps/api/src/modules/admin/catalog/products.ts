@@ -5,10 +5,17 @@ import {
   db,
   inventoryLevels,
   inventoryMovements,
+  productImages,
   products,
   productVariants,
+  stores,
+  warehouses,
 } from '@starsuperscare/database';
-import { AdminProductCreateSchema, AdminProductUpdateSchema } from '@starsuperscare/contracts';
+import {
+  AdminProductCreateSchema,
+  AdminProductImageAddSchema,
+  AdminProductUpdateSchema,
+} from '@starsuperscare/contracts';
 import { AuthContext, authMiddleware, requirePermission } from '../../../middleware/auth.ts';
 import { logAudit } from '../../../utils/audit.ts';
 import { eq, isNull, sql } from 'drizzle-orm';
@@ -70,7 +77,7 @@ const routes = app
   })
   .get('/:id/variants', async (c) => {
     const id = c.req.param('id');
-    const list = await db.select({
+    const listRaw = await db.select({
       id: productVariants.id,
       productId: productVariants.productId,
       sku: productVariants.sku,
@@ -79,11 +86,21 @@ const routes = app
       createdAt: productVariants.createdAt,
       updatedAt: productVariants.updatedAt,
       availableStock: inventoryLevels.available,
-      initialStock: sql<number>`COALESCE((SELECT quantity FROM sss_inventory_movements WHERE variant_id = ${productVariants.id} AND type = 'initial' LIMIT 1), 0)`.as('initial_stock'),
+      optionValues: productVariants.optionValues,
+      initialStock: sql<
+        number
+      >`COALESCE((SELECT quantity FROM sss_inventory_movements WHERE variant_id = ${productVariants.id} AND type = 'initial' LIMIT 1), 0)`
+        .as('initial_stock'),
     })
       .from(productVariants)
       .leftJoin(inventoryLevels, eq(inventoryLevels.variantId, productVariants.id))
       .where(eq(productVariants.productId, id));
+
+    const list = listRaw.map((v) => ({
+      ...v,
+      size: (v.optionValues as any)?.size || null,
+    }));
+
     return c.json({ data: list, meta: { request_id: c.get('requestId') }, error: null });
   })
   .post(
@@ -96,6 +113,7 @@ const routes = app
         price: z.number(),
         comparePrice: z.number().optional(),
         initialStock: z.number().optional(),
+        size: z.string().optional(),
       }),
     ),
     async (c) => {
@@ -107,19 +125,24 @@ const routes = app
           sku: data.sku,
           price: data.price,
           comparePrice: data.comparePrice ?? null,
+          optionValues: data.size ? { size: data.size } : null,
         }).returning();
+
+        const [defaultWarehouse] = await tx.select().from(warehouses).limit(1);
+        const warehouseId = defaultWarehouse?.id;
+        if (!warehouseId) throw new HTTPException(500, { message: 'No warehouse configured' });
 
         // Create empty inventory record for the new variant
         await tx.insert(inventoryLevels).values({
           variantId: variant.id,
-          warehouseId: 'default', // Assuming 'default' warehouse, or adjust as needed
+          warehouseId,
           available: data.initialStock || 0,
         });
 
         if (data.initialStock && data.initialStock > 0) {
           await tx.insert(inventoryMovements).values({
             variantId: variant.id,
-            warehouseId: 'default',
+            warehouseId,
             quantity: data.initialStock,
             type: 'initial',
             note: 'Stok Awal Sistem',
@@ -140,7 +163,12 @@ const routes = app
     requirePermission('catalog.write'),
     zValidator(
       'json',
-      z.object({ sku: z.string(), price: z.number(), comparePrice: z.number().optional() }),
+      z.object({
+        sku: z.string(),
+        price: z.number(),
+        comparePrice: z.number().optional(),
+        size: z.string().optional(),
+      }),
     ),
     async (c) => {
       const variantId = c.req.param('variantId') as string;
@@ -149,6 +177,7 @@ const routes = app
         sku: data.sku,
         price: data.price,
         comparePrice: data.comparePrice ?? null,
+        optionValues: data.size ? { size: data.size } : null,
         updatedAt: new Date().toISOString(),
       }).where(eq(productVariants.id, variantId)).returning();
 
@@ -187,9 +216,17 @@ const routes = app
         throw new HTTPException(409, { message: 'Product slug conflict' });
       }
 
+      let storeId = data.storeId;
+      if (!storeId) {
+        const [defaultStore] = await db.select().from(stores).limit(1);
+        if (!defaultStore) throw new HTTPException(500, { message: 'No stores available' });
+        storeId = defaultStore.id;
+      }
+
       const product = await db.transaction(async (tx) => {
         const [newProduct] = await tx.insert(products).values({
           ...data,
+          storeId,
           slug,
           brandId: data.brandId || null,
           description: data.description || null,
@@ -349,6 +386,37 @@ const routes = app
       meta: { request_id: c.get('requestId') },
       error: null,
     });
-  });
+  })
+  .post(
+    '/:id/images',
+    requirePermission('catalog.write'),
+    zValidator('json', AdminProductImageAddSchema),
+    async (c) => {
+      const id = c.req.param('id') as string;
+      const data = c.req.valid('json');
+
+      const [product] = await db.select().from(products).where(eq(products.id, id)).limit(1);
+      if (!product) throw new HTTPException(404, { message: 'Product not found' });
+
+      // If this is marked as primary, unmark others (optional, but good practice)
+      if (data.isPrimary) {
+        await db.update(productImages)
+          .set({ isPrimary: false })
+          .where(eq(productImages.productId, id));
+      }
+
+      const [_image] = await db.insert(productImages).values({
+        productId: id,
+        objectKey: data.objectKey,
+        isPrimary: data.isPrimary,
+      }).returning();
+
+      return c.json({
+        data: { success: true },
+        meta: { request_id: c.get('requestId') },
+        error: null,
+      });
+    },
+  );
 
 export default routes;
