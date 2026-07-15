@@ -39,23 +39,27 @@ export const ProductCard = (
 
   return (
     <div className='flex flex-col bg-white rounded-lg border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 group relative'>
-      {/* ── Top badges ── */}
-      <div className='absolute top-1.5 left-1.5 flex flex-col gap-0.5 z-10'>
-        {product.netSold === 0 && !isOutOfStock && (
-          <span className='bg-blue-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm leading-tight'>
-            Baru
-          </span>
-        )}
-        {isOutOfStock && (
-          <span className='bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm leading-tight'>
-            Habis
-          </span>
-        )}
-        {hasDiscount && (
-          <span className='bg-orange-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm leading-tight'>
-            -{discountPct}%
-          </span>
-        )}
+      {/* ── Top badge — priority: Habis > Diskon > Baru ── */}
+      <div className='absolute top-1.5 left-1.5 z-10'>
+        {isOutOfStock
+          ? (
+            <span className='bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm leading-tight'>
+              Habis
+            </span>
+          )
+          : hasDiscount
+          ? (
+            <span className='bg-orange-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm leading-tight'>
+              -{discountPct}%
+            </span>
+          )
+          : product.netSold === 0
+          ? (
+            <span className='bg-blue-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm leading-tight'>
+              Baru
+            </span>
+          )
+          : null}
       </div>
 
       {/* Wishlist */}
