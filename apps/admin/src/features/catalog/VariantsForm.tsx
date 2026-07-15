@@ -52,9 +52,10 @@ export function VariantsForm({ productId }: { productId: string }) {
     setEditingId(v.id);
     setSku(v.sku);
     setName((v as any).name || '');
-    setPrice(v.price.toString());
-    setComparePrice(v.comparePrice ? v.comparePrice.toString() : '');
+    setPrice(v.price.toLocaleString('id-ID'));
+    setComparePrice(v.comparePrice ? v.comparePrice.toLocaleString('id-ID') : '');
     setSize(v.size || '');
+    setInitialStock('');
     setShowForm(true);
   };
 
@@ -85,20 +86,27 @@ export function VariantsForm({ productId }: { productId: string }) {
     }
   };
 
+  const formatNumberInput = (val: string) => {
+    const numericVal = val.replace(/\D/g, '');
+    if (!numericVal) return '';
+    return parseInt(numericVal, 10).toLocaleString('id-ID');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const priceNum = Number(price);
+    const priceNum = Number(price.replace(/\D/g, ''));
     if (!priceNum || priceNum <= 0) {
       toast.error('Harga harus lebih dari 0');
       return;
     }
+    const comparePriceNum = comparePrice ? Number(comparePrice.replace(/\D/g, '')) : undefined;
     setIsAdding(true);
     try {
       const payload: any = {
         sku: sku.trim() || undefined,
         name: name.trim() || undefined,
         price: priceNum,
-        comparePrice: comparePrice ? Number(comparePrice) : undefined,
+        comparePrice: comparePriceNum,
         initialStock: initialStock ? Number(initialStock) : undefined,
         size: size.trim() || undefined,
       };
@@ -322,11 +330,10 @@ export function VariantsForm({ productId }: { productId: string }) {
                   Harga Jual (Rp) <span className='text-red-500'>*</span>
                 </label>
                 <input
-                  type='number'
+                  type='text'
                   value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  placeholder='cth: 150000'
-                  min={1}
+                  onChange={(e) => setPrice(formatNumberInput(e.target.value))}
+                  placeholder='cth: 150.000'
                   className='w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white'
                   required
                 />
@@ -337,11 +344,10 @@ export function VariantsForm({ productId }: { productId: string }) {
                   Harga Coret (opsional)
                 </label>
                 <input
-                  type='number'
+                  type='text'
                   value={comparePrice}
-                  onChange={(e) => setComparePrice(e.target.value)}
-                  placeholder='cth: 200000'
-                  min={0}
+                  onChange={(e) => setComparePrice(formatNumberInput(e.target.value))}
+                  placeholder='cth: 200.000'
                   className='w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white'
                 />
               </div>
