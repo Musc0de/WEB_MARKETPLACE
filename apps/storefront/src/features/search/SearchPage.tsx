@@ -191,17 +191,9 @@ export const SearchPage = (): JSX.Element => {
             )
             : loading
             ? (
-              <div
-                className='flex overflow-x-auto gap-3 pb-4 snap-x no-scrollbar'
-                onWheel={(e) => {
-                  if (e.deltaY !== 0) {
-                    e.currentTarget.scrollLeft += e.deltaY;
-                    e.preventDefault();
-                  }
-                }}
-              >
+              <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6'>
                 {Array.from({ length: perPage }).map((_, i) => (
-                  <div key={i} className='w-[140px] sm:w-[160px] md:w-[180px] shrink-0 snap-start'>
+                  <div key={i}>
                     <ProductCardSkeleton />
                   </div>
                 ))}
@@ -223,20 +215,9 @@ export const SearchPage = (): JSX.Element => {
             )
             : (
               <>
-                <div
-                  className='flex overflow-x-auto gap-3 pb-4 snap-x no-scrollbar'
-                  onWheel={(e) => {
-                    if (e.deltaY !== 0) {
-                      e.currentTarget.scrollLeft += e.deltaY;
-                      e.preventDefault();
-                    }
-                  }}
-                >
+                <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6'>
                   {products.map((product) => (
-                    <div
-                      key={product.id}
-                      className='w-[140px] sm:w-[160px] md:w-[180px] shrink-0 snap-start'
-                    >
+                    <div key={product.id}>
                       <ProductCard
                         product={product}
                         isLoading={actionLoading === product.id}

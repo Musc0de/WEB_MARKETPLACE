@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { ProductDetailSchema } from './catalog.ts';
 
-const _AdminProductCreateSchema = z.object({
+export const AdminProductCreateSchema = z.object({
   storeId: z.string().uuid().optional(),
   name: z.string().min(2),
   type: z.enum(['physical', 'digital', 'service']),
@@ -10,10 +10,9 @@ const _AdminProductCreateSchema = z.object({
   categoryIds: z.array(z.string().uuid()).optional(),
   purchaseLimit: z.number().min(0).default(0),
 });
-export type AdminProductCreate = z.infer<typeof _AdminProductCreateSchema>;
-export const AdminProductCreateSchema: z.ZodType<AdminProductCreate> = _AdminProductCreateSchema;
+export type AdminProductCreate = z.infer<typeof AdminProductCreateSchema>;
 
-const _AdminProductUpdateSchema = z.object({
+export const AdminProductUpdateSchema = z.object({
   version: z.number().min(1),
   name: z.string().min(2).optional(),
   type: z.enum(['physical', 'digital', 'service']).optional(),
@@ -24,10 +23,9 @@ const _AdminProductUpdateSchema = z.object({
   seoTitle: z.string().optional(),
   seoDescription: z.string().optional(),
 });
-export type AdminProductUpdate = z.infer<typeof _AdminProductUpdateSchema>;
-export const AdminProductUpdateSchema: z.ZodType<AdminProductUpdate> = _AdminProductUpdateSchema;
+export type AdminProductUpdate = z.infer<typeof AdminProductUpdateSchema>;
 
-const _AdminProductVariantCreateSchema = z.object({
+export const AdminProductVariantCreateSchema = z.object({
   sku: z.string().min(3),
   price: z.number().min(0),
   comparePrice: z.number().min(0).optional(),
@@ -35,11 +33,9 @@ const _AdminProductVariantCreateSchema = z.object({
   dimension: z.any().optional(),
   size: z.string().optional(),
 });
-export type AdminProductVariantCreate = z.infer<typeof _AdminProductVariantCreateSchema>;
-export const AdminProductVariantCreateSchema: z.ZodType<AdminProductVariantCreate> =
-  _AdminProductVariantCreateSchema;
+export type AdminProductVariantCreate = z.infer<typeof AdminProductVariantCreateSchema>;
 
-const _AdminProductVariantUpdateSchema = z.object({
+export const AdminProductVariantUpdateSchema = z.object({
   version: z.number().min(1),
   sku: z.string().min(3).optional(),
   price: z.number().min(0).optional(),
@@ -47,29 +43,23 @@ const _AdminProductVariantUpdateSchema = z.object({
   weight: z.number().min(0).nullable().optional(),
   size: z.string().nullable().optional(),
 });
-export type AdminProductVariantUpdate = z.infer<typeof _AdminProductVariantUpdateSchema>;
-export const AdminProductVariantUpdateSchema: z.ZodType<AdminProductVariantUpdate> =
-  _AdminProductVariantUpdateSchema;
+export type AdminProductVariantUpdate = z.infer<typeof AdminProductVariantUpdateSchema>;
 
-const _AdminProductImageAddSchema = z.object({
+export const AdminProductImageAddSchema = z.object({
   objectKey: z.string().min(1),
   isPrimary: z.boolean().default(false),
 });
-export type AdminProductImageAdd = z.infer<typeof _AdminProductImageAddSchema>;
-export const AdminProductImageAddSchema: z.ZodType<AdminProductImageAdd> =
-  _AdminProductImageAddSchema;
+export type AdminProductImageAdd = z.infer<typeof AdminProductImageAddSchema>;
 
-const _AdminProductMutationResponse = z.object({
+export const AdminProductMutationResponse = z.object({
   data: ProductDetailSchema,
   meta: z.object({ request_id: z.string() }),
   error: z.null(),
 });
-export type AdminProductMutation = z.infer<typeof _AdminProductMutationResponse>;
-export const AdminProductMutationResponse: z.ZodType<AdminProductMutation> =
-  _AdminProductMutationResponse;
+export type AdminProductMutation = z.infer<typeof AdminProductMutationResponse>;
 
 // Admin Category
-const _AdminCategoryCreateSchema = z.object({
+export const AdminCategoryCreateSchema = z.object({
   name: z.string().min(1),
   slug: z.string().min(1),
   parentId: z.string().uuid().nullable().optional(),
@@ -77,10 +67,9 @@ const _AdminCategoryCreateSchema = z.object({
   seoTitle: z.string().nullable().optional(),
   seoDescription: z.string().nullable().optional(),
 });
-export type AdminCategoryCreate = z.infer<typeof _AdminCategoryCreateSchema>;
-export const AdminCategoryCreateSchema: z.ZodType<AdminCategoryCreate> = _AdminCategoryCreateSchema;
+export type AdminCategoryCreate = z.infer<typeof AdminCategoryCreateSchema>;
 
-const _AdminCategoryUpdateSchema = z.object({
+export const AdminCategoryUpdateSchema = z.object({
   name: z.string().min(1).optional(),
   slug: z.string().min(1).optional(),
   parentId: z.string().uuid().nullable().optional(),
@@ -88,20 +77,17 @@ const _AdminCategoryUpdateSchema = z.object({
   seoTitle: z.string().nullable().optional(),
   seoDescription: z.string().nullable().optional(),
 });
-export type AdminCategoryUpdate = z.infer<typeof _AdminCategoryUpdateSchema>;
-export const AdminCategoryUpdateSchema: z.ZodType<AdminCategoryUpdate> = _AdminCategoryUpdateSchema;
+export type AdminCategoryUpdate = z.infer<typeof AdminCategoryUpdateSchema>;
 
 // Admin Brand
-const _AdminBrandCreateSchema = z.object({
+export const AdminBrandCreateSchema = z.object({
   name: z.string().min(1),
   slug: z.string().min(1),
 });
-export type AdminBrandCreate = z.infer<typeof _AdminBrandCreateSchema>;
-export const AdminBrandCreateSchema: z.ZodType<AdminBrandCreate> = _AdminBrandCreateSchema;
+export type AdminBrandCreate = z.infer<typeof AdminBrandCreateSchema>;
 
-const _AdminBrandUpdateSchema = z.object({
+export const AdminBrandUpdateSchema = z.object({
   name: z.string().min(1).optional(),
   slug: z.string().min(1).optional(),
 });
-export type AdminBrandUpdate = z.infer<typeof _AdminBrandUpdateSchema>;
-export const AdminBrandUpdateSchema: z.ZodType<AdminBrandUpdate> = _AdminBrandUpdateSchema;
+export type AdminBrandUpdate = z.infer<typeof AdminBrandUpdateSchema>;
