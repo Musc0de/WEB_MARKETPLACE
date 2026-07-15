@@ -99,6 +99,7 @@ const routes = app
 
     const list = listRaw.map((v) => ({
       ...v,
+      name: (v.optionValues as any)?.name || null,
       size: (v.optionValues as any)?.size || null,
     }));
 
@@ -110,7 +111,8 @@ const routes = app
     zValidator(
       'json',
       z.object({
-        sku: z.string(),
+        sku: z.string().optional(),
+        name: z.string().optional(),
         price: z.number(),
         comparePrice: z.number().optional(),
         initialStock: z.number().optional(),
@@ -121,14 +123,21 @@ const routes = app
       const id = c.req.param('id');
       const data = c.req.valid('json');
       let newVariant;
+
+      // Auto-generate SKU if empty
+      const generatedSku = data.sku ||
+        `SKU-${Date.now().toString(36).toUpperCase()}-${
+          Math.random().toString(36).substring(2, 6).toUpperCase()
+        }`;
+
       try {
         [newVariant] = await db.transaction(async (tx) => {
           const [variant] = await tx.insert(productVariants).values({
             productId: id,
-            sku: data.sku,
+            sku: generatedSku,
             price: data.price,
             comparePrice: data.comparePrice ?? null,
-            optionValues: data.size ? { size: data.size } : null,
+            optionValues: (data.size || data.name) ? { size: data.size, name: data.name } : null,
           }).returning();
 
           const [defaultWarehouse] = await tx.select().from(warehouses).limit(1);
@@ -175,7 +184,8 @@ const routes = app
     zValidator(
       'json',
       z.object({
-        sku: z.string(),
+        sku: z.string().optional(),
+        name: z.string().optional(),
         price: z.number(),
         comparePrice: z.number().optional(),
         size: z.string().optional(),
@@ -185,14 +195,22 @@ const routes = app
       const variantId = c.req.param('variantId') as string;
       const data = c.req.valid('json');
       let updated;
+
+      // Keep existing SKU if not provided in PUT, or we can just assume the frontend sends the existing one.
+      // We will only update SKU if it's provided.
+      const updateData: any = {
+        price: data.price,
+        comparePrice: data.comparePrice ?? null,
+        optionValues: (data.size || data.name) ? { size: data.size, name: data.name } : null,
+        updatedAt: new Date().toISOString(),
+      };
+      if (data.sku) updateData.sku = data.sku;
+
       try {
-        [updated] = await db.update(productVariants).set({
-          sku: data.sku,
-          price: data.price,
-          comparePrice: data.comparePrice ?? null,
-          optionValues: data.size ? { size: data.size } : null,
-          updatedAt: new Date().toISOString(),
-        }).where(eq(productVariants.id, variantId)).returning();
+        [updated] = await db.update(productVariants)
+          .set(updateData)
+          .where(eq(productVariants.id, variantId))
+          .returning();
       } catch (err: any) {
         if (err.message?.includes('sss_product_variants_sku_unique')) {
           throw new HTTPException(400, {

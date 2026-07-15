@@ -21,6 +21,7 @@ export interface ProductVariant {
   price: number;
   comparePrice?: number | null | undefined;
   availableStock: number;
+  name?: string | null | undefined;
   size?: string | null | undefined;
 }
 

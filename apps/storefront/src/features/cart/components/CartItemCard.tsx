@@ -97,7 +97,9 @@ export function CartItemCard({ item, onUpdate, onRemove }: CartItemCardProps) {
               </h3>
               <p className='ml-4'>{formatIDR(item.variant.price)}</p>
             </div>
-            <p className='mt-1 text-sm text-gray-500'>SKU: {item.variant.sku}</p>
+            <p className='mt-1 text-sm text-gray-500'>
+              Varian: {item.variant.name || item.variant.sku}
+            </p>
           </div>
 
           <div className='flex flex-1 items-end justify-between text-sm mt-4'>
