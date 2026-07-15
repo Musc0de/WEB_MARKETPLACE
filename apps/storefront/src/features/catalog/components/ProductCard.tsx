@@ -19,11 +19,8 @@ export const ProductCard = (
 
   const { minPrice, maxPrice, maxComparePrice } = product.variantsSummary;
 
-  const hasDiscount = maxComparePrice != null && maxComparePrice > 0 &&
-    maxComparePrice !== minPrice;
-  const safeMin = Math.min(minPrice, maxComparePrice || minPrice);
-  const safeMax = Math.max(minPrice, maxComparePrice || minPrice);
-  const discountPct = hasDiscount ? Math.round((1 - safeMin / safeMax) * 100) : 0;
+  const hasDiscount = maxComparePrice != null && maxComparePrice > minPrice;
+  const discountPct = hasDiscount ? Math.round((1 - minPrice / maxComparePrice!) * 100) : 0;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();

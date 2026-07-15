@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { ProductDetail, ProductVariant } from '@starsuperscare/contracts';
-import { Badge, Button, formatIndonesianSold, H1, H3, Text } from '@starsuperscare/ui';
+import { Button, formatIndonesianSold, H1, H3, Text } from '@starsuperscare/ui';
 import { toast } from '@starsuperscare/ui';
 import { Check, Loader2, ShieldCheck, ShoppingCart, Star } from 'lucide-react';
 import { WishlistButton } from '../../wishlist/components/WishlistButton.tsx';
@@ -26,11 +26,9 @@ export const ProductSummary = ({ product }: { product: ProductDetail }) => {
   const comparePrice = selectedVariant?.comparePrice || product.variantsSummary.maxComparePrice ||
     null;
 
-  const hasDiscount = comparePrice != null && comparePrice > 0 && comparePrice !== price;
-  const safeMin = hasDiscount ? Math.min(price, comparePrice) : price;
-  const safeMax = hasDiscount ? Math.max(price, comparePrice) : price;
-  const discountPct = hasDiscount ? Math.round((1 - safeMin / safeMax) * 100) : 0;
-  const savings = hasDiscount ? Math.abs(comparePrice - price) : 0;
+  const hasDiscount = comparePrice != null && comparePrice > price;
+  const discountPct = hasDiscount ? Math.round((1 - price / comparePrice) * 100) : 0;
+  const savings = hasDiscount ? comparePrice - price : 0;
   const stock = selectedVariant?.availableStock || 0;
 
   const isOutOfStock = stock <= 0;
