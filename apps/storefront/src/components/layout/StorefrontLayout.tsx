@@ -84,12 +84,18 @@ const Header = () => {
     const timer = setTimeout(async () => {
       try {
         setIsSuggestionsLoading(true);
-        const res = await fetch(
-          `/api/v1/products?search=${encodeURIComponent(searchQuery.trim())}&per_page=10`,
-        );
+        const res = await client.v1.catalog.products.$get({
+          query: {
+            page: '1',
+            per_page: '5',
+            search: searchQuery.trim(),
+            sort: 'newest',
+            in_stock: 'false',
+          } as any,
+        });
         if (res.ok) {
-          const data = await res.json();
-          setSuggestions(data.data || []);
+          const payload = await res.json();
+          setSuggestions(payload.data?.items || []);
         }
       } catch (_err) {
         // ignore error
