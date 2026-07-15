@@ -3,12 +3,46 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { ResponsiveGooeyToaster } from '@starsuperscare/ui';
 import { DashboardLayout } from './components/layout/DashboardLayout.tsx';
 
-const Fallback = ({ error }: { error: Error }) => (
-  <div role='alert'>
-    <p>Something went wrong:</p>
-    <pre style={{ color: 'red' }}>{error.message}</pre>
-  </div>
-);
+const Fallback = ({ error }: { error: unknown }) => {
+  const msg = error instanceof Error
+    ? error.message
+    : typeof error === 'object' && error !== null
+    ? JSON.stringify(error, null, 2)
+    : String(error);
+  return (
+    <div role='alert' style={{ padding: '2rem', fontFamily: 'system-ui' }}>
+      <h2 style={{ color: '#dc2626' }}>Terjadi Kesalahan</h2>
+      <pre
+        style={{
+          background: '#fef2f2',
+          border: '1px solid #fecaca',
+          padding: '1rem',
+          borderRadius: 8,
+          fontSize: '0.875rem',
+          color: '#7f1d1d',
+        }}
+      >
+        {msg}
+      </pre>
+      <button
+        type='button'
+        onClick={() => global.location.reload()}
+        style={{
+          marginTop: '1rem',
+          padding: '0.5rem 1.25rem',
+          background: '#2563eb',
+          color: '#fff',
+          border: 'none',
+          borderRadius: 6,
+          cursor: 'pointer',
+          fontWeight: 600,
+        }}
+      >
+        Refresh
+      </button>
+    </div>
+  );
+};
 
 import { DashboardHome } from './features/home/DashboardHome.tsx';
 import { ProfilePage } from './features/profile/ProfilePage.tsx';

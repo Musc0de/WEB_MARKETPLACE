@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator';
 import { AuthContext, authMiddleware, requirePermission } from '../../../middleware/auth.ts';
 import { z } from 'zod';
 import { attachments, db, faqs, supportMessages, supportTickets } from '@starsuperscare/database';
-import { and, desc, eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import {
   createMessageRequestSchema,
   updateTicketStatusRequestSchema,
@@ -49,21 +49,40 @@ app.get('/tickets/:id', async (c) => {
 
   const messages = await db.query.supportMessages.findMany({
     where: eq(supportMessages.ticketId, ticketId),
-    orderBy: [desc(supportMessages.createdAt)],
+    orderBy: [supportMessages.createdAt],
   });
 
-  const attachmentsList = await db.query.attachments.findMany({
-    where: and(
-      eq(attachments.referenceType, 'ticket'),
-      eq(attachments.referenceId, ticketId),
-    ),
-  });
+  // Fetch all attachments linked to these messages
+  const msgIds = messages.map((m) => m.id);
+  const attachmentsList = msgIds.length > 0
+    ? (await Promise.all(
+        msgIds.map((mid) =>
+          db.query.attachments.findMany({ where: eq(attachments.referenceId, mid) })
+        ),
+      )).flat()
+    : [];
+
+  // Reconstruct publicUrl per attachment
+  const r2PubUrl = (Deno.env.get('R2_SUPPORT_PUBLIC_URL') ?? '').replace(/\/$/, '');
+  const port = Deno.env.get('PORT') ?? '8000';
+  const localBase = `http://localhost:${port}/storage`;
 
   const messagesWithAttachments = messages.map((msg) => ({
     ...msg,
-    attachments: attachmentsList.filter((a) =>
-      a.referenceId === msg.id || a.referenceId === ticketId
-    ),
+    // 'admin' or 'true' = sent from admin portal; anything else = customer
+    senderType: (msg.isInternal === 'admin' || msg.isInternal === 'true')
+      ? 'admin'
+      : msg.senderId !== ticket.userId
+        ? 'admin'
+        : 'user',
+    attachments: attachmentsList
+      .filter((a) => a.referenceId === msg.id)
+      .map((a) => ({
+        ...a,
+        publicUrl: (r2PubUrl && a.objectKey?.startsWith('img/'))
+          ? `${r2PubUrl}/${a.objectKey}`
+          : `${localBase}/${a.objectKey}`,
+      })),
   }));
 
   return c.json({
@@ -116,7 +135,8 @@ app.post('/tickets/:id/messages', zValidator('json', createMessageRequestSchema)
       ticketId: ticket.id,
       senderId: admin.id,
       content: payload.content,
-      isInternal: payload.isInternal ? 'true' : 'false',
+      // 'admin' = public admin reply; 'true' = internal note; customer messages use 'false'/null
+      isInternal: payload.isInternal ? 'true' : 'admin',
     })
     .returning();
 

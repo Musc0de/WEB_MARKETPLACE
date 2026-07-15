@@ -71,31 +71,38 @@ function dayStr(iso: string): string {
 }
 
 // ─── Message bubble ───────────────────────────────────────────────────────────
-function MessageBubble({ msg, userId }: { msg: any; userId: string }) {
-  const isUser = msg.senderId === userId;
-  const isInternal = msg.isInternal === true || msg.isInternal === 'true';
+function MessageBubble({ msg }: { msg: any }) {
+  const isUser = msg.senderType === 'user';
+  // Only 'true' = internal note; 'admin' = public admin reply (not internal)
+  const isInternal = msg.isInternal === 'true';
 
   return (
     <div className={`flex gap-3 ${isUser ? 'flex-row' : 'flex-row-reverse'}`}>
       {/* Avatar */}
       <span
         className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold shadow-sm ${
-          isUser ? 'bg-gradient-to-br from-blue-400 to-indigo-600 text-white' : 'bg-gradient-to-br from-emerald-400 to-teal-600 text-white'
+          isUser
+            ? 'bg-gradient-to-br from-slate-400 to-slate-600 text-white'
+            : isInternal
+            ? 'bg-gradient-to-br from-yellow-400 to-amber-500 text-white'
+            : 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white'
         }`}
       >
         {isUser ? <User className='h-4 w-4' /> : <Headphones className='h-4 w-4' />}
       </span>
 
-      <div className={`flex max-w-[78%] flex-col gap-1 ${isUser ? 'items-start' : 'items-end'}`}>
+      <div className={`flex max-w-[75%] flex-col gap-1 ${isUser ? 'items-start' : 'items-end'}`}>
         {/* Sender label */}
-        <div className='flex items-center gap-1.5 text-[11px] text-gray-400'>
-          <span className='font-medium'>{isUser ? 'Pelanggan' : 'Admin'}</span>
+        <div className={`flex items-center gap-1.5 text-[11px] ${isUser ? '' : 'flex-row-reverse'}`}>
+          <span className={`font-semibold ${isUser ? 'text-slate-500' : isInternal ? 'text-yellow-600' : 'text-emerald-600'}`}>
+            {isUser ? 'Pelanggan' : isInternal ? 'Admin (Internal)' : 'Admin'}
+          </span>
           {isInternal && (
             <span className='inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2 py-0.5 text-[10px] font-bold text-yellow-700'>
-              <ShieldAlert className='h-2.5 w-2.5' /> Internal
+              <ShieldAlert className='h-2.5 w-2.5' /> Catatan
             </span>
           )}
-          <span>{timeStr(msg.createdAt)}</span>
+          <span className='text-gray-400'>{timeStr(msg.createdAt)}</span>
           <Lock className='h-2.5 w-2.5 text-gray-300' />
         </div>
 
@@ -103,31 +110,48 @@ function MessageBubble({ msg, userId }: { msg: any; userId: string }) {
         <div
           className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-sm ${
             isInternal
-              ? 'rounded-tl-sm border border-yellow-200 bg-yellow-50/80 text-yellow-900'
+              ? 'rounded-tl-sm border-2 border-yellow-300 bg-yellow-50 text-yellow-900'
               : isUser
-              ? 'rounded-tl-sm bg-gray-100 text-gray-800'
-              : 'rounded-tr-sm bg-gradient-to-br from-blue-600 to-indigo-600 text-white'
+              ? 'rounded-tl-sm border border-gray-200 bg-gray-100 text-gray-800'
+              : 'rounded-tr-sm bg-gradient-to-br from-emerald-500 to-teal-600 text-white'
           }`}
           style={{ wordBreak: 'break-word' }}
         >
           <p className='whitespace-pre-wrap'>{msg.content}</p>
 
-          {/* Attachments */}
+          {/* Attachments — images shown inline, files as download links */}
           {msg.attachments && msg.attachments.length > 0 && (
             <div className='mt-3 space-y-2'>
-              {msg.attachments.map((att: any) => (
-                <a
-                  key={att.id}
-                  href={getMediaUrl(att.objectKey) || '#'}
-                  target='_blank'
-                  rel='noreferrer'
-                  className='flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 p-2 text-xs transition hover:bg-white/20'
-                >
-                  <File className='h-3.5 w-3.5 flex-shrink-0' />
-                  <span className='flex-1 truncate max-w-[180px]'>{att.fileName}</span>
-                  <Download className='h-3.5 w-3.5 opacity-60' />
-                </a>
-              ))}
+              {msg.attachments.map((att: any) => {
+                const isImg = att.mimeType?.startsWith('image/');
+                const src = att.publicUrl || getMediaUrl(att.objectKey);
+                if (isImg && src) {
+                  return (
+                    <a key={att.id} href={src} target='_blank' rel='noreferrer' className='block'>
+                      <img
+                        src={src}
+                        alt={att.fileName ?? 'attachment'}
+                        className='max-w-[280px] rounded-xl border border-white/20 object-cover shadow-sm hover:opacity-90 transition'
+                        style={{ maxHeight: 240 }}
+                      />
+                      <span className='mt-1 block text-[10px] opacity-60'>{att.fileName}</span>
+                    </a>
+                  );
+                }
+                return (
+                  <a
+                    key={att.id}
+                    href={src || '#'}
+                    target='_blank'
+                    rel='noreferrer'
+                    className='flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 p-2 text-xs transition hover:bg-white/20'
+                  >
+                    <File className='h-3.5 w-3.5 flex-shrink-0' />
+                    <span className='flex-1 truncate max-w-[180px]'>{att.fileName}</span>
+                    <Download className='h-3.5 w-3.5 opacity-60' />
+                  </a>
+                );
+              })}
             </div>
           )}
         </div>
@@ -355,7 +379,7 @@ export const AdminTicketDetailPage = () => {
                     acc.push(<DaySeparator key={`sep-${i}`} date={msg.createdAt} />);
                   }
                   acc.push(
-                    <MessageBubble key={msg.id} msg={msg} userId={ticket.userId} />
+                    <MessageBubble key={msg.id} msg={msg} />
                   );
                   return acc;
                 }, [])
