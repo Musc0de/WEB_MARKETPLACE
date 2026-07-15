@@ -9,7 +9,7 @@ export const Skeleton: React.ForwardRefExoticComponent<
   ({ className = '', ...props }, ref) => (
     <div
       ref={ref}
-      className={`animate-pulse rounded-md bg-gray-200 dark:bg-gray-800 ${className}`}
+      className={`animate-pulse rounded-[var(--radius-control)] bg-[var(--color-border-default)] ${className}`}
       {...props}
     />
   ),

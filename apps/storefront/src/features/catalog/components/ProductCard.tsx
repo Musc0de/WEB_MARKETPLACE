@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { ProductListItem } from '@starsuperscare/contracts';
 import {
   Badge,
@@ -11,17 +12,20 @@ import {
   Small,
   Text,
 } from '@starsuperscare/ui';
-import { ShoppingCart, Star } from 'lucide-react';
+import { CheckCircle, Loader2, ShoppingCart, Star } from 'lucide-react';
 import { WishlistButton } from '../../wishlist/components/WishlistButton.tsx';
 
 export interface ProductCardProps {
   product: ProductListItem;
   onAddToCart?: (product: ProductListItem) => void;
   onBuyNow?: (product: ProductListItem) => void;
+  isLoading?: boolean;
 }
+
 export const ProductCard = (
-  { product, onAddToCart, onBuyNow }: ProductCardProps,
+  { product, onAddToCart, onBuyNow, isLoading = false }: ProductCardProps,
 ): JSX.Element => {
+  const [cartSuccess, setCartSuccess] = useState(false);
   const isOutOfStock = product.variantsSummary.totalAvailableStock <= 0;
 
   // Format price
@@ -33,13 +37,17 @@ export const ProductCard = (
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (isOutOfStock) return;
+    if (isOutOfStock || isLoading) return;
     onAddToCart?.(product);
+
+    // Briefly show success state on the button
+    setCartSuccess(true);
+    setTimeout(() => setCartSuccess(false), 1500);
   };
 
   const handleBuyNow = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (isOutOfStock) return;
+    if (isOutOfStock || isLoading) return;
     onBuyNow?.(product);
   };
 
@@ -65,37 +73,41 @@ export const ProductCard = (
       />
 
       {/* Image Area */}
-      <div className='aspect-square relative bg-gray-100 overflow-hidden'>
-        {product.primaryImage
-          ? (
-            <img
-              src={product.primaryImage}
-              alt={`Gambar produk ${product.name}`}
-              className={`object-cover w-full h-full transition-transform duration-300 group-hover:scale-105 ${
-                isOutOfStock ? 'opacity-50 grayscale' : ''
-              }`}
-              loading='lazy'
-              onError={(e) => {
-                (e.target as HTMLImageElement).src =
-                  'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22200%22%20height%3D%22200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20200%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_18a1a3b1a10%20text%20%7B%20fill%3A%23999%3Bfont-weight%3Anormal%3Bfont-family%3Avar(--font-sans)%2C%20sans-serif%3Bfont-size%3A14pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_18a1a3b1a10%22%3E%3Crect%20width%3D%22200%22%20height%3D%22200%22%20fill%3D%22%23f3f4f6%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%2274%22%20y%3D%22105%22%3EImage%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E';
-              }}
-            />
-          )
-          : (
-            <div className='flex items-center justify-center w-full h-full text-gray-400 text-sm'>
-              No Image
-            </div>
-          )}
-      </div>
+      <a href={`/products/${product.slug}`} className='block'>
+        <div className='aspect-square relative bg-gray-100 overflow-hidden'>
+          {product.primaryImage
+            ? (
+              <img
+                src={product.primaryImage}
+                alt={`Gambar produk ${product.name}`}
+                className={`object-cover w-full h-full transition-transform duration-300 group-hover:scale-105 ${
+                  isOutOfStock ? 'opacity-50 grayscale' : ''
+                }`}
+                loading='lazy'
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src =
+                    'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22200%22%20height%3D%22200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20200%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder%20text%20%7B%20fill%3A%23999%3Bfont-weight%3Anormal%3Bfont-family%3Asans-serif%3Bfont-size%3A14pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder%22%3E%3Crect%20width%3D%22200%22%20height%3D%22200%22%20fill%3D%22%23f3f4f6%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%2260%22%20y%3D%22105%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E';
+                }}
+              />
+            )
+            : (
+              <div className='flex items-center justify-center w-full h-full text-gray-400 text-sm'>
+                No Image
+              </div>
+            )}
+        </div>
+      </a>
 
       <CardContent className='flex flex-col flex-grow p-4 gap-2'>
         <Small className='text-gray-500 line-clamp-1 h-5'>
           {product.brandId ? 'Brand' : 'Unbranded'}
         </Small>
 
-        <Text className='font-medium line-clamp-2 leading-tight h-10 group-hover:text-blue-600 transition-colors'>
-          {product.name}
-        </Text>
+        <a href={`/products/${product.slug}`}>
+          <Text className='font-medium line-clamp-2 leading-tight h-10 group-hover:text-blue-600 transition-colors'>
+            {product.name}
+          </Text>
+        </a>
 
         <div className='mt-auto pt-2'>
           <H4
@@ -123,20 +135,35 @@ export const ProductCard = (
           variant='outline'
           className='flex-1 w-full'
           onClick={handleBuyNow}
-          disabled={isOutOfStock}
+          disabled={isOutOfStock || isLoading}
           aria-label={isOutOfStock ? 'Stok habis' : 'Beli Langsung'}
         >
-          Beli
+          {isLoading ? <Loader2 className='w-4 h-4 animate-spin' /> : 'Beli'}
         </Button>
         <Button
           variant='default'
-          className='flex-1 w-full flex items-center justify-center gap-2'
+          className={`flex-1 w-full flex items-center justify-center gap-2 transition-all duration-300 ${
+            cartSuccess ? 'bg-green-600 hover:bg-green-700' : ''
+          }`}
           onClick={handleAddToCart}
-          disabled={isOutOfStock}
+          disabled={isOutOfStock || isLoading}
           aria-label={isOutOfStock ? 'Stok habis' : 'Tambah ke Keranjang'}
         >
-          <ShoppingCart className='w-4 h-4' />
-          <span className='sr-only sm:not-sr-only'>Keranjang</span>
+          {isLoading
+            ? <Loader2 className='w-4 h-4 animate-spin' />
+            : cartSuccess
+            ? (
+              <>
+                <CheckCircle className='w-4 h-4' />
+                <span className='sr-only sm:not-sr-only'>Ditambahkan!</span>
+              </>
+            )
+            : (
+              <>
+                <ShoppingCart className='w-4 h-4' />
+                <span className='sr-only sm:not-sr-only'>Keranjang</span>
+              </>
+            )}
         </Button>
       </CardFooter>
     </Card>

@@ -1,18 +1,22 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   Banknote,
+  Bell,
   CreditCard,
   FileText,
   LayoutDashboard,
   LifeBuoy,
+  Menu,
   Package,
+  Search,
   ShoppingCart,
   Undo2,
   Users,
   Warehouse,
+  X,
 } from 'lucide-react';
 import { useAuth } from '../../features/auth/AuthContext.tsx';
-import { Button } from '@starsuperscare/ui';
+import { useState } from 'react';
 
 const navItems = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -30,92 +34,137 @@ const navItems = [
 export function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
+  const getPageTitle = () => {
+    const activeItem = navItems.find((item) =>
+      item.href === location.pathname ||
+      (item.href !== '/' && location.pathname.startsWith(item.href))
+    );
+    return activeItem ? activeItem.name : 'Admin Portal';
+  };
+
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'system-ui, sans-serif' }}>
+    <div className='flex min-h-screen bg-gray-50 font-sans text-gray-900'>
+      {/* Mobile Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className='fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden'
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
       <aside
-        style={{
-          width: '250px',
-          background: '#1a1a1a',
-          color: 'white',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white transform transition-transform duration-200 ease-in-out lg:static lg:translate-x-0 flex flex-col ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
       >
-        <div style={{ padding: '1.5rem', fontWeight: 'bold', fontSize: '1.25rem' }}>
-          StarSuperScare
-          <div style={{ fontSize: '0.875rem', color: '#888', fontWeight: 'normal' }}>
-            Admin Portal
+        <div className='flex items-center justify-between h-16 px-6 bg-gray-950'>
+          <div>
+            <span className='font-bold text-lg tracking-tight text-white'>StarSuperScare</span>
+            <span className='block text-xs text-gray-400'>Admin Portal</span>
           </div>
+          <button
+            type='button'
+            className='lg:hidden text-gray-400 hover:text-white'
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <X size={20} />
+          </button>
         </div>
 
-        <nav
-          style={{
-            flex: 1,
-            padding: '1rem',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.5rem',
-          }}
-        >
-          {navItems.map((item) => (
-            <NavLink
-              key={item.href}
-              to={item.href}
-              style={({ isActive }) => ({
-                color: isActive ? '#fff' : '#aaa',
-                textDecoration: 'none',
-                padding: '0.5rem 1rem',
-                background: isActive ? '#333' : 'transparent',
-                borderRadius: '4px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-              })}
-            >
-              <item.icon size={18} />
-              {item.name}
-            </NavLink>
-          ))}
+        <nav className='flex-1 overflow-y-auto py-4 px-3 space-y-1'>
+          {navItems.map((item) => {
+            const isActive = item.href === '/'
+              ? location.pathname === '/'
+              : location.pathname.startsWith(item.href);
+            return (
+              <NavLink
+                key={item.href}
+                to={item.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                }`}
+              >
+                <item.icon size={18} className={isActive ? 'text-white' : 'text-gray-400'} />
+                {item.name}
+              </NavLink>
+            );
+          })}
         </nav>
 
-        <div style={{ padding: '1rem', borderTop: '1px solid #333' }}>
-          <div style={{ marginBottom: '0.5rem', fontSize: '0.875rem' }}>
-            Logged in as <strong>{user?.username}</strong>
+        <div className='p-4 bg-gray-950 border-t border-gray-800'>
+          <div className='mb-3 text-sm'>
+            <span className='text-gray-400'>Login sebagai</span>
+            <div className='font-medium truncate'>{user?.username || 'Admin'}</div>
           </div>
-          <Button
+          <button
+            type='button'
             onClick={handleLogout}
-            style={{ width: '100%', borderColor: '#555', color: '#fff' }}
+            className='w-full px-4 py-2 text-sm font-medium text-red-400 bg-gray-900 border border-gray-700 rounded-md hover:bg-gray-800 hover:text-red-300 transition-colors'
           >
             Logout
-          </Button>
+          </button>
         </div>
       </aside>
 
-      <main style={{ flex: 1, background: '#f5f5f5', overflowY: 'auto' }}>
-        <header
-          style={{
-            background: 'white',
-            padding: '1rem 2rem',
-            borderBottom: '1px solid #ddd',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-          }}
-        >
-          {/* Header content like search or user profile can go here */}
-          <span>StarSuperScare Administration</span>
+      {/* Main Content */}
+      <div className='flex-1 flex flex-col min-w-0 overflow-hidden'>
+        {/* Topbar */}
+        <header className='h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 bg-white border-b border-gray-200 z-30'>
+          <div className='flex items-center flex-1'>
+            <button
+              type='button'
+              className='lg:hidden p-2 -ml-2 mr-4 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500'
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <Menu size={24} />
+            </button>
+
+            {/* Command / Search */}
+            <div className='hidden sm:flex max-w-lg w-full relative group'>
+              <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
+                <Search className='h-4 w-4 text-gray-400 group-focus-within:text-blue-500' />
+              </div>
+              <input
+                type='text'
+                placeholder='Ketik "/" untuk mencari (Command Palette)...'
+                className='block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-gray-50 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 focus:bg-white sm:text-sm transition-colors'
+              />
+            </div>
+          </div>
+
+          <div className='flex items-center gap-4 ml-4'>
+            <span className='hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800'>
+              Production
+            </span>
+            <button type='button' className='p-2 text-gray-400 hover:text-gray-500 relative'>
+              <Bell size={20} />
+              <span className='absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white' />
+            </button>
+          </div>
         </header>
 
-        <div style={{ padding: '2rem' }}>
-          <Outlet />
-        </div>
-      </main>
+        {/* Page Content Container */}
+        <main className='flex-1 relative overflow-y-auto focus:outline-none bg-gray-50'>
+          <div className='py-6'>
+            <div className='max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8'>
+              <h1 className='text-2xl font-bold text-gray-900 mb-6'>{getPageTitle()}</h1>
+              <Outlet />
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

@@ -64,12 +64,12 @@ const VerifySchema = z.object({
   token: z.string().min(10),
 });
 
-verificationRouter.post(
+const routes = verificationRouter.post(
   '/',
   zValidator('json', VerifySchema),
   async (c) => {
     let { token } = c.req.valid('json');
-    
+
     // Fix for legacy tokens sent without url encoding where '+' became ' '
     if (token.includes(' ')) {
       token = token.replace(/ /g, '+');
@@ -91,7 +91,7 @@ verificationRouter.post(
         const usedToken = await tx.query.tokens.findFirst({
           where: and(
             eq(tokens.tokenHash, token),
-            eq(tokens.type, 'email_verification')
+            eq(tokens.type, 'email_verification'),
           ),
         });
         if (usedToken && usedToken.usedAt && usedToken.userId) {
@@ -141,7 +141,7 @@ const ResendSchema = z.object({
   token: z.string().min(10),
 });
 
-verificationRouter.post(
+const routes2 = routes.post(
   '/resend',
   zValidator('json', ResendSchema),
   async (c) => {
@@ -212,4 +212,4 @@ verificationRouter.post(
   },
 );
 
-export default verificationRouter;
+export default routes2;

@@ -68,7 +68,8 @@ if (Deno.env.get('SMTP_HOST')) {
           pass: Deno.env.get('SMTP_PASS'),
         },
       });
-      this.from = Deno.env.get('SMTP_FROM') || 'StarSuperScare <noreply@starsuperscare.test>';
+      this.from = Deno.env.get('SMTP_FROM') as string;
+      if (!this.from) throw new Error('SMTP_FROM environment variable is required');
     }
 
     async send(options: SendEmailOptions): Promise<string> {

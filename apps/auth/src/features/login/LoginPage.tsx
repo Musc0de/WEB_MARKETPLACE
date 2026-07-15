@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@starsuperscare/ui';
 import { Input } from '../../components/ui/Input.tsx';
-import { useToast } from '../../components/ui/ToastProvider.tsx';
+import { notify } from '@starsuperscare/ui';
 import { apiClient, parseApiError } from '../../lib/api.ts';
 import { LoginSchema } from '../../lib/schemas.ts';
 import { z } from 'zod';
+import { motion } from 'framer-motion';
+import { Lock, Mail } from 'lucide-react';
 
 export function LoginPage() {
   const [identifier, setIdentifier] = useState('');
@@ -13,14 +15,12 @@ export function LoginPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
 
-  const toast = useToast();
   const [searchParams] = useSearchParams();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
 
-    // Client-side validation
     try {
       LoginSchema.parse({ identifier, password });
     } catch (err: unknown) {
@@ -42,86 +42,133 @@ export function LoginPage() {
 
       if (!res.ok) {
         const errorMsg = await parseApiError(res);
-        toast(errorMsg, 'error');
+        notify.error(errorMsg);
         return;
       }
 
-      toast('Login successful!', 'success');
+      notify.success('Login successful!');
 
-      // Handle return_to
       const returnTo = searchParams.get('return_to');
+      const dashboardUrl = (import.meta as any).env?.VITE_DASHBOARD_URL;
+
       if (returnTo) {
-        // Redirecting via location.href because it might go to another subdomain (dashboard)
-        globalThis.location.href = returnTo;
+        if (returnTo.startsWith('/') && !returnTo.startsWith('//')) {
+          if (!dashboardUrl) throw new Error('VITE_DASHBOARD_URL is missing');
+          globalThis.location.href = `${dashboardUrl}${returnTo}`;
+        } else {
+          globalThis.location.href = returnTo;
+        }
       } else {
-        // Fallback default
-        const dashboardUrl = (import.meta as any).env?.VITE_DASHBOARD_URL;
-        globalThis.location.href = dashboardUrl ? dashboardUrl : 'http://localhost:5175';
+        if (!dashboardUrl) throw new Error('VITE_DASHBOARD_URL is missing');
+        globalThis.location.href = dashboardUrl;
       }
     } catch (err: any) {
-      toast(err.message || 'Network error occurred', 'error');
+      notify.error(err.message || 'Network error occurred');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, staggerChildren: 0.1 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+  };
+
   return (
-    <div
-      style={{
-        maxWidth: '400px',
-        margin: '40px auto',
-        padding: '24px',
-        fontFamily: 'system-ui, sans-serif',
-      }}
+    <motion.div
+      variants={containerVariants}
+      initial='hidden'
+      animate='visible'
+      className='w-full max-w-md mx-auto'
     >
-      <h1 style={{ fontSize: '24px', marginBottom: '8px', color: '#111827' }}>Welcome back</h1>
-      <p style={{ color: '#4b5563', marginBottom: '24px', fontSize: '14px' }}>
-        Sign in to your account
-      </p>
+      <motion.div variants={itemVariants} className='mb-8'>
+        <h1 className='text-3xl font-bold text-gray-900 mb-2'>Selamat datang kembali</h1>
+        <p className='text-gray-500 text-sm'>Silakan masuk ke akun Anda untuk melanjutkan</p>
+      </motion.div>
 
-      <form onSubmit={handleSubmit} noValidate>
-        <Input
-          label='Username or Email'
-          type='text'
-          value={identifier}
-          onChange={(e: any) => setIdentifier(e.target.value)}
-          error={errors.identifier}
-          disabled={isLoading}
-          placeholder='admin'
-          autoComplete='username'
-        />
+      <form onSubmit={handleSubmit} noValidate className='space-y-5'>
+        <motion.div variants={itemVariants}>
+          <Input
+            label='Username atau Email'
+            type='text'
+            value={identifier}
+            onChange={(e: any) => setIdentifier(e.target.value)}
+            error={errors.identifier}
+            disabled={isLoading}
+            placeholder='anda@contoh.com'
+            autoComplete='username'
+            icon={<Mail className='w-4 h-4 text-gray-400' />}
+          />
+        </motion.div>
 
-        <Input
-          label='Password'
-          type='password'
-          value={password}
-          onChange={(e: any) => setPassword(e.target.value)}
-          error={errors.password}
-          disabled={isLoading}
-          placeholder='••••••••'
-          autoComplete='current-password'
-        />
+        <motion.div variants={itemVariants}>
+          <Input
+            label='Kata Sandi'
+            type='password'
+            value={password}
+            onChange={(e: any) => setPassword(e.target.value)}
+            error={errors.password}
+            disabled={isLoading}
+            placeholder='••••••••'
+            autoComplete='current-password'
+            icon={<Lock className='w-4 h-4 text-gray-400' />}
+          />
+        </motion.div>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
+        <motion.div variants={itemVariants} className='flex items-center justify-between mt-2'>
+          <div className='flex items-center'>
+            <input
+              id='remember-me'
+              name='remember-me'
+              type='checkbox'
+              className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 cursor-pointer'
+            />
+            <label
+              htmlFor='remember-me'
+              className='ml-2 block text-sm text-gray-900 cursor-pointer'
+            >
+              Ingat saya
+            </label>
+          </div>
           <Link
             to='/forgot-password'
-            style={{ fontSize: '14px', color: '#4f46e5', textDecoration: 'none', fontWeight: 500 }}
+            className='text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors'
           >
-            Forgot password?
+            Lupa kata sandi?
           </Link>
-        </div>
+        </motion.div>
 
-        <Button type='submit' disabled={isLoading} style={{ width: '100%', marginBottom: '16px' }}>
-          {isLoading ? 'Signing in...' : 'Sign In'}
-        </Button>
+        <motion.div variants={itemVariants} className='pt-2'>
+          <Button
+            type='submit'
+            disabled={isLoading}
+            className='w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md transition-all hover:shadow-lg active:scale-[0.98]'
+          >
+            {isLoading ? 'Masuk...' : 'Masuk'}
+          </Button>
+        </motion.div>
 
-        <p style={{ textAlign: 'center', fontSize: '14px', color: '#4b5563' }}>
-          Don't have an account?{' '}
-          <Link to='/signup' style={{ color: '#4f46e5', textDecoration: 'none', fontWeight: 500 }}>
-            Sign up
-          </Link>
-        </p>
+        <motion.div variants={itemVariants} className='text-center mt-6'>
+          <p className='text-sm text-gray-600'>
+            Belum punya akun?{' '}
+            <Link
+              to='/signup'
+              className='font-semibold text-indigo-600 hover:text-indigo-500 transition-colors'
+            >
+              Daftar sekarang
+            </Link>
+          </p>
+        </motion.div>
       </form>
-    </div>
+    </motion.div>
   );
 }

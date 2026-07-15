@@ -1,6 +1,6 @@
 import { ErrorBoundary } from 'react-error-boundary';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { ToastProvider } from '@starsuperscare/ui';
+import { ResponsiveGooeyToaster } from '@starsuperscare/ui';
 import { StorefrontLayout } from './components/layout/StorefrontLayout.tsx';
 import HomePage from './features/home/HomePage.tsx';
 import { SearchPage } from './features/search/SearchPage.tsx';
@@ -15,6 +15,9 @@ import { PaymentStatusPage } from './features/checkout/payment/PaymentStatusPage
 import { VerifyEmailPage } from './features/auth/pages/VerifyEmailPage.tsx';
 import { TermsPage } from './features/legal/pages/TermsPage.tsx';
 import { PrivacyPage } from './features/legal/pages/PrivacyPage.tsx';
+import { HelpPage } from './features/legal/pages/HelpPage.tsx';
+import { ReturnsPage } from './features/legal/pages/ReturnsPage.tsx';
+import { AboutPage } from './features/legal/pages/AboutPage.tsx';
 
 const Fallback = ({ error }: { error: Error }) => (
   <div role='alert' className='p-6'>
@@ -34,7 +37,7 @@ const NotFound = () => (
 export default function App() {
   return (
     <ErrorBoundary FallbackComponent={Fallback}>
-      <ToastProvider />
+      <ResponsiveGooeyToaster />
       <BrowserRouter>
         <StorefrontLayout>
           <Routes>
@@ -54,6 +57,9 @@ export default function App() {
             <Route path='/verify-email' element={<VerifyEmailPage />} />
             <Route path='/terms' element={<TermsPage />} />
             <Route path='/privacy' element={<PrivacyPage />} />
+            <Route path='/help' element={<HelpPage />} />
+            <Route path='/returns' element={<ReturnsPage />} />
+            <Route path='/about' element={<AboutPage />} />
             <Route path='*' element={<NotFound />} />
           </Routes>
         </StorefrontLayout>

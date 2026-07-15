@@ -8,5 +8,7 @@ export * from './components/skeleton.tsx';
 export * from './components/badge.tsx';
 export * from './components/pagination.tsx';
 export * from './components/toast.tsx';
+export * from './components/textarea.tsx';
+export * from './components/spinner.tsx';
 
 export * from './lib/formatters.ts';

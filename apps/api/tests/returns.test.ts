@@ -1,6 +1,14 @@
 import { assertEquals } from '@std/assert';
 import app from '../src/app.ts';
-import { db, orderItems, orders, users, stores, products, productVariants } from '@starsuperscare/database';
+import {
+  db,
+  orderItems,
+  orders,
+  products,
+  productVariants,
+  stores,
+  users,
+} from '@starsuperscare/database';
 import { eq } from 'drizzle-orm';
 import { createSessionToken } from '@starsuperscare/auth-pkg';
 

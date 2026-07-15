@@ -1,12 +1,11 @@
 import { hc } from 'hono/client';
 import type { AppType } from '../../../api/src/app.ts';
 
-// Extract base URL from Vite env or fallback to localhost
-let apiUrl = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8000';
-if (typeof window !== 'undefined' && globalThis.location.hostname === '127.0.0.1') {
-  apiUrl = apiUrl.replace('localhost', '127.0.0.1');
+const envApiUrl = (import.meta as any).env?.VITE_API_URL;
+if (!envApiUrl) {
+  throw new Error('VITE_API_URL is missing in environment variables');
 }
-export const API_BASE_URL = apiUrl;
+export const API_BASE_URL = envApiUrl;
 
 // Setup global Hono client instance with credentials included for cookies/CSRF
 export const apiClient = hc<AppType>(API_BASE_URL, {

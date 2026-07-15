@@ -28,21 +28,37 @@ Deno.test('Admin Orders API', async (t) => {
     adminId = u.id;
 
     // Give orders.read, orders.write
-    const [r1] = await db.insert(roles).values({ name: 'orders.read', slug: 'orders-read' }).onConflictDoUpdate({ target: roles.slug, set: { name: 'orders.read' } }).returning();
-    const [r2] = await db.insert(roles).values({ name: 'orders.write', slug: 'orders-write' }).onConflictDoUpdate({ target: roles.slug, set: { name: 'orders.write' } }).returning();
+    const [r1] = await db.insert(roles).values({ name: 'orders.read', slug: 'orders-read' })
+      .onConflictDoUpdate({ target: roles.slug, set: { name: 'orders.read' } }).returning();
+    const [r2] = await db.insert(roles).values({ name: 'orders.write', slug: 'orders-write' })
+      .onConflictDoUpdate({ target: roles.slug, set: { name: 'orders.write' } }).returning();
 
     await db.insert(userRoles).values({ userId: adminId, roleId: r1.id });
     await db.insert(userRoles).values({ userId: adminId, roleId: r2.id });
 
-    let [p1] = await db.select().from(permissions).where(and(eq(permissions.resource, 'orders'), eq(permissions.action, 'read')));
-    if (!p1) [p1] = await db.insert(permissions).values({ resource: 'orders', action: 'read' }).returning();
-    let [p2] = await db.select().from(permissions).where(and(eq(permissions.resource, 'orders'), eq(permissions.action, 'write')));
-    if (!p2) [p2] = await db.insert(permissions).values({ resource: 'orders', action: 'write' }).returning();
+    let [p1] = await db.select().from(permissions).where(
+      and(eq(permissions.resource, 'orders'), eq(permissions.action, 'read')),
+    );
+    if (!p1) {
+      [p1] = await db.insert(permissions).values({ resource: 'orders', action: 'read' })
+        .returning();
+    }
+    let [p2] = await db.select().from(permissions).where(
+      and(eq(permissions.resource, 'orders'), eq(permissions.action, 'write')),
+    );
+    if (!p2) {
+      [p2] = await db.insert(permissions).values({ resource: 'orders', action: 'write' })
+        .returning();
+    }
 
     // Check if role-permission exists
-    const [rp1] = await db.select().from(rolePermissions).where(and(eq(rolePermissions.roleId, r1.id), eq(rolePermissions.permissionId, p1.id)));
+    const [rp1] = await db.select().from(rolePermissions).where(
+      and(eq(rolePermissions.roleId, r1.id), eq(rolePermissions.permissionId, p1.id)),
+    );
     if (!rp1) await db.insert(rolePermissions).values({ roleId: r1.id, permissionId: p1.id });
-    const [rp2] = await db.select().from(rolePermissions).where(and(eq(rolePermissions.roleId, r2.id), eq(rolePermissions.permissionId, p2.id)));
+    const [rp2] = await db.select().from(rolePermissions).where(
+      and(eq(rolePermissions.roleId, r2.id), eq(rolePermissions.permissionId, p2.id)),
+    );
     if (!rp2) await db.insert(rolePermissions).values({ roleId: r2.id, permissionId: p2.id });
 
     const tokenRes = await createSessionToken();

@@ -52,9 +52,8 @@ const app = new Hono<AppContext>();
 
 // Global Middlewares
 // Parse ALLOWED_ORIGINS
-const allowedOriginsStr = Deno.env.get('ALLOWED_ORIGINS') ||
-  'http://localhost:3000,http://localhost:5173';
-const allowedOrigins = allowedOriginsStr.split(',').map((o) => o.trim());
+const allowedOriginsStr = Deno.env.get('ALLOWED_ORIGINS') || '';
+const allowedOrigins = allowedOriginsStr.split(',').map((o) => o.trim()).filter(Boolean);
 
 // Custom static file handler for /storage
 import * as path from 'node:path';
@@ -68,23 +67,29 @@ app.get('/storage/*', async (c) => {
   // Resolve workspace root from apps/api/src
   const workspaceRoot = path.join(import.meta.dirname!, '..', '..', '..');
   const filePath = path.join(workspaceRoot, 'data', reqPath);
-  
+
   try {
-    const file = await Deno.readFile(filePath);
+    const file = await Deno.open(filePath, { read: true });
+
+    // Determine content type based on extension
+    const ext = path.extname(filePath).toLowerCase();
     let contentType = 'application/octet-stream';
-    if (filePath.endsWith('.pdf')) contentType = 'application/pdf';
-    else if (filePath.endsWith('.png')) contentType = 'image/png';
-    else if (filePath.endsWith('.jpg')) contentType = 'image/jpeg';
-    
-    return c.body(file, 200, {
-      'Content-Type': contentType,
-      'Cache-Control': 'public, max-age=3600'
-    });
-  } catch (e) {
-    console.error('File read error:', e);
-    return c.json({ error: { code: 'NOT_FOUND', message: 'File not found at ' + filePath } }, 404);
+    if (ext === '.pdf') contentType = 'application/pdf';
+    else if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
+    else if (ext === '.png') contentType = 'image/png';
+    else if (ext === '.gif') contentType = 'image/gif';
+    else if (ext === '.webp') contentType = 'image/webp';
+
+    c.header('Content-Type', contentType);
+
+    // Use standard Web Streams API as expected by Hono's body()
+    return c.body(file.readable);
+  } catch (_e) {
+    return c.text('File not found', 404);
   }
 });
+
+// Configure Hono to use standard Web Streams for streaming responses
 app.use(
   '*',
   secureHeaders({
@@ -110,15 +115,11 @@ app.use(
   '*',
   cors({
     origin: (origin) => {
-      // Allow any localhost/127.0.0.1 in development
-      if (!origin) return allowedOrigins[0];
+      if (!origin) return allowedOrigins[0] || '*';
       if (allowedOrigins.includes(origin)) return origin;
-      if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
-        return origin;
-      }
       return null; // reject
     },
-    allowHeaders: ['X-Custom-Header', 'Upgrade-Insecure-Requests', 'Content-Type', 'Authorization'],
+    allowHeaders: ['X-Custom-Header', 'Upgrade-Insecure-Requests', 'Content-Type', 'Authorization', 'X-Cart-Token'],
     allowMethods: ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE', 'PATCH'],
     exposeHeaders: ['Content-Length', 'X-Request-Id'],
     maxAge: 600,

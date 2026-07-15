@@ -1,5 +1,6 @@
 import { ErrorBoundary } from 'react-error-boundary';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { ResponsiveGooeyToaster } from '@starsuperscare/ui';
 import { DashboardLayout } from './components/layout/DashboardLayout.tsx';
 
 const Fallback = ({ error }: { error: Error }) => (
@@ -35,6 +36,7 @@ const NotFound = () => (
 export default function App() {
   return (
     <ErrorBoundary FallbackComponent={Fallback}>
+      <ResponsiveGooeyToaster />
       <BrowserRouter>
         <DashboardLayout>
           <Routes>

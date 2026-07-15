@@ -1,0 +1,20 @@
+@theme {
+  --color-bg-canvas: #f8fafc;
+  --color-bg-surface: #ffffff;
+  --color-bg-elevated: #ffffff;
+
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+
+  --color-border-default: #e2e8f0;
+
+  --color-action-primary: #2563eb;
+  --color-action-hover: #1d4ed8;
+  --color-action-active: #1e40af;
+  --color-action-disabled: #94a3b8;
+
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #0ea5e9;
+}

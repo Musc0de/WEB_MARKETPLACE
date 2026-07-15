@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
   goeyToast,
   GoeyToaster as Toaster,
@@ -5,9 +6,31 @@ import {
 } from 'goey-toast';
 import 'goey-toast/styles.css';
 
-export const ToastProvider = (): JSX.Element => {
-  return <Toaster position='bottom-right' />;
+export const ResponsiveGooeyToaster = (): JSX.Element => {
+  const [position, setPosition] = useState<'top-right' | 'bottom-center'>('top-right');
+
+  useEffect(() => {
+    const handleResize = () => {
+      // Use standard md breakpoint (768px)
+      if (globalThis.innerWidth < 768) {
+        setPosition('bottom-center');
+      } else {
+        setPosition('top-right');
+      }
+    };
+
+    // Set initial position
+    handleResize();
+
+    globalThis.addEventListener('resize', handleResize);
+    return () => globalThis.removeEventListener('resize', handleResize);
+  }, []);
+
+  return <Toaster position={position} />;
 };
+
+// Alias for backward compatibility
+export const ToastProvider = ResponsiveGooeyToaster;
 
 // Check if user prefers reduced motion for accessibility
 const prefersReducedMotion = (): boolean => {
@@ -28,7 +51,6 @@ const createToast = (
 
   // Turn off animations if user prefers reduced motion
   if (prefersReducedMotion()) {
-    // goey-toast doesn't have a built-in disable animation toggle globally but you can override classNames
     baseOptions.classNames = {
       ...baseOptions.classNames,
       wrapper: `${baseOptions.classNames?.wrapper || ''} !transition-none !animate-none`.trim(),
@@ -55,7 +77,7 @@ const createToast = (
   }
 };
 
-export const toast = {
+export const notify = {
   success: (message: string = 'Berhasil!', options?: ToastOptions): string | number =>
     createToast(message, 'success', options),
 
@@ -85,3 +107,6 @@ export const toast = {
 
   dismiss: (toastId?: string): void => goeyToast.dismiss(toastId),
 };
+
+// Alias for backward compatibility
+export const toast = notify;

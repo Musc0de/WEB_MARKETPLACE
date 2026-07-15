@@ -42,7 +42,8 @@ export async function handleOrderPaid(payload: any, _eventId: string) {
         template: 'invoice',
         data: {
           orderNumber: orderData.orderNumber,
-          customerName: orderData.shippingSnapshot?.fullName || orderData.emailSnapshot?.split('@')[0] || 'Pelanggan',
+          customerName: orderData.shippingSnapshot?.fullName ||
+            orderData.emailSnapshot?.split('@')[0] || 'Pelanggan',
           invoiceObjectKey: objectKey,
         },
       },

@@ -1,65 +1,71 @@
 {
-  "hash": "91fb386c",
-  "configHash": "b473113e",
+  "hash": "bef4a96f",
+  "configHash": "cf53d055",
   "lockfileHash": "e3b0c442",
-  "browserHash": "c6c36848",
+  "browserHash": "2ae3e177",
   "optimized": {
     "goey-toast": {
       "src": "../../../../node_modules/.deno/goey-toast@0.5.0/node_modules/goey-toast/dist/index.js",
       "file": "goey-toast.js",
-      "fileHash": "08a45f58",
+      "fileHash": "4f8a67d5",
+      "needsInterop": false
+    },
+    "lucide-react": {
+      "src": "../../../../node_modules/.deno/lucide-react@1.24.0/node_modules/lucide-react/dist/esm/lucide-react.mjs",
+      "file": "lucide-react.js",
+      "fileHash": "76ed6f09",
       "needsInterop": false
     },
     "react-dom": {
       "src": "../../../../node_modules/.deno/react-dom@18.3.1/node_modules/react-dom/index.js",
       "file": "react-dom.js",
-      "fileHash": "96aa74f4",
+      "fileHash": "bde6d1e9",
       "needsInterop": true
     },
     "react-dom/client": {
       "src": "../../../../node_modules/.deno/react-dom@18.3.1/node_modules/react-dom/client.js",
       "file": "react-dom_client.js",
-      "fileHash": "d448848e",
+      "fileHash": "2cd6d9d6",
       "needsInterop": true
     },
     "react-error-boundary": {
       "src": "../../../../node_modules/.deno/react-error-boundary@4.1.2/node_modules/react-error-boundary/dist/react-error-boundary.development.esm.js",
       "file": "react-error-boundary.js",
-      "fileHash": "389dca15",
+      "fileHash": "d3029a48",
       "needsInterop": false
     },
     "react-router-dom": {
       "src": "../../../../node_modules/.deno/react-router-dom@6.30.4/node_modules/react-router-dom/dist/index.js",
       "file": "react-router-dom.js",
-      "fileHash": "5161cc66",
+      "fileHash": "10c72645",
       "needsInterop": false
     },
     "react": {
       "src": "../../../../node_modules/.deno/react@18.3.1/node_modules/react/index.js",
       "file": "react.js",
-      "fileHash": "8ff56078",
+      "fileHash": "99150750",
       "needsInterop": true
     },
     "react/jsx-dev-runtime": {
       "src": "../../../../node_modules/.deno/react@18.3.1/node_modules/react/jsx-dev-runtime.js",
       "file": "react_jsx-dev-runtime.js",
-      "fileHash": "aefd9a63",
+      "fileHash": "1c2a1f25",
       "needsInterop": true
     },
     "react/jsx-runtime": {
       "src": "../../../../node_modules/.deno/react@18.3.1/node_modules/react/jsx-runtime.js",
       "file": "react_jsx-runtime.js",
-      "fileHash": "6ac998cd",
+      "fileHash": "60275f5c",
       "needsInterop": true
     }
   },
   "chunks": {
-    "react-dom-DRI03ng8": {
-      "file": "react-dom-DRI03ng8.js",
+    "react-dom-Dm2xnJd2": {
+      "file": "react-dom-Dm2xnJd2.js",
       "isDynamicEntry": false
     },
-    "rolldown-runtime-FDOR9p9I": {
-      "file": "rolldown-runtime-FDOR9p9I.js",
+    "rolldown-runtime-B-1-B7_t": {
+      "file": "rolldown-runtime-B-1-B7_t.js",
       "isDynamicEntry": false
     }
   }

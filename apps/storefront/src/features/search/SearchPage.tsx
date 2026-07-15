@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import type { ProductListItem } from '@starsuperscare/contracts';
 import { Button, H1, H3, Pagination, Text } from '@starsuperscare/ui';
 import { toast } from '@starsuperscare/ui';
 import { client } from '../../lib/api.ts';
+import { useCart } from '../cart/api/useCart.ts';
 import { ProductCard } from '../catalog/components/ProductCard.tsx';
 import { ProductCardSkeleton } from '../catalog/components/ProductCardSkeleton.tsx';
 import { Search, SearchX } from 'lucide-react';
@@ -37,6 +38,36 @@ export const SearchPage = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [totalItems, setTotalItems] = useState(0);
+
+  const navigate = useNavigate();
+  const { addItem } = useCart();
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  const handleAction = async (p: ProductListItem, isBuyNow: boolean) => {
+    if (actionLoading) return;
+    try {
+      setActionLoading(p.id);
+      const res = await client.v1.catalog.products[':slug'].$get({ param: { slug: p.slug } });
+      if (!res.ok) throw new Error('Produk tidak ditemukan');
+      const detail = (await res.json()).data;
+      if (!detail.variants || detail.variants.length === 0) {
+        toast.error('Produk tidak memiliki varian tersedia');
+        return;
+      }
+      await addItem(detail.variants[0].id, 1);
+      if (isBuyNow) {
+        navigate('/checkout');
+      } else {
+        toast.success(`${p.name} ditambahkan ke keranjang`, {
+          action: { label: 'Lihat Keranjang', onClick: () => navigate('/cart') },
+        } as any);
+      }
+    } catch (_e) {
+      toast.error('Gagal memproses aksi. Coba lagi.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -195,9 +226,9 @@ export const SearchPage = (): JSX.Element => {
                     <ProductCard
                       key={product.id}
                       product={product}
-                      onAddToCart={(p: ProductListItem) =>
-                        toast.success(`${p.name} ditambahkan ke keranjang`)}
-                      onBuyNow={(p: ProductListItem) => toast.success(`Membeli ${p.name}`)}
+                      isLoading={actionLoading === product.id}
+                      onAddToCart={(p) => handleAction(p, false)}
+                      onBuyNow={(p) => handleAction(p, true)}
                     />
                   ))}
                 </div>

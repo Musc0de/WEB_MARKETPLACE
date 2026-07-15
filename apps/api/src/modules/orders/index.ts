@@ -218,9 +218,9 @@ const routes = app
       .limit(1);
 
     const [customer] = await db
-      .select({ 
-        name: userProfiles.fullName, 
-        email: users.emailDisplay 
+      .select({
+        name: userProfiles.fullName,
+        email: users.emailDisplay,
       })
       .from(users)
       .leftJoin(userProfiles, eq(users.id, userProfiles.userId))

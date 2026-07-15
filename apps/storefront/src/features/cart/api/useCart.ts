@@ -2,31 +2,52 @@ import useSWR from 'swr';
 import { client } from '../../../lib/api.ts';
 import type { CartItem, UpdateCartItemRequest } from '@starsuperscare/contracts';
 
+/**
+ * Cart fetcher — reads the X-Cart-Token from localStorage at call time
+ * (the client custom fetch in api.ts handles injecting the header).
+ */
 const fetcher = async () => {
   const res = await client.v1.cart.$get();
   if (!res.ok) {
     throw new Error('Failed to fetch cart');
   }
   const data = await res.json();
-
-  if (data.data && typeof data.data === 'object' && 'guestToken' in data.data) {
-    localStorage.setItem('guestToken', (data.data as any).guestToken);
-  }
   return data.data;
 };
 
 export function useCart() {
-  const { data, error, isLoading, mutate } = useSWR('/api/v1/cart', fetcher);
+  const { data, error, isLoading, mutate } = useSWR('/api/v1/cart', fetcher, {
+    // Revalidate on focus so the cart badge stays fresh when user returns to tab
+    revalidateOnFocus: true,
+    // Don't dedupe too aggressively — we want fresh data after addItem
+    dedupingInterval: 500,
+  });
 
+  /**
+   * addItem — adds a variant to the cart.
+   * Crucially:
+   *  1. We await the POST which may return a new guestToken for first-time guests.
+   *  2. We SYNCHRONOUSLY save the token to localStorage BEFORE calling mutate().
+   *  3. Only then we call mutate() so the refetch uses the correct token.
+   */
   const addItem = async (variantId: string, quantity: number) => {
     const res = await client.v1.cart.items.$post({
       json: { variantId, quantity },
     });
-    if (!res.ok) throw new Error('Gagal menambah item ke keranjang');
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => null) as any;
+      throw new Error(errData?.error?.message || 'Gagal menambah item ke keranjang');
+    }
+
     const result = await res.json();
+
+    // Save guest token synchronously BEFORE triggering SWR revalidation
     if (result.data?.guestToken) {
       localStorage.setItem('guestToken', result.data.guestToken);
     }
+
+    // Now trigger revalidation — the fetcher will pick up the new token from localStorage
     await mutate();
     return result;
   };
@@ -46,7 +67,6 @@ export function useCart() {
     });
 
     if (!res.ok) {
-      // Revert on failure
       await mutate();
       throw new Error('Gagal memperbarui item');
     }
@@ -54,6 +74,7 @@ export function useCart() {
   };
 
   const removeItem = async (itemId: string) => {
+    // Optimistic update
     if (data) {
       const newItems = data.items.filter((item: CartItem) => item.id !== itemId);
       mutate({ ...data, items: newItems as any }, false);

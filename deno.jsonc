@@ -83,6 +83,7 @@
     }
   },
   "tasks": {
+    "test:smoke:staging": "deno test --allow-all --env=infrastructure/deploy/staging.env.example",
     "dev": "deno task dev:all",
 
     "dev:all": "deno run -A npm:concurrently@^10.0.3 -k -n API,WORKER,SHOP,AUTH,DASHBOARD,ADMIN,TRACKING \"deno task dev:api\" \"deno task dev:worker\" \"deno task dev:storefront\" \"deno task dev:auth\" \"deno task dev:dashboard\" \"deno task dev:admin\" \"deno task dev:tracking\"",

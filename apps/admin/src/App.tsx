@@ -17,7 +17,7 @@ import { CustomersList } from './features/customers/CustomersList.tsx';
 import { CustomerDetail } from './features/customers/CustomerDetail.tsx';
 import { PaymentsList } from './features/payments/PaymentsList.tsx';
 import { InvoicesList } from './features/payments/InvoicesList.tsx';
-import { GoeyToaster } from 'goey-toast';
+import { ResponsiveGooeyToaster } from '@starsuperscare/ui';
 import { DashboardCards } from './features/overview/DashboardCards.tsx';
 import { ReviewsList } from './features/reviews/ReviewsList.tsx';
 import { AuditLogViewer } from './features/audit/AuditLogViewer.tsx';
@@ -52,7 +52,7 @@ export default function App() {
   return (
     <ErrorBoundary FallbackComponent={Fallback}>
       <QueryClientProvider client={queryClient}>
-        <GoeyToaster position='top-right' />
+        <ResponsiveGooeyToaster />
         <AuthProvider>
           <BrowserRouter>
             <Routes>

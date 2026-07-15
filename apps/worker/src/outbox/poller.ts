@@ -34,9 +34,9 @@ export async function pollOutbox(): Promise<number> {
 
       // 2. Mark them as 'processing' so they aren't picked up by another transaction
       // and we can release the row locks when this transaction ends, allowing us to
-      // process them outside of the lock safely.
+      // process them outside of the lock safely. We also update availableAt to track when processing started.
       await tx.update(outboxEvents)
-        .set({ state: 'processing' })
+        .set({ state: 'processing', availableAt: now })
         .where(inArray(outboxEvents.id, eventIds));
     }
 

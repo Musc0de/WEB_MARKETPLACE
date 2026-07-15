@@ -1,0 +1,23 @@
+@import "../tokens/colors.css";
+@import "../tokens/spacing.css";
+@import "../tokens/radius.css";
+@import "../tokens/typography.css";
+@import "../tokens/motion.css";
+@import "../tokens/z-index.css";
+@import "../tokens/shadows.css";
+@import "../tokens/breakpoints.css";
+
+/* Global Reset & Base Styles */
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    background-color: var(--color-bg-canvas, #f8fafc);
+    color: var(--color-text-primary, #0f172a);
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}

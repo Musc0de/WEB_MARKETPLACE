@@ -161,7 +161,7 @@ const routes = router
       const currentPrice = Number(item.variant.price);
       const observedPrice = item.priceObservation ? Number(item.priceObservation) : currentPrice;
 
-      if (item.product.status !== 'published') {
+      if (item.product.status !== 'published' && item.product.status !== 'active') {
         status = 'inactive';
         idsToDelete.push(item.id);
       } else if (item.variant.availableStock <= 0) {
@@ -340,17 +340,27 @@ const routes = router
       .where(and(eq(cartItems.cartId, cartId), eq(cartItems.variantId, variantId)))
       .limit(1);
 
-    if (existing.length > 0) {
-      await db.update(cartItems)
-        .set({ quantity: existing[0].quantity + quantity })
-        .where(eq(cartItems.id, existing[0].id));
-    } else {
-      await db.insert(cartItems).values({
-        cartId,
-        variantId,
-        quantity,
-        priceObservation,
-      });
+    try {
+      if (existing.length > 0) {
+        await db.update(cartItems)
+          .set({ quantity: existing[0].quantity + quantity })
+          .where(eq(cartItems.id, existing[0].id));
+      } else {
+        const inserted = await db.insert(cartItems).values({
+          cartId,
+          variantId,
+          quantity,
+          priceObservation,
+        }).returning({ id: cartItems.id });
+        console.log('[cart] INSERT cartItem result:', JSON.stringify(inserted));
+      }
+    } catch (insertErr) {
+      console.error('[cart] INSERT cartItem FAILED:', insertErr);
+      return c.json({
+        data: null,
+        meta: { request_id: c.get('requestId') },
+        error: { code: 'INSERT_FAILED', message: String(insertErr) },
+      }, 500);
     }
 
     return c.json({

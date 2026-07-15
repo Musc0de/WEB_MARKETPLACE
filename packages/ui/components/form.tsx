@@ -10,7 +10,7 @@ export const Label: React.ForwardRefExoticComponent<
   ({ className = '', ...props }, ref) => (
     <label
       ref={ref}
-      className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${className}`}
+      className={`text-[var(--text-sm)] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${className}`}
       {...props}
     />
   ),
@@ -28,9 +28,13 @@ export const FormGroup: React.ForwardRefExoticComponent<
   FormGroupProps
 >(
   ({ className = '', error, children, ...props }, ref) => (
-    <div ref={ref} className={`space-y-2 ${className}`} {...props}>
+    <div ref={ref} className={`space-y-[var(--spacing-2)] ${className}`} {...props}>
       {children}
-      {error && <p className='text-[0.8rem] font-medium text-red-500'>{error}</p>}
+      {error && (
+        <p className='text-[var(--text-metadata)] font-medium text-[var(--color-danger)]'>
+          {error}
+        </p>
+      )}
     </div>
   ),
 );

@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@starsuperscare/ui';
 import { Input } from '../../components/ui/Input.tsx';
-import { useToast } from '../../components/ui/ToastProvider.tsx';
+import { notify } from '@starsuperscare/ui';
 import { apiClient, parseApiError } from '../../lib/api.ts';
 import { SignupSchema } from '../../lib/schemas.ts';
 import { z } from 'zod';
+import { motion } from 'framer-motion';
+import { CheckCircle2, Lock, Mail, User } from 'lucide-react';
 
 export function SignupPage() {
   const [email, setEmail] = useState('');
@@ -15,8 +17,6 @@ export function SignupPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-
-  const toast = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,107 +43,138 @@ export function SignupPage() {
 
       if (!res.ok) {
         const errorMsg = await parseApiError(res);
-        toast(errorMsg, 'error');
+        notify.error(errorMsg);
         return;
       }
 
       setIsSuccess(true);
-      toast('Account created! Please verify your email.', 'success');
+      notify.success('Account created! Please verify your email.');
     } catch (err: any) {
-      toast(err.message || 'Network error occurred', 'error');
+      notify.error(err.message || 'Network error occurred');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, staggerChildren: 0.1 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+  };
+
   if (isSuccess) {
     return (
-      <div
-        style={{
-          maxWidth: '400px',
-          margin: '40px auto',
-          padding: '24px',
-          textAlign: 'center',
-          fontFamily: 'system-ui, sans-serif',
-        }}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4 }}
+        className='w-full text-center'
       >
-        <h1 style={{ fontSize: '24px', marginBottom: '8px', color: '#166534' }}>
-          Check Your Email
+        <div className='mx-auto w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6'>
+          <CheckCircle2 className='w-8 h-8' />
+        </div>
+        <h1 className='text-3xl font-bold text-gray-900 mb-4'>
+          Periksa Email Anda
         </h1>
-        <p style={{ color: '#4b5563', marginBottom: '24px' }}>
-          We've sent a verification link to{' '}
-          <strong>{email}</strong>. Please check your inbox to activate your account.
+        <p className='text-gray-500 mb-8 max-w-sm mx-auto leading-relaxed'>
+          Kami telah mengirimkan tautan verifikasi ke{' '}
+          <strong className='text-gray-900'>{email}</strong>. Silakan periksa kotak masuk Anda untuk mengaktifkan akun.
         </p>
-        <Link to='/login' style={{ color: '#4f46e5', textDecoration: 'none', fontWeight: 500 }}>
-          Back to Login
+        <Link
+          to='/login'
+          className='inline-flex justify-center px-6 py-2.5 bg-indigo-50 text-indigo-600 font-semibold rounded-lg hover:bg-indigo-100 transition-colors'
+        >
+          Kembali ke Login
         </Link>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div
-      style={{
-        maxWidth: '400px',
-        margin: '40px auto',
-        padding: '24px',
-        fontFamily: 'system-ui, sans-serif',
-      }}
+    <motion.div
+      variants={containerVariants}
+      initial='hidden'
+      animate='visible'
+      className='w-full max-w-md mx-auto'
     >
-      <h1 style={{ fontSize: '24px', marginBottom: '8px', color: '#111827' }}>Create an Account</h1>
-      <p style={{ color: '#4b5563', marginBottom: '24px', fontSize: '14px' }}>
-        Join StarSuperScare today.
-      </p>
+      <motion.div variants={itemVariants} className='mb-8'>
+        <h1 className='text-3xl font-bold text-gray-900 mb-2'>Buat Akun Baru</h1>
+        <p className='text-gray-500 text-sm'>Bergabunglah dengan StarSuperScare hari ini untuk memulai.</p>
+      </motion.div>
 
-      <form onSubmit={handleSubmit} noValidate>
-        <Input
-          label='Email Address'
-          type='email'
-          value={email}
-          onChange={(e: any) => setEmail(e.target.value)}
-          error={errors.email}
-          disabled={isLoading}
-          placeholder='you@example.com'
-          autoComplete='email'
-        />
+      <form onSubmit={handleSubmit} noValidate className='space-y-5'>
+        <motion.div variants={itemVariants}>
+          <Input
+            label='Alamat Email'
+            type='email'
+            value={email}
+            onChange={(e: any) => setEmail(e.target.value)}
+            error={errors.email}
+            disabled={isLoading}
+            placeholder='anda@contoh.com'
+            autoComplete='email'
+            icon={<Mail className='w-4 h-4 text-gray-400' />}
+          />
+        </motion.div>
 
-        <Input
-          label='Username'
-          type='text'
-          value={username}
-          onChange={(e: any) => setUsername(e.target.value)}
-          error={errors.username}
-          disabled={isLoading}
-          placeholder='cool_user'
-          autoComplete='username'
-        />
+        <motion.div variants={itemVariants}>
+          <Input
+            label='Username'
+            type='text'
+            value={username}
+            onChange={(e: any) => setUsername(e.target.value)}
+            error={errors.username}
+            disabled={isLoading}
+            placeholder='nama_keren'
+            autoComplete='username'
+            icon={<User className='w-4 h-4 text-gray-400' />}
+          />
+        </motion.div>
 
-        <Input
-          label='Password'
-          type='password'
-          value={password}
-          onChange={(e: any) => setPassword(e.target.value)}
-          error={errors.password}
-          disabled={isLoading}
-          placeholder='••••••••'
-          autoComplete='new-password'
-        />
+        <motion.div variants={itemVariants}>
+          <Input
+            label='Kata Sandi'
+            type='password'
+            value={password}
+            onChange={(e: any) => setPassword(e.target.value)}
+            error={errors.password}
+            disabled={isLoading}
+            placeholder='••••••••'
+            autoComplete='new-password'
+            icon={<Lock className='w-4 h-4 text-gray-400' />}
+          />
+        </motion.div>
 
-        <Button
-          type='submit'
-          disabled={isLoading}
-          style={{ width: '100%', marginTop: '8px', marginBottom: '16px' }}
-        >
-          {isLoading ? 'Creating account...' : 'Sign Up'}
-        </Button>
+        <motion.div variants={itemVariants} className='pt-2'>
+          <Button
+            type='submit'
+            disabled={isLoading}
+            className='w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md transition-all hover:shadow-lg active:scale-[0.98]'
+          >
+            {isLoading ? 'Membuat akun...' : 'Daftar Sekarang'}
+          </Button>
+        </motion.div>
 
-        <p style={{ textAlign: 'center', fontSize: '14px', color: '#4b5563' }}>
-          Already have an account?{' '}
-          <Link to='/login' style={{ color: '#4f46e5', textDecoration: 'none', fontWeight: 500 }}>
-            Sign in
-          </Link>
-        </p>
+        <motion.div variants={itemVariants} className='text-center mt-6'>
+          <p className='text-sm text-gray-600'>
+            Sudah punya akun?{' '}
+            <Link
+              to='/login'
+              className='font-semibold text-indigo-600 hover:text-indigo-500 transition-colors'
+            >
+              Masuk di sini
+            </Link>
+          </p>
+        </motion.div>
       </form>
-    </div>
+    </motion.div>
   );
 }

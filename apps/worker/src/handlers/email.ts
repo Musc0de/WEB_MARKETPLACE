@@ -21,14 +21,14 @@ export async function handleEmailSend(payload: any, eventId: string) {
           attachments = [{
             filename: `Invoice-${data.orderNumber}.pdf`,
             content: pdfBytes,
-            contentType: 'application/pdf'
+            contentType: 'application/pdf',
           }];
         }
       } catch (e) {
         console.error('[Email] Failed to attach invoice PDF:', e);
       }
     }
-    const rendered = templates.invoice({ 
+    const rendered = templates.invoice({
       orderNumber: data.orderNumber,
       customerName: data.customerName,
     });
@@ -93,15 +93,42 @@ export async function handleEmailSend(payload: any, eventId: string) {
 
 export async function handleEmailVerificationRequested(payload: any, _eventId: string) {
   const { email, token, customerName } = payload;
-  const verificationUrl = `${Deno.env.get('VITE_STOREFRONT_URL') || 'http://localhost:5173'}/verify-email?token=${encodeURIComponent(token)}`;
-  
+  const authUrl = Deno.env.get('VITE_AUTH_URL');
+  if (!authUrl) throw new Error('VITE_AUTH_URL is missing in environment variables');
+
+  const verificationUrl = `${authUrl}/verify-email?token=${encodeURIComponent(token)}`;
+
   const rendered = templates.email_verification_requested({
     verificationUrl,
     customerName,
   });
-  
+
+  const from = Deno.env.get('SMTP_FROM');
+  if (!from) throw new Error('SMTP_FROM is missing in environment variables');
+
   await emailProvider.send({
-    from: '"StarSuperScare Marketplace" <no-reply@starsuperscare.net>',
+    from,
+    to: email,
+    subject: rendered.subject,
+    html: rendered.html,
+    text: rendered.text,
+  });
+}
+
+export async function handlePasswordResetRequested(payload: any, _eventId: string) {
+  const { email, token } = payload;
+  const authUrl = Deno.env.get('VITE_AUTH_URL');
+  if (!authUrl) throw new Error('VITE_AUTH_URL is missing in environment variables');
+
+  const resetUrl = `${authUrl}/reset-password?token=${encodeURIComponent(token)}`;
+
+  const rendered = templates.resetPassword(resetUrl);
+
+  const from = Deno.env.get('SMTP_FROM');
+  if (!from) throw new Error('SMTP_FROM is missing in environment variables');
+
+  await emailProvider.send({
+    from,
     to: email,
     subject: rendered.subject,
     html: rendered.html,

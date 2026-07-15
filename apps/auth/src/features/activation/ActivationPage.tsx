@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '@starsuperscare/ui';
 import { Input } from '../../components/ui/Input.tsx';
-import { useToast } from '../../components/ui/ToastProvider.tsx';
+import { notify } from '@starsuperscare/ui';
 import { apiClient, parseApiError } from '../../lib/api.ts';
 import { ActivationSchema } from '../../lib/schemas.ts';
 import { z } from 'zod';
+import { motion } from 'framer-motion';
+import { CheckCircle2, Lock, User, XCircle } from 'lucide-react';
 
 export function ActivationPage() {
   const [username, setUsername] = useState('');
@@ -14,7 +16,6 @@ export function ActivationPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const toast = useToast();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
 
@@ -23,7 +24,7 @@ export function ActivationPage() {
     setErrors({});
 
     if (!token) {
-      toast('Activation token is missing', 'error');
+      notify.error('Activation token is missing');
       return;
     }
 
@@ -48,114 +49,144 @@ export function ActivationPage() {
 
       if (!res.ok) {
         const errorMsg = await parseApiError(res);
-        toast(errorMsg, 'error');
+        notify.error(errorMsg);
         return;
       }
 
       setIsSuccess(true);
-      toast('Account activated successfully!', 'success');
+      notify.success('Account activated successfully!');
 
       // Redirect directly to dashboard or returnTo URL
       setTimeout(() => {
         const returnTo = searchParams.get('return_to');
+        const dashboardUrl = (import.meta as any).env?.VITE_DASHBOARD_URL;
+
         if (returnTo) {
-          globalThis.location.href = returnTo;
+          if (returnTo.startsWith('/') && !returnTo.startsWith('//')) {
+            if (!dashboardUrl) throw new Error('VITE_DASHBOARD_URL is missing');
+            globalThis.location.href = `${dashboardUrl}${returnTo}`;
+          } else {
+            globalThis.location.href = returnTo;
+          }
         } else {
-          globalThis.location.href = (import.meta as any).env?.VITE_DASHBOARD_URL ||
-            'http://localhost:5175';
+          if (!dashboardUrl) throw new Error('VITE_DASHBOARD_URL is missing');
+          globalThis.location.href = dashboardUrl;
         }
       }, 1500);
     } catch (err: any) {
-      toast(err.message || 'Network error occurred', 'error');
+      notify.error(err.message || 'Network error occurred');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, staggerChildren: 0.1 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+  };
+
   if (isSuccess) {
     return (
-      <div
-        style={{
-          maxWidth: '400px',
-          margin: '40px auto',
-          padding: '24px',
-          textAlign: 'center',
-          fontFamily: 'system-ui, sans-serif',
-        }}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4 }}
+        className='w-full text-center'
       >
-        <h1 style={{ fontSize: '24px', marginBottom: '8px', color: '#166534' }}>
-          Account Activated!
+        <div className='mx-auto w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6'>
+          <CheckCircle2 className='w-8 h-8' />
+        </div>
+        <h1 className='text-3xl font-bold text-gray-900 mb-4'>
+          Akun Diaktifkan!
         </h1>
-        <p style={{ color: '#4b5563', marginBottom: '24px' }}>
-          Your account has been fully activated. Redirecting you to your dashboard...
+        <p className='text-gray-500 mb-8 max-w-sm mx-auto leading-relaxed'>
+          Akun Anda telah sepenuhnya aktif. Mengarahkan Anda ke dasbor...
         </p>
-      </div>
+      </motion.div>
     );
   }
 
   if (!token) {
     return (
-      <div
-        style={{
-          maxWidth: '400px',
-          margin: '40px auto',
-          padding: '24px',
-          textAlign: 'center',
-          fontFamily: 'system-ui, sans-serif',
-        }}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4 }}
+        className='w-full text-center'
       >
-        <h1 style={{ fontSize: '24px', marginBottom: '8px', color: '#991b1b' }}>Invalid Request</h1>
-        <p style={{ color: '#4b5563', marginBottom: '24px' }}>
-          The activation token is missing from the URL. Please use the link provided in your email.
+        <div className='mx-auto w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-6'>
+          <XCircle className='w-8 h-8' />
+        </div>
+        <h1 className='text-3xl font-bold text-gray-900 mb-4'>Permintaan Tidak Valid</h1>
+        <p className='text-gray-500 mb-8 max-w-sm mx-auto leading-relaxed'>
+          Token aktivasi tidak ditemukan atau tidak valid. Silakan periksa email Anda dan gunakan tautan yang diberikan.
         </p>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div
-      style={{
-        maxWidth: '400px',
-        margin: '40px auto',
-        padding: '24px',
-        fontFamily: 'system-ui, sans-serif',
-      }}
+    <motion.div
+      variants={containerVariants}
+      initial='hidden'
+      animate='visible'
+      className='w-full max-w-md mx-auto'
     >
-      <h1 style={{ fontSize: '24px', marginBottom: '8px', color: '#111827' }}>Activate Account</h1>
-      <p style={{ color: '#4b5563', marginBottom: '24px', fontSize: '14px' }}>
-        Welcome! Please choose a username and secure password to complete your account setup.
-      </p>
+      <motion.div variants={itemVariants} className='mb-8'>
+        <h1 className='text-3xl font-bold text-gray-900 mb-2'>Aktifkan Akun</h1>
+        <p className='text-gray-500 text-sm'>
+          Silakan atur nama pengguna dan kata sandi Anda untuk melanjutkan.
+        </p>
+      </motion.div>
 
-      <form onSubmit={handleSubmit} noValidate>
-        <Input
-          label='Choose Username'
-          type='text'
-          value={username}
-          onChange={(e: any) => setUsername(e.target.value)}
-          error={errors.username}
-          disabled={isLoading}
-          placeholder='your_username'
-          autoComplete='username'
-        />
+      <form onSubmit={handleSubmit} noValidate className='space-y-5'>
+        <motion.div variants={itemVariants}>
+          <Input
+            label='Username'
+            type='text'
+            value={username}
+            onChange={(e: any) => setUsername(e.target.value)}
+            error={errors.username}
+            disabled={isLoading}
+            placeholder='nama_keren'
+            autoComplete='username'
+            icon={<User className='w-4 h-4 text-gray-400' />}
+          />
+        </motion.div>
 
-        <Input
-          label='Set Password'
-          type='password'
-          value={password}
-          onChange={(e: any) => setPassword(e.target.value)}
-          error={errors.password}
-          disabled={isLoading}
-          placeholder='••••••••'
-          autoComplete='new-password'
-        />
+        <motion.div variants={itemVariants}>
+          <Input
+            label='Kata Sandi'
+            type='password'
+            value={password}
+            onChange={(e: any) => setPassword(e.target.value)}
+            error={errors.password}
+            disabled={isLoading}
+            placeholder='••••••••'
+            autoComplete='new-password'
+            icon={<Lock className='w-4 h-4 text-gray-400' />}
+          />
+        </motion.div>
 
-        <Button
-          disabled={isLoading}
-          style={{ width: '100%', marginTop: '8px', marginBottom: '16px' }}
-        >
-          {isLoading ? 'Activating...' : 'Activate Account'}
-        </Button>
+        <motion.div variants={itemVariants} className='pt-2'>
+          <Button
+            type='submit'
+            disabled={isLoading}
+            className='w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md transition-all hover:shadow-lg active:scale-[0.98]'
+          >
+            {isLoading ? 'Mengaktifkan...' : 'Aktifkan Akun'}
+          </Button>
+        </motion.div>
       </form>
-    </div>
+    </motion.div>
   );
 }

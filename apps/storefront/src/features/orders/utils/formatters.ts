@@ -13,7 +13,7 @@ export const formatDate = (dateString: string | null | undefined, includeTime = 
   try {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return '-';
-    
+
     const options: Intl.DateTimeFormatOptions = {
       day: 'numeric',
       month: 'long',
@@ -22,9 +22,9 @@ export const formatDate = (dateString: string | null | undefined, includeTime = 
         hour: '2-digit',
         minute: '2-digit',
         timeZoneName: 'short',
-      })
+      }),
     };
-    
+
     return new Intl.DateTimeFormat('id-ID', options).format(date);
   } catch (_e) {
     return '-';

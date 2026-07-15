@@ -1,0 +1,10 @@
+@theme {
+  --text-metadata: 0.75rem; /* 12px */
+  --text-sm: 0.875rem; /* 14px */
+  --text-body: 1rem; /* 16px */
+  --text-lg: 1.125rem; /* 18px */
+  --text-heading-3: 1.5rem; /* 24px */
+  --text-heading-2: 1.875rem; /* 30px */
+  --text-heading-1: 2.25rem; /* 36px */
+  --text-display: 3rem; /* 48px */
+}

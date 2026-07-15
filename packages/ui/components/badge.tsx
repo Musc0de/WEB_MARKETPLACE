@@ -12,16 +12,17 @@ export const Badge: React.ForwardRefExoticComponent<
 >(
   ({ className = '', variant = 'default', ...props }, ref) => {
     const variants = {
-      default: 'border-transparent bg-gray-900 text-gray-50 hover:bg-gray-900/80',
-      secondary: 'border-transparent bg-gray-100 text-gray-900 hover:bg-gray-100/80',
-      destructive: 'border-transparent bg-red-500 text-gray-50 hover:bg-red-500/80',
-      outline: 'text-gray-950',
+      default: 'border-transparent bg-[var(--color-action-primary)] text-white hover:opacity-90',
+      secondary:
+        'border-transparent bg-[var(--color-bg-canvas)] text-[var(--color-text-primary)] hover:bg-[var(--color-border-default)]',
+      destructive: 'border-transparent bg-[var(--color-danger)] text-white hover:opacity-90',
+      outline: 'text-[var(--color-text-primary)] border-[var(--color-border-default)]',
     };
 
     return (
       <div
         ref={ref}
-        className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2 ${
+        className={`inline-flex items-center rounded-[var(--radius-pill)] border px-[var(--spacing-2)] py-[var(--spacing-1)] text-[var(--text-metadata)] font-semibold transition-colors duration-[var(--motion-fast)] focus:outline-none focus:ring-2 focus:ring-[var(--color-action-primary)] focus:ring-offset-2 ${
           variants[variant]
         } ${className}`}
         {...props}

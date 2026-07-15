@@ -125,10 +125,11 @@ export const templates = {
           <tr>
             <td align="center" style="padding-bottom: 24px;">
               <a href="${websiteUrl}" style="text-decoration: none;">
-                ${data.logoUrl 
-                  ? `<img src="${data.logoUrl}" alt="StarSuperScare Marketplace" width="160" style="display: block; max-width: 160px; border: 0;" />` 
-                  : `<h1 style="margin: 0; font-size: 24px; font-weight: bold; color: #1e3a8a;">StarSuperScare Marketplace</h1>`
-                }
+                ${
+        data.logoUrl
+          ? `<img src="${data.logoUrl}" alt="StarSuperScare Marketplace" width="160" style="display: block; max-width: 160px; border: 0;" />`
+          : `<h1 style="margin: 0; font-size: 24px; font-weight: bold; color: #1e3a8a;">StarSuperScare Marketplace</h1>`
+      }
               </a>
             </td>
           </tr>
@@ -244,7 +245,7 @@ Mengalami kendala? Hubungi ${supportEmail}
     const supportEmail = data.supportEmail || 'support@starsuperscare.net';
     const websiteUrl = data.websiteUrl || 'https://www.starsuperscare.net';
     const currentYear = data.currentYear || new Date().getFullYear();
-    
+
     return {
       subject: 'Verifikasi Email Anda — StarSuperScare Marketplace',
       html: `
@@ -330,10 +331,11 @@ Mengalami kendala? Hubungi ${supportEmail}
           <tr>
             <td align="center" style="padding-bottom: 24px;">
               <a href="${websiteUrl}" style="text-decoration: none;">
-                ${data.logoUrl 
-                  ? `<img src="${data.logoUrl}" alt="StarSuperScare Marketplace" width="160" style="display: block; max-width: 160px; border: 0;" />` 
-                  : `<h1 style="margin: 0; font-size: 24px; font-weight: bold; color: #1e3a8a;">StarSuperScare Marketplace</h1>`
-                }
+                ${
+        data.logoUrl
+          ? `<img src="${data.logoUrl}" alt="StarSuperScare Marketplace" width="160" style="display: block; max-width: 160px; border: 0;" />`
+          : `<h1 style="margin: 0; font-size: 24px; font-weight: bold; color: #1e3a8a;">StarSuperScare Marketplace</h1>`
+      }
               </a>
             </td>
           </tr>

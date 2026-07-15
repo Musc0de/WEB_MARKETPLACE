@@ -36,7 +36,8 @@ export function useNotifications() {
     const connectSSE = () => {
       // Connect to the stream endpoint
       // Ensure we use the proper API URL
-      const apiUrl = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8000';
+      const apiUrl = (import.meta as any).env?.VITE_API_URL;
+      if (!apiUrl) throw new Error('VITE_API_URL is missing in environment variables');
       eventSource = new EventSource(`${apiUrl}/v1/notifications/stream`, {
         withCredentials: true,
       });

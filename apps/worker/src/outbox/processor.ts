@@ -77,7 +77,9 @@ export async function processOutboxEvent(event: typeof outboxEvents.$inferSelect
         errorDetails,
         availableAt: nextAvailableAt.toISOString(),
       }).where(eq(outboxEvents.id, event.id));
-      console.log(`[Processor] Updated event ${event.id} (${event.type}) to pending with retryCount ${nextRetryCount}`);
+      console.log(
+        `[Processor] Updated event ${event.id} (${event.type}) to pending with retryCount ${nextRetryCount}`,
+      );
     }
   }
 }

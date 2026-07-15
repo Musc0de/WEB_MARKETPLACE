@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@starsuperscare/ui';
 import { Input } from '../../components/ui/Input.tsx';
-import { useToast } from '../../components/ui/ToastProvider.tsx';
+import { notify } from '@starsuperscare/ui';
 import { apiClient, parseApiError } from '../../lib/api.ts';
 import { ResetPasswordSchema } from '../../lib/schemas.ts';
 import { z } from 'zod';
+import { motion } from 'framer-motion';
+import { CheckCircle2, Lock, XCircle } from 'lucide-react';
 
 export function ResetPasswordPage() {
   const [password, setPassword] = useState('');
@@ -13,7 +15,6 @@ export function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const toast = useToast();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
 
@@ -22,7 +23,7 @@ export function ResetPasswordPage() {
     setErrors({});
 
     if (!token) {
-      toast('Reset token is missing from the URL', 'error');
+      notify.error('Reset token is missing from the URL');
       return;
     }
 
@@ -47,103 +48,122 @@ export function ResetPasswordPage() {
 
       if (!res.ok) {
         const errorMsg = await parseApiError(res);
-        toast(errorMsg, 'error');
+        notify.error(errorMsg);
         return;
       }
 
       setIsSuccess(true);
-      toast('Password reset successfully!', 'success');
+      notify.success('Password reset successfully!');
     } catch (err: any) {
-      toast(err.message || 'Network error occurred', 'error');
+      notify.error(err.message || 'Network error occurred');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, staggerChildren: 0.1 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+  };
+
   if (isSuccess) {
     return (
-      <div
-        style={{
-          maxWidth: '400px',
-          margin: '40px auto',
-          padding: '24px',
-          textAlign: 'center',
-          fontFamily: 'system-ui, sans-serif',
-        }}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4 }}
+        className='w-full text-center'
       >
-        <h1 style={{ fontSize: '24px', marginBottom: '8px', color: '#166534' }}>
-          Password Updated
+        <div className='mx-auto w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6'>
+          <CheckCircle2 className='w-8 h-8' />
+        </div>
+        <h1 className='text-3xl font-bold text-gray-900 mb-4'>
+          Kata Sandi Diperbarui
         </h1>
-        <p style={{ color: '#4b5563', marginBottom: '24px' }}>
-          Your password has been successfully reset. All previous sessions have been revoked for
-          your security.
+        <p className='text-gray-500 mb-8 max-w-sm mx-auto leading-relaxed'>
+          Kata sandi Anda telah berhasil diatur ulang. Semua sesi sebelumnya telah dibatalkan demi keamanan Anda.
         </p>
-        <Link to='/login' style={{ color: '#4f46e5', textDecoration: 'none', fontWeight: 500 }}>
-          Go to Login
+        <Link
+          to='/login'
+          className='inline-flex justify-center px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-sm'
+        >
+          Masuk ke Akun
         </Link>
-      </div>
+      </motion.div>
     );
   }
 
   if (!token) {
     return (
-      <div
-        style={{
-          maxWidth: '400px',
-          margin: '40px auto',
-          padding: '24px',
-          textAlign: 'center',
-          fontFamily: 'system-ui, sans-serif',
-        }}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4 }}
+        className='w-full text-center'
       >
-        <h1 style={{ fontSize: '24px', marginBottom: '8px', color: '#991b1b' }}>Invalid Request</h1>
-        <p style={{ color: '#4b5563', marginBottom: '24px' }}>
-          The password reset token is missing. Please request a new password reset link.
+        <div className='mx-auto w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-6'>
+          <XCircle className='w-8 h-8' />
+        </div>
+        <h1 className='text-3xl font-bold text-gray-900 mb-4'>Permintaan Tidak Valid</h1>
+        <p className='text-gray-500 mb-8 max-w-sm mx-auto leading-relaxed'>
+          Token atur ulang kata sandi tidak ditemukan atau tidak valid. Silakan minta tautan atur ulang kata sandi yang baru.
         </p>
         <Link
           to='/forgot-password'
-          style={{ color: '#4f46e5', textDecoration: 'none', fontWeight: 500 }}
+          className='inline-flex justify-center px-6 py-2.5 bg-indigo-50 text-indigo-600 font-semibold rounded-lg hover:bg-indigo-100 transition-colors'
         >
-          Request New Link
+          Minta Tautan Baru
         </Link>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div
-      style={{
-        maxWidth: '400px',
-        margin: '40px auto',
-        padding: '24px',
-        fontFamily: 'system-ui, sans-serif',
-      }}
+    <motion.div
+      variants={containerVariants}
+      initial='hidden'
+      animate='visible'
+      className='w-full max-w-md mx-auto'
     >
-      <h1 style={{ fontSize: '24px', marginBottom: '8px', color: '#111827' }}>Reset Password</h1>
-      <p style={{ color: '#4b5563', marginBottom: '24px', fontSize: '14px' }}>
-        Please enter your new password below.
-      </p>
+      <motion.div variants={itemVariants} className='mb-8'>
+        <h1 className='text-3xl font-bold text-gray-900 mb-2'>Atur Kata Sandi Baru</h1>
+        <p className='text-gray-500 text-sm'>Silakan masukkan kata sandi baru Anda di bawah ini.</p>
+      </motion.div>
 
-      <form onSubmit={handleSubmit} noValidate>
-        <Input
-          label='New Password'
-          type='password'
-          value={password}
-          onChange={(e: any) => setPassword(e.target.value)}
-          error={errors.password}
-          disabled={isLoading}
-          placeholder='••••••••'
-          autoComplete='new-password'
-        />
+      <form onSubmit={handleSubmit} noValidate className='space-y-5'>
+        <motion.div variants={itemVariants}>
+          <Input
+            label='Kata Sandi Baru'
+            type='password'
+            value={password}
+            onChange={(e: any) => setPassword(e.target.value)}
+            error={errors.password}
+            disabled={isLoading}
+            placeholder='••••••••'
+            autoComplete='new-password'
+            icon={<Lock className='w-4 h-4 text-gray-400' />}
+          />
+        </motion.div>
 
-        <Button
-          type='submit'
-          disabled={isLoading}
-          style={{ width: '100%', marginTop: '8px', marginBottom: '16px' }}
-        >
-          {isLoading ? 'Updating...' : 'Update Password'}
-        </Button>
+        <motion.div variants={itemVariants} className='pt-2'>
+          <Button
+            type='submit'
+            disabled={isLoading}
+            className='w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md transition-all hover:shadow-lg active:scale-[0.98]'
+          >
+            {isLoading ? 'Memperbarui...' : 'Atur Ulang Kata Sandi'}
+          </Button>
+        </motion.div>
       </form>
-    </div>
+    </motion.div>
   );
 }

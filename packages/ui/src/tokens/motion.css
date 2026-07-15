@@ -1,0 +1,5 @@
+@theme {
+  --motion-fast: 150ms;
+  --motion-standard: 200ms;
+  --motion-emphasized: 300ms;
+}

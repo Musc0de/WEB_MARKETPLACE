@@ -1,18 +1,23 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { ProductDetail, ProductListItem } from '@starsuperscare/contracts';
+import { toast } from '@starsuperscare/ui';
 import { client } from '../../../lib/api.ts';
+import { useCart } from '../../cart/api/useCart.ts';
 import { ProductCard } from './ProductCard.tsx';
 import { ProductCardSkeleton } from './ProductCardSkeleton.tsx';
 
 export const RelatedProducts = ({ product }: { product: ProductDetail }) => {
   const [related, setRelated] = useState<ProductListItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { addItem } = useCart();
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchRelated = async () => {
       try {
         setLoading(true);
-        // Build query for related products: same category if available, else newest
         const categoryId = product.categories.length > 0 ? product.categories[0].id : undefined;
 
         const res = await client.v1.catalog.products.$get({
@@ -26,12 +31,10 @@ export const RelatedProducts = ({ product }: { product: ProductDetail }) => {
 
         if (res.ok) {
           const payload = await res.json();
-          // Filter out the current product
           const items = payload.data.items.filter((p) => p.id !== product.id).slice(0, 4);
           setRelated(items);
         }
       } catch (err) {
-        // Silently fail for related products and show nothing
         console.error(err);
       } finally {
         setLoading(false);
@@ -40,6 +43,32 @@ export const RelatedProducts = ({ product }: { product: ProductDetail }) => {
 
     fetchRelated();
   }, [product.id, product.categories]);
+
+  const handleAction = async (p: ProductListItem, isBuyNow: boolean) => {
+    if (actionLoading) return;
+    try {
+      setActionLoading(p.id);
+      const res = await client.v1.catalog.products[':slug'].$get({ param: { slug: p.slug } });
+      if (!res.ok) throw new Error('Produk tidak ditemukan');
+      const detail = (await res.json()).data;
+      if (!detail.variants || detail.variants.length === 0) {
+        toast.error('Produk tidak memiliki varian tersedia');
+        return;
+      }
+      await addItem(detail.variants[0].id, 1);
+      if (isBuyNow) {
+        navigate('/checkout');
+      } else {
+        toast.success(`${p.name} ditambahkan ke keranjang`, {
+          action: { label: 'Lihat Keranjang', onClick: () => navigate('/cart') },
+        } as any);
+      }
+    } catch (_e) {
+      toast.error('Gagal memproses aksi. Coba lagi.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -56,7 +85,15 @@ export const RelatedProducts = ({ product }: { product: ProductDetail }) => {
   return (
     <div className='mt-4'>
       <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-        {related.map((p) => <ProductCard key={p.id} product={p} />)}
+        {related.map((p) => (
+          <ProductCard
+            key={p.id}
+            product={p}
+            isLoading={actionLoading === p.id}
+            onAddToCart={(pItem) => handleAction(pItem, false)}
+            onBuyNow={(pItem) => handleAction(pItem, true)}
+          />
+        ))}
       </div>
     </div>
   );

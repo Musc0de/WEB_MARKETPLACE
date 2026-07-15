@@ -3,6 +3,7 @@ import { zValidator } from '../../middleware/validator.ts';
 import { AuthContext, optionalAuthMiddleware } from '../../middleware/auth.ts';
 import { resolveActiveCart } from '../cart/cart.ts';
 import {
+  addresses,
   cartItems,
   db,
   inventoryLevels,
@@ -11,7 +12,6 @@ import {
   orders,
   products,
   productVariants,
-  addresses,
 } from '@starsuperscare/database';
 import { and, eq, sql } from 'drizzle-orm';
 import {
@@ -299,7 +299,9 @@ checkoutRouter.post('/orders', zValidator('json', CreateOrderRequestSchema), asy
       // 4.5. Automatically save address to user's address book if they are logged in
       if (session?.userId) {
         // Check if user already has any addresses
-        const existingAddresses = await tx.select({ id: addresses.id }).from(addresses).where(eq(addresses.userId, session.userId)).limit(1);
+        const existingAddresses = await tx.select({ id: addresses.id }).from(addresses).where(
+          eq(addresses.userId, session.userId),
+        ).limit(1);
         if (existingAddresses.length === 0) {
           await tx.insert(addresses).values({
             userId: session.userId,

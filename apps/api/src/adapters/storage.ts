@@ -26,5 +26,6 @@ export class LocalStorageAdapter implements StoragePort {
 }
 
 // In a real scenario, this would be injected via DI or configured based on env vars
-const API_URL = Deno.env.get('API_URL') || 'http://localhost:8000';
+const API_URL = Deno.env.get('VITE_API_URL');
+if (!API_URL) throw new Error('VITE_API_URL is missing in environment variables');
 export const storageAdapter: StoragePort = new LocalStorageAdapter(API_URL);

@@ -18,9 +18,7 @@ export const csrfProtection = (allowedOrigins: string[]) => {
 
       // If the request has an origin, check it
       if (origin && !allowedOrigins.includes(origin)) {
-        if (!origin.startsWith('http://localhost:') && !origin.startsWith('http://127.0.0.1:')) {
-          throw new HTTPException(403, { message: 'CSRF token mismatch or invalid origin' });
-        }
+        throw new HTTPException(403, { message: 'CSRF token mismatch or invalid origin' });
       }
 
       // If no origin but has referer, check referer
@@ -28,12 +26,7 @@ export const csrfProtection = (allowedOrigins: string[]) => {
         try {
           const refererUrl = new URL(referer);
           if (!allowedOrigins.includes(refererUrl.origin)) {
-            if (
-              !refererUrl.origin.startsWith('http://localhost:') &&
-              !refererUrl.origin.startsWith('http://127.0.0.1:')
-            ) {
-              throw new HTTPException(403, { message: 'CSRF token mismatch or invalid referer' });
-            }
+            throw new HTTPException(403, { message: 'CSRF token mismatch or invalid referer' });
           }
         } catch (_e) {
           throw new HTTPException(403, { message: 'Invalid referer header' });

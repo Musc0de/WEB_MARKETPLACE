@@ -26,7 +26,7 @@ export class HandlerRegistry {
 export const defaultRegistry = new HandlerRegistry();
 
 import { handleOrderPaid } from '../handlers/invoice.ts';
-import { handleEmailSend, handleEmailVerificationRequested } from '../handlers/email.ts';
+import { handleEmailSend, handleEmailVerificationRequested, handlePasswordResetRequested } from '../handlers/email.ts';
 import { handleProvisionAccount } from '../jobs/provision-account.ts';
 import { handleNotificationCreate } from '../jobs/notifications.ts';
 
@@ -36,6 +36,7 @@ export function initializeHandlers(registry: HandlerRegistry = defaultRegistry) 
   registry.register('notification.create', handleNotificationCreate);
   registry.register('email.send', handleEmailSend);
   registry.register('email_verification_requested', handleEmailVerificationRequested);
+  registry.register('password_reset_requested', handlePasswordResetRequested);
 
   registry.register('test.error', () => {
     throw new Error('Simulated failure');

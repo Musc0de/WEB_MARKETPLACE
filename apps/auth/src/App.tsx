@@ -1,6 +1,7 @@
 import { ErrorBoundary } from 'react-error-boundary';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { ToastProvider } from './components/ui/ToastProvider.tsx';
+import { ResponsiveGooeyToaster } from '@starsuperscare/ui';
+import { AuthLayout } from './components/layout/AuthLayout.tsx';
 
 import { LoginPage } from './features/login/LoginPage.tsx';
 import { SignupPage } from './features/signup/SignupPage.tsx';
@@ -10,17 +11,18 @@ import { ActivationPage } from './features/activation/ActivationPage.tsx';
 import { VerifyEmailPage } from './features/activation/VerifyEmailPage.tsx';
 import { ClaimOrderPage } from './features/claim/ClaimOrderPage.tsx';
 
+import { HelpPage } from './features/legal/HelpPage.tsx';
+import { PrivacyPage } from './features/legal/PrivacyPage.tsx';
+import { TermsPage } from './features/legal/TermsPage.tsx';
+
 const Fallback = ({ error }: { error: Error }) => (
-  <div role='alert' style={{ padding: '2rem', fontFamily: 'system-ui, sans-serif' }}>
-    <h1 style={{ color: '#991b1b' }}>Something went wrong</h1>
-    <pre
-      style={{ backgroundColor: '#f3f4f6', padding: '1rem', borderRadius: '4px' }}
-    >{error.message}</pre>
+  <div role='alert' className='p-8'>
+    <h1 className='text-red-600 font-bold'>Something went wrong</h1>
+    <pre className='bg-gray-100 p-4 mt-2'>{error.message}</pre>
     <button
       type='button'
-      onClick={() =>
-        globalThis.location.reload()}
-      style={{ padding: '8px 16px', marginTop: '1rem' }}
+      onClick={() => globalThis.location.reload()}
+      className='mt-4 px-4 py-2 border rounded'
     >
       Reload Page
     </button>
@@ -28,17 +30,18 @@ const Fallback = ({ error }: { error: Error }) => (
 );
 
 const NotFound = () => (
-  <div style={{ padding: '2rem', fontFamily: 'system-ui, sans-serif', textAlign: 'center' }}>
-    <h1>404 - Not Found</h1>
-    <p>The page you are looking for does not exist.</p>
+  <div className='text-center py-8'>
+    <h1 className='font-bold text-xl'>404 - Not Found</h1>
+    <p className='text-gray-500'>The page you are looking for does not exist.</p>
   </div>
 );
 
 export default function App() {
   return (
     <ErrorBoundary FallbackComponent={Fallback}>
-      <ToastProvider>
-        <BrowserRouter>
+      <ResponsiveGooeyToaster />
+      <BrowserRouter>
+        <AuthLayout>
           <Routes>
             <Route path='/' element={<Navigate to='/login' replace />} />
             <Route path='/login' element={<LoginPage />} />
@@ -48,10 +51,13 @@ export default function App() {
             <Route path='/activate' element={<ActivationPage />} />
             <Route path='/verify-email' element={<VerifyEmailPage />} />
             <Route path='/claim-order' element={<ClaimOrderPage />} />
+            <Route path='/help' element={<HelpPage />} />
+            <Route path='/privacy' element={<PrivacyPage />} />
+            <Route path='/terms' element={<TermsPage />} />
             <Route path='*' element={<NotFound />} />
           </Routes>
-        </BrowserRouter>
-      </ToastProvider>
+        </AuthLayout>
+      </BrowserRouter>
     </ErrorBoundary>
   );
 }

@@ -185,4 +185,23 @@ export async function runCleanupJobs() {
   } catch (err) {
     console.error(`[cleanup] Error archiving outbox events:`, err);
   }
+
+  // 7. Cleanup Stuck Outbox Events
+  try {
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const stuckEvents = await db.update(outboxEvents)
+      .set({ state: 'pending' })
+      .where(
+        and(
+          eq(outboxEvents.state, 'processing'),
+          lte(outboxEvents.availableAt, fiveMinutesAgo),
+        ),
+      )
+      .returning({ id: outboxEvents.id });
+    if (stuckEvents.length > 0) {
+      console.log(`[cleanup] Reset ${stuckEvents.length} stuck outbox events back to pending.`);
+    }
+  } catch (err) {
+    console.error(`[cleanup] Error resetting stuck outbox events:`, err);
+  }
 }

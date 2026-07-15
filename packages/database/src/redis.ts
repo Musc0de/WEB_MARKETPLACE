@@ -17,10 +17,13 @@ const getRedisUrl = (): string => {
   } catch (_e) {
     // Ignore error
   }
-  return 'redis://localhost:6379';
+  return '';
 };
 
-const redisUrl = getRedisUrl() || 'redis://localhost:6379';
+const redisUrl = getRedisUrl();
+if (!redisUrl) {
+  throw new Error('REDIS_URL is missing in environment variables');
+}
 
 // Single shared connection for general operations
 export const redis: RedisNamed = new (RedisClass as any)(redisUrl);

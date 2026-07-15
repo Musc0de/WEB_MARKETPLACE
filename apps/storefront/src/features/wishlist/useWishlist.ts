@@ -29,7 +29,8 @@ export const useWishlist = create<WishlistState>()(
           },
         });
 
-        const hasSession = typeof document !== 'undefined' && document.cookie.includes('sss_session');
+        const hasSession = typeof document !== 'undefined' &&
+          document.cookie.includes('sss_session');
 
         if (!hasSession) {
           if (!isWished) {

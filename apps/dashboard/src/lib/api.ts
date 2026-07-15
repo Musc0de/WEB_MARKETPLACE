@@ -1,24 +1,17 @@
 import { hc } from 'hono/client';
 import type { AppType } from '../../../api/src/app.ts';
 
-// Get the API URL from environment variables, fallback to localhost for development
-let apiUrl = 'http://localhost:8000';
-if (typeof (import.meta as any).env !== 'undefined') {
-  apiUrl = (import.meta as any).env.VITE_API_URL || apiUrl;
+const envApiUrl = (import.meta as any).env?.VITE_API_URL;
+if (!envApiUrl) {
+  throw new Error('VITE_API_URL is missing in environment variables');
 }
-if (typeof globalThis !== 'undefined' && globalThis.location?.hostname === '127.0.0.1') {
-  apiUrl = apiUrl.replace('localhost', '127.0.0.1');
-}
-export const API_URL = apiUrl;
+export const API_URL = envApiUrl;
 
-let authUrl = 'http://localhost:5174';
-if (typeof (import.meta as any).env !== 'undefined') {
-  authUrl = (import.meta as any).env.VITE_AUTH_URL || authUrl;
+const envAuthUrl = (import.meta as any).env?.VITE_AUTH_URL;
+if (!envAuthUrl) {
+  throw new Error('VITE_AUTH_URL is missing in environment variables');
 }
-if (typeof globalThis !== 'undefined' && globalThis.location?.hostname === '127.0.0.1') {
-  authUrl = authUrl.replace('localhost', '127.0.0.1');
-}
-export const AUTH_URL = authUrl;
+export const AUTH_URL = envAuthUrl;
 
 // Initialize the RPC client
 export const client = hc<AppType>(API_URL, {

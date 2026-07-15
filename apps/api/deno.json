@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "exports": "./src/main.ts",
   "tasks": {
-    "dev": "deno run --env --watch -A src/main.ts",
-    "start": "deno run --env -A src/main.ts",
+    "dev": "deno run --env --watch -A --unstable-no-legacy-abort src/main.ts",
+    "start": "deno run --env -A --unstable-no-legacy-abort src/main.ts",
     "test": "deno test --env -A"
   },
   "imports": {

@@ -1,5 +1,5 @@
 import * as path from 'node:path';
-import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 /**
  * A mock object storage provider that saves files to the local file system.
@@ -66,7 +66,8 @@ const __dirname = import.meta.dirname || '';
 // __dirname is packages/storage/src
 const WORKSPACE_ROOT = path.resolve(__dirname, '../../..');
 const MOCK_STORAGE_DIR = path.join(WORKSPACE_ROOT, 'data', 'storage');
-const API_BASE_URL = Deno.env.get('API_URL') || 'http://localhost:8000';
+const API_BASE_URL = Deno.env.get('VITE_API_URL') || Deno.env.get('API_URL');
+if (!API_BASE_URL) throw new Error('VITE_API_URL is missing in environment variables');
 
 /** Default storage instance */
 export const storage: ObjectStorageProvider = new LocalStorageProvider(

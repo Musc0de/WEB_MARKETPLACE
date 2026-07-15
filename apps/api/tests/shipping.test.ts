@@ -37,12 +37,12 @@ Deno.test('Shipping Webhooks API', async (t) => {
     const req = new Request('http://localhost/v1/webhooks/shipping/JNE', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        trackingNumber, 
+      body: JSON.stringify({
+        trackingNumber,
         eventId: 'evt-123',
         status: 'delivered',
         description: 'Test description',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }),
     });
     const res = await app.fetch(req);

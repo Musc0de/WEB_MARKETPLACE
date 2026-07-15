@@ -1,0 +1,72 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches:
+      - staging
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Cache Deno Dependencies
+        run: deno task build
+        env:
+          DENO_DIR: my_cache_dir
+
+      - name: Run Type Check & Linting
+        run: deno task quality
+
+      - name: Run Unit Tests
+        run: deno test --allow-all
+
+  deploy-api:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: Deploy API to Deno Deploy
+        uses: denoland/deployctl@v1
+        with:
+          project: "starsuperscare-api-staging"
+          entrypoint: "apps/api/src/server.ts"
+          root: "."
+        env:
+          DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
+
+  deploy-frontends:
+    needs: deploy-api
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node (For Vite Build)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build Storefront
+        run: deno task build --filter @starsuperscare/storefront
+
+      # Add deploy steps for Vercel/Netlify/Cloudflare Pages depending on the hosting provider for the frontend
+      # E.g., deploying Storefront, Dashboard, Auth to Cloudflare Pages
+      - name: Deploy Storefront to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          projectName: starsuperscare-storefront-staging
+          directory: apps/storefront/dist
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}

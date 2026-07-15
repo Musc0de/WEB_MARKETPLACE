@@ -12,7 +12,8 @@ export function AuthGuard({ children, requirePermission }: AuthGuardProps) {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      const authUrl = (import.meta as any).env?.VITE_AUTH_URL || 'http://localhost:5174';
+      const authUrl = (import.meta as any).env?.VITE_AUTH_URL;
+      if (!authUrl) throw new Error('VITE_AUTH_URL is missing in environment variables');
       globalThis.location.href = `${authUrl}/login?return_to=${
         encodeURIComponent(globalThis.location.href)
       }`;

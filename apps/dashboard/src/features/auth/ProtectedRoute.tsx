@@ -8,9 +8,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isLoading && (!session || isError)) {
       // Redirect to auth if not logged in
-      const currentUrl = encodeURIComponent(
-        globalThis.location.pathname + globalThis.location.search,
-      );
+      const currentUrl = encodeURIComponent(globalThis.location.href);
       globalThis.location.href = `${AUTH_URL}/login?return_to=${currentUrl}`;
     }
   }, [session, isLoading, isError]);
