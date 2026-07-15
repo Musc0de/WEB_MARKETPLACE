@@ -72,8 +72,8 @@ export const RelatedProducts = ({ product }: { product: ProductDetail }) => {
 
   if (loading) {
     return (
-      <div className='grid grid-cols-2 md:grid-cols-4 gap-4 mt-4'>
-        {Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)}
+      <div className='grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 mt-3'>
+        {Array.from({ length: 5 }).map((_, i) => <ProductCardSkeleton key={i} />)}
       </div>
     );
   }
@@ -83,8 +83,8 @@ export const RelatedProducts = ({ product }: { product: ProductDetail }) => {
   }
 
   return (
-    <div className='mt-4'>
-      <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+    <div className='mt-3'>
+      <div className='grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2'>
         {related.map((p) => (
           <ProductCard
             key={p.id}

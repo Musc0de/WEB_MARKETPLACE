@@ -49,3 +49,5 @@ UI/UX V2 mencakup:
 ## Cara menerapkan UI/UX patch
 
 Baca `APPLY-UIUX-V2-PATCH.md`. Patch hanya menimpa dokumentasi Markdown dan tidak menimpa source code atau secret.
+
+## Catatan: .git/hooks/pre-commit hanya aktif di mesin ini. Kalau ada developer lain clone ulang, mereka perlu setup hook-nya sendiri. Untuk team, bisa pakai Husky atau simpan hook di folder .hooks/ dan dokumenkan di README.

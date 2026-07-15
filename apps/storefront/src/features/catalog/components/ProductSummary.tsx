@@ -69,18 +69,29 @@ export const ProductSummary = ({ product }: { product: ProductDetail }) => {
 
   return (
     <div className='flex flex-col'>
-      <div className='flex items-center gap-2 mb-2 text-gray-500'>
-        <Text className='font-medium text-blue-600 hover:underline cursor-pointer'>
+      {/* Brand · Rating · Sold row */}
+      <div className='flex items-center flex-wrap gap-x-2 gap-y-1 mb-2'>
+        <span className='text-xs font-semibold text-blue-600 hover:underline cursor-pointer'>
           {product.brand?.name || 'Unbranded'}
-        </Text>
-        <span>•</span>
-        <span className='flex items-center gap-1 text-sm text-yellow-500'>
-          <Star className='w-4 h-4 fill-current' />
-          <span className='text-gray-700'>{product.averageRating.toFixed(1)}</span>
-          <span className='text-gray-400'>({product.reviewCount})</span>
         </span>
-        <span>•</span>
-        <Text className='text-sm'>{formatIndonesianSold(product.netSold)}</Text>
+        <span className='text-gray-300 text-xs'>|</span>
+        <span className='flex items-center gap-0.5 text-xs text-yellow-500'>
+          <Star className='w-3.5 h-3.5 fill-current' />
+          <span className='text-gray-700 font-medium'>
+            {product.reviewCount > 0 ? product.averageRating.toFixed(1) : 'Belum ada rating'}
+          </span>
+          {product.reviewCount > 0 && (
+            <span className='text-gray-400'>
+              ({product.reviewCount} ulasan)
+            </span>
+          )}
+        </span>
+        <span className='text-gray-300 text-xs'>|</span>
+        <span className='text-xs text-gray-500'>
+          {product.netSold > 0
+            ? `${formatIndonesianSold(product.netSold)} terjual`
+            : 'Belum ada penjualan'}
+        </span>
       </div>
 
       <H1 className='text-2xl md:text-3xl font-bold mb-4 text-gray-900'>{product.name}</H1>

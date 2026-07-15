@@ -1,17 +1,6 @@
 import { useState } from 'react';
 import type { ProductListItem } from '@starsuperscare/contracts';
-import {
-  Badge,
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
-  formatIDR,
-  formatIndonesianSold,
-  H4,
-  Small,
-  Text,
-} from '@starsuperscare/ui';
+import { formatIDR, formatIndonesianSold } from '@starsuperscare/ui';
 import { CheckCircle, Loader2, ShoppingCart, Star } from 'lucide-react';
 import { WishlistButton } from '../../wishlist/components/WishlistButton.tsx';
 
@@ -28,19 +17,15 @@ export const ProductCard = (
   const [cartSuccess, setCartSuccess] = useState(false);
   const isOutOfStock = product.variantsSummary.totalAvailableStock <= 0;
 
-  // Format price
   const { minPrice, maxPrice } = product.variantsSummary;
-  let priceDisplay = formatIDR(minPrice);
-  if (maxPrice && maxPrice > minPrice) {
-    priceDisplay = `${formatIDR(minPrice)} - ${formatIDR(maxPrice)}`;
-  }
+  const priceDisplay = maxPrice && maxPrice > minPrice
+    ? `${formatIDR(minPrice)}`
+    : formatIDR(minPrice);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     if (isOutOfStock || isLoading) return;
     onAddToCart?.(product);
-
-    // Briefly show success state on the button
     setCartSuccess(true);
     setTimeout(() => setCartSuccess(false), 1500);
   };
@@ -52,29 +37,31 @@ export const ProductCard = (
   };
 
   return (
-    <Card className='flex flex-col h-full overflow-hidden transition-all hover:shadow-lg group relative'>
-      {/* Badges */}
-      <div className='absolute top-2 left-2 flex flex-col gap-1 z-10'>
+    <div className='flex flex-col bg-white rounded-lg border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 group relative'>
+      {/* Badge: Baru / Habis */}
+      <div className='absolute top-1.5 left-1.5 flex flex-col gap-0.5 z-10'>
         {product.netSold === 0 && !isOutOfStock && (
-          <Badge className='bg-blue-500 hover:bg-blue-600 border-none font-bold shadow-sm'>
+          <span className='bg-blue-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm'>
             Baru
-          </Badge>
+          </span>
         )}
         {isOutOfStock && (
-          <Badge variant='destructive' className='font-bold shadow-sm'>
+          <span className='bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm'>
             Habis
-          </Badge>
+          </span>
         )}
       </div>
 
+      {/* Wishlist button */}
       <WishlistButton
         productId={product.id}
-        className='absolute top-2 right-2 z-10 bg-white/80 backdrop-blur-sm shadow-sm'
+        className='absolute top-1.5 right-1.5 z-10 bg-white/80 backdrop-blur-sm shadow-sm w-6 h-6 p-0.5 rounded-full'
+        iconClassName='w-3.5 h-3.5'
       />
 
-      {/* Image Area */}
+      {/* Image — compact square */}
       <a href={`/products/${product.slug}`} className='block'>
-        <div className='aspect-square relative bg-gray-100 overflow-hidden'>
+        <div className='aspect-square relative bg-gray-50 overflow-hidden'>
           {product.primaryImage
             ? (
               <img
@@ -85,85 +72,95 @@ export const ProductCard = (
                 }`}
                 loading='lazy'
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src =
-                    'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22200%22%20height%3D%22200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20200%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder%20text%20%7B%20fill%3A%23999%3Bfont-weight%3Anormal%3Bfont-family%3Asans-serif%3Bfont-size%3A14pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder%22%3E%3Crect%20width%3D%22200%22%20height%3D%22200%22%20fill%3D%22%23f3f4f6%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%2260%22%20y%3D%22105%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E';
+                  (e.target as HTMLImageElement).style.display = 'none';
                 }}
               />
             )
             : (
-              <div className='flex items-center justify-center w-full h-full text-gray-400 text-sm'>
+              <div className='flex items-center justify-center w-full h-full text-gray-300 text-xs select-none'>
                 No Image
               </div>
             )}
         </div>
       </a>
 
-      <CardContent className='flex flex-col flex-grow p-4 gap-2'>
-        <Small className='text-gray-500 line-clamp-1 h-5'>
+      {/* Content */}
+      <div className='flex flex-col flex-grow px-2 py-2 gap-0.5'>
+        {/* Brand */}
+        <span className='text-[10px] text-gray-400 truncate'>
           {product.brandId ? 'Brand' : 'Unbranded'}
-        </Small>
+        </span>
 
+        {/* Name */}
         <a href={`/products/${product.slug}`}>
-          <Text className='font-medium line-clamp-2 leading-tight h-10 group-hover:text-blue-600 transition-colors'>
+          <p className='text-xs font-medium text-gray-800 line-clamp-2 leading-tight min-h-[2.5rem] group-hover:text-blue-600 transition-colors'>
             {product.name}
-          </Text>
+          </p>
         </a>
 
-        <div className='mt-auto pt-2'>
-          <H4
-            className={`font-bold ${isOutOfStock ? 'text-gray-400' : 'text-gray-900'}`}
-          >
-            {priceDisplay}
-          </H4>
-
-          <div className='flex items-center gap-2 mt-2 text-xs text-gray-500'>
-            <div className='flex items-center text-yellow-500'>
-              <Star className='w-3.5 h-3.5 fill-current mr-1' />
-              <span className='font-medium'>
-                {product.averageRating > 0 ? product.averageRating.toFixed(1) : '-'}
-              </span>
-            </div>
-            {product.reviewCount > 0 && <span>({product.reviewCount})</span>}
-            <span className='w-1 h-1 rounded-full bg-gray-300'></span>
-            <span>{formatIndonesianSold(product.netSold)}</span>
-          </div>
-        </div>
-      </CardContent>
-
-      <CardFooter className='p-4 pt-0 gap-2'>
-        <Button
-          variant='outline'
-          className='flex-1 w-full'
-          onClick={handleBuyNow}
-          disabled={isOutOfStock || isLoading}
-          aria-label={isOutOfStock ? 'Stok habis' : 'Beli Langsung'}
+        {/* Price */}
+        <p
+          className={`text-sm font-bold mt-0.5 ${isOutOfStock ? 'text-gray-400' : 'text-gray-900'}`}
         >
-          {isLoading ? <Loader2 className='w-4 h-4 animate-spin' /> : 'Beli'}
-        </Button>
-        <Button
-          variant='default'
-          className={`flex-1 w-full flex items-center justify-center gap-2 transition-all duration-300 ${
-            cartSuccess ? 'bg-green-600 hover:bg-green-700' : ''
-          }`}
-          onClick={handleAddToCart}
-          disabled={isOutOfStock || isLoading}
-          aria-label={isOutOfStock ? 'Stok habis' : 'Tambah ke Keranjang'}
-        >
-          {isLoading ? <Loader2 className='w-4 h-4 animate-spin' /> : cartSuccess
+          {priceDisplay}
+          {maxPrice && maxPrice > minPrice && (
+            <span className='text-[10px] font-normal text-gray-400 ml-0.5'>
+              ~
+            </span>
+          )}
+        </p>
+
+        {/* Rating · Sold */}
+        <div className='flex items-center gap-1 text-[10px] text-gray-400 mt-0.5'>
+          {product.averageRating > 0
             ? (
-              <>
-                <CheckCircle className='w-4 h-4' />
-                <span className='sr-only sm:not-sr-only'>Ditambahkan!</span>
-              </>
+              <span className='flex items-center gap-0.5 text-yellow-500'>
+                <Star className='w-2.5 h-2.5 fill-current' />
+                <span className='text-gray-600 font-medium'>
+                  {product.averageRating.toFixed(1)}
+                </span>
+              </span>
             )
-            : (
-              <>
-                <ShoppingCart className='w-4 h-4' />
-                <span className='sr-only sm:not-sr-only'>Keranjang</span>
-              </>
-            )}
-        </Button>
-      </CardFooter>
-    </Card>
+            : <span>Belum ada rating</span>}
+          {product.netSold > 0 && (
+            <>
+              <span className='text-gray-300'>·</span>
+              <span>{formatIndonesianSold(product.netSold)} terjual</span>
+            </>
+          )}
+        </div>
+
+        {/* Action buttons — compact */}
+        <div className='flex gap-1 mt-1.5'>
+          <button
+            type='button'
+            onClick={handleBuyNow}
+            disabled={isOutOfStock || isLoading}
+            className='flex-1 text-[11px] font-medium py-1 rounded border border-gray-300 text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed'
+          >
+            {isLoading ? <Loader2 className='w-3 h-3 animate-spin mx-auto' /> : 'Beli'}
+          </button>
+          <button
+            type='button'
+            onClick={handleAddToCart}
+            disabled={isOutOfStock || isLoading}
+            className={`flex-1 text-[11px] font-semibold py-1 rounded flex items-center justify-center gap-0.5 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed ${
+              cartSuccess ? 'bg-green-500 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
+            }`}
+          >
+            {isLoading
+              ? <Loader2 className='w-3 h-3 animate-spin' />
+              : cartSuccess
+              ? <CheckCircle className='w-3 h-3' />
+              : (
+                <>
+                  <ShoppingCart className='w-3 h-3' />
+                  <span>Keranjang</span>
+                </>
+              )}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
