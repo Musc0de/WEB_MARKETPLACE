@@ -8,6 +8,10 @@ import { ReturnsList } from './features/returns/ReturnsList.tsx';
 import { RefundsList } from './features/refunds/RefundsList.tsx';
 import { ProductsList } from './features/catalog/ProductsList.tsx';
 import { ProductForm } from './features/catalog/ProductForm.tsx';
+import { CategoriesList } from './features/catalog/CategoriesList.tsx';
+import { CategoryForm } from './features/catalog/CategoryForm.tsx';
+import { BrandsList } from './features/catalog/BrandsList.tsx';
+import { BrandForm } from './features/catalog/BrandForm.tsx';
 import { InventoryList } from './features/inventory/InventoryList.tsx';
 import { SupportQueueList } from './features/support/SupportQueueList.tsx';
 import { AdminTicketDetailPage } from './features/support/AdminTicketDetailPage.tsx';
@@ -103,6 +107,16 @@ export default function App() {
                 <Route path='catalog' element={<ProductsList />} />
                 <Route path='catalog/create' element={<ProductForm />} />
                 <Route path='catalog/:id/edit' element={<ProductForm />} />
+
+                {/* Categories */}
+                <Route path='catalog/categories' element={<CategoriesList />} />
+                <Route path='catalog/categories/create' element={<CategoryForm />} />
+                <Route path='catalog/categories/:id/edit' element={<CategoryForm />} />
+
+                {/* Brands */}
+                <Route path='catalog/brands' element={<BrandsList />} />
+                <Route path='catalog/brands/create' element={<BrandForm />} />
+                <Route path='catalog/brands/:id/edit' element={<BrandForm />} />
 
                 {/* Inventory Management */}
                 <Route path='inventory' element={<InventoryList />} />

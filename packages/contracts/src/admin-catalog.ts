@@ -1,8 +1,6 @@
-// deno-lint-ignore-file explicit-module-boundary-types
 import { z } from 'zod';
 import { ProductDetailSchema } from './catalog.ts';
 
-// We reuse the basic Product schemas but define specific mutations
 const _AdminProductCreateSchema = z.object({
   storeId: z.string().uuid().optional(),
   name: z.string().min(2),
@@ -59,7 +57,6 @@ export type AdminProductImageAdd = z.infer<typeof _AdminProductImageAddSchema>;
 export const AdminProductImageAddSchema: z.ZodType<AdminProductImageAdd> =
   _AdminProductImageAddSchema;
 
-// Admin Responses
 const _AdminProductMutationResponse = z.object({
   data: ProductDetailSchema,
   meta: z.object({ request_id: z.string() }),
