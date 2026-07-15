@@ -87,6 +87,8 @@ export function ProductForm() {
     version: 1,
     brandId: '',
     categoryIds: [] as string[],
+    seoTitle: '',
+    seoDescription: '',
   });
   const [status, setStatus] = useState<string | undefined>(undefined);
   const [isDirty, setIsDirty] = useState(false);
@@ -149,6 +151,8 @@ export function ProductForm() {
             version: data.data.version ?? 1,
             brandId: data.data.brandId ?? '',
             categoryIds: (data.data as any).categoryIds ?? [],
+            seoTitle: data.data.seoTitle ?? '',
+            seoDescription: data.data.seoDescription ?? '',
           });
           setStatus(data.data.status);
         }
@@ -181,6 +185,8 @@ export function ProductForm() {
           purchaseLimit: formData.purchaseLimit,
           brandId: formData.brandId || undefined,
           categoryIds: formData.categoryIds,
+          seoTitle: formData.seoTitle || undefined,
+          seoDescription: formData.seoDescription || undefined,
         };
         const res = await client.v1.admin.catalog.products[':id'].$put({
           param: { id },
@@ -198,6 +204,8 @@ export function ProductForm() {
           purchaseLimit: formData.purchaseLimit,
           brandId: formData.brandId || undefined,
           categoryIds: formData.categoryIds,
+          seoTitle: formData.seoTitle || undefined,
+          seoDescription: formData.seoDescription || undefined,
         };
         const parsed = AdminProductCreateSchema.safeParse(payload);
         if (!parsed.success) {
@@ -602,6 +610,54 @@ export function ProductForm() {
               </p>
             </div>
           )}
+        </SectionCard>
+
+        {/* SEO Metadata */}
+        <SectionCard
+          title='SEO & Metadata'
+          description='Optimasi mesin pencari agar produk mudah ditemukan.'
+          icon={
+            <svg
+              className='w-5 h-5 text-gray-500'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
+              />
+            </svg>
+          }
+        >
+          <div className='space-y-5'>
+            <Field label='SEO Title' hint='Opsional. Judul halaman untuk mesin pencari.'>
+              <input
+                type='text'
+                name='seoTitle'
+                value={formData.seoTitle}
+                onChange={handleChange}
+                placeholder='Contoh: Jual Kemeja Pria Batik Kualitas Premium'
+                className={inputCls}
+              />
+            </Field>
+
+            <Field
+              label='SEO Description'
+              hint='Opsional. Deskripsi singkat untuk hasil pencarian Google.'
+            >
+              <textarea
+                name='seoDescription'
+                value={formData.seoDescription}
+                onChange={handleChange}
+                placeholder='Tuliskan deskripsi SEO maksimal 160 karakter...'
+                rows={2}
+                className={`${inputCls} resize-none`}
+              />
+            </Field>
+          </div>
         </SectionCard>
       </form>
 

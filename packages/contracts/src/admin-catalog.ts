@@ -83,11 +83,17 @@ export type AdminCategoryUpdate = z.infer<typeof AdminCategoryUpdateSchema>;
 export const AdminBrandCreateSchema = z.object({
   name: z.string().min(1),
   slug: z.string().min(1),
+  description: z.string().nullable().optional(),
+  seoTitle: z.string().nullable().optional(),
+  seoDescription: z.string().nullable().optional(),
 });
 export type AdminBrandCreate = z.infer<typeof AdminBrandCreateSchema>;
 
 export const AdminBrandUpdateSchema = z.object({
   name: z.string().min(1).optional(),
   slug: z.string().min(1).optional(),
+  description: z.string().nullable().optional(),
+  seoTitle: z.string().nullable().optional(),
+  seoDescription: z.string().nullable().optional(),
 });
 export type AdminBrandUpdate = z.infer<typeof AdminBrandUpdateSchema>;

@@ -50,6 +50,13 @@
       "when": 1783950660000,
       "version": "7",
       "tag": "0006_add_metadata_to_tokens"
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1784158594418,
+      "tag": "0007_great_scrambler",
+      "breakpoints": true
     }
   ]
 }

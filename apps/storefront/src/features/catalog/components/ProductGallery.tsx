@@ -15,7 +15,7 @@ export const ProductGallery = ({ product }: { product: ProductDetail }) => {
 
     // Preload all images in the background to cache them for a smooth slider experience
     allImages.forEach((src) => {
-      const img = new window.Image();
+      const img = new globalThis.Image();
       img.src = src;
     });
 

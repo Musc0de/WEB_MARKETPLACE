@@ -63,6 +63,9 @@ export function BrandForm() {
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
+    description: '',
+    seoTitle: '',
+    seoDescription: '',
   });
 
   useEffect(() => {
@@ -76,6 +79,9 @@ export function BrandForm() {
           setFormData({
             name: b.name || '',
             slug: b.slug || '',
+            description: b.description || '',
+            seoTitle: b.seoTitle || '',
+            seoDescription: b.seoDescription || '',
           });
         } catch (err: any) {
           toast.error(err.message || 'Terjadi kesalahan');
@@ -238,6 +244,52 @@ export function BrandForm() {
                 />
               </div>
               <InputError error={errors.slug} />
+            </Field>
+          </div>
+        </SectionCard>
+
+        <SectionCard
+          title='SEO & Metadata'
+          description='Optimasi mesin pencari dan informasi tambahan.'
+          icon={<Tag className='w-5 h-5' />}
+        >
+          <div className='space-y-5'>
+            <Field label='Deskripsi' hint='Opsional. Jelaskan tentang brand ini.'>
+              <textarea
+                value={formData.description}
+                onChange={(e) => handleChange('description', e.target.value)}
+                placeholder='Tuliskan deskripsi brand...'
+                rows={3}
+                className='w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors'
+              />
+              <InputError error={errors.description} />
+            </Field>
+
+            <Field label='SEO Title' hint='Opsional. Judul halaman untuk mesin pencari.'>
+              <input
+                type='text'
+                value={formData.seoTitle}
+                onChange={(e) => handleChange('seoTitle', e.target.value)}
+                placeholder='Contoh: Nike Original - Sepatu Olahraga'
+                className={`w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors ${
+                  errors.seoTitle ? 'border-red-500' : 'border-gray-300'
+                }`}
+              />
+              <InputError error={errors.seoTitle} />
+            </Field>
+
+            <Field
+              label='SEO Description'
+              hint='Opsional. Deskripsi singkat untuk hasil pencarian Google.'
+            >
+              <textarea
+                value={formData.seoDescription}
+                onChange={(e) => handleChange('seoDescription', e.target.value)}
+                placeholder='Tuliskan deskripsi SEO maksimal 160 karakter...'
+                rows={2}
+                className='w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors'
+              />
+              <InputError error={errors.seoDescription} />
             </Field>
           </div>
         </SectionCard>

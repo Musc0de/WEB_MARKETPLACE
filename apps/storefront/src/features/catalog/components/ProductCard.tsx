@@ -23,7 +23,7 @@ export const ProductCard = (
 
     // Preload all images in the background to cache them for a smooth slider experience
     product.images.forEach((src) => {
-      const img = new window.Image();
+      const img = new globalThis.Image();
       img.src = src;
     });
 
@@ -120,7 +120,7 @@ export const ProductCard = (
                     className={`object-cover w-full h-full transition-transform duration-300 group-hover:scale-105 ${
                       isOutOfStock ? 'opacity-50 grayscale' : ''
                     }`}
-                    loading={idx === 0 ? 'eager' : 'lazy'}
+                    loading='eager'
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = 'none';
                     }}
