@@ -40,6 +40,7 @@ import { adminCustomersRouter } from './modules/admin/customers/index.ts';
 import { adminPaymentsRouter } from './modules/admin/payments/index.ts';
 import adminReviewsRouter from './modules/admin/reviews/index.ts';
 import adminAuditRouter from './modules/admin/audit/index.ts';
+import adminReportsRouter from './modules/admin/reports/index.ts';
 import adminOverviewRouter from './modules/admin/overview/index.ts';
 
 type AppContext = {
@@ -119,7 +120,7 @@ app.use(
       if (allowedOrigins.includes(origin)) return origin;
       return null; // reject
     },
-    allowHeaders: ['X-Custom-Header', 'Upgrade-Insecure-Requests', 'Content-Type', 'Authorization', 'X-Cart-Token'],
+    allowHeaders: ['X-Custom-Header', 'Upgrade-Insecure-Requests', 'Content-Type', 'Authorization', 'X-Cart-Token', 'X-Direct-Buy-Token'],
     allowMethods: ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE', 'PATCH'],
     exposeHeaders: ['Content-Length', 'X-Request-Id'],
     maxAge: 600,
@@ -203,6 +204,7 @@ const v1 = new Hono<AppContext>()
       .route('/payments', adminPaymentsRouter)
       .route('/reviews', adminReviewsRouter)
       .route('/audit', adminAuditRouter)
+      .route('/reports', adminReportsRouter)
       .route('/overview', adminOverviewRouter),
   );
 

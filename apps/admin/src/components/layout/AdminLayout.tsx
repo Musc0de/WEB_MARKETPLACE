@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   Banknote,
+  BarChart3,
   Bell,
   CreditCard,
   FileText,
@@ -28,6 +29,7 @@ const navItems = [
   { name: 'Payments', href: '/payments', icon: CreditCard },
   { name: 'Invoices', href: '/invoices', icon: FileText },
   { name: 'Support', href: '/support', icon: LifeBuoy },
+  { name: 'Laporan', href: '/reports', icon: BarChart3 },
 ];
 
 export function AdminLayout() {
@@ -137,7 +139,9 @@ export function AdminLayout() {
 
         {/* Page Content Container */}
         <main className='flex-1 relative overflow-y-auto focus:outline-none bg-gray-50'>
-          <Outlet />
+          <div className='px-6 py-8 sm:px-8 lg:px-10 max-w-screen-2xl mx-auto'>
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

@@ -32,12 +32,45 @@ router.use('*', optionalAuthMiddleware);
 /**
  * Helper to resolve the active cart for the current request.
  */
-export async function resolveActiveCart(c: any, createIfMissing = false) {
+export async function resolveActiveCart(c: any, createIfMissing = false, isDirectBuy = false) {
   const session = c.get('session');
   const guestToken = c.req.header('X-Cart-Token');
+  const directBuyOverrideToken = c.req.header('X-Direct-Buy-Token');
 
   let activeCartId: string | null = null;
   let newGuestToken: string | undefined = undefined;
+
+  if (isDirectBuy) {
+    newGuestToken = crypto.randomUUID();
+    const digest = await computeSha256(newGuestToken);
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 1);
+
+    const [newCart] = await db.insert(carts).values({
+      userId: null,
+      guestTokenHash: digest,
+      status: 'active',
+      expiresAt: expiresAt.toISOString(),
+    }).returning({ id: carts.id });
+
+    return { cartId: newCart.id, guestToken: newGuestToken };
+  }
+
+  // If explicit direct buy token is provided, prioritize it completely
+  if (directBuyOverrideToken) {
+    const digest = await computeSha256(directBuyOverrideToken);
+    const activeCarts = await db.select({ id: carts.id })
+      .from(carts)
+      .where(and(
+        eq(carts.guestTokenHash, digest),
+        eq(carts.status, 'active')
+      ))
+      .limit(1);
+
+    if (activeCarts.length > 0) {
+      return { cartId: activeCarts[0].id, guestToken: directBuyOverrideToken };
+    }
+  }
 
   if (session?.userId) {
     const activeCarts = await db.select({ id: carts.id })
@@ -331,8 +364,8 @@ const routes = router
     return c.json({ success: true, meta: { request_id: c.get('requestId') } });
   })
   .post('/items', zValidator('json', AddCartItemRequestSchema), async (c) => {
-    const { variantId, quantity } = c.req.valid('json');
-    const { cartId, guestToken } = await resolveActiveCart(c, true);
+    const { variantId, quantity, isDirectBuy } = c.req.valid('json');
+    const { cartId, guestToken } = await resolveActiveCart(c, true, isDirectBuy);
 
     if (!cartId) return c.json({ error: 'Failed to resolve cart' }, 500);
 

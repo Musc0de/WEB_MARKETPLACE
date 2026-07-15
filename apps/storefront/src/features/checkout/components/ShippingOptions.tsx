@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+
 import { useShippingOptions } from '../api/useCheckout.ts';
 import { formatIDR } from '@starsuperscare/ui';
 import { Loader2 } from 'lucide-react';
@@ -14,13 +14,9 @@ interface ShippingOptionsProps {
 export function ShippingOptions(
   { province, city, selectedOptionId, onSelect, onNext }: ShippingOptionsProps,
 ) {
-  const { data, isMutating, trigger } = useShippingOptions();
+  const { data, isLoading } = useShippingOptions(province, city);
 
-  useEffect(() => {
-    trigger({ destinationProvince: province, destinationCity: city });
-  }, [province, city, trigger]);
-
-  if (isMutating) {
+  if (isLoading) {
     return (
       <div className='flex flex-col items-center justify-center py-12'>
         <Loader2 className='w-8 h-8 animate-spin text-gray-500 mb-4' />

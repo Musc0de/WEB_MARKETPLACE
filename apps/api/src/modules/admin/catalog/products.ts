@@ -20,6 +20,7 @@ import { AuthContext, authMiddleware, requirePermission } from '../../../middlew
 import { logAudit } from '../../../utils/audit.ts';
 import { eq, isNull, sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
+import { storageAdapter } from '../../../adapters/storage.ts';
 
 const app = new Hono<AuthContext>();
 
@@ -410,6 +411,47 @@ const routes = app
         objectKey: data.objectKey,
         isPrimary: data.isPrimary,
       }).returning();
+
+      return c.json({
+        data: { success: true },
+        meta: { request_id: c.get('requestId') },
+        error: null,
+      });
+    },
+  )
+  .get('/:id/images', requirePermission('catalog.read'), async (c) => {
+    const id = c.req.param('id') as string;
+    const images = await db.select().from(productImages).where(eq(productImages.productId, id));
+
+    const mapped = await Promise.all(
+      images.map(async (img) => ({
+        id: img.id,
+        objectKey: img.objectKey,
+        isPrimary: img.isPrimary,
+        url: await storageAdapter.generatePresignedDownloadUrl(img.objectKey),
+      }))
+    );
+
+    return c.json({ data: mapped, meta: { request_id: c.get('requestId') }, error: null });
+  })
+  .delete(
+    '/:id/images/:imageId',
+    requirePermission('catalog.write'),
+    async (c) => {
+      const imageId = c.req.param('imageId') as string;
+
+      const [img] = await db.select().from(productImages).where(eq(productImages.id, imageId)).limit(1);
+      if (!img) throw new HTTPException(404, { message: 'Image not found' });
+
+      // Delete from DB
+      await db.delete(productImages).where(eq(productImages.id, imageId));
+
+      // Try deleting from S3/R2, but don't fail the request if it errors
+      try {
+        await storageAdapter.deleteObject(img.objectKey);
+      } catch (e) {
+        console.error('Failed to delete object from storage:', e);
+      }
 
       return c.json({
         data: { success: true },

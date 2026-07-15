@@ -1,11 +1,52 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 import { client } from '../../lib/rpc.ts';
-import { Button, Card, toast } from '@starsuperscare/ui';
-import { Package, Search } from 'lucide-react';
+import { toast } from '@starsuperscare/ui';
+import { RotateCcw, CheckCircle2, XCircle, PackageCheck, DollarSign } from 'lucide-react';
+import {
+  PageHeader,
+  SearchBar,
+  StatusPill,
+  DataTable,
+  TableSkeleton,
+  EmptyState,
+  FilterTabs,
+} from '../../components/admin-ui.tsx';
+import { ConfirmModal, InputModal, useModalState } from '../../components/modal.tsx';
+import { formatDate } from '@starsuperscare/ui';
+
+type ReturnStatus = 'all' | 'pending' | 'approved' | 'rejected' | 'received' | 'completed';
+
+const STATUS_TABS: { key: ReturnStatus; label: string }[] = [
+  { key: 'all', label: 'Semua' },
+  { key: 'pending', label: 'Menunggu' },
+  { key: 'approved', label: 'Disetujui' },
+  { key: 'received', label: 'Diterima' },
+  { key: 'completed', label: 'Selesai' },
+  { key: 'rejected', label: 'Ditolak' },
+];
+
+const TABLE_HEADERS = [
+  { label: 'ID Retur' },
+  { label: 'Order ID' },
+  { label: 'Resolusi' },
+  { label: 'Alasan' },
+  { label: 'Status' },
+  { label: 'Tanggal' },
+  { label: 'Aksi' },
+];
 
 export const ReturnsList = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<ReturnStatus>('all');
+
+  // Modal state
+  const approveModal = useModalState();
+  const rejectModal = useModalState();
+  const receiveModal = useModalState();
+  const refundAmountModal = useModalState();
+  const [activeReturnId, setActiveReturnId] = useState<string | null>(null);
+  const [activeReturn, setActiveReturn] = useState<any>(null);
 
   const { data: returns, mutate, isLoading } = useSWR(
     '/api/v1/admin/returns',
@@ -23,146 +64,194 @@ export const ReturnsList = () => {
         json: { status },
       });
       if (res.ok) {
-        toast.success(`Status updated to ${status}`);
+        toast.success(`Status retur berhasil diperbarui menjadi "${status}"`);
         mutate();
       } else {
-        toast.error('Failed to update status');
+        toast.error('Gagal memperbarui status retur');
       }
-    } catch (_e) {
-      toast.error('Network error');
+    } catch {
+      toast.error('Kesalahan jaringan, coba lagi');
     }
   };
 
-  const handleCreateRefund = async (returnItem: any) => {
+  const handleCreateRefund = async (returnItem: any, amount: number) => {
     try {
-      // In a real scenario, you'd prompt for the exact amount. We default to 0 for the backend to handle or update later.
-      const amount = parseFloat(
-        prompt('Masukkan nominal refund (0 untuk default/full):', '0') || '0',
-      );
       const res = await (client.v1 as any).admin.refunds.$post({
         json: { returnId: returnItem.id, amount },
       });
       if (res.ok) {
-        toast.success('Refund created successfully');
+        toast.success('Refund berhasil dibuat dan sedang diproses');
       } else {
-        toast.error('Failed to create refund');
+        toast.error('Gagal membuat refund');
       }
-    } catch (_e) {
-      toast.error('Network error');
+    } catch {
+      toast.error('Kesalahan jaringan, coba lagi');
     }
   };
 
-  const filteredReturns = returns?.filter((r: any) =>
-    r.id.includes(searchTerm) || r.orderId.includes(searchTerm)
-  );
+  const filtered = returns?.filter((r: any) => {
+    const matchSearch =
+      !search ||
+      r.id.toLowerCase().includes(search.toLowerCase()) ||
+      r.orderId.toLowerCase().includes(search.toLowerCase());
+    const matchStatus = statusFilter === 'all' || r.status === statusFilter;
+    return matchSearch && matchStatus;
+  });
+
+  const total = filtered?.length ?? 0;
 
   return (
-    <div className='p-6 max-w-6xl mx-auto space-y-6'>
-      <div className='flex items-center justify-between'>
-        <div>
-          <h1 className='text-3xl font-bold tracking-tight text-white'>Returns</h1>
-          <p className='text-muted-foreground'>Manage customer return requests.</p>
-        </div>
+    <div className='space-y-6'>
+      <PageHeader
+        icon={RotateCcw}
+        title='Retur Barang'
+        description='Kelola permintaan pengembalian barang dari pelanggan.'
+        badge='After Sales'
+        badgeColor='bg-purple-50 text-purple-700 ring-purple-600/20'
+      />
+
+      {/* Filters */}
+      <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+        <FilterTabs<ReturnStatus>
+          options={STATUS_TABS}
+          value={statusFilter}
+          onChange={setStatusFilter}
+        />
+        <SearchBar
+          value={search}
+          onChange={setSearch}
+          placeholder='Cari ID Retur atau Order ID…'
+        />
       </div>
 
-      <div className='flex items-center gap-4 bg-[#0f1115] p-4 rounded-xl border border-white/10'>
-        <div className='relative flex-1'>
-          <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground' />
-          <input
-            type='text'
-            placeholder='Search returns by ID or Order ID...'
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className='w-full pl-10 pr-4 py-2 bg-black/50 border border-white/10 rounded-md text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary'
-          />
-        </div>
-      </div>
-
-      <div className='grid gap-4'>
-        {isLoading
-          ? <div className='animate-pulse h-32 bg-white/5 rounded-xl border border-white/10' />
-          : filteredReturns?.length === 0
-          ? (
-            <div className='text-center py-12 bg-white/5 rounded-xl border border-white/10'>
-              <Package className='w-12 h-12 mx-auto text-muted-foreground mb-4 opacity-50' />
-              <h3 className='text-lg font-medium text-white mb-1'>No returns found</h3>
-            </div>
-          )
-          : (
-            filteredReturns?.map((ret: any) => (
-              <Card
-                key={ret.id}
-                className='p-5 bg-[#0f1115] border-white/10 flex flex-col md:flex-row justify-between gap-4'
-              >
-                <div className='space-y-2'>
-                  <div className='flex items-center gap-3'>
-                    <span className='font-mono text-sm text-primary'>{ret.id.slice(0, 8)}</span>
-                    <span
-                      className={`px-2 py-0.5 rounded text-xs font-medium uppercase
-                    ${
-                        ret.status === 'pending'
-                          ? 'bg-yellow-500/20 text-yellow-500'
-                          : ret.status === 'approved'
-                          ? 'bg-blue-500/20 text-blue-500'
-                          : ret.status === 'received'
-                          ? 'bg-green-500/20 text-green-500'
-                          : ret.status === 'completed'
-                          ? 'bg-gray-500/20 text-gray-400'
-                          : 'bg-red-500/20 text-red-500'
-                      }`}
-                    >
-                      {ret.status}
-                    </span>
-                    <span className='px-2 py-0.5 rounded text-xs font-medium uppercase bg-white/10 text-white'>
-                      {ret.resolution.replace('_', ' ')}
-                    </span>
-                  </div>
-                  <p className='text-sm text-gray-400'>Order ID: {ret.orderId}</p>
-                  <p className='text-sm text-gray-400'>Reason: {ret.reason || 'None provided'}</p>
-                  <p className='text-xs text-muted-foreground'>
-                    Created: {new Date(ret.createdAt).toLocaleString()}
-                  </p>
-                </div>
-
-                <div className='flex flex-wrap gap-2 items-center'>
+      {/* Table */}
+      <DataTable headers={TABLE_HEADERS} summary={`${total} retur ditemukan`}>
+        {isLoading ? (
+          <TableSkeleton cols={7} />
+        ) : !filtered?.length ? (
+          <tr>
+            <td colSpan={7}>
+              <EmptyState
+                icon={RotateCcw}
+                title='Tidak ada data retur'
+                description='Semua permintaan retur pelanggan akan muncul di sini.'
+              />
+            </td>
+          </tr>
+        ) : (
+          filtered.map((ret: any) => (
+            <tr key={ret.id} className='hover:bg-blue-50/20 transition-colors'>
+              <td className='px-5 py-3.5'>
+                <span className='font-mono text-sm font-semibold text-blue-600'>{ret.id.slice(0, 8)}…</span>
+              </td>
+              <td className='px-5 py-3.5'>
+                <span className='font-mono text-sm text-gray-600'>{ret.orderId.slice(0, 8)}…</span>
+              </td>
+              <td className='px-5 py-3.5'>
+                <span className='inline-flex rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-700 capitalize'>
+                  {ret.resolution?.replace('_', ' ')}
+                </span>
+              </td>
+              <td className='px-5 py-3.5 text-sm text-gray-600 max-w-xs'>
+                <span className='line-clamp-2'>{ret.reason || '—'}</span>
+              </td>
+              <td className='px-5 py-3.5'><StatusPill status={ret.status} /></td>
+              <td className='px-5 py-3.5 text-sm text-gray-400'>{formatDate(ret.createdAt)}</td>
+              <td className='px-5 py-3.5'>
+                <div className='flex items-center gap-1.5'>
                   {ret.status === 'pending' && (
                     <>
-                      <Button
-                        size='sm'
-                        variant='outline'
-                        className='border-red-500/50 text-red-500 hover:bg-red-500/10'
-                        onClick={() => handleUpdateStatus(ret.id, 'rejected')}
+                      <button
+                        type='button'
+                        onClick={() => { setActiveReturnId(ret.id); approveModal.show(); }}
+                        className='inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-emerald-500 transition'
                       >
-                        Reject
-                      </Button>
-                      <Button size='sm' onClick={() => handleUpdateStatus(ret.id, 'approved')}>
-                        Approve
-                      </Button>
+                        <CheckCircle2 className='h-3 w-3' /> Setujui
+                      </button>
+                      <button
+                        type='button'
+                        onClick={() => { setActiveReturnId(ret.id); rejectModal.show(); }}
+                        className='inline-flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100 transition'
+                      >
+                        <XCircle className='h-3 w-3' /> Tolak
+                      </button>
                     </>
                   )}
                   {ret.status === 'approved' && (
-                    <Button
-                      size='sm'
-                      onClick={() => handleUpdateStatus(ret.id, 'received')}
+                    <button
+                      type='button'
+                      onClick={() => { setActiveReturnId(ret.id); receiveModal.show(); }}
+                      className='inline-flex items-center gap-1 rounded-lg bg-blue-600 px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-blue-500 transition'
                     >
-                      Mark as Received
-                    </Button>
+                      <PackageCheck className='h-3 w-3' /> Diterima
+                    </button>
                   )}
-                  {(ret.status === 'approved' || ret.status === 'received') &&
-                    ret.resolution === 'refund' && (
-                    <Button
-                      size='sm'
-                      variant='secondary'
-                      onClick={() => handleCreateRefund(ret)}
+                  {(ret.status === 'approved' || ret.status === 'received') && ret.resolution === 'refund' && (
+                    <button
+                      type='button'
+                      onClick={() => { setActiveReturn(ret); refundAmountModal.show(); }}
+                      className='inline-flex items-center gap-1 rounded-lg border border-purple-200 bg-purple-50 px-2.5 py-1.5 text-xs font-semibold text-purple-700 hover:bg-purple-100 transition'
                     >
-                      Create Refund
-                    </Button>
+                      <DollarSign className='h-3 w-3' /> Buat Refund
+                    </button>
+                  )}
+                  {!['pending', 'approved', 'received'].includes(ret.status) && (
+                    <span className='text-xs text-gray-400'>—</span>
                   )}
                 </div>
-              </Card>
-            ))
-          )}
-      </div>
+              </td>
+            </tr>
+          ))
+        )}
+      </DataTable>
+
+      {/* ── Modals ── */}
+      <ConfirmModal
+        open={approveModal.open}
+        onClose={approveModal.hide}
+        onConfirm={() => activeReturnId && handleUpdateStatus(activeReturnId, 'approved')}
+        title='Setujui Retur'
+        message='Pelanggan akan dinotifikasi bahwa retur mereka telah disetujui. Lanjutkan?'
+        variant='success'
+        confirmLabel='Ya, Setujui'
+      />
+
+      <ConfirmModal
+        open={rejectModal.open}
+        onClose={rejectModal.hide}
+        onConfirm={() => activeReturnId && handleUpdateStatus(activeReturnId, 'rejected')}
+        title='Tolak Permintaan Retur'
+        message='Permintaan retur akan ditolak dan pelanggan akan dinotifikasi. Tindakan ini tidak dapat dibatalkan.'
+        variant='danger'
+        confirmLabel='Ya, Tolak'
+      />
+
+      <ConfirmModal
+        open={receiveModal.open}
+        onClose={receiveModal.hide}
+        onConfirm={() => activeReturnId && handleUpdateStatus(activeReturnId, 'received')}
+        title='Tandai Barang Diterima'
+        message='Konfirmasi bahwa barang retur dari pelanggan sudah diterima di gudang.'
+        variant='info'
+        confirmLabel='Konfirmasi Diterima'
+      />
+
+      <InputModal
+        open={refundAmountModal.open}
+        onClose={refundAmountModal.hide}
+        onConfirm={(val) => {
+          const amount = parseFloat(val) || 0;
+          if (activeReturn) handleCreateRefund(activeReturn, amount);
+        }}
+        title='Buat Refund'
+        message='Masukkan nominal refund yang akan dikembalikan kepada pelanggan. Masukkan 0 untuk refund penuh.'
+        label='Nominal Refund (Rp)'
+        placeholder='Contoh: 150000'
+        inputType='number'
+        defaultValue='0'
+        variant='info'
+        confirmLabel='Buat Refund'
+      />
     </div>
   );
 };

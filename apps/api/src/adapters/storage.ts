@@ -8,6 +8,7 @@ export interface StoragePort {
     maxSize: number,
   ): Promise<{ uploadUrl: string; expiresAt: Date; publicUrl: string }>;
   generatePresignedDownloadUrl(objectKey: string): Promise<string>;
+  deleteObject(objectKey: string): Promise<void>;
 }
 
 export class CloudflareR2Adapter implements StoragePort {
@@ -62,6 +63,15 @@ export class CloudflareR2Adapter implements StoragePort {
     });
     // Set URL expiration to 24 hours (86400 seconds) for viewing
     return await getSignedUrl(this.client, command, { expiresIn: 86400 });
+  }
+
+  async deleteObject(objectKey: string): Promise<void> {
+    const { DeleteObjectCommand } = await import('npm:@aws-sdk/client-s3@3');
+    const command = new DeleteObjectCommand({
+      Bucket: this.bucketName,
+      Key: objectKey,
+    });
+    await this.client.send(command);
   }
 }
 

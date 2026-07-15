@@ -1,4 +1,5 @@
 import useSWRMutation from 'swr/mutation';
+import useSWR from 'swr';
 import type {
   CheckoutValidateResponse,
   CreateOrderRequest,
@@ -48,6 +49,9 @@ async function validateCheckout(
   };
   if (token) {
     headers['X-Cart-Token'] = token;
+    if (_cartToken) {
+      headers['X-Direct-Buy-Token'] = token;
+    }
   }
   const res = await fetcher(`${url}/validate`, {
     method: 'POST',
@@ -57,17 +61,7 @@ async function validateCheckout(
   return res.data;
 }
 
-async function fetchShippingOptions(
-  url: string,
-  { arg }: { arg: { destinationProvince?: string; destinationCity?: string } },
-): Promise<{ options: ShippingOption[] }> {
-  const res = await fetcher(`${url}/shipping-options`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(arg),
-  });
-  return res.data;
-}
+
 
 async function createOrder(
   url: string,
@@ -80,6 +74,9 @@ async function createOrder(
   };
   if (token) {
     headers['X-Cart-Token'] = token;
+    if (_cartToken) {
+      headers['X-Direct-Buy-Token'] = token;
+    }
   }
   const res = await fetcher(`${url}/orders`, {
     method: 'POST',
@@ -93,8 +90,18 @@ export function useCheckoutValidation() {
   return useSWRMutation(CHECKOUT_API, validateCheckout);
 }
 
-export function useShippingOptions() {
-  return useSWRMutation(CHECKOUT_API, fetchShippingOptions);
+export function useShippingOptions(province?: string | null, city?: string | null) {
+  return useSWR<{ options: ShippingOption[] }>(
+    province && city ? [`${CHECKOUT_API}/shipping-options`, province, city] : null,
+    async ([url, p, c]) => {
+      const res = await fetcher(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ destinationProvince: p, destinationCity: c }),
+      });
+      return res.data;
+    }
+  );
 }
 
 export function useCreateOrder() {

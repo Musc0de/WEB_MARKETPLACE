@@ -52,6 +52,7 @@ export interface CartResponse {
 export interface AddCartItemRequest {
   variantId: string;
   quantity: number;
+  isDirectBuy?: boolean | undefined;
 }
 
 export interface UpdateCartItemRequest {
@@ -66,7 +67,7 @@ export interface MergeCartRequest {
 }
 
 // Zod Schemas
-export const CartItemStatusSchema = z.enum([
+export const CartItemStatusSchema: z.ZodType<CartItemStatus> = z.enum([
   'available',
   'out_of_stock',
   'price_changed',
@@ -110,6 +111,7 @@ export const CartResponseSchema: z.ZodType<CartResponse> = z.object({
 export const AddCartItemRequestSchema: z.ZodType<AddCartItemRequest> = z.object({
   variantId: z.string().uuid(),
   quantity: z.number().int().min(1),
+  isDirectBuy: z.boolean().optional(),
 });
 
 export const UpdateCartItemRequestSchema: z.ZodType<UpdateCartItemRequest> = z.object({

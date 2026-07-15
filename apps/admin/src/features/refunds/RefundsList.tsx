@@ -1,11 +1,48 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 import { client } from '../../lib/rpc.ts';
-import { Button, Card, toast } from '@starsuperscare/ui';
-import { CreditCard, Search } from 'lucide-react';
+import { toast } from '@starsuperscare/ui';
+import { CreditCard, Banknote, Loader2 } from 'lucide-react';
+import {
+  PageHeader,
+  SearchBar,
+  StatusPill,
+  DataTable,
+  TableSkeleton,
+  EmptyState,
+  FilterTabs,
+} from '../../components/admin-ui.tsx';
+import { ToggleInputModal, useModalState } from '../../components/modal.tsx';
+import { formatDate, formatIDR } from '@starsuperscare/ui';
+
+type RefundStatus = 'all' | 'pending' | 'processing' | 'completed' | 'failed';
+
+const STATUS_TABS: { key: RefundStatus; label: string }[] = [
+  { key: 'all', label: 'Semua' },
+  { key: 'pending', label: 'Menunggu' },
+  { key: 'processing', label: 'Diproses' },
+  { key: 'completed', label: 'Selesai' },
+  { key: 'failed', label: 'Gagal' },
+];
+
+const TABLE_HEADERS = [
+  { label: 'ID Refund' },
+  { label: 'Order / Return' },
+  { label: 'Jumlah' },
+  { label: 'Referensi' },
+  { label: 'Status' },
+  { label: 'Tanggal' },
+  { label: 'Aksi' },
+];
 
 export const RefundsList = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<RefundStatus>('all');
+  const [processing, setProcessing] = useState<string | null>(null);
+
+  // Modal state
+  const processModal = useModalState();
+  const [activeRefundId, setActiveRefundId] = useState<string | null>(null);
 
   const { data: refunds, mutate, isLoading } = useSWR(
     '/api/v1/admin/refunds',
@@ -16,120 +53,148 @@ export const RefundsList = () => {
     },
   );
 
-  const handleProcessRefund = async (refundId: string) => {
+  const handleProcessRefund = async (refundId: string, amount: string, restockItems: boolean) => {
     try {
-      const amountStr = prompt(
-        'Masukkan nominal final untuk diproses (kosongkan untuk default):',
-        '',
-      );
-      const restockStr = confirm('Apakah Anda ingin mengembalikan stok produk (restock)?');
-
-      const payload: any = { restockItems: restockStr };
-      if (amountStr && !isNaN(parseFloat(amountStr))) {
-        payload.amount = parseFloat(amountStr);
+      setProcessing(refundId);
+      const payload: any = { restockItems };
+      if (amount && !isNaN(parseFloat(amount))) {
+        payload.amount = parseFloat(amount);
       }
-
       const res = await (client.v1 as any).admin.refunds[':id'].process.$post({
         param: { id: refundId },
         json: payload,
       });
-
       if (res.ok) {
-        toast.success('Refund processed successfully');
+        toast.success('Refund berhasil diproses dan dana sedang dikembalikan');
         mutate();
       } else {
-        const errorData = await res.json();
-        toast.error(errorData.error || 'Failed to process refund');
+        const err = await res.json();
+        toast.error(err.error || 'Gagal memproses refund');
       }
-    } catch (_e) {
-      toast.error('Network error');
+    } catch {
+      toast.error('Kesalahan jaringan, coba lagi');
+    } finally {
+      setProcessing(null);
     }
   };
 
-  const filteredRefunds = refunds?.filter((r: any) =>
-    r.id.includes(searchTerm) || r.orderId.includes(searchTerm)
-  );
+  const filtered = refunds?.filter((r: any) => {
+    const matchSearch =
+      !search ||
+      r.id.toLowerCase().includes(search.toLowerCase()) ||
+      r.orderId?.toLowerCase().includes(search.toLowerCase());
+    const matchStatus = statusFilter === 'all' || r.status === statusFilter;
+    return matchSearch && matchStatus;
+  });
 
   return (
-    <div className='p-6 max-w-6xl mx-auto space-y-6'>
-      <div className='flex items-center justify-between'>
-        <div>
-          <h1 className='text-3xl font-bold tracking-tight text-white'>Refunds</h1>
-          <p className='text-muted-foreground'>Manage and process customer refunds.</p>
-        </div>
+    <div className='space-y-6'>
+      <PageHeader
+        icon={Banknote}
+        title='Refund'
+        description='Proses dan pantau pengembalian dana kepada pelanggan.'
+        badge='Keuangan'
+        badgeColor='bg-amber-50 text-amber-700 ring-amber-600/20'
+      />
+
+      {/* Filters */}
+      <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+        <FilterTabs<RefundStatus>
+          options={STATUS_TABS}
+          value={statusFilter}
+          onChange={setStatusFilter}
+        />
+        <SearchBar
+          value={search}
+          onChange={setSearch}
+          placeholder='Cari ID Refund atau Order ID…'
+        />
       </div>
 
-      <div className='flex items-center gap-4 bg-[#0f1115] p-4 rounded-xl border border-white/10'>
-        <div className='relative flex-1'>
-          <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground' />
-          <input
-            type='text'
-            placeholder='Search refunds by ID or Order ID...'
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className='w-full pl-10 pr-4 py-2 bg-black/50 border border-white/10 rounded-md text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary'
-          />
-        </div>
-      </div>
-
-      <div className='grid gap-4'>
-        {isLoading
-          ? <div className='animate-pulse h-32 bg-white/5 rounded-xl border border-white/10' />
-          : filteredRefunds?.length === 0
-          ? (
-            <div className='text-center py-12 bg-white/5 rounded-xl border border-white/10'>
-              <CreditCard className='w-12 h-12 mx-auto text-muted-foreground mb-4 opacity-50' />
-              <h3 className='text-lg font-medium text-white mb-1'>No refunds found</h3>
-            </div>
-          )
-          : (
-            filteredRefunds?.map((refund: any) => (
-              <Card
-                key={refund.id}
-                className='p-5 bg-[#0f1115] border-white/10 flex flex-col md:flex-row justify-between gap-4'
-              >
-                <div className='space-y-2'>
-                  <div className='flex items-center gap-3'>
-                    <span className='font-mono text-sm text-primary'>{refund.id.slice(0, 8)}</span>
-                    <span
-                      className={`px-2 py-0.5 rounded text-xs font-medium uppercase
-                    ${
-                        refund.status === 'pending'
-                          ? 'bg-yellow-500/20 text-yellow-500'
-                          : refund.status === 'processing'
-                          ? 'bg-blue-500/20 text-blue-500'
-                          : refund.status === 'completed'
-                          ? 'bg-green-500/20 text-green-500'
-                          : 'bg-red-500/20 text-red-500'
-                      }`}
-                    >
-                      {refund.status}
-                    </span>
-                  </div>
-                  <p className='text-sm text-gray-400'>Order ID: {refund.orderId}</p>
-                  {refund.returnId && (
-                    <p className='text-sm text-gray-400'>Return ID: {refund.returnId}</p>
-                  )}
-                  <p className='text-sm font-medium text-white mt-2'>
-                    Amount: Rp {refund.amount?.toLocaleString('id-ID')}
+      {/* Table */}
+      <DataTable
+        headers={TABLE_HEADERS}
+        summary={`${filtered?.length ?? 0} refund ditemukan`}
+      >
+        {isLoading ? (
+          <TableSkeleton cols={7} />
+        ) : !filtered?.length ? (
+          <tr>
+            <td colSpan={7}>
+              <EmptyState
+                icon={CreditCard}
+                title='Tidak ada data refund'
+                description='Semua proses pengembalian dana akan ditampilkan di sini.'
+              />
+            </td>
+          </tr>
+        ) : (
+          filtered.map((refund: any) => (
+            <tr key={refund.id} className='hover:bg-amber-50/20 transition-colors'>
+              <td className='px-5 py-3.5'>
+                <span className='font-mono text-sm font-semibold text-amber-600'>
+                  {refund.id.slice(0, 8)}…
+                </span>
+              </td>
+              <td className='px-5 py-3.5'>
+                <p className='text-sm font-medium text-gray-700'>
+                  Order: <span className='font-mono text-xs text-gray-500'>{refund.orderId?.slice(0, 8)}…</span>
+                </p>
+                {refund.returnId && (
+                  <p className='text-xs text-gray-400'>
+                    Retur: <span className='font-mono'>{refund.returnId?.slice(0, 8)}…</span>
                   </p>
-                  {refund.providerReference && (
-                    <p className='text-xs text-muted-foreground'>Ref: {refund.providerReference}</p>
-                  )}
-                  <p className='text-xs text-muted-foreground'>
-                    Created: {new Date(refund.createdAt).toLocaleString()}
-                  </p>
-                </div>
+                )}
+              </td>
+              <td className='px-5 py-3.5'>
+                <span className='text-sm font-bold text-gray-900'>{formatIDR(refund.amount ?? 0)}</span>
+              </td>
+              <td className='px-5 py-3.5'>
+                <span className='text-xs font-mono text-gray-400'>{refund.providerReference || '—'}</span>
+              </td>
+              <td className='px-5 py-3.5'>
+                <StatusPill status={refund.status} />
+              </td>
+              <td className='px-5 py-3.5 text-sm text-gray-400'>{formatDate(refund.createdAt)}</td>
+              <td className='px-5 py-3.5'>
+                {refund.status === 'pending' ? (
+                  <button
+                    type='button'
+                    disabled={processing === refund.id}
+                    onClick={() => { setActiveRefundId(refund.id); processModal.show(); }}
+                    className='inline-flex items-center gap-1.5 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-amber-500 transition disabled:opacity-60'
+                  >
+                    {processing === refund.id
+                      ? <Loader2 className='h-3 w-3 animate-spin' />
+                      : <CreditCard className='h-3 w-3' />}
+                    Proses
+                  </button>
+                ) : (
+                  <span className='text-xs text-gray-400'>—</span>
+                )}
+              </td>
+            </tr>
+          ))
+        )}
+      </DataTable>
 
-                <div className='flex items-center'>
-                  {refund.status === 'pending' && (
-                    <Button onClick={() => handleProcessRefund(refund.id)}>Process Refund</Button>
-                  )}
-                </div>
-              </Card>
-            ))
-          )}
-      </div>
+      {/* ── Process Refund Modal ── */}
+      <ToggleInputModal
+        open={processModal.open}
+        onClose={processModal.hide}
+        onConfirm={(amount, restockItems) => {
+          if (activeRefundId) handleProcessRefund(activeRefundId, amount, restockItems);
+        }}
+        title='Proses Refund'
+        message='Nominal akhir yang akan dikembalikan kepada pelanggan. Kosongkan untuk menggunakan nominal default dari sistem.'
+        inputLabel='Nominal Final (Rp) — opsional'
+        inputPlaceholder='Contoh: 150000 (kosongkan = default)'
+        inputType='number'
+        toggleLabel='Kembalikan stok produk ke gudang (restock)'
+        defaultToggle={false}
+        variant='warning'
+        confirmLabel='Proses Refund'
+      />
     </div>
   );
 };

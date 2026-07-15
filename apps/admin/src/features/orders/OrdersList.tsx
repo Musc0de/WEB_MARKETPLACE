@@ -1,19 +1,19 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../../lib/api.ts';
 import { formatDate, formatIDR } from '@starsuperscare/ui';
 import { Link } from 'react-router-dom';
 import {
-  Search,
+  CheckCircle2,
+  ChevronRight,
+  Clock,
   Eye,
   Package,
-  Clock,
-  CheckCircle2,
-  XCircle,
-  Truck,
   RefreshCw,
+  Search,
   ShoppingBag,
-  ChevronRight,
+  Truck,
+  XCircle,
 } from 'lucide-react';
 import { Pagination } from '../../components/Pagination.tsx';
 
@@ -72,7 +72,16 @@ const STATUS_CONFIG: Record<
   },
 };
 
-const ALL_STATUSES = ['all', 'pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
+const ALL_STATUSES = [
+  'all',
+  'pending',
+  'paid',
+  'processing',
+  'shipped',
+  'delivered',
+  'cancelled',
+  'refunded',
+];
 
 function StatusBadge({ status }: { status: string }) {
   const cfg = STATUS_CONFIG[status] ?? {
@@ -113,7 +122,9 @@ function CustomerAvatar({ name }: { name: string }) {
 
   return (
     <div
-      className={`w-8 h-8 rounded-full ${colors[colorIdx]} flex items-center justify-center text-white text-xs font-bold flex-shrink-0`}
+      className={`w-8 h-8 rounded-full ${
+        colors[colorIdx]
+      } flex items-center justify-center text-white text-xs font-bold flex-shrink-0`}
     >
       {initials || '?'}
     </div>
@@ -153,10 +164,11 @@ export function OrdersList() {
   // Stats — use statusCounts from API (global totals), totalOrders for 'all'
   const stats = useMemo(() => ({
     total: totalOrders,
-    pending:   (statusCounts['pending']   ?? 0),
-    paid:      (statusCounts['paid']       ?? 0) + (statusCounts['processing'] ?? 0),
-    delivered: (statusCounts['delivered'] ?? 0),
-    cancelled: (statusCounts['cancelled'] ?? 0),
+    pending: statusCounts['pending'] ?? 0,
+    processing: statusCounts['processing'] ?? 0,
+    paid: statusCounts['paid'] ?? 0,
+    delivered: statusCounts['delivered'] ?? 0,
+    cancelled: statusCounts['cancelled'] ?? 0,
   }), [statusCounts, totalOrders]);
 
   return (
@@ -178,10 +190,34 @@ export function OrdersList() {
       {/* Stats Cards */}
       <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
         {[
-          { label: 'Semua Pesanan',   value: stats.total,    color: 'text-gray-900',   bg: 'bg-gray-50',    border: 'border-gray-200' },
-          { label: 'Menunggu',        value: stats.pending,  color: 'text-amber-700',  bg: 'bg-amber-50',   border: 'border-amber-200' },
-          { label: 'Dibayar / Proses',value: stats.paid,     color: 'text-emerald-700',bg: 'bg-emerald-50', border: 'border-emerald-200' },
-          { label: 'Terkirim',        value: stats.delivered,color: 'text-blue-700',   bg: 'bg-blue-50',    border: 'border-blue-200' },
+          {
+            label: 'Semua Pesanan',
+            value: stats.total,
+            color: 'text-gray-900',
+            bg: 'bg-gray-50',
+            border: 'border-gray-200',
+          },
+          {
+            label: 'Menunggu untuk dikirim',
+            value: stats.processing,
+            color: 'text-amber-700',
+            bg: 'bg-amber-50',
+            border: 'border-amber-200',
+          },
+          {
+            label: 'Baru Dibayar',
+            value: stats.paid,
+            color: 'text-emerald-700',
+            bg: 'bg-emerald-50',
+            border: 'border-emerald-200',
+          },
+          {
+            label: 'Terkirim',
+            value: stats.delivered,
+            color: 'text-blue-700',
+            bg: 'bg-blue-50',
+            border: 'border-blue-200',
+          },
         ].map((s) => (
           <div
             key={s.label}
@@ -202,7 +238,10 @@ export function OrdersList() {
             type='text'
             placeholder='Cari nomor pesanan atau nama pelanggan...'
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
             className='w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-400'
           />
         </div>
@@ -216,7 +255,10 @@ export function OrdersList() {
               <button
                 key={s}
                 type='button'
-                onClick={() => { setStatus(s); setPage(1); }}
+                onClick={() => {
+                  setStatus(s);
+                  setPage(1);
+                }}
                 className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
                   isActive
                     ? s === 'all'
@@ -251,12 +293,24 @@ export function OrdersList() {
             {isLoading
               ? Array.from({ length: 6 }).map((_, i) => (
                 <tr key={i} className='animate-pulse'>
-                  <td className='px-4 py-3.5'><div className='h-4 bg-gray-100 rounded w-40' /></td>
-                  <td className='px-4 py-3.5'><div className='h-4 bg-gray-100 rounded w-28' /></td>
-                  <td className='px-4 py-3.5'><div className='h-4 bg-gray-100 rounded w-20' /></td>
-                  <td className='px-4 py-3.5'><div className='h-4 bg-gray-100 rounded w-24' /></td>
-                  <td className='px-4 py-3.5'><div className='h-5 bg-gray-100 rounded-full w-20' /></td>
-                  <td className='px-4 py-3.5'><div className='h-8 bg-gray-100 rounded w-16' /></td>
+                  <td className='px-4 py-3.5'>
+                    <div className='h-4 bg-gray-100 rounded w-40' />
+                  </td>
+                  <td className='px-4 py-3.5'>
+                    <div className='h-4 bg-gray-100 rounded w-28' />
+                  </td>
+                  <td className='px-4 py-3.5'>
+                    <div className='h-4 bg-gray-100 rounded w-20' />
+                  </td>
+                  <td className='px-4 py-3.5'>
+                    <div className='h-4 bg-gray-100 rounded w-24' />
+                  </td>
+                  <td className='px-4 py-3.5'>
+                    <div className='h-5 bg-gray-100 rounded-full w-20' />
+                  </td>
+                  <td className='px-4 py-3.5'>
+                    <div className='h-8 bg-gray-100 rounded w-16' />
+                  </td>
                 </tr>
               ))
               : filtered.length === 0
@@ -265,7 +319,9 @@ export function OrdersList() {
                   <td colSpan={6} className='px-4 py-16 text-center'>
                     <ShoppingBag className='w-10 h-10 text-gray-300 mx-auto mb-3' />
                     <p className='text-sm font-medium text-gray-500'>No orders found</p>
-                    <p className='text-xs text-gray-400 mt-1'>Try changing the filter or search term</p>
+                    <p className='text-xs text-gray-400 mt-1'>
+                      Try changing the filter or search term
+                    </p>
                   </td>
                 </tr>
               )

@@ -20,7 +20,7 @@ export async function createDirectBuyCart(
     headers: { 'Content-Type': 'application/json' },
     // NO X-Cart-Token header — creates a brand new guest cart session
     credentials: 'include',
-    body: JSON.stringify({ variantId, quantity }),
+    body: JSON.stringify({ variantId, quantity, isDirectBuy: true }),
   });
 
   if (!res.ok) {

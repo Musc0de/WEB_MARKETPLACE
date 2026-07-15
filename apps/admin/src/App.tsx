@@ -21,22 +21,56 @@ import { ResponsiveGooeyToaster } from '@starsuperscare/ui';
 import { DashboardCards } from './features/overview/DashboardCards.tsx';
 import { ReviewsList } from './features/reviews/ReviewsList.tsx';
 import { AuditLogViewer } from './features/audit/AuditLogViewer.tsx';
+import { ReportsPage } from './features/reports/ReportsPage.tsx';
 import 'goey-toast/styles.css';
 
 const queryClient = new QueryClient();
 
-const Fallback = ({ error }: { error: Error }) => (
-  <div role='alert' style={{ padding: '2rem' }}>
-    <h2 style={{ color: 'red' }}>Application Error</h2>
-    <pre style={{ background: '#f8f8f8', padding: '1rem', overflow: 'auto' }}>
-      {error.message}
-    </pre>
-  </div>
-);
+const Fallback = ({ error }: { error: unknown }) => {
+  const isError = error instanceof Error;
+  const message = isError
+    ? error.message
+    : typeof error === 'object' && error !== null
+    ? JSON.stringify(error, null, 2)
+    : String(error);
+  return (
+    <div role='alert' style={{ padding: '2rem', fontFamily: 'system-ui, sans-serif' }}>
+      <h2 style={{ color: '#dc2626', marginBottom: '1rem' }}>Application Error</h2>
+      <pre
+        style={{
+          background: '#fef2f2',
+          border: '1px solid #fecaca',
+          padding: '1rem',
+          borderRadius: '8px',
+          overflow: 'auto',
+          fontSize: '0.875rem',
+          color: '#7f1d1d',
+        }}
+      >
+        {message}
+      </pre>
+      <button
+        type='button'
+        onClick={() => global.location.reload()}
+        style={{
+          marginTop: '1rem',
+          padding: '0.5rem 1.25rem',
+          background: '#2563eb',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '6px',
+          cursor: 'pointer',
+          fontWeight: 600,
+        }}
+      >
+        Refresh Halaman
+      </button>
+    </div>
+  );
+};
 
 const Dashboard = () => (
   <div>
-    <h1>Dashboard</h1>
     <DashboardCards />
   </div>
 );
@@ -89,6 +123,8 @@ export default function App() {
 
                 <Route path='returns' element={<ReturnsList />} />
                 <Route path='refunds' element={<RefundsList />} />
+
+                <Route path='reports' element={<ReportsPage />} />
 
                 {/* Fallback */}
                 <Route path='*' element={<NotFound />} />

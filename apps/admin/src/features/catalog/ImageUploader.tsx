@@ -1,11 +1,18 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { client } from '../../lib/rpc.ts';
 import { goeyToast as toast } from 'goey-toast';
 
 interface ImageUploaderProps {
   productId: string;
   productName?: string;
-  onUploadSuccess?: (objectKey: string) => void;
+  onUploadSuccess?: (objectKey: string) => void | Promise<void>;
+}
+
+interface ExistingImage {
+  id: string;
+  url: string;
+  objectKey: string;
+  isPrimary: boolean;
 }
 
 // Accepted image types
@@ -18,7 +25,45 @@ export function ImageUploader({ productId: _productId, productName, onUploadSucc
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [existingImages, setExistingImages] = useState<ExistingImage[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const fetchImages = async () => {
+    if (!_productId) return;
+    try {
+      const res = await client.v1.admin.catalog.products[':id'].images.$get({
+        param: { id: _productId }
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setExistingImages(json.data as ExistingImage[]);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    fetchImages();
+  }, [_productId]);
+
+  const deleteExistingImage = async (imageId: string) => {
+    if (!confirm('Apakah Anda yakin ingin menghapus gambar ini?')) return;
+    try {
+      const res = await client.v1.admin.catalog.products[':id'].images[':imageId'].$delete({
+        param: { id: _productId, imageId }
+      });
+      if (res.ok) {
+        toast.success('Gambar dihapus');
+        fetchImages();
+      } else {
+        toast.error('Gagal menghapus gambar');
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error('Terjadi kesalahan');
+    }
+  };
 
   const processFiles = (newFiles: FileList | File[]) => {
     const validFiles = Array.from(newFiles).filter((f) => {
@@ -104,11 +149,13 @@ export function ImageUploader({ productId: _productId, productName, onUploadSucc
       setFiles([]);
       setProgress(100);
       
-      // Call success for each object key (or just the first one if the parent expects one)
-      // Ideally parent handles multiple, but we loop for backward compatibility
-      urlData.forEach(d => {
-        onUploadSuccess?.(d.objectKey);
-      });
+      // Call success for each object key (await to ensure DB is updated)
+      for (const d of urlData) {
+        if (onUploadSuccess) await onUploadSuccess(d.objectKey);
+      }
+      
+      // Refresh gallery after all DB records are created
+      fetchImages();
       
       setTimeout(() => setProgress(0), 1500);
     } catch (err) {
@@ -126,7 +173,35 @@ export function ImageUploader({ productId: _productId, productName, onUploadSucc
   };
 
   return (
-    <div className='space-y-4'>
+    <div className='space-y-6'>
+      {/* Existing Images Gallery */}
+      {existingImages.length > 0 && (
+        <div className='space-y-2'>
+          <h4 className='text-sm font-medium text-gray-700'>Galeri Produk</h4>
+          <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4'>
+            {existingImages.map((img) => (
+              <div key={img.id} className='relative group aspect-square rounded-lg overflow-hidden bg-gray-100 border border-gray-200 shadow-sm'>
+                <img
+                  src={img.url}
+                  alt={img.objectKey}
+                  className='w-full h-full object-cover'
+                />
+                <button
+                  type='button'
+                  onClick={() => deleteExistingImage(img.id)}
+                  className='absolute top-1.5 right-1.5 w-7 h-7 bg-white/90 hover:bg-red-50 text-red-600 rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm border border-red-100'
+                  title='Hapus Gambar'
+                >
+                  <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
+                  </svg>
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Drop Zone */}
       <div
         onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
