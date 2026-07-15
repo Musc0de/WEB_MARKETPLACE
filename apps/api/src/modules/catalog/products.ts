@@ -273,6 +273,7 @@ const routes = productsRouter
         ...v,
         availableStock: v.availableStock || 0,
         size: (v.optionValues as any)?.size || null,
+        name: (v.optionValues as any)?.name || null,
       }));
 
       const imagesData = await db.select({ objectKey: productImages.objectKey })
