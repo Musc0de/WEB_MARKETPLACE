@@ -117,20 +117,25 @@ const routes = app
             .where(inArray(productImages.productId, uniqueProductIds))
           : [];
 
-        // Build a map: productId → sorted image object keys
+        // Build full public URLs using server-side R2_PUBLIC_URL env var
+        // This is built on the server so the frontend never needs R2 config
+        const r2BaseUrl = Deno.env.get('R2_PUBLIC_URL') || '';
         const imageMap: Record<string, string[]> = {};
         for (const img of imageRows) {
           if (!imageMap[img.productId]) imageMap[img.productId] = [];
-          imageMap[img.productId].push(img.objectKey);
+          // Build the full CDN URL on the server side
+          imageMap[img.productId].push(`${r2BaseUrl}/${img.objectKey}`);
         }
 
         for (const item of allItems) {
           if (!itemsMap[item.orderId]) {
             itemsMap[item.orderId] = [];
           }
+          // Only send the first (primary) image URL — caller shows 1 image per item
+          const allImageUrls = imageMap[item.productId] || [];
           itemsMap[item.orderId].push({
             ...item,
-            imageKeys: imageMap[item.productId] || [],
+            imageUrl: allImageUrls[0] ?? null,
           });
         }
       }
