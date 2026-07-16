@@ -14,7 +14,7 @@ export function SEO({ title, description, appId }: SEOProps) {
     const apiUrl = (import.meta as any).env?.VITE_API_URL || '';
     if (!apiUrl) return;
 
-    fetch(`${apiUrl}/v1/settings?app=${appId || 'storefront'}`)
+    fetch(`${apiUrl}/v1/settings?app=${appId || ''}`)
       .then((res) => {
         if (!res.ok) throw new Error('Network response was not ok');
         return res.json();
@@ -28,7 +28,7 @@ export function SEO({ title, description, appId }: SEOProps) {
   }, []);
 
   useEffect(() => {
-    const siteTitle = globalSettings?.siteTitle || 'StarSuperScare Marketplace';
+    const siteTitle = globalSettings?.siteTitle || '';
 
     let finalTitle = siteTitle;
     if (title) {

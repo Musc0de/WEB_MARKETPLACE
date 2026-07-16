@@ -11,12 +11,12 @@ app.use('/*', authMiddleware);
 app.use('/*', requirePermission('catalog.write')); // Require an admin-level permission
 
 app.get('/', async (c) => {
-  const appId = c.req.query('app') || 'storefront';
+  const appId = c.req.query('app') || '';
   const [settings] = await db.select().from(globalSettings).where(eq(globalSettings.id, appId))
     .limit(1);
   return c.json({
     data: settings ||
-      { siteTitle: 'StarSuperScare Marketplace', siteDescription: null, faviconUrl: null },
+      { siteTitle: null, siteDescription: null, faviconUrl: null },
     meta: { request_id: c.get('requestId') },
     error: null,
   });
