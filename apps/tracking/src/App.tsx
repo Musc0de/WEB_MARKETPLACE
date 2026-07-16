@@ -1,6 +1,7 @@
 import { ErrorBoundary } from 'react-error-boundary';
 import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import { ResponsiveGooeyToaster } from '@starsuperscare/ui';
+import { SEO } from '@starsuperscare/ui';
 import { TrackingLayout } from './components/layout/TrackingLayout.tsx';
 import { TrackingPage } from './features/tracking/TrackingPage.tsx';
 import { PackageSearch } from 'lucide-react';
@@ -99,6 +100,7 @@ export default function App() {
   return (
     <ErrorBoundary FallbackComponent={Fallback}>
       <ResponsiveGooeyToaster />
+      <SEO appTitle='Tracking Portal' />
       <BrowserRouter>
         <TrackingLayout>
           <Routes>

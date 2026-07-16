@@ -8,7 +8,7 @@ import { ProductGallery } from '../components/ProductGallery.tsx';
 import { ProductSummary } from '../components/ProductSummary.tsx';
 import { ProductDetailsAccordion } from '../components/ProductDetailsAccordion.tsx';
 import { RelatedProducts } from '../components/RelatedProducts.tsx';
-import { SEO } from '../../../components/SEO.tsx';
+import { SEO } from '@starsuperscare/ui';
 
 export const ProductDetailPage = (): JSX.Element => {
   const { slug } = useParams<{ slug: string }>();

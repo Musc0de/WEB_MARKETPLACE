@@ -1,6 +1,7 @@
 import { ErrorBoundary } from 'react-error-boundary';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { ResponsiveGooeyToaster } from '@starsuperscare/ui';
+import { SEO } from '@starsuperscare/ui';
 import { AuthLayout } from './components/layout/AuthLayout.tsx';
 
 import { LoginPage } from './features/login/LoginPage.tsx';
@@ -40,6 +41,7 @@ export default function App() {
   return (
     <ErrorBoundary FallbackComponent={Fallback}>
       <ResponsiveGooeyToaster />
+      <SEO appTitle='Auth Portal' />
       <BrowserRouter>
         <AuthLayout>
           <Routes>

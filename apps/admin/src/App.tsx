@@ -22,6 +22,7 @@ import { CustomerDetail } from './features/customers/CustomerDetail.tsx';
 import { PaymentsList } from './features/payments/PaymentsList.tsx';
 import { InvoicesList } from './features/payments/InvoicesList.tsx';
 import { ResponsiveGooeyToaster } from '@starsuperscare/ui';
+import { SEO } from '@starsuperscare/ui';
 import { DashboardCards } from './features/overview/DashboardCards.tsx';
 import { ReviewsList } from './features/reviews/ReviewsList.tsx';
 import { AuditLogViewer } from './features/audit/AuditLogViewer.tsx';
@@ -92,6 +93,7 @@ export default function App() {
     <ErrorBoundary FallbackComponent={Fallback}>
       <QueryClientProvider client={queryClient}>
         <ResponsiveGooeyToaster />
+        <SEO appTitle='Admin Portal' />
         <AuthProvider>
           <BrowserRouter>
             <Routes>
