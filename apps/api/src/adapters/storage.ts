@@ -6,6 +6,8 @@ export interface StoragePort {
     objectKey: string,
     contentType: string,
     maxSize: number,
+    customBucket?: string,
+    customPublicUrlBase?: string,
   ): Promise<{ uploadUrl: string; expiresAt: Date; publicUrl: string }>;
   generatePresignedDownloadUrl(objectKey: string): Promise<string>;
   deleteObject(objectKey: string): Promise<void>;
@@ -42,16 +44,18 @@ export class CloudflareR2Adapter implements StoragePort {
     objectKey: string,
     contentType: string,
     _maxSize: number,
+    customBucket?: string,
+    customPublicUrlBase?: string,
   ): Promise<{ uploadUrl: string; expiresAt: Date; publicUrl: string }> {
     const command = new PutObjectCommand({
-      Bucket: this.bucketName,
+      Bucket: customBucket || this.bucketName,
       Key: objectKey,
       ContentType: contentType,
     });
 
     const uploadUrl = await getSignedUrl(this.client, command, { expiresIn: 3600 });
     const expiresAt = new Date(Date.now() + 3600 * 1000);
-    const publicUrl = `${this.publicUrlBase}/${objectKey}`;
+    const publicUrl = `${customPublicUrlBase || this.publicUrlBase}/${objectKey}`;
 
     return { uploadUrl, expiresAt, publicUrl };
   }

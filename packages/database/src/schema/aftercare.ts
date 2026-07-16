@@ -65,6 +65,7 @@ export const refunds = pgTable('sss_refunds', {
   amount: bigint('amount', { mode: 'number' }).notNull(),
   status: text('status').notNull().default('pending'), // 'pending', 'processing', 'completed', 'failed'
   providerReference: text('provider_reference'), // to map to payment gateway
+  proofImageUrl: text('proof_image_url'),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });

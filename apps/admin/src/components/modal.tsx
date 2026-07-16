@@ -86,7 +86,7 @@ const VARIANT_STYLES: Record<
 
 // ─── Backdrop & Shell ────────────────────────────────────────────────────────
 
-function ModalShell(
+export function ModalShell(
   { open, onClose, children }: { open: boolean; onClose: () => void; children: React.ReactNode },
 ) {
   if (!open) return null;

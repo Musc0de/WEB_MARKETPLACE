@@ -95,6 +95,7 @@ app.post('/:id/process', zValidator('json', processRefundRequestSchema), async (
         status: 'completed',
         amount: finalAmount,
         providerReference: `REF-${Date.now()}`,
+        proofImageUrl: payload.proofImageUrl || null,
         updatedAt: new Date().toISOString(),
       })
       .where(eq(refunds.id, refundId))

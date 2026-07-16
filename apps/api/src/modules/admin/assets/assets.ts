@@ -43,6 +43,41 @@ const routes = app.post(
       expiresAt: expiresAt.toISOString(),
     });
   },
+).post(
+  '/upload-proof-url',
+  requirePermission('orders.write'), // Or appropriate permission
+  zValidator('json', AssetUploadRequestSchema),
+  async (c) => {
+    const data = c.req.valid('json');
+    const ext = data.filename.split('.').pop() || 'bin';
+    const rawFilename = data.filename.replace(`.${ext}`, '').replace(/[^a-zA-Z0-9]/g, '-')
+      .substring(0, 50);
+    const uniqueName = `${rawFilename}-${crypto.randomUUID().substring(0, 8)}.${ext}`;
+    const objectKey = `refunds/${uniqueName}`;
+
+    // Read directly from env as requested without hardcoded fallback
+    const bucket = Deno.env.get('R2_PROFF_IMAGE');
+    const publicUrlBase = Deno.env.get('R2_PROFF_IMAGE_PUBLIC_URL');
+
+    if (!bucket || !publicUrlBase) {
+      return c.json({ error: 'R2 proof bucket config missing in environment' }, 500);
+    }
+
+    const { uploadUrl, expiresAt, publicUrl } = await storageAdapter.generatePresignedUploadUrl(
+      objectKey,
+      data.contentType,
+      data.size,
+      bucket,
+      publicUrlBase,
+    );
+
+    return c.json({
+      uploadUrl,
+      objectKey,
+      publicUrl,
+      expiresAt: expiresAt.toISOString(),
+    });
+  },
 );
 
 export default routes;
