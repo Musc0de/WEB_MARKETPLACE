@@ -27,7 +27,7 @@ function SectionCard({ title, icon, description, children }: {
 }
 
 // ─── Form Field ────────────────────────────────────────────────────────────────
-function Field({ label, required, hint, children }: {
+export function Field({ label, required, hint, children }: {
   label: string;
   required?: boolean;
   hint?: string;

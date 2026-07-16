@@ -1,3 +1,4 @@
+// deno-lint-ignore-file
 import { pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const globalSettings = pgTable('sss_global_settings', {

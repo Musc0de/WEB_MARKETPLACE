@@ -49,6 +49,8 @@ export interface ProductListItem {
 
 export interface ProductDetail extends ProductListItem {
   description?: string | null | undefined;
+  seoTitle?: string | null | undefined;
+  seoDescription?: string | null | undefined;
   purchaseLimit: number;
   brand?: Brand | null | undefined;
   categories: Category[];
@@ -155,6 +157,8 @@ export const ProductListItemSchema: z.ZodType<ProductListItem> = z.object({
 
 export const ProductDetailSchema: z.ZodType<ProductDetail> = ProductListItemSchema.and(z.object({
   description: z.string().nullable().optional(),
+  seoTitle: z.string().nullable().optional(),
+  seoDescription: z.string().nullable().optional(),
   purchaseLimit: z.number().default(0),
   brand: BrandSchema.nullable().optional(),
   categories: z.array(CategorySchema).default([]),

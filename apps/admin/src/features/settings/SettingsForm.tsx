@@ -6,7 +6,42 @@ import { client } from '../../lib/rpc.ts';
 import { goeyToast as toast } from 'goey-toast';
 import { Camera, Globe, Loader2, Save } from 'lucide-react';
 import { PageHeader } from '../../components/admin-ui.tsx';
-import { Field, SectionCard } from '../catalog/BrandForm.tsx';
+
+function Field(
+  { label, error, children }: {
+    label: string;
+    error?: string | undefined;
+    children: React.ReactNode;
+  },
+) {
+  return (
+    <div>
+      <label className='mb-1.5 block text-sm font-medium text-gray-700'>{label}</label>
+      {children}
+      {error && <p className='mt-1.5 text-sm text-red-500'>{error}</p>}
+    </div>
+  );
+}
+
+function SectionCard(
+  { title, description, children }: {
+    title: string;
+    description: string;
+    children: React.ReactNode;
+  },
+) {
+  return (
+    <div className='bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden'>
+      <div className='px-6 py-5 border-b border-gray-200 bg-gray-50/50'>
+        <h3 className='text-base font-semibold text-gray-900'>{title}</h3>
+        <p className='mt-1 text-sm text-gray-500'>{description}</p>
+      </div>
+      <div className='p-6'>
+        {children}
+      </div>
+    </div>
+  );
+}
 
 const formSchema = z.object({
   siteTitle: z.string().min(1, 'Site Title is required'),
@@ -41,7 +76,7 @@ export function SettingsForm() {
         });
         setFaviconUrl(json.data?.faviconUrl || null);
       }
-    } catch (e) {
+    } catch (_e) {
       toast.error('Gagal memuat pengaturan');
     } finally {
       setIsLoading(false);
@@ -68,7 +103,7 @@ export function SettingsForm() {
       } else {
         toast.error('Gagal menyimpan pengaturan');
       }
-    } catch (e) {
+    } catch (_e) {
       toast.error('Kesalahan jaringan');
     } finally {
       setIsSaving(false);

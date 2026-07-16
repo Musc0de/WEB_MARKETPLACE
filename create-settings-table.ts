@@ -13,7 +13,7 @@ async function run() {
   `);
   
   const existing = await db.execute(sql`SELECT * FROM sss_global_settings LIMIT 1`);
-  if (existing.length === 0) {
+  if (existing.rowCount === 0) {
     await db.execute(sql`
       INSERT INTO sss_global_settings (id, site_title, updated_at)
       VALUES ('global_1', 'StarSuperScare Marketplace', (now() at time zone 'utc')::text)

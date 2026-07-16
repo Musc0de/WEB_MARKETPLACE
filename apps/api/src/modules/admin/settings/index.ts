@@ -34,15 +34,25 @@ app.put(
     const payload = c.req.valid('json');
     const [existing] = await db.select().from(globalSettings).limit(1);
 
+    const updatePayload: any = { updatedAt: new Date().toISOString() };
+    if (payload.siteTitle !== undefined) updatePayload.siteTitle = payload.siteTitle;
+    if (payload.siteDescription !== undefined) {
+      updatePayload.siteDescription = payload.siteDescription;
+    }
+    if (payload.faviconUrl !== undefined) updatePayload.faviconUrl = payload.faviconUrl;
+
     let result;
     if (existing) {
       [result] = await db.update(globalSettings)
-        .set({ ...payload, updatedAt: new Date().toISOString() })
+        .set(updatePayload)
         .where(eq(globalSettings.id, existing.id))
         .returning();
     } else {
       [result] = await db.insert(globalSettings)
-        .values({ id: 'global_1', ...payload, updatedAt: new Date().toISOString() })
+        .values({
+          id: 'global_1',
+          ...updatePayload,
+        })
         .returning();
     }
 

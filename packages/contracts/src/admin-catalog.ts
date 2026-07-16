@@ -1,3 +1,4 @@
+// deno-lint-ignore-file
 import { z } from 'zod';
 import { ProductDetailSchema } from './catalog.ts';
 

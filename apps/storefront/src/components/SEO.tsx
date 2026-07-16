@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import useSWR from 'swr';
-import { client } from '../lib/rpc.ts';
+import { client } from '../lib/api.ts';
 
 interface SEOProps {
-  title?: string | null;
-  description?: string | null;
+  title?: string | null | undefined;
+  description?: string | null | undefined;
 }
 
 export function SEO({ title, description }: SEOProps) {
@@ -22,7 +22,7 @@ export function SEO({ title, description }: SEOProps) {
 
   useEffect(() => {
     // 1. Update Title
-    const siteTitle = globalSettings?.siteTitle || 'StarSuperScare Marketplace';
+    const siteTitle = globalSettings?.siteTitle || '';
     const finalTitle = title ? `${title} | ${siteTitle}` : siteTitle;
     document.title = finalTitle;
 
