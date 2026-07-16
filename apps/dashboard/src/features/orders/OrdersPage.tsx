@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 import { client } from '../../lib/api.ts';
-import { Badge, Button, Card, CardContent } from '@starsuperscare/ui';
+import { Badge, Button } from '@starsuperscare/ui';
 import { useNavigate } from 'react-router-dom';
-import { Box, Package, Receipt, ShoppingBag } from 'lucide-react';
-import { Pagination } from '../../components/Pagination.tsx';
+import { ChevronLeft, ChevronRight, Package, RefreshCcw, ShoppingCart } from 'lucide-react';
+import { toast } from '@starsuperscare/ui';
 
 type Tab = 'semua' | 'aktif' | 'selesai' | 'dibatalkan' | 'refund';
 
-const tabs: { value: Tab; label: string }[] = [
+const TABS: { value: Tab; label: string }[] = [
   { value: 'semua', label: 'Semua' },
   { value: 'aktif', label: 'Aktif' },
   { value: 'selesai', label: 'Selesai' },
@@ -22,77 +22,194 @@ const fetchOrders = async (_url: string, tab: Tab, page: number) => {
     const json = await res.json();
     return json.data;
   }
-  throw new Error('Failed to fetch orders');
+  throw new Error('Failed');
 };
+
+const STATUS_STYLE: Record<string, string> = {
+  pending: 'text-amber-600 bg-amber-50 border-amber-200',
+  paid: 'text-blue-600 bg-blue-50 border-blue-200',
+  processing: 'text-sky-600 bg-sky-50 border-sky-200',
+  shipped: 'text-indigo-600 bg-indigo-50 border-indigo-200',
+  delivered: 'text-emerald-600 bg-emerald-50 border-emerald-200',
+  cancelled: 'text-red-600 bg-red-50 border-red-200',
+  refunded: 'text-rose-600 bg-rose-50 border-rose-200',
+};
+const STATUS_LABEL: Record<string, string> = {
+  pending: 'Menunggu Pembayaran',
+  paid: 'Dibayar',
+  processing: 'Diproses',
+  shipped: 'Dikirim',
+  delivered: 'Selesai',
+  cancelled: 'Dibatalkan',
+  refunded: 'Dikembalikan',
+};
+
+/** Build full Cloudflare R2 image URL from objectKey — reads VITE_R2_PUBLIC_URL env variable */
+const R2_PUBLIC_URL = (import.meta as any).env?.VITE_R2_PUBLIC_URL ?? '';
+const buildImageUrl = (objectKey: string) => `${R2_PUBLIC_URL}/${objectKey}`;
+
+/** Parse variant option values (JSON) into human-readable string */
+const variantLabel = (optionValues: any): string => {
+  if (!optionValues) return '';
+  if (typeof optionValues === 'string') {
+    try {
+      optionValues = JSON.parse(optionValues);
+    } catch {
+      return optionValues;
+    }
+  }
+  if (Array.isArray(optionValues)) return optionValues.map((v: any) => v.value ?? v).join(' / ');
+  return Object.values(optionValues).join(' / ');
+};
+
+const fmt = (n: number) => `Rp\u00a0${n.toLocaleString('id-ID')}`;
+
+/** Mini image carousel for a single product's images */
+function ItemImageSlideshow({ imageKeys }: { imageKeys: string[] }) {
+  const [idx, setIdx] = useState(0);
+
+  if (!imageKeys.length) {
+    return (
+      <div className='w-20 h-20 rounded-xl bg-gray-100 flex items-center justify-center shrink-0 border border-gray-200'>
+        <Package className='w-8 h-8 text-gray-300' />
+      </div>
+    );
+  }
+
+  return (
+    <div className='relative w-20 h-20 shrink-0 select-none'>
+      <img
+        src={buildImageUrl(imageKeys[idx])}
+        alt='Produk'
+        className='w-20 h-20 rounded-xl object-cover border border-gray-200 bg-gray-50'
+        onError={(e) => {
+          (e.target as HTMLImageElement).src = '';
+          (e.target as HTMLImageElement).classList.add('hidden');
+        }}
+      />
+      {imageKeys.length > 1 && (
+        <>
+          <button
+            type='button'
+            onClick={(e) => {
+              e.stopPropagation();
+              setIdx((i) => (i - 1 + imageKeys.length) % imageKeys.length);
+            }}
+            className='absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 w-5 h-5 rounded-full bg-white/90 shadow border border-gray-200 flex items-center justify-center hover:bg-white transition'
+          >
+            <ChevronLeft className='w-3 h-3 text-gray-600' />
+          </button>
+          <button
+            type='button'
+            onClick={(e) => {
+              e.stopPropagation();
+              setIdx((i) => (i + 1) % imageKeys.length);
+            }}
+            className='absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 w-5 h-5 rounded-full bg-white/90 shadow border border-gray-200 flex items-center justify-center hover:bg-white transition'
+          >
+            <ChevronRight className='w-3 h-3 text-gray-600' />
+          </button>
+          {/* dot indicators */}
+          <div className='absolute bottom-0 left-0 right-0 flex justify-center gap-0.5 pb-1'>
+            {imageKeys.map((_, i) => (
+              <span
+                key={i}
+                className={`inline-block w-1 h-1 rounded-full transition-all ${
+                  i === idx ? 'bg-primary w-2' : 'bg-white/70'
+                }`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+/** "Beli Lagi" button — posts to buy-again endpoint */
+function BuyAgainButton({ orderId }: { orderId: string }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setLoading(true);
+    try {
+      const res = await client.v1.orders[':id']['buy-again'].$post({
+        param: { id: orderId },
+      });
+      if (res.ok) {
+        const result = await res.json();
+        if (result.data.outOfStockItems?.length > 0) {
+          toast.warning(
+            `Beberapa item habis: ${result.data.outOfStockItems.join(', ')}`,
+          );
+        }
+        if (result.data.addedCount > 0) {
+          toast.success('Item ditambahkan ke keranjang!');
+        } else {
+          toast.error('Tidak ada item yang tersedia.');
+        }
+      } else {
+        toast.error('Gagal memproses beli lagi.');
+      }
+    } catch {
+      toast.error('Terjadi kesalahan jaringan.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <button
+      type='button'
+      onClick={handleClick}
+      disabled={loading}
+      className='inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-primary/40 text-primary bg-primary/5 hover:bg-primary/10 hover:border-primary transition-all disabled:opacity-50'
+    >
+      {loading
+        ? <RefreshCcw className='w-3 h-3 animate-spin' />
+        : <ShoppingCart className='w-3 h-3' />}
+      Beli Lagi
+    </button>
+  );
+}
 
 export const OrdersPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>('semua');
   const [page, setPage] = useState(1);
 
-  const { data, error, isLoading } = useSWR(
+  const { data, isLoading, error } = useSWR(
     ['/api/orders', activeTab, page],
     ([url, t, p]) => fetchOrders(url, t as Tab, p),
   );
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-      case 'paid':
-      case 'processing':
-        return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
-      case 'shipped':
-        return 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20';
-      case 'delivered':
-        return 'bg-green-500/10 text-green-500 border-green-500/20';
-      case 'cancelled':
-      case 'refunded':
-        return 'bg-red-500/10 text-red-500 border-red-500/20';
-      default:
-        return 'bg-gray-500/10 text-gray-500 border-gray-500/20';
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      pending: 'Menunggu Pembayaran',
-      paid: 'Dibayar',
-      processing: 'Diproses',
-      shipped: 'Dikirim',
-      delivered: 'Selesai',
-      cancelled: 'Dibatalkan',
-      refunded: 'Refund',
-    };
-    return labels[status] || status;
-  };
+  const totalPages = data?.pagination?.totalPages ?? 1;
 
   return (
-    <div className='space-y-6'>
-      <div className='flex justify-between items-center'>
-        <div>
-          <h2 className='text-2xl font-bold tracking-tight'>Pesanan Saya</h2>
-          <p className='text-muted-foreground text-sm mt-1'>
-            Kelola dan lacak pesanan Anda di sini.
-          </p>
-        </div>
+    <div className='space-y-0'>
+      {/* ── Header ── */}
+      <div className='mb-4'>
+        <h2 className='text-xl font-bold text-gray-900'>Pesanan Saya</h2>
+        <p className='text-sm text-gray-500 mt-0.5'>Kelola dan lacak semua pesanan Anda</p>
       </div>
 
-      <div className='flex space-x-1.5 border-b border-gray-100 pb-4 overflow-x-auto scrollbar-hide'>
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.value;
+      {/* ── Tab Bar ── */}
+      <div className='flex border-b border-gray-200 overflow-x-auto scrollbar-hide'>
+        {TABS.map((tab) => {
+          const active = activeTab === tab.value;
           return (
             <button
-              type='button'
               key={tab.value}
+              type='button'
               onClick={() => {
                 setActiveTab(tab.value);
                 setPage(1);
               }}
-              className={`px-5 py-2.5 text-sm font-medium rounded-xl whitespace-nowrap transition-all duration-200 ${
-                isActive
-                  ? 'bg-primary text-primary-foreground shadow-md shadow-primary/10'
-                  : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
+              className={`px-5 py-3 text-sm font-medium whitespace-nowrap transition-all border-b-2 -mb-px ${
+                active
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300'
               }`}
             >
               {tab.label}
@@ -101,135 +218,167 @@ export const OrdersPage = () => {
         })}
       </div>
 
-      {isLoading
-        ? (
-          <div className='grid gap-4'>
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className='animate-pulse bg-gray-50 border-gray-100 h-32' />
-            ))}
-          </div>
-        )
-        : error
-        ? (
-          <div className='text-center py-10 bg-red-50 text-red-600 rounded-xl border border-red-100'>
-            <p>Gagal memuat pesanan. Silakan coba lagi.</p>
-          </div>
-        )
-        : data?.orders?.length === 0
-        ? (
-          <div className='text-center py-20 bg-gray-50 rounded-xl border border-gray-100'>
-            <Package className='w-12 h-12 mx-auto text-gray-400 mb-4 opacity-50' />
-            <h3 className='text-lg font-medium text-gray-900 mb-2'>Belum Ada Pesanan</h3>
-            <p className='text-gray-500 text-sm mb-6 max-w-sm mx-auto'>
-              Anda belum memiliki pesanan dengan status ini. Mulai belanja untuk melihat riwayat
-              Anda.
-            </p>
-            <Button onClick={() => navigate('/')}>
-              Mulai Belanja
-            </Button>
-          </div>
-        )
-        : (
-          <div className='grid gap-6'>
-            {data?.orders.map((order: any) => (
-              <Card
-                key={order.id}
-                className='bg-white border-gray-200 hover:border-gray-300 transition-all duration-300 overflow-hidden group shadow-sm hover:shadow-md rounded-2xl'
-              >
-                <div className='p-5 sm:p-7 flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between border-b border-gray-100 bg-gradient-to-r from-gray-50/50 to-transparent'>
-                  <div className='flex items-center gap-4 w-full sm:w-auto'>
-                    <div className='w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20 group-hover:scale-105 transition-transform duration-300'>
-                      <ShoppingBag className='w-6 h-6 text-primary' />
-                    </div>
-                    <div className='flex flex-col gap-1.5'>
-                      <div className='flex items-center gap-2'>
-                        <span className='font-bold text-gray-900 text-base tracking-wide flex items-center gap-2'>
-                          <Receipt className='w-4 h-4 text-gray-400' />
-                          {order.orderNumber}
-                        </span>
-                        <Badge
-                          variant='outline'
-                          className={`${
-                            getStatusColor(order.status)
-                          } border px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white`}
-                        >
-                          {getStatusLabel(order.status)}
-                        </Badge>
-                      </div>
-                      <p className='text-sm text-gray-500 flex items-center gap-1.5'>
+      {/* ── Content ── */}
+      <div className='py-4 space-y-3'>
+        {isLoading
+          ? (
+            <>
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className='animate-pulse h-40 rounded-xl bg-gray-100 border border-gray-200'
+                />
+              ))}
+            </>
+          )
+          : error
+          ? (
+            <div className='text-center py-16 text-sm text-red-500 bg-red-50 rounded-xl border border-red-100'>
+              Gagal memuat pesanan. Silakan muat ulang halaman.
+            </div>
+          )
+          : !data?.orders?.length
+          ? (
+            <div className='text-center py-20 bg-white rounded-xl border border-gray-200'>
+              <Package className='w-14 h-14 mx-auto text-gray-300 mb-4' />
+              <p className='text-base font-semibold text-gray-700 mb-1'>Belum Ada Pesanan</p>
+              <p className='text-sm text-gray-400 mb-6'>
+                Mulai belanja sekarang dan temukan produk favorit Anda!
+              </p>
+              <Button onClick={() => navigate('/')} className='rounded-full px-8'>
+                Mulai Belanja
+              </Button>
+            </div>
+          )
+          : (
+            <>
+              {data.orders.map((order: any) => (
+                <div
+                  key={order.id}
+                  className='bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md hover:border-gray-300 transition-all duration-200'
+                >
+                  {/* Order header */}
+                  <div className='px-4 py-3 flex items-center justify-between border-b border-gray-100 bg-gray-50/60'>
+                    <div className='flex items-center gap-2'>
+                      <span className='text-xs font-semibold text-gray-500 uppercase tracking-wide'>
+                        {order.orderNumber}
+                      </span>
+                      <span className='text-gray-300'>·</span>
+                      <span className='text-xs text-gray-400'>
                         {new Date(order.createdAt).toLocaleDateString('id-ID', {
                           day: 'numeric',
-                          month: 'long',
+                          month: 'short',
                           year: 'numeric',
                         })}
+                      </span>
+                    </div>
+                    <Badge
+                      variant='outline'
+                      className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
+                        STATUS_STYLE[order.status] || 'text-gray-600 bg-gray-50 border-gray-200'
+                      }`}
+                    >
+                      {STATUS_LABEL[order.status] || order.status}
+                    </Badge>
+                  </div>
+
+                  {/* Items list */}
+                  <div className='divide-y divide-gray-100'>
+                    {order.items.map((item: any) => {
+                      const label = variantLabel(item.optionValues);
+                      const hasDiscount = item.comparePrice &&
+                        item.comparePrice > item.priceSnapshot;
+                      return (
+                        <div key={item.orderItemId} className='px-4 py-4 flex gap-4 items-start'>
+                          {/* Product image with slideshow */}
+                          <ItemImageSlideshow imageKeys={item.imageKeys ?? []} />
+
+                          {/* Product info */}
+                          <div className='flex-1 min-w-0'>
+                            <p className='text-sm font-semibold text-gray-900 line-clamp-2 leading-snug'>
+                              {item.productName}
+                            </p>
+                            {label && (
+                              <p className='text-xs text-gray-400 mt-1 bg-gray-50 border border-gray-200 rounded-md px-2 py-0.5 inline-block'>
+                                {label}
+                              </p>
+                            )}
+                            <div className='flex items-center gap-3 mt-2'>
+                              {hasDiscount && (
+                                <span className='text-xs text-gray-400 line-through tabular-nums'>
+                                  {fmt(item.comparePrice)}
+                                </span>
+                              )}
+                              <span className='text-sm font-bold text-primary tabular-nums'>
+                                {fmt(item.priceSnapshot)}
+                              </span>
+                            </div>
+                            <p className='text-xs text-gray-400 mt-1'>
+                              × {item.quantity} item
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Footer: Total + CTAs */}
+                  <div className='px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t border-gray-100 bg-gray-50/40'>
+                    <div>
+                      <p className='text-xs text-gray-500'>
+                        {order.items.length} produk · Total Belanja
+                      </p>
+                      <p className='text-base font-bold text-gray-900 tabular-nums'>
+                        {fmt(order.totalAmount)}
                       </p>
                     </div>
-                  </div>
-                  <div className='text-left sm:text-right w-full sm:w-auto flex sm:flex-col justify-between sm:justify-start items-center sm:items-end p-4 sm:p-0 bg-gray-50 sm:bg-transparent rounded-xl sm:rounded-none border sm:border-none border-gray-100'>
-                    <p className='text-xs text-gray-500 uppercase tracking-wider font-medium mb-1'>
-                      Total Belanja
-                    </p>
-                    <p className='font-bold text-xl text-gray-900'>
-                      Rp {order.totalAmount.toLocaleString('id-ID')}
-                    </p>
+                    <div className='flex items-center gap-2'>
+                      <BuyAgainButton orderId={order.id} />
+                      <button
+                        type='button'
+                        onClick={() => navigate(`/orders/${order.id}`)}
+                        className='inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 transition-all'
+                      >
+                        Lihat Detail
+                      </button>
+                    </div>
                   </div>
                 </div>
-                <CardContent className='p-5 sm:p-7 flex flex-col sm:flex-row items-center justify-between gap-6'>
-                  <div className='flex items-center gap-4 w-full sm:w-auto'>
-                    <div className='flex -space-x-3'>
-                      {order.items?.slice(0, 3).map((item: any, idx: number) => (
-                        <div
-                          key={idx}
-                          className='w-12 h-12 rounded-full bg-white border-2 border-gray-50 flex items-center justify-center relative z-10 shadow-sm'
-                          title={item.productName}
-                        >
-                          <Box className='w-4 h-4 text-gray-300 absolute' />
-                          <span className='text-xs font-bold text-gray-700 relative z-10'>
-                            {item.quantity}x
-                          </span>
-                        </div>
-                      ))}
-                      {(order.items?.length || 0) > 3 && (
-                        <div className='w-12 h-12 rounded-full bg-gray-50 border-2 border-white flex items-center justify-center relative z-0'>
-                          <span className='text-xs font-medium text-gray-500'>
-                            +{(order.items?.length || 0) - 3}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    <div className='flex flex-col justify-center'>
-                      <p className='text-sm font-semibold text-gray-900 line-clamp-1'>
-                        {order.items?.[0]?.productName || 'Produk'}
-                      </p>
-                      {(order.items?.length || 0) > 1 && (
-                        <p className='text-xs text-gray-500 mt-0.5'>
-                          + {(order.items?.length || 0) - 1} produk lainnya
-                        </p>
-                      )}
-                    </div>
+              ))}
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className='flex items-center justify-between pt-4 pb-2 border-t border-gray-100'>
+                  <span className='text-sm text-gray-500'>
+                    Halaman <strong className='text-gray-900'>{page}</strong> dari{' '}
+                    <strong className='text-gray-900'>{totalPages}</strong>
+                    <span className='text-gray-400 ml-1.5'>({data.pagination.total} pesanan)</span>
+                  </span>
+                  <div className='flex items-center gap-2'>
+                    <button
+                      type='button'
+                      disabled={page <= 1}
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      className='inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-all disabled:opacity-40 disabled:cursor-not-allowed border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300'
+                    >
+                      <ChevronLeft className='w-4 h-4' />
+                      Sebelumnya
+                    </button>
+                    <button
+                      type='button'
+                      disabled={page >= totalPages}
+                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                      className='inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-all disabled:opacity-40 disabled:cursor-not-allowed border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300'
+                    >
+                      Berikutnya
+                      <ChevronRight className='w-4 h-4' />
+                    </button>
                   </div>
-
-                  <Button
-                    variant='outline'
-                    onClick={() => navigate(`/orders/${order.id}`)}
-                    className='w-full sm:w-auto border-gray-200 bg-white hover:bg-gray-50 hover:text-gray-900 shrink-0 shadow-sm rounded-xl'
-                  >
-                    Lihat Detail Pesanan
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-
-            {data?.pagination && data.pagination.total > 0 && (
-              <Pagination
-                page={page}
-                limit={data.pagination.limit}
-                total={data.pagination.total}
-                onPageChange={setPage}
-              />
-            )}
-          </div>
-        )}
+                </div>
+              )}
+            </>
+          )}
+      </div>
     </div>
   );
 };

@@ -9,6 +9,7 @@ import {
   orders,
   orderStatusHistory,
   payments,
+  productImages,
   products,
   productVariants,
   shipments,
@@ -79,26 +80,58 @@ const routes = app
         .limit(limit)
         .offset(offset);
 
-      // Fetch items summary for these orders
+      // Fetch rich items (with variant & image) for these orders
       const orderIds = orderList.map((o) => o.id);
       const itemsMap: Record<string, any[]> = {};
 
       if (orderIds.length > 0) {
+        // Join orderItems → productVariants to get comparePrice + optionValues
         const allItems = await db
           .select({
             orderId: orderItems.orderId,
+            orderItemId: orderItems.id,
+            productId: orderItems.productId,
+            variantId: orderItems.variantId,
             productName: orderItems.productNameSnapshot,
             variantSku: orderItems.variantSkuSnapshot,
             quantity: orderItems.quantity,
+            priceSnapshot: orderItems.priceSnapshot,
+            comparePrice: productVariants.comparePrice,
+            optionValues: productVariants.optionValues,
           })
           .from(orderItems)
+          .leftJoin(productVariants, eq(orderItems.variantId, productVariants.id))
           .where(inArray(orderItems.orderId, orderIds));
+
+        // Fetch primary images for each unique product
+        const uniqueProductIds = [...new Set(allItems.map((i) => i.productId))];
+        const imageRows = uniqueProductIds.length > 0
+          ? await db
+            .select({
+              productId: productImages.productId,
+              objectKey: productImages.objectKey,
+              isPrimary: productImages.isPrimary,
+              sortOrder: productImages.sortOrder,
+            })
+            .from(productImages)
+            .where(inArray(productImages.productId, uniqueProductIds))
+          : [];
+
+        // Build a map: productId → sorted image object keys
+        const imageMap: Record<string, string[]> = {};
+        for (const img of imageRows) {
+          if (!imageMap[img.productId]) imageMap[img.productId] = [];
+          imageMap[img.productId].push(img.objectKey);
+        }
 
         for (const item of allItems) {
           if (!itemsMap[item.orderId]) {
             itemsMap[item.orderId] = [];
           }
-          itemsMap[item.orderId].push(item);
+          itemsMap[item.orderId].push({
+            ...item,
+            imageKeys: imageMap[item.productId] || [],
+          });
         }
       }
 
