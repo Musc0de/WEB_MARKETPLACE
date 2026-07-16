@@ -106,7 +106,8 @@ export const ProductDetailPage = (): JSX.Element => {
     <div className='container mx-auto px-4 py-8 max-w-6xl'>
       <SEO
         title={product.seoTitle || product.name}
-        description={product.seoDescription || product.description}
+        description={product.seoDescription || product.description || ''}
+        appId='storefront'
       />
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-10'>
         {/* Left Column: Gallery */}

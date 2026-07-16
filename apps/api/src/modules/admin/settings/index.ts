@@ -11,7 +11,9 @@ app.use('/*', authMiddleware);
 app.use('/*', requirePermission('catalog.write')); // Require an admin-level permission
 
 app.get('/', async (c) => {
-  const [settings] = await db.select().from(globalSettings).limit(1);
+  const appId = c.req.query('app') || 'storefront';
+  const [settings] = await db.select().from(globalSettings).where(eq(globalSettings.id, appId))
+    .limit(1);
   return c.json({
     data: settings ||
       { siteTitle: 'StarSuperScare Marketplace', siteDescription: null, faviconUrl: null },
@@ -25,6 +27,7 @@ app.put(
   zValidator(
     'json',
     z.object({
+      appId: z.string().min(1),
       siteTitle: z.string().optional(),
       siteDescription: z.string().nullable().optional(),
       faviconUrl: z.string().nullable().optional(),
@@ -32,7 +35,9 @@ app.put(
   ),
   async (c) => {
     const payload = c.req.valid('json');
-    const [existing] = await db.select().from(globalSettings).limit(1);
+    const [existing] = await db.select().from(globalSettings).where(
+      eq(globalSettings.id, payload.appId),
+    ).limit(1);
 
     const updatePayload: any = { updatedAt: new Date().toISOString() };
     if (payload.siteTitle !== undefined) updatePayload.siteTitle = payload.siteTitle;
@@ -50,7 +55,7 @@ app.put(
     } else {
       [result] = await db.insert(globalSettings)
         .values({
-          id: 'global_1',
+          id: payload.appId,
           ...updatePayload,
         })
         .returning();

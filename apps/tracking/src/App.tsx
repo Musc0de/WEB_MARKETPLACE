@@ -100,7 +100,7 @@ export default function App() {
   return (
     <ErrorBoundary FallbackComponent={Fallback}>
       <ResponsiveGooeyToaster />
-      <SEO appTitle='Tracking Portal' />
+      <SEO appId='tracking' />
       <BrowserRouter>
         <TrackingLayout>
           <Routes>

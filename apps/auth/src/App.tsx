@@ -41,7 +41,7 @@ export default function App() {
   return (
     <ErrorBoundary FallbackComponent={Fallback}>
       <ResponsiveGooeyToaster />
-      <SEO appTitle='Auth Portal' />
+      <SEO appId='auth' />
       <BrowserRouter>
         <AuthLayout>
           <Routes>

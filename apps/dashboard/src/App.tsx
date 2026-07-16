@@ -72,7 +72,7 @@ export default function App() {
   return (
     <ErrorBoundary FallbackComponent={Fallback}>
       <ResponsiveGooeyToaster />
-      <SEO appTitle='Dashboard' />
+      <SEO appId='dashboard' />
       <BrowserRouter>
         <DashboardLayout>
           <Routes>

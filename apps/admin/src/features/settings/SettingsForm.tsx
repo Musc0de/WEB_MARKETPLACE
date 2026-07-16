@@ -50,6 +50,9 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export function SettingsForm() {
+  const [activeApp, setActiveApp] = useState(() =>
+    localStorage.getItem('admin_settings_active_app') || ''
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [faviconUrl, setFaviconUrl] = useState<string | null>(null);
@@ -65,13 +68,14 @@ export function SettingsForm() {
     resolver: zodResolver(formSchema),
   });
 
-  const loadSettings = async () => {
+  const loadSettings = async (appId: string) => {
+    setIsLoading(true);
     try {
-      const res = await (client.v1.admin as any).settings.$get();
+      const res = await (client.v1.admin as any).settings.$get({ query: { app: appId } });
       if (res.ok) {
         const json = await res.json();
         reset({
-          siteTitle: json.data?.siteTitle || 'StarSuperScare Marketplace',
+          siteTitle: json.data?.siteTitle || '',
           siteDescription: json.data?.siteDescription || '',
         });
         setFaviconUrl(json.data?.faviconUrl || null);
@@ -84,14 +88,16 @@ export function SettingsForm() {
   };
 
   useEffect(() => {
-    loadSettings();
-  }, []);
+    localStorage.setItem('admin_settings_active_app', activeApp);
+    loadSettings(activeApp);
+  }, [activeApp]);
 
   const onSubmit = async (values: FormValues) => {
     setIsSaving(true);
     try {
       const res = await (client.v1.admin as any).settings.$put({
         json: {
+          appId: activeApp,
           siteTitle: values.siteTitle,
           siteDescription: values.siteDescription,
           faviconUrl,
@@ -189,6 +195,25 @@ export function SettingsForm() {
       </div>
 
       <form className='space-y-6'>
+        <SectionCard
+          title='Pilih Aplikasi'
+          description='Pilih aplikasi mana yang ingin Anda atur identitasnya.'
+        >
+          <Field label='Aplikasi Tujuan'>
+            <select
+              value={activeApp}
+              onChange={(e) => setActiveApp(e.target.value)}
+              className='w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500 outline-none transition-all'
+            >
+              <option value='storefront'>Storefront (Katalog Publik)</option>
+              <option value='admin'>Admin Portal</option>
+              <option value='dashboard'>User Dashboard</option>
+              <option value='auth'>Auth Portal</option>
+              <option value='tracking'>Tracking Portal</option>
+            </select>
+          </Field>
+        </SectionCard>
+
         <SectionCard
           title='Identitas Situs'
           description='Pengaturan dasar situs yang akan ditampilkan di tab browser dan mesin pencari.'

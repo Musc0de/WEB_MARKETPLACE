@@ -93,7 +93,7 @@ export default function App() {
     <ErrorBoundary FallbackComponent={Fallback}>
       <QueryClientProvider client={queryClient}>
         <ResponsiveGooeyToaster />
-        <SEO appTitle='Admin Portal' />
+        <SEO appId='admin' />
         <AuthProvider>
           <BrowserRouter>
             <Routes>

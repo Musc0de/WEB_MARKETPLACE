@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react';
 interface SEOProps {
   title?: string | null | undefined;
   description?: string | null | undefined;
-  appTitle?: string;
+  appId?: string;
 }
 
-export function SEO({ title, description, appTitle }: SEOProps) {
+export function SEO({ title, description, appId }: SEOProps) {
   const [globalSettings, setGlobalSettings] = useState<any>(null);
 
   useEffect(() => {
@@ -14,7 +14,7 @@ export function SEO({ title, description, appTitle }: SEOProps) {
     const apiUrl = (import.meta as any).env?.VITE_API_URL || '';
     if (!apiUrl) return;
 
-    fetch(`${apiUrl}/v1/settings`)
+    fetch(`${apiUrl}/v1/settings?app=${appId || 'storefront'}`)
       .then((res) => {
         if (!res.ok) throw new Error('Network response was not ok');
         return res.json();
@@ -31,12 +31,8 @@ export function SEO({ title, description, appTitle }: SEOProps) {
     const siteTitle = globalSettings?.siteTitle || 'StarSuperScare Marketplace';
 
     let finalTitle = siteTitle;
-    if (title && appTitle) {
-      finalTitle = `${title} | ${appTitle} | ${siteTitle}`;
-    } else if (title) {
+    if (title) {
       finalTitle = `${title} | ${siteTitle}`;
-    } else if (appTitle) {
-      finalTitle = `${appTitle} | ${siteTitle}`;
     }
 
     if (finalTitle) {
@@ -63,7 +59,7 @@ export function SEO({ title, description, appTitle }: SEOProps) {
       }
       linkIcon.href = globalSettings.faviconUrl;
     }
-  }, [title, description, appTitle, globalSettings]);
+  }, [title, description, appId, globalSettings]);
 
   return null;
 }

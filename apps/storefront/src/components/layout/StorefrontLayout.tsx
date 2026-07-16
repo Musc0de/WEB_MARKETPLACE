@@ -520,7 +520,7 @@ const Footer = () => {
 export const StorefrontLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div className='min-h-screen flex flex-col font-sans bg-gray-50 text-gray-900 pb-14 md:pb-0'>
-      <SEO appTitle='Storefront' />
+      <SEO appId='storefront' />
       <Header />
       <main className='flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-8 py-6'>
         <ErrorBoundary
