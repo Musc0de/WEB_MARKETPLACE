@@ -3,7 +3,8 @@ import useSWR from 'swr';
 import { client } from '../../lib/api.ts';
 import { Badge, Button, Card, CardContent } from '@starsuperscare/ui';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Package } from 'lucide-react';
+import { Box, Package, Receipt, ShoppingBag } from 'lucide-react';
+import { Pagination } from '../../components/Pagination.tsx';
 
 type Tab = 'semua' | 'aktif' | 'selesai' | 'dibatalkan' | 'refund';
 
@@ -77,24 +78,27 @@ export const OrdersPage = () => {
         </div>
       </div>
 
-      <div className='flex space-x-2 border-b border-white/10 pb-4 overflow-x-auto'>
-        {tabs.map((tab) => (
-          <button
-            type='button'
-            key={tab.value}
-            onClick={() => {
-              setActiveTab(tab.value);
-              setPage(1);
-            }}
-            className={`px-4 py-2 text-sm font-medium rounded-full whitespace-nowrap transition-colors ${
-              activeTab === tab.value
-                ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:bg-white/5 hover:text-white'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className='flex space-x-1.5 border-b border-white/10 pb-4 overflow-x-auto scrollbar-hide'>
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.value;
+          return (
+            <button
+              type='button'
+              key={tab.value}
+              onClick={() => {
+                setActiveTab(tab.value);
+                setPage(1);
+              }}
+              className={`px-5 py-2.5 text-sm font-medium rounded-xl whitespace-nowrap transition-all duration-200 ${
+                isActive
+                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
+                  : 'text-muted-foreground hover:bg-white/5 hover:text-white'
+              }`}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
 
       {isLoading
@@ -126,66 +130,81 @@ export const OrdersPage = () => {
           </div>
         )
         : (
-          <div className='grid gap-4'>
+          <div className='grid gap-6'>
             {data?.orders.map((order: any) => (
               <Card
                 key={order.id}
-                className='bg-[#0f1115] border-white/10 hover:border-white/20 transition-all overflow-hidden group'
+                className='bg-black/20 backdrop-blur-md border border-white/5 hover:border-white/20 transition-all duration-300 overflow-hidden group shadow-sm hover:shadow-xl hover:shadow-black/40 rounded-2xl'
               >
-                <div className='p-4 sm:p-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between border-b border-white/5 bg-white/[0.02]'>
-                  <div className='flex items-center gap-3'>
-                    <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0'>
-                      <Package className='w-5 h-5 text-primary' />
+                <div className='p-5 sm:p-7 flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between border-b border-white/5 bg-gradient-to-r from-white/[0.03] to-transparent'>
+                  <div className='flex items-center gap-4 w-full sm:w-auto'>
+                    <div className='w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20 group-hover:scale-105 transition-transform duration-300'>
+                      <ShoppingBag className='w-6 h-6 text-primary' />
                     </div>
-                    <div>
-                      <p className='text-sm text-muted-foreground mb-1'>
+                    <div className='flex flex-col gap-1.5'>
+                      <div className='flex items-center gap-2'>
+                        <span className='font-bold text-white text-base tracking-wide flex items-center gap-2'>
+                          <Receipt className='w-4 h-4 text-muted-foreground' />
+                          {order.orderNumber}
+                        </span>
+                        <Badge
+                          variant='outline'
+                          className={`${
+                            getStatusColor(order.status)
+                          } border px-2.5 py-0.5 rounded-full text-xs font-semibold backdrop-blur-sm`}
+                        >
+                          {getStatusLabel(order.status)}
+                        </Badge>
+                      </div>
+                      <p className='text-sm text-muted-foreground flex items-center gap-1.5'>
                         {new Date(order.createdAt).toLocaleDateString('id-ID', {
                           day: 'numeric',
                           month: 'long',
                           year: 'numeric',
                         })}
                       </p>
-                      <div className='flex items-center gap-2'>
-                        <span className='font-medium text-white'>{order.orderNumber}</span>
-                        <Badge variant='outline' className={getStatusColor(order.status)}>
-                          {getStatusLabel(order.status)}
-                        </Badge>
-                      </div>
                     </div>
                   </div>
-                  <div className='text-left sm:text-right w-full sm:w-auto flex sm:flex-col justify-between sm:justify-start items-center sm:items-end'>
-                    <p className='text-sm text-muted-foreground'>Total Belanja</p>
-                    <p className='font-bold text-lg text-white'>
+                  <div className='text-left sm:text-right w-full sm:w-auto flex sm:flex-col justify-between sm:justify-start items-center sm:items-end p-4 sm:p-0 bg-white/5 sm:bg-transparent rounded-xl sm:rounded-none border sm:border-none border-white/5'>
+                    <p className='text-xs text-muted-foreground uppercase tracking-wider font-medium mb-1'>
+                      Total Belanja
+                    </p>
+                    <p className='font-bold text-xl text-white'>
                       Rp {order.totalAmount.toLocaleString('id-ID')}
                     </p>
                   </div>
                 </div>
-                <CardContent className='p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4'>
-                  <div className='flex -space-x-2 w-full sm:w-auto'>
+                <CardContent className='p-5 sm:p-7 flex flex-col sm:flex-row items-center justify-between gap-6'>
+                  <div className='flex items-center gap-4 w-full sm:w-auto'>
                     {/* Summary of items */}
-                    {order.items.slice(0, 3).map((item: any, idx: number) => (
-                      <div
-                        key={idx}
-                        className='w-12 h-12 rounded-lg bg-white/10 border border-[#0f1115] flex items-center justify-center overflow-hidden relative z-10'
-                        title={item.productName}
-                      >
-                        <span className='text-xs text-muted-foreground'>{item.quantity}x</span>
-                      </div>
-                    ))}
-                    {order.items.length > 3 && (
-                      <div className='w-12 h-12 rounded-lg bg-white/5 border border-[#0f1115] flex items-center justify-center relative z-0'>
-                        <span className='text-xs text-muted-foreground'>
-                          +{order.items.length - 3}
-                        </span>
-                      </div>
-                    )}
-                    <div className='ml-4 pl-4 flex flex-col justify-center'>
-                      <p className='text-sm font-medium text-white line-clamp-1'>
-                        {order.items[0]?.productName}
+                    <div className='flex -space-x-3'>
+                      {order.items?.slice(0, 3).map((item: any, idx: number) => (
+                        <div
+                          key={idx}
+                          className='w-12 h-12 rounded-full bg-[#16181d] border-2 border-[#0a0c10] flex items-center justify-center relative z-10 shadow-sm'
+                          title={item.productName}
+                        >
+                          <Box className='w-4 h-4 text-muted-foreground opacity-50 absolute' />
+                          <span className='text-xs font-bold text-white relative z-10 drop-shadow-md'>
+                            {item.quantity}x
+                          </span>
+                        </div>
+                      ))}
+                      {(order.items?.length || 0) > 3 && (
+                        <div className='w-12 h-12 rounded-full bg-white/5 border-2 border-[#0a0c10] flex items-center justify-center relative z-0 backdrop-blur-sm'>
+                          <span className='text-xs font-medium text-muted-foreground'>
+                            +{(order.items?.length || 0) - 3}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className='flex flex-col justify-center'>
+                      <p className='text-sm font-semibold text-white line-clamp-1'>
+                        {order.items?.[0]?.productName || 'Produk'}
                       </p>
-                      {order.items.length > 1 && (
-                        <p className='text-xs text-muted-foreground'>
-                          + {order.items.length - 1} produk lainnya
+                      {(order.items?.length || 0) > 1 && (
+                        <p className='text-xs text-muted-foreground mt-0.5'>
+                          + {(order.items?.length || 0) - 1} produk lainnya
                         </p>
                       )}
                     </div>
@@ -194,40 +213,21 @@ export const OrdersPage = () => {
                   <Button
                     variant='outline'
                     onClick={() => navigate(`/orders/${order.id}`)}
-                    className='w-full sm:w-auto border-white/20 hover:bg-white/10 shrink-0'
+                    className='w-full sm:w-auto border-white/10 bg-white/5 hover:bg-white/10 hover:text-white shrink-0 shadow-sm rounded-xl'
                   >
-                    Detail Pesanan
+                    Lihat Detail Pesanan
                   </Button>
                 </CardContent>
               </Card>
             ))}
 
-            {/* Pagination */}
-            {(data?.pagination?.totalPages ?? 0) > 1 && (
-              <div className='flex justify-center items-center gap-4 mt-8'>
-                <Button
-                  variant='outline'
-                  size='icon'
-                  disabled={page === 1}
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  className='border-white/20 hover:bg-white/10'
-                >
-                  <ChevronLeft className='w-4 h-4' />
-                </Button>
-                <span className='text-sm text-muted-foreground'>
-                  Halaman <span className='text-white font-medium'>{page}</span> dari{' '}
-                  {data?.pagination?.totalPages}
-                </span>
-                <Button
-                  variant='outline'
-                  size='icon'
-                  disabled={page === data?.pagination?.totalPages}
-                  onClick={() => setPage((p) => Math.min(data?.pagination?.totalPages || 1, p + 1))}
-                  className='border-white/20 hover:bg-white/10'
-                >
-                  <ChevronRight className='w-4 h-4' />
-                </Button>
-              </div>
+            {data?.pagination && data.pagination.total > 0 && (
+              <Pagination
+                page={page}
+                limit={data.pagination.limit}
+                total={data.pagination.total}
+                onPageChange={setPage}
+              />
             )}
           </div>
         )}
