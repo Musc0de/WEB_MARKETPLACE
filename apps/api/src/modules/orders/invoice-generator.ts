@@ -127,14 +127,14 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Uint8Array>
     font: fontReg,
     color: GRAY,
   });
-  page.drawText(`Kepada: ${data.customerName}`, {
+  page.drawText(`Kepada: ${data.customerName ?? 'Pelanggan'}`, {
     x: ML,
     y: y - LINE_H,
     size: 9,
     font: fontReg,
     color: GRAY,
   });
-  page.drawText(data.customerEmail, {
+  page.drawText(data.customerEmail ?? '-', {
     x: ML,
     y: y - LINE_H * 2,
     size: 9,
@@ -147,20 +147,38 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Uint8Array>
     const sa = data.shippingAddress;
     const rx = width / 2 + 10;
     page.drawText('Alamat Pengiriman', { x: rx, y, size: 9, font: fontBold, color: DARK });
-    page.drawText(sa.recipientName, { x: rx, y: y - LINE_H, size: 9, font: fontReg, color: GRAY });
-    page.drawText(sa.phone, { x: rx, y: y - LINE_H * 2, size: 9, font: fontReg, color: GRAY });
-    const addr = `${sa.addressLine1}${sa.addressLine2 ? ', ' + sa.addressLine2 : ''}`;
-    page.drawText(addr.substring(0, 55), {
+    page.drawText(sa.recipientName ?? '-', {
+      x: rx,
+      y: y - LINE_H,
+      size: 9,
+      font: fontReg,
+      color: GRAY,
+    });
+    page.drawText(sa.phone ?? '-', {
+      x: rx,
+      y: y - LINE_H * 2,
+      size: 9,
+      font: fontReg,
+      color: GRAY,
+    });
+    const addr = `${sa.addressLine1 ?? ''}${sa.addressLine2 ? ', ' + sa.addressLine2 : ''}`;
+    page.drawText((addr || '-').substring(0, 55), {
       x: rx,
       y: y - LINE_H * 3,
       size: 8,
       font: fontReg,
       color: GRAY,
     });
-    page.drawText(
-      `${sa.district}, ${sa.city}, ${sa.province} ${sa.postalCode}`,
-      { x: rx, y: y - LINE_H * 4, size: 8, font: fontReg, color: GRAY },
-    );
+    const cityLine = `${sa.district ?? ''}, ${sa.city ?? ''}, ${sa.province ?? ''} ${
+      sa.postalCode ?? ''
+    }`;
+    page.drawText(cityLine.replace(/^,\s*/, '').trim() || '-', {
+      x: rx,
+      y: y - LINE_H * 4,
+      size: 8,
+      font: fontReg,
+      color: GRAY,
+    });
   }
 
   y -= LINE_H * 4 + 24;
@@ -201,11 +219,11 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Uint8Array>
       });
     }
     page.drawText(String(i + 1), { x: cols.no, y: rowY, size: 8, font: fontReg, color: GRAY });
-    const pname = item.productName.length > 30
-      ? item.productName.substring(0, 28) + '…'
-      : item.productName;
+    const rawName = item.productName ?? 'Produk';
+    const pname = rawName.length > 30 ? rawName.substring(0, 28) + '\u2026' : rawName;
     page.drawText(pname, { x: cols.product, y: rowY, size: 8, font: fontReg, color: DARK });
-    page.drawText(item.variantSku.substring(0, 18), {
+    const rawSku = (item.variantSku ?? '-').substring(0, 18);
+    page.drawText(rawSku, {
       x: cols.sku,
       y: rowY,
       size: 7,
