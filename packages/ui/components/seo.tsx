@@ -11,7 +11,9 @@ export function SEO({ title, description, appTitle }: SEOProps) {
 
   useEffect(() => {
     // Fetch global settings directly without SWR to avoid extra dependencies in UI library
-    const apiUrl = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8000';
+    const apiUrl = (import.meta as any).env?.VITE_API_URL || '';
+    if (!apiUrl) return;
+
     fetch(`${apiUrl}/v1/settings`)
       .then((res) => {
         if (!res.ok) throw new Error('Network response was not ok');
