@@ -2,7 +2,7 @@ import { useState } from 'react';
 import useSWR from 'swr';
 import { client } from '../../lib/api.ts';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Badge, Button, Card } from '@starsuperscare/ui';
+import { Badge } from '@starsuperscare/ui';
 import {
   ArrowLeft,
   CheckCircle2,
@@ -20,59 +20,86 @@ import {
 } from 'lucide-react';
 import { toast } from '@starsuperscare/ui';
 
+// ─── helpers ────────────────────────────────────────────────────────────────
+
 const fetchOrderDetail = async (id: string) => {
   const res = await client.v1.orders[':id'].$get({ param: { id } });
-  if (res.ok) {
-    const json = await res.json();
-    return json.data;
+  if (res.ok) return (await res.json()).data;
+  throw new Error('Failed to fetch');
+};
+
+const fmt = (n: number) => `Rp\u00a0${n.toLocaleString('id-ID')}`;
+
+const STATUS_CONFIG: Record<string, { style: string; dot: string; label: string }> = {
+  pending: {
+    style: 'text-amber-700 bg-amber-50 border-amber-200',
+    dot: 'bg-amber-500',
+    label: 'Menunggu Pembayaran',
+  },
+  paid: {
+    style: 'text-blue-700 bg-blue-50 border-blue-200',
+    dot: 'bg-blue-500',
+    label: 'Dibayar',
+  },
+  processing: {
+    style: 'text-sky-700 bg-sky-50 border-sky-200',
+    dot: 'bg-sky-500',
+    label: 'Diproses',
+  },
+  shipped: {
+    style: 'text-indigo-700 bg-indigo-50 border-indigo-200',
+    dot: 'bg-indigo-500',
+    label: 'Dikirim',
+  },
+  delivered: {
+    style: 'text-emerald-700 bg-emerald-50 border-emerald-200',
+    dot: 'bg-emerald-500',
+    label: 'Selesai',
+  },
+  cancelled: {
+    style: 'text-red-700 bg-red-50 border-red-200',
+    dot: 'bg-red-500',
+    label: 'Dibatalkan',
+  },
+  refunded: {
+    style: 'text-rose-700 bg-rose-50 border-rose-200',
+    dot: 'bg-rose-500',
+    label: 'Dikembalikan',
+  },
+};
+
+const getStatusCfg = (s: string) =>
+  STATUS_CONFIG[s] ??
+    { style: 'text-gray-700 bg-gray-50 border-gray-200', dot: 'bg-gray-400', label: s };
+
+const variantLabel = (optionValues: any): string => {
+  if (!optionValues) return '';
+  try {
+    const parsed = typeof optionValues === 'string' ? JSON.parse(optionValues) : optionValues;
+    if (Array.isArray(parsed)) return parsed.map((v: any) => v.value ?? v).join(' · ');
+    return Object.values(parsed).join(' · ');
+  } catch {
+    return String(optionValues);
   }
-  throw new Error('Failed to fetch order detail');
 };
 
-/** Status badge styles for light mode */
-const getStatusStyle = (status: string) => {
-  const styles: Record<string, string> = {
-    pending: 'bg-amber-50 text-amber-700 border-amber-200',
-    paid: 'bg-blue-50 text-blue-700 border-blue-200',
-    processing: 'bg-sky-50 text-sky-700 border-sky-200',
-    shipped: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-    delivered: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    cancelled: 'bg-red-50 text-red-700 border-red-200',
-    refunded: 'bg-rose-50 text-rose-700 border-rose-200',
-  };
-  return styles[status] || 'bg-gray-50 text-gray-600 border-gray-200';
-};
-
-const getStatusLabel = (status: string) => {
-  const labels: Record<string, string> = {
-    pending: 'Menunggu Pembayaran',
-    paid: 'Dibayar',
-    processing: 'Diproses',
-    shipped: 'Dikirim',
-    delivered: 'Selesai',
-    cancelled: 'Dibatalkan',
-    refunded: 'Dikembalikan',
-  };
-  return labels[status] || status;
-};
-
-/** Timeline event icon */
-const getEventIcon = (status: string) => {
+const timelineIcon = (status: string) => {
   if (status === 'delivered') return <CheckCircle2 className='w-4 h-4 text-emerald-600' />;
   if (status === 'shipped') return <Truck className='w-4 h-4 text-indigo-600' />;
-  if (status.includes('cancel')) return <XCircle className='w-4 h-4 text-red-500' />;
-  if (status === 'refunded') return <RefreshCcw className='w-4 h-4 text-rose-500' />;
+  if (status === 'cancelled' || status === 'refunded') {
+    return <XCircle className='w-4 h-4 text-red-500' />;
+  }
   return <Clock className='w-4 h-4 text-blue-500' />;
 };
 
-/** Timeline event dot color */
-const getEventDotColor = (status: string) => {
-  if (status === 'delivered') return 'bg-emerald-100 border-emerald-300';
-  if (status === 'shipped') return 'bg-indigo-100 border-indigo-300';
-  if (status.includes('cancel')) return 'bg-red-100 border-red-300';
-  if (status === 'refunded') return 'bg-rose-100 border-rose-300';
-  return 'bg-blue-100 border-blue-300';
+const timelineDotColor = (status: string) => {
+  if (status === 'delivered') return 'border-emerald-400 bg-emerald-50';
+  if (status === 'shipped') return 'border-indigo-400 bg-indigo-50';
+  if (status === 'cancelled' || status === 'refunded') return 'border-red-400 bg-red-50';
+  return 'border-blue-400 bg-blue-50';
 };
+
+// ─── component ──────────────────────────────────────────────────────────────
 
 export const OrderDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -91,97 +118,96 @@ export const OrderDetailPage = () => {
       const res = await client.v1.orders[':id']['buy-again'].$post({ param: { id } });
       if (res.ok) {
         const result = await res.json();
-        if (result.data.outOfStockItems?.length > 0) {
-          toast.warning(
-            `Beberapa item habis/tidak tersedia: ${result.data.outOfStockItems.join(', ')}`,
-          );
+        if ((result.data.outOfStockItems?.length ?? 0) > 0) {
+          toast.warning(`Item habis: ${result.data.outOfStockItems.join(', ')}`);
         }
-        if (result.data.addedCount > 0) {
-          toast.success('Item berhasil ditambahkan ke keranjang!');
-        } else if (result.data.addedCount === 0) {
-          toast.error('Tidak ada item yang bisa dibeli lagi saat ini.');
-        }
+        if (result.data.addedCount > 0) toast.success('Item ditambahkan ke keranjang!');
+        else toast.error('Tidak ada item yang bisa dibeli lagi.');
       } else {
-        toast.error('Gagal memproses permintaan beli lagi');
+        toast.error('Gagal memproses beli lagi.');
       }
-    } catch (_err) {
-      toast.error('Terjadi kesalahan jaringan');
+    } catch {
+      toast.error('Terjadi kesalahan jaringan.');
     } finally {
       setIsBuyingAgain(false);
     }
   };
 
-  /* ── Loading State ── */
+  /* ── Loading ── */
   if (isLoading) {
     return (
-      <div className='max-w-5xl mx-auto space-y-6 animate-pulse'>
-        <div className='h-8 w-48 bg-gray-100 rounded-lg' />
-        <div className='h-4 w-72 bg-gray-100 rounded-lg' />
-        <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
-          <div className='lg:col-span-2 space-y-6'>
-            <div className='h-64 bg-gray-100 rounded-2xl' />
-            <div className='h-48 bg-gray-100 rounded-2xl' />
+      <div className='max-w-5xl mx-auto space-y-5 animate-pulse pb-10'>
+        <div className='h-8 w-52 bg-gray-100 rounded-xl' />
+        <div className='h-4 w-80 bg-gray-100 rounded-xl' />
+        <div className='grid grid-cols-1 lg:grid-cols-3 gap-5 mt-4'>
+          <div className='lg:col-span-2 space-y-5'>
+            <div className='h-56 bg-gray-100 rounded-2xl' />
+            <div className='h-44 bg-gray-100 rounded-2xl' />
           </div>
-          <div className='space-y-6'>
+          <div className='space-y-5'>
             <div className='h-52 bg-gray-100 rounded-2xl' />
-            <div className='h-40 bg-gray-100 rounded-2xl' />
+            <div className='h-44 bg-gray-100 rounded-2xl' />
           </div>
         </div>
       </div>
     );
   }
 
-  /* ── Error State ── */
+  /* ── Error ── */
   if (error || !data) {
     return (
-      <div className='text-center py-20 max-w-md mx-auto'>
-        <div className='w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-5 border border-red-100'>
-          <Package className='w-8 h-8 text-red-400' />
+      <div className='text-center py-24 max-w-sm mx-auto'>
+        <div className='w-16 h-16 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center mx-auto mb-5'>
+          <Package className='w-8 h-8 text-red-300' />
         </div>
-        <h3 className='text-lg font-semibold text-gray-900 mb-2'>Pesanan Tidak Ditemukan</h3>
-        <p className='text-gray-500 text-sm mb-6'>
-          Pesanan yang Anda cari tidak ada atau mungkin sudah dihapus.
-        </p>
-        <Button variant='outline' onClick={() => navigate('/orders')} className='rounded-full px-6'>
-          <ArrowLeft className='w-4 h-4 mr-2' />
-          Kembali ke Daftar Pesanan
-        </Button>
+        <p className='text-base font-bold text-gray-800 mb-1'>Pesanan Tidak Ditemukan</p>
+        <p className='text-sm text-gray-400 mb-6'>Pesanan yang Anda cari tidak tersedia.</p>
+        <button
+          type='button'
+          onClick={() => navigate('/orders')}
+          className='inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full border-2 border-gray-200 text-gray-700 hover:bg-gray-50 transition'
+        >
+          <ArrowLeft className='w-4 h-4' />
+          Kembali ke Pesanan
+        </button>
       </div>
     );
   }
 
   const { order, items, addresses, history } = data;
   const shipping: any = addresses?.shippingSnapshot;
+  const cfg = getStatusCfg(order.status);
+
+  const hasDiscount = order.discountAmount > 0;
+  const discountPct = hasDiscount && order.subtotalAmount > 0
+    ? Math.round((order.discountAmount / (order.subtotalAmount + order.discountAmount)) * 100)
+    : 0;
 
   return (
-    <div className='space-y-8 max-w-5xl mx-auto pb-10'>
-      {/* ═══════════ Header ═══════════ */}
-      <div className='flex flex-col sm:flex-row sm:items-start justify-between gap-5'>
-        <div className='flex items-start gap-4'>
+    <div className='space-y-6 max-w-5xl mx-auto pb-10'>
+      {/* ══════════ Header ══════════ */}
+      <div className='flex flex-col sm:flex-row sm:items-start justify-between gap-4'>
+        <div className='flex items-start gap-3'>
           <button
             type='button'
             onClick={() => navigate('/orders')}
-            className='mt-1 p-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-all active:scale-95 shrink-0'
+            className='mt-0.5 p-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 active:scale-95 transition shrink-0'
           >
             <ArrowLeft className='w-4 h-4 text-gray-600' />
           </button>
           <div>
-            <div className='flex items-center gap-3 flex-wrap'>
-              <h2 className='text-xl font-bold text-gray-900'>
-                {order.orderNumber}
-              </h2>
+            <div className='flex items-center gap-2.5 flex-wrap'>
+              <h2 className='text-lg font-bold text-gray-900'>{order.orderNumber}</h2>
               <Badge
                 variant='outline'
-                className={`${
-                  getStatusStyle(order.status)
-                } border rounded-full px-3 py-0.5 text-xs font-semibold`}
+                className={`${cfg.style} border rounded-full px-3 py-0.5 text-xs font-bold`}
               >
-                {getStatusLabel(order.status)}
+                {cfg.label}
               </Badge>
             </div>
-            <p className='text-sm text-gray-500 mt-1.5 flex items-center gap-1.5'>
-              <Clock className='w-3.5 h-3.5' />
-              Dibuat pada {new Date(order.createdAt).toLocaleString('id-ID', {
+            <p className='text-xs text-gray-400 mt-1 flex items-center gap-1.5'>
+              <Clock className='w-3 h-3' />
+              Dibuat {new Date(order.createdAt).toLocaleString('id-ID', {
                 dateStyle: 'long',
                 timeStyle: 'short',
               })}
@@ -190,114 +216,164 @@ export const OrderDetailPage = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className='flex items-center gap-2.5 pl-14 sm:pl-0'>
-          <Button
-            variant='outline'
-            className='rounded-xl border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-medium'
+        <div className='flex items-center gap-2 pl-11 sm:pl-0 shrink-0'>
+          <button
+            type='button'
             onClick={() => globalThis.open(`/api/v1/orders/${order.id}/invoice`, '_blank')}
+            className='inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-full border-2 border-gray-200 text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 active:scale-95 transition'
           >
-            <Download className='w-4 h-4 mr-2' />
-            Unduh Invoice
-          </Button>
-          <Button
+            <Download className='w-3.5 h-3.5' />
+            Invoice
+          </button>
+          <button
+            type='button'
             onClick={handleBuyAgain}
             disabled={isBuyingAgain}
-            className='rounded-xl font-medium shadow-sm'
+            className='inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-full bg-orange-500 text-white hover:bg-orange-600 active:scale-95 transition disabled:opacity-50 shadow-sm shadow-orange-200'
           >
             {isBuyingAgain
-              ? <RefreshCcw className='w-4 h-4 mr-2 animate-spin' />
-              : <ShoppingCart className='w-4 h-4 mr-2' />}
+              ? <RefreshCcw className='w-3.5 h-3.5 animate-spin' />
+              : <ShoppingCart className='w-3.5 h-3.5' />}
             Beli Lagi
-          </Button>
+          </button>
         </div>
       </div>
 
-      {/* ═══════════ Main Content Grid ═══════════ */}
-      <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
-        {/* ── Left Column ── */}
-        <div className='lg:col-span-2 space-y-6'>
-          {/* ── Products Card ── */}
-          <Card className='bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm'>
-            <div className='px-6 py-4 border-b border-gray-100 bg-gray-50/50'>
-              <h3 className='text-base font-semibold text-gray-900 flex items-center gap-2'>
-                <Package className='w-4 h-4 text-gray-500' />
-                Detail Produk
-                <span className='text-xs font-normal text-gray-400 ml-1'>
-                  ({items.length} item)
-                </span>
-              </h3>
+      {/* ══════════ Main Grid ══════════ */}
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-5'>
+        {/* ── Left column ── */}
+        <div className='lg:col-span-2 space-y-5'>
+          {/* Products Card */}
+          <div className='bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm'>
+            <div className='px-5 py-4 border-b border-gray-100 flex items-center gap-2 bg-gradient-to-r from-orange-50/50 to-transparent'>
+              <Package className='w-4 h-4 text-orange-500' />
+              <h3 className='text-sm font-bold text-gray-900'>Detail Produk</h3>
+              <span className='text-xs text-gray-400 font-normal'>({items.length} item)</span>
             </div>
             <div className='divide-y divide-gray-100'>
-              {items.map((item: any) => (
-                <div
-                  key={item.id}
-                  className='px-6 py-5 flex items-start gap-4 hover:bg-gray-50/50 transition-colors'
-                >
-                  <div className='w-16 h-16 rounded-xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center shrink-0 border border-gray-200'>
-                    <Package className='w-6 h-6 text-gray-400' />
-                  </div>
-                  <div className='flex-1 min-w-0'>
-                    <h4 className='font-semibold text-gray-900 text-sm truncate'>
-                      {item.productNameSnapshot}
-                    </h4>
-                    <p className='text-xs text-gray-400 mt-0.5 font-mono'>
-                      SKU: {item.variantSkuSnapshot}
-                    </p>
-                    <div className='mt-2.5 flex items-center justify-between'>
-                      <span className='text-sm text-gray-500'>
-                        {item.quantity} × Rp {item.priceSnapshot.toLocaleString('id-ID')}
-                      </span>
-                      <span className='font-bold text-gray-900 text-sm tabular-nums'>
-                        Rp {(item.quantity * item.priceSnapshot).toLocaleString('id-ID')}
+              {items.map((item: any) => {
+                const label = variantLabel(item.optionValues);
+                const hasItemDiscount = item.comparePrice && item.comparePrice > item.priceSnapshot;
+                const lineTotal = item.quantity * item.priceSnapshot;
+                const savedAmount = hasItemDiscount
+                  ? item.quantity * (item.comparePrice - item.priceSnapshot)
+                  : 0;
+
+                return (
+                  <div
+                    key={item.id}
+                    className='px-5 py-4 flex gap-4 hover:bg-gray-50/50 transition-colors'
+                  >
+                    {/* Image */}
+                    <div className='w-[76px] h-[76px] rounded-xl overflow-hidden shrink-0 bg-gray-100 border border-gray-200'>
+                      {item.imageUrl
+                        ? (
+                          <img
+                            src={item.imageUrl}
+                            alt={item.productNameSnapshot}
+                            loading='lazy'
+                            decoding='async'
+                            className='w-full h-full object-cover'
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        )
+                        : (
+                          <div className='w-full h-full flex items-center justify-center'>
+                            <Package className='w-7 h-7 text-gray-300' />
+                          </div>
+                        )}
+                    </div>
+
+                    {/* Info */}
+                    <div className='flex-1 min-w-0'>
+                      <p className='font-semibold text-gray-900 text-sm leading-snug line-clamp-2'>
+                        {item.productNameSnapshot}
+                      </p>
+                      <p className='text-[11px] text-gray-400 mt-0.5 font-mono'>
+                        {item.variantSkuSnapshot}
+                      </p>
+                      {label && (
+                        <span className='inline-block mt-1 text-[11px] text-indigo-600 bg-indigo-50 border border-indigo-100 rounded px-2 py-0.5 font-medium'>
+                          {label}
+                        </span>
+                      )}
+                      <div className='mt-2 flex items-center gap-2'>
+                        {hasItemDiscount && (
+                          <span className='text-[11px] text-gray-400 line-through tabular-nums'>
+                            {fmt(item.comparePrice)}
+                          </span>
+                        )}
+                        <span className='text-sm font-bold text-orange-600 tabular-nums'>
+                          {fmt(item.priceSnapshot)}
+                        </span>
+                        <span className='text-xs text-gray-400'>× {item.quantity}</span>
+                        {savedAmount > 0 && (
+                          <span className='text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded px-1.5 py-0.5'>
+                            Hemat {fmt(savedAmount)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Line total */}
+                    <div className='shrink-0 text-right flex flex-col justify-end'>
+                      <span className='text-sm font-bold text-gray-900 tabular-nums'>
+                        {fmt(lineTotal)}
                       </span>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
-          </Card>
+          </div>
 
-          {/* ── Order Timeline ── */}
-          <Card className='bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm'>
-            <div className='px-6 py-4 border-b border-gray-100 bg-gray-50/50'>
-              <h3 className='text-base font-semibold text-gray-900 flex items-center gap-2'>
-                <Truck className='w-4 h-4 text-gray-500' />
-                Lacak Pesanan
-              </h3>
+          {/* Timeline Card */}
+          <div className='bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm'>
+            <div className='px-5 py-4 border-b border-gray-100 flex items-center gap-2 bg-gradient-to-r from-indigo-50/50 to-transparent'>
+              <Truck className='w-4 h-4 text-indigo-500' />
+              <h3 className='text-sm font-bold text-gray-900'>Lacak Pesanan</h3>
             </div>
-            <div className='px-6 py-6'>
+            <div className='px-5 py-5'>
               <div className='space-y-0'>
                 {history.map((event: any, idx: number) => {
                   const isLast = idx === history.length - 1;
+                  const evtCfg = getStatusCfg(event.status);
                   return (
                     <div key={event.id} className='flex gap-4'>
-                      {/* Timeline dot + line */}
-                      <div className='flex flex-col items-center'>
+                      {/* dot + line */}
+                      <div className='flex flex-col items-center pt-0.5'>
                         <div
-                          className={`w-9 h-9 rounded-full ${
-                            getEventDotColor(event.status)
-                          } border flex items-center justify-center shrink-0 z-10`}
+                          className={`w-8 h-8 rounded-full border-2 ${
+                            timelineDotColor(event.status)
+                          } flex items-center justify-center shrink-0`}
                         >
-                          {getEventIcon(event.status)}
+                          {timelineIcon(event.status)}
                         </div>
-                        {!isLast && <div className='w-px flex-1 bg-gray-200 my-1' />}
+                        {!isLast && <div className='w-px flex-1 bg-gray-100 my-1.5 min-h-[20px]' />}
                       </div>
-                      {/* Content */}
-                      <div className={`pb-6 ${isLast ? 'pb-0' : ''}`}>
-                        <p className='font-semibold text-gray-900 text-sm'>
-                          {getStatusLabel(event.status)}
-                        </p>
-                        <p className='text-xs text-gray-400 mt-0.5 flex items-center gap-1'>
-                          <Clock className='w-3 h-3' />
-                          {new Date(event.createdAt).toLocaleString('id-ID', {
-                            dateStyle: 'medium',
-                            timeStyle: 'short',
-                          })}
-                        </p>
+                      {/* content */}
+                      <div className={`flex-1 pb-5 ${isLast ? 'pb-0' : ''}`}>
+                        <div className='flex items-center gap-2 flex-wrap'>
+                          <Badge
+                            variant='outline'
+                            className={`${evtCfg.style} border rounded-full px-2 py-0 text-[11px] font-bold`}
+                          >
+                            {evtCfg.label}
+                          </Badge>
+                          <span className='text-[11px] text-gray-400 flex items-center gap-1'>
+                            <Clock className='w-3 h-3' />
+                            {new Date(event.createdAt).toLocaleString('id-ID', {
+                              dateStyle: 'medium',
+                              timeStyle: 'short',
+                            })}
+                          </span>
+                        </div>
                         {event.note && (
-                          <div className='mt-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100'>
+                          <p className='mt-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-100 rounded-lg px-3 py-2'>
                             {event.note}
-                          </div>
+                          </p>
                         )}
                       </div>
                     </div>
@@ -305,77 +381,94 @@ export const OrderDetailPage = () => {
                 })}
               </div>
             </div>
-          </Card>
+          </div>
         </div>
 
-        {/* ── Right Column (Sidebar) ── */}
-        <div className='space-y-6'>
-          {/* ── Payment Summary ── */}
-          <Card className='bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm'>
-            <div className='px-6 py-4 border-b border-gray-100 bg-gray-50/50'>
-              <h3 className='text-base font-semibold text-gray-900 flex items-center gap-2'>
-                <CreditCard className='w-4 h-4 text-gray-500' />
-                Rincian Pembayaran
-              </h3>
+        {/* ── Right sidebar ── */}
+        <div className='space-y-5'>
+          {/* Payment Summary Card */}
+          <div className='bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm'>
+            <div className='px-5 py-4 border-b border-gray-100 flex items-center gap-2 bg-gradient-to-r from-blue-50/50 to-transparent'>
+              <CreditCard className='w-4 h-4 text-blue-500' />
+              <h3 className='text-sm font-bold text-gray-900'>Rincian Pembayaran</h3>
             </div>
-            <div className='px-6 py-5 space-y-3.5'>
-              <div className='flex justify-between text-sm'>
+            <div className='px-5 py-4 space-y-3'>
+              {/* Subtotal */}
+              <div className='flex justify-between items-center text-sm'>
                 <span className='text-gray-500'>Subtotal Produk</span>
                 <span className='text-gray-800 font-medium tabular-nums'>
-                  Rp {order.subtotalAmount.toLocaleString('id-ID')}
+                  {fmt(order.subtotalAmount)}
                 </span>
               </div>
-              <div className='flex justify-between text-sm'>
+
+              {/* Shipping */}
+              <div className='flex justify-between items-center text-sm'>
                 <span className='text-gray-500'>Ongkos Kirim</span>
                 <span className='text-gray-800 font-medium tabular-nums'>
-                  Rp {order.shippingAmount.toLocaleString('id-ID')}
+                  {fmt(order.shippingAmount)}
                 </span>
               </div>
+
+              {/* Tax */}
               {order.taxAmount > 0 && (
-                <div className='flex justify-between text-sm'>
+                <div className='flex justify-between items-center text-sm'>
                   <span className='text-gray-500'>Pajak</span>
                   <span className='text-gray-800 font-medium tabular-nums'>
-                    Rp {order.taxAmount.toLocaleString('id-ID')}
+                    {fmt(order.taxAmount)}
                   </span>
                 </div>
               )}
-              {order.discountAmount > 0 && (
-                <div className='flex justify-between text-sm'>
-                  <span className='text-emerald-600 font-medium'>Diskon</span>
-                  <span className='text-emerald-600 font-medium tabular-nums'>
-                    −Rp {order.discountAmount.toLocaleString('id-ID')}
+
+              {/* Discount */}
+              {hasDiscount && (
+                <div className='flex justify-between items-center text-sm'>
+                  <span className='flex items-center gap-1.5 text-emerald-600 font-medium'>
+                    Diskon
+                    {discountPct > 0 && (
+                      <span className='text-[10px] bg-emerald-100 text-emerald-700 border border-emerald-200 rounded px-1.5 py-0.5 font-bold'>
+                        -{discountPct}%
+                      </span>
+                    )}
+                  </span>
+                  <span className='text-emerald-600 font-bold tabular-nums'>
+                    −{fmt(order.discountAmount)}
                   </span>
                 </div>
               )}
 
               {/* Total */}
-              <div className='pt-4 mt-2 border-t border-gray-100 flex justify-between items-center'>
-                <span className='font-bold text-gray-900'>Total Belanja</span>
-                <span className='font-bold text-lg text-gray-900 tabular-nums'>
-                  Rp {order.totalAmount.toLocaleString('id-ID')}
-                </span>
+              <div className='pt-3 mt-2 border-t-2 border-dashed border-gray-100'>
+                <div className='flex justify-between items-center'>
+                  <span className='font-bold text-gray-900 text-sm'>Total Belanja</span>
+                  <span className='font-bold text-lg text-orange-600 tabular-nums'>
+                    {fmt(order.totalAmount)}
+                  </span>
+                </div>
+                {hasDiscount && (
+                  <p className='text-[11px] text-emerald-600 text-right mt-1 font-medium'>
+                    Kamu hemat {fmt(order.discountAmount)} 🎉
+                  </p>
+                )}
               </div>
             </div>
-          </Card>
+          </div>
 
-          {/* ── Shipping Info ── */}
+          {/* Shipping Address Card */}
           {shipping && (
-            <Card className='bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm'>
-              <div className='px-6 py-4 border-b border-gray-100 bg-gray-50/50'>
-                <h3 className='text-base font-semibold text-gray-900 flex items-center gap-2'>
-                  <MapPin className='w-4 h-4 text-gray-500' />
-                  Alamat Pengiriman
-                </h3>
+            <div className='bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm'>
+              <div className='px-5 py-4 border-b border-gray-100 flex items-center gap-2 bg-gradient-to-r from-emerald-50/50 to-transparent'>
+                <MapPin className='w-4 h-4 text-emerald-500' />
+                <h3 className='text-sm font-bold text-gray-900'>Alamat Pengiriman</h3>
               </div>
-              <div className='px-6 py-5 space-y-4'>
+              <div className='px-5 py-4 space-y-4'>
                 {/* Recipient */}
-                <div className='flex items-start gap-3'>
-                  <div className='w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center shrink-0 mt-0.5'>
-                    <User className='w-4 h-4 text-gray-500' />
+                <div className='flex gap-3'>
+                  <div className='w-8 h-8 rounded-lg bg-orange-50 border border-orange-100 flex items-center justify-center shrink-0'>
+                    <User className='w-4 h-4 text-orange-400' />
                   </div>
                   <div>
-                    <p className='font-semibold text-gray-900 text-sm'>{shipping.recipientName}</p>
-                    <p className='text-xs text-gray-500 flex items-center gap-1 mt-0.5'>
+                    <p className='font-bold text-gray-900 text-sm'>{shipping.recipientName}</p>
+                    <p className='text-xs text-gray-400 flex items-center gap-1 mt-0.5'>
                       <Phone className='w-3 h-3' />
                       {shipping.phone}
                     </p>
@@ -383,21 +476,23 @@ export const OrderDetailPage = () => {
                 </div>
 
                 {/* Address */}
-                <div className='flex items-start gap-3'>
-                  <div className='w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center shrink-0 mt-0.5'>
-                    <MapPin className='w-4 h-4 text-gray-500' />
+                <div className='flex gap-3'>
+                  <div className='w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 mt-0.5'>
+                    <MapPin className='w-4 h-4 text-emerald-400' />
                   </div>
                   <div className='text-sm text-gray-600 leading-relaxed'>
-                    <p>
+                    <p className='font-medium text-gray-800'>
                       {shipping.addressLine1}
                       {shipping.addressLine2 ? `, ${shipping.addressLine2}` : ''}
                     </p>
                     <p>{shipping.district}, {shipping.city}</p>
-                    <p className='text-gray-500'>{shipping.province}, {shipping.postalCode}</p>
+                    <p className='text-gray-400 text-xs mt-0.5'>
+                      {shipping.province} {shipping.postalCode}
+                    </p>
                   </div>
                 </div>
               </div>
-            </Card>
+            </div>
           )}
         </div>
       </div>
