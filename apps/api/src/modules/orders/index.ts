@@ -21,6 +21,7 @@ import { HTTPException } from 'hono/http-exception';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { AuthContext, authMiddleware } from '../../middleware/auth.ts';
+import { generateInvoicePDF, uploadInvoicePDF } from './invoice-generator.ts';
 
 const app = new Hono<AuthContext>();
 
@@ -242,6 +243,86 @@ const routes = app
       meta: { request_id: c.get('requestId') },
       error: null,
     });
+  })
+  // ─── GET /:id/invoice — generate PDF, upload to R2 #2, redirect to CDN URL ──
+  .get('/:id/invoice', async (c) => {
+    const user = c.get('user');
+    const id = c.req.param('id');
+
+    // 1. Verify order ownership
+    const [order] = await db
+      .select()
+      .from(orders)
+      .where(and(eq(orders.id, id), eq(orders.userId, user.id)))
+      .limit(1);
+
+    if (!order) throw new HTTPException(404, { message: 'Order not found' });
+
+    // 2. Fetch order items
+    const orderItemRows = await db
+      .select({
+        productNameSnapshot: orderItems.productNameSnapshot,
+        variantSkuSnapshot: orderItems.variantSkuSnapshot,
+        quantity: orderItems.quantity,
+        priceSnapshot: orderItems.priceSnapshot,
+      })
+      .from(orderItems)
+      .where(eq(orderItems.orderId, id));
+
+    // 3. Fetch shipping address
+    const [addresses] = await db
+      .select()
+      .from(orderAddresses)
+      .where(eq(orderAddresses.orderId, id))
+      .limit(1);
+    const shipping: any = addresses?.shippingSnapshot;
+
+    // 4. Fetch customer name + email
+    const [customer] = await db
+      .select({ name: userProfiles.fullName, email: users.emailDisplay })
+      .from(users)
+      .leftJoin(userProfiles, eq(users.id, userProfiles.userId))
+      .where(eq(users.id, user.id))
+      .limit(1);
+
+    const customerName = customer?.name ?? 'Pelanggan';
+    const customerEmail = customer?.email ?? user.id;
+
+    // 5. Build unique object key:
+    //    invoicebill/<safeName>_<safeEmail>/<orderNum>-<uuid8>.pdf
+    const safeName = customerName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-')
+      .substring(0, 30);
+    const safeEmail = customerEmail.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-')
+      .substring(0, 40);
+    const safeOrder = order.orderNumber.replace(/[^a-zA-Z0-9-]/g, '-');
+    const uniqueSuffix = crypto.randomUUID().substring(0, 8);
+    const objectKey = `invoicebill/${safeName}_${safeEmail}/${safeOrder}-${uniqueSuffix}.pdf`;
+
+    // 6. Generate PDF
+    const pdfBytes = await generateInvoicePDF({
+      orderNumber: order.orderNumber,
+      createdAt: order.createdAt,
+      customerName,
+      customerEmail,
+      items: orderItemRows.map((it) => ({
+        productName: it.productNameSnapshot,
+        variantSku: it.variantSkuSnapshot,
+        quantity: it.quantity,
+        price: it.priceSnapshot,
+      })),
+      subtotal: order.subtotalAmount,
+      shipping: order.shippingAmount,
+      tax: order.taxAmount,
+      discount: order.discountAmount,
+      total: order.totalAmount,
+      shippingAddress: shipping ?? undefined,
+    });
+
+    // 7. Upload to R2 invoice bucket and get public CDN URL
+    const publicUrl = await uploadInvoicePDF(pdfBytes, objectKey);
+
+    // 8. Redirect browser directly to the CDN PDF URL (opens in new tab)
+    return c.redirect(publicUrl, 302);
   })
   .get('/:id/invoice-data', async (c) => {
     const user = c.get('user');
