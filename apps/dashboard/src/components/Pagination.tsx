@@ -15,10 +15,10 @@ export function Pagination({ page, limit, total, onPageChange }: PaginationProps
   if (total === 0) return null;
 
   return (
-    <div className='flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 pb-2 border-t border-white/5'>
-      <span className='text-sm text-muted-foreground'>
-        Menampilkan <strong className='text-white'>{Math.min(limit, total)}</strong> dari{' '}
-        <strong className='text-white'>{total}</strong> pesanan
+    <div className='flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 pb-2 border-t border-gray-100'>
+      <span className='text-sm text-gray-500'>
+        Menampilkan <strong className='text-gray-900'>{Math.min(limit, total)}</strong> dari{' '}
+        <strong className='text-gray-900'>{total}</strong> pesanan
       </span>
 
       <div className='flex items-center gap-2'>
@@ -28,8 +28,8 @@ export function Pagination({ page, limit, total, onPageChange }: PaginationProps
           onClick={() => onPageChange(page - 1)}
           className={`inline-flex items-center justify-center p-2 rounded-lg border transition-all ${
             isFirst
-              ? 'border-white/5 bg-white/5 text-white/20 cursor-not-allowed'
-              : 'border-white/10 bg-white/5 text-white hover:bg-white/10 hover:border-white/20 active:scale-95'
+              ? 'border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed'
+              : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 active:scale-95'
           }`}
           title='Halaman Sebelumnya'
         >
@@ -37,9 +37,9 @@ export function Pagination({ page, limit, total, onPageChange }: PaginationProps
         </button>
 
         <div className='flex items-center gap-1 px-2'>
-          <span className='text-sm text-white font-medium min-w-[2rem] text-center'>{page}</span>
-          <span className='text-sm text-muted-foreground'>/</span>
-          <span className='text-sm text-muted-foreground min-w-[2rem] text-center'>
+          <span className='text-sm text-gray-900 font-medium min-w-[2rem] text-center'>{page}</span>
+          <span className='text-sm text-gray-400'>/</span>
+          <span className='text-sm text-gray-500 min-w-[2rem] text-center'>
             {totalPages}
           </span>
         </div>
@@ -50,8 +50,8 @@ export function Pagination({ page, limit, total, onPageChange }: PaginationProps
           onClick={() => onPageChange(page + 1)}
           className={`inline-flex items-center justify-center p-2 rounded-lg border transition-all ${
             isLast
-              ? 'border-white/5 bg-white/5 text-white/20 cursor-not-allowed'
-              : 'border-white/10 bg-white/5 text-white hover:bg-white/10 hover:border-white/20 active:scale-95'
+              ? 'border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed'
+              : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 active:scale-95'
           }`}
           title='Halaman Berikutnya'
         >

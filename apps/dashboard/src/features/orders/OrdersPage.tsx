@@ -78,7 +78,7 @@ export const OrdersPage = () => {
         </div>
       </div>
 
-      <div className='flex space-x-1.5 border-b border-white/10 pb-4 overflow-x-auto scrollbar-hide'>
+      <div className='flex space-x-1.5 border-b border-gray-100 pb-4 overflow-x-auto scrollbar-hide'>
         {tabs.map((tab) => {
           const isActive = activeTab === tab.value;
           return (
@@ -91,8 +91,8 @@ export const OrdersPage = () => {
               }}
               className={`px-5 py-2.5 text-sm font-medium rounded-xl whitespace-nowrap transition-all duration-200 ${
                 isActive
-                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
-                  : 'text-muted-foreground hover:bg-white/5 hover:text-white'
+                  ? 'bg-primary text-primary-foreground shadow-md shadow-primary/10'
+                  : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
               }`}
             >
               {tab.label}
@@ -105,22 +105,22 @@ export const OrdersPage = () => {
         ? (
           <div className='grid gap-4'>
             {[1, 2, 3].map((i) => (
-              <Card key={i} className='animate-pulse bg-white/5 border-white/10 h-32' />
+              <Card key={i} className='animate-pulse bg-gray-50 border-gray-100 h-32' />
             ))}
           </div>
         )
         : error
         ? (
-          <div className='text-center py-10 bg-red-500/10 text-red-400 rounded-lg border border-red-500/20'>
+          <div className='text-center py-10 bg-red-50 text-red-600 rounded-xl border border-red-100'>
             <p>Gagal memuat pesanan. Silakan coba lagi.</p>
           </div>
         )
         : data?.orders?.length === 0
         ? (
-          <div className='text-center py-20 bg-white/5 rounded-xl border border-white/10'>
-            <Package className='w-12 h-12 mx-auto text-muted-foreground mb-4 opacity-50' />
-            <h3 className='text-lg font-medium text-white mb-2'>Belum Ada Pesanan</h3>
-            <p className='text-muted-foreground text-sm mb-6 max-w-sm mx-auto'>
+          <div className='text-center py-20 bg-gray-50 rounded-xl border border-gray-100'>
+            <Package className='w-12 h-12 mx-auto text-gray-400 mb-4 opacity-50' />
+            <h3 className='text-lg font-medium text-gray-900 mb-2'>Belum Ada Pesanan</h3>
+            <p className='text-gray-500 text-sm mb-6 max-w-sm mx-auto'>
               Anda belum memiliki pesanan dengan status ini. Mulai belanja untuk melihat riwayat
               Anda.
             </p>
@@ -134,29 +134,29 @@ export const OrdersPage = () => {
             {data?.orders.map((order: any) => (
               <Card
                 key={order.id}
-                className='bg-black/20 backdrop-blur-md border border-white/5 hover:border-white/20 transition-all duration-300 overflow-hidden group shadow-sm hover:shadow-xl hover:shadow-black/40 rounded-2xl'
+                className='bg-white border-gray-200 hover:border-gray-300 transition-all duration-300 overflow-hidden group shadow-sm hover:shadow-md rounded-2xl'
               >
-                <div className='p-5 sm:p-7 flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between border-b border-white/5 bg-gradient-to-r from-white/[0.03] to-transparent'>
+                <div className='p-5 sm:p-7 flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between border-b border-gray-100 bg-gradient-to-r from-gray-50/50 to-transparent'>
                   <div className='flex items-center gap-4 w-full sm:w-auto'>
                     <div className='w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20 group-hover:scale-105 transition-transform duration-300'>
                       <ShoppingBag className='w-6 h-6 text-primary' />
                     </div>
                     <div className='flex flex-col gap-1.5'>
                       <div className='flex items-center gap-2'>
-                        <span className='font-bold text-white text-base tracking-wide flex items-center gap-2'>
-                          <Receipt className='w-4 h-4 text-muted-foreground' />
+                        <span className='font-bold text-gray-900 text-base tracking-wide flex items-center gap-2'>
+                          <Receipt className='w-4 h-4 text-gray-400' />
                           {order.orderNumber}
                         </span>
                         <Badge
                           variant='outline'
                           className={`${
                             getStatusColor(order.status)
-                          } border px-2.5 py-0.5 rounded-full text-xs font-semibold backdrop-blur-sm`}
+                          } border px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white`}
                         >
                           {getStatusLabel(order.status)}
                         </Badge>
                       </div>
-                      <p className='text-sm text-muted-foreground flex items-center gap-1.5'>
+                      <p className='text-sm text-gray-500 flex items-center gap-1.5'>
                         {new Date(order.createdAt).toLocaleDateString('id-ID', {
                           day: 'numeric',
                           month: 'long',
@@ -165,45 +165,44 @@ export const OrdersPage = () => {
                       </p>
                     </div>
                   </div>
-                  <div className='text-left sm:text-right w-full sm:w-auto flex sm:flex-col justify-between sm:justify-start items-center sm:items-end p-4 sm:p-0 bg-white/5 sm:bg-transparent rounded-xl sm:rounded-none border sm:border-none border-white/5'>
-                    <p className='text-xs text-muted-foreground uppercase tracking-wider font-medium mb-1'>
+                  <div className='text-left sm:text-right w-full sm:w-auto flex sm:flex-col justify-between sm:justify-start items-center sm:items-end p-4 sm:p-0 bg-gray-50 sm:bg-transparent rounded-xl sm:rounded-none border sm:border-none border-gray-100'>
+                    <p className='text-xs text-gray-500 uppercase tracking-wider font-medium mb-1'>
                       Total Belanja
                     </p>
-                    <p className='font-bold text-xl text-white'>
+                    <p className='font-bold text-xl text-gray-900'>
                       Rp {order.totalAmount.toLocaleString('id-ID')}
                     </p>
                   </div>
                 </div>
                 <CardContent className='p-5 sm:p-7 flex flex-col sm:flex-row items-center justify-between gap-6'>
                   <div className='flex items-center gap-4 w-full sm:w-auto'>
-                    {/* Summary of items */}
                     <div className='flex -space-x-3'>
                       {order.items?.slice(0, 3).map((item: any, idx: number) => (
                         <div
                           key={idx}
-                          className='w-12 h-12 rounded-full bg-[#16181d] border-2 border-[#0a0c10] flex items-center justify-center relative z-10 shadow-sm'
+                          className='w-12 h-12 rounded-full bg-white border-2 border-gray-50 flex items-center justify-center relative z-10 shadow-sm'
                           title={item.productName}
                         >
-                          <Box className='w-4 h-4 text-muted-foreground opacity-50 absolute' />
-                          <span className='text-xs font-bold text-white relative z-10 drop-shadow-md'>
+                          <Box className='w-4 h-4 text-gray-300 absolute' />
+                          <span className='text-xs font-bold text-gray-700 relative z-10'>
                             {item.quantity}x
                           </span>
                         </div>
                       ))}
                       {(order.items?.length || 0) > 3 && (
-                        <div className='w-12 h-12 rounded-full bg-white/5 border-2 border-[#0a0c10] flex items-center justify-center relative z-0 backdrop-blur-sm'>
-                          <span className='text-xs font-medium text-muted-foreground'>
+                        <div className='w-12 h-12 rounded-full bg-gray-50 border-2 border-white flex items-center justify-center relative z-0'>
+                          <span className='text-xs font-medium text-gray-500'>
                             +{(order.items?.length || 0) - 3}
                           </span>
                         </div>
                       )}
                     </div>
                     <div className='flex flex-col justify-center'>
-                      <p className='text-sm font-semibold text-white line-clamp-1'>
+                      <p className='text-sm font-semibold text-gray-900 line-clamp-1'>
                         {order.items?.[0]?.productName || 'Produk'}
                       </p>
                       {(order.items?.length || 0) > 1 && (
-                        <p className='text-xs text-muted-foreground mt-0.5'>
+                        <p className='text-xs text-gray-500 mt-0.5'>
                           + {(order.items?.length || 0) - 1} produk lainnya
                         </p>
                       )}
@@ -213,7 +212,7 @@ export const OrdersPage = () => {
                   <Button
                     variant='outline'
                     onClick={() => navigate(`/orders/${order.id}`)}
-                    className='w-full sm:w-auto border-white/10 bg-white/5 hover:bg-white/10 hover:text-white shrink-0 shadow-sm rounded-xl'
+                    className='w-full sm:w-auto border-gray-200 bg-white hover:bg-gray-50 hover:text-gray-900 shrink-0 shadow-sm rounded-xl'
                   >
                     Lihat Detail Pesanan
                   </Button>
