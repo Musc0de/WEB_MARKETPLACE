@@ -26,6 +26,7 @@ import { DashboardCards } from './features/overview/DashboardCards.tsx';
 import { ReviewsList } from './features/reviews/ReviewsList.tsx';
 import { AuditLogViewer } from './features/audit/AuditLogViewer.tsx';
 import { ReportsPage } from './features/reports/ReportsPage.tsx';
+import { SettingsForm } from './features/settings/SettingsForm.tsx';
 import 'goey-toast/styles.css';
 
 const queryClient = new QueryClient();
@@ -139,6 +140,7 @@ export default function App() {
                 <Route path='refunds' element={<RefundsList />} />
 
                 <Route path='reports' element={<ReportsPage />} />
+                <Route path='settings' element={<SettingsForm />} />
 
                 {/* Fallback */}
                 <Route path='*' element={<NotFound />} />

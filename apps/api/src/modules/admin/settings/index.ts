@@ -1,0 +1,57 @@
+import { Hono } from 'hono';
+import { zValidator } from '../../../middleware/validator.ts';
+import { AuthContext, authMiddleware, requirePermission } from '../../../middleware/auth.ts';
+import { z } from 'zod';
+import { db, globalSettings } from '@starsuperscare/database';
+import { eq } from 'drizzle-orm';
+
+const app = new Hono<AuthContext>();
+
+app.use('/*', authMiddleware);
+app.use('/*', requirePermission('catalog.write')); // Require an admin-level permission
+
+app.get('/', async (c) => {
+  const [settings] = await db.select().from(globalSettings).limit(1);
+  return c.json({
+    data: settings ||
+      { siteTitle: 'StarSuperScare Marketplace', siteDescription: null, faviconUrl: null },
+    meta: { request_id: c.get('requestId') },
+    error: null,
+  });
+});
+
+app.put(
+  '/',
+  zValidator(
+    'json',
+    z.object({
+      siteTitle: z.string().optional(),
+      siteDescription: z.string().nullable().optional(),
+      faviconUrl: z.string().nullable().optional(),
+    }),
+  ),
+  async (c) => {
+    const payload = c.req.valid('json');
+    const [existing] = await db.select().from(globalSettings).limit(1);
+
+    let result;
+    if (existing) {
+      [result] = await db.update(globalSettings)
+        .set({ ...payload, updatedAt: new Date().toISOString() })
+        .where(eq(globalSettings.id, existing.id))
+        .returning();
+    } else {
+      [result] = await db.insert(globalSettings)
+        .values({ id: 'global_1', ...payload, updatedAt: new Date().toISOString() })
+        .returning();
+    }
+
+    return c.json({
+      data: result,
+      meta: { request_id: c.get('requestId') },
+      error: null,
+    });
+  },
+);
+
+export { app as adminSettingsRouter };

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ErrorBoundary } from 'react-error-boundary';
 import { client } from '../../lib/api.ts';
 import { useCart } from '../../features/cart/api/useCart.ts';
+import { SEO } from '../SEO.tsx';
 
 /** Animated cart badge — bounces every time itemCount changes */
 const CartBadge = ({ count }: { count: number }) => {
@@ -519,6 +520,7 @@ const Footer = () => {
 export const StorefrontLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div className='min-h-screen flex flex-col font-sans bg-gray-50 text-gray-900 pb-14 md:pb-0'>
+      <SEO />
       <Header />
       <main className='flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-8 py-6'>
         <ErrorBoundary

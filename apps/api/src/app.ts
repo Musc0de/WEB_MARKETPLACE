@@ -42,6 +42,8 @@ import adminReviewsRouter from './modules/admin/reviews/index.ts';
 import adminAuditRouter from './modules/admin/audit/index.ts';
 import adminReportsRouter from './modules/admin/reports/index.ts';
 import adminOverviewRouter from './modules/admin/overview/index.ts';
+import { adminSettingsRouter } from './modules/admin/settings/index.ts';
+import { settingsRouter } from './modules/settings/index.ts';
 
 type AppContext = {
   Variables: {
@@ -193,6 +195,7 @@ const v1 = new Hono<AppContext>()
   .route('/reviews', reviewsRouter)
   .route('/returns', returnsRouter)
   .route('/support', supportRouter)
+  .route('/settings', settingsRouter)
   .route(
     '/dashboard',
     new Hono<AppContext>().route('/home', dashboardHomeRouter),
@@ -212,7 +215,8 @@ const v1 = new Hono<AppContext>()
       .route('/reviews', adminReviewsRouter)
       .route('/audit', adminAuditRouter)
       .route('/reports', adminReportsRouter)
-      .route('/overview', adminOverviewRouter),
+      .route('/overview', adminOverviewRouter)
+      .route('/settings', adminSettingsRouter),
   );
 
 const routes = app.route('/v1', v1);

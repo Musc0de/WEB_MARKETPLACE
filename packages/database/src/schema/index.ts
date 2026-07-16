@@ -13,3 +13,4 @@ export * from './aftercare.ts';
 export * from './audit.ts';
 export * from './wishlist.ts';
 export * from './archives.ts';
+export * from './settings.ts';

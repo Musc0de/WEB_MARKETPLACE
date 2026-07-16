@@ -5,6 +5,7 @@ import {
   Bell,
   CreditCard,
   FileText,
+  Globe,
   LayoutDashboard,
   LifeBuoy,
   Menu,
@@ -34,6 +35,7 @@ const navItems = [
   { name: 'Invoices', href: '/invoices', icon: FileText },
   { name: 'Support', href: '/support', icon: LifeBuoy },
   { name: 'Laporan', href: '/reports', icon: BarChart3 },
+  { name: 'Settings', href: '/settings', icon: Globe },
 ];
 
 export function AdminLayout() {

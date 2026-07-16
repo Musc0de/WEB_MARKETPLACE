@@ -8,6 +8,7 @@ import { ProductGallery } from '../components/ProductGallery.tsx';
 import { ProductSummary } from '../components/ProductSummary.tsx';
 import { ProductDetailsAccordion } from '../components/ProductDetailsAccordion.tsx';
 import { RelatedProducts } from '../components/RelatedProducts.tsx';
+import { SEO } from '../../../components/SEO.tsx';
 
 export const ProductDetailPage = (): JSX.Element => {
   const { slug } = useParams<{ slug: string }>();
@@ -103,6 +104,10 @@ export const ProductDetailPage = (): JSX.Element => {
 
   return (
     <div className='container mx-auto px-4 py-8 max-w-6xl'>
+      <SEO
+        title={product.seoTitle || product.name}
+        description={product.seoDescription || product.description}
+      />
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-10'>
         {/* Left Column: Gallery */}
         <ProductGallery product={product} />
