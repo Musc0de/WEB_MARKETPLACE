@@ -174,7 +174,7 @@ const routes = app
       throw new HTTPException(404, { message: 'Order not found' });
     }
 
-    const items = await db
+    const rawItems = await db
       .select({
         id: orderItems.id,
         productId: orderItems.productId,
@@ -183,11 +183,42 @@ const routes = app
         priceSnapshot: orderItems.priceSnapshot,
         productNameSnapshot: orderItems.productNameSnapshot,
         variantSkuSnapshot: orderItems.variantSkuSnapshot,
-        productSlug: products.slug, // Include slug for linking
+        productSlug: products.slug,
+        comparePrice: productVariants.comparePrice,
+        optionValues: productVariants.optionValues,
       })
       .from(orderItems)
       .leftJoin(products, eq(orderItems.productId, products.id))
+      .leftJoin(productVariants, eq(orderItems.variantId, productVariants.id))
       .where(eq(orderItems.orderId, id));
+
+    // Fetch primary image for each unique product
+    const uniqueProductIds = [...new Set(rawItems.map((i) => i.productId))];
+    const r2Base = Deno.env.get('R2_PUBLIC_URL') || '';
+    const imageRows = uniqueProductIds.length > 0
+      ? await db
+        .select({
+          productId: productImages.productId,
+          objectKey: productImages.objectKey,
+          isPrimary: productImages.isPrimary,
+        })
+        .from(productImages)
+        .where(inArray(productImages.productId, uniqueProductIds))
+      : [];
+
+    // Build productId → first image URL map
+    const imageMap: Record<string, string> = {};
+    for (const img of imageRows) {
+      if (!imageMap[img.productId]) {
+        imageMap[img.productId] = `${r2Base}/${img.objectKey}`;
+      }
+    }
+
+    // Attach imageUrl to each item
+    const items = rawItems.map((item) => ({
+      ...item,
+      imageUrl: imageMap[item.productId] ?? null,
+    }));
 
     const [addresses] = await db
       .select()
