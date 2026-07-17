@@ -1,5 +1,5 @@
 // deno-lint-ignore-file
-import { pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { jsonb, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const globalSettings = pgTable('sss_global_settings', {
   id: text('id').primaryKey(),
@@ -7,5 +7,8 @@ export const globalSettings = pgTable('sss_global_settings', {
   siteDescription: text('site_description'),
   faviconUrl: text('favicon_url'),
   activePaymentGateway: text('active_payment_gateway').default('sandbox').notNull(),
+  paymentGatewayConfigs: jsonb('payment_gateway_configs').$type<
+    Record<string, { mode: 'sandbox' | 'production'; config?: any }>
+  >().default({}),
   updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
 });

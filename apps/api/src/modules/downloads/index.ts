@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import {
   db,
   digitalAssets,
+  digitalCredentials,
   digitalEntitlements,
   orderItems,
   products,
@@ -12,6 +13,7 @@ import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { HTTPException } from 'hono/http-exception';
 import { AuthContext, authMiddleware } from '../../middleware/auth.ts';
+import { decryptCredential } from '../../utils/crypto.ts';
 
 const app = new Hono<AuthContext>();
 
@@ -63,9 +65,47 @@ const routes = app
         .limit(limit)
         .offset(offset);
 
+      const rawCredentials = await db
+        .select({
+          id: digitalCredentials.id,
+          orderItemId: digitalCredentials.orderItemId,
+          status: digitalCredentials.status,
+          encryptedData: digitalCredentials.encryptedData,
+          iv: digitalCredentials.iv,
+          authTag: digitalCredentials.authTag,
+          createdAt: digitalCredentials.createdAt,
+          productName: products.name,
+          variantName: productVariants.sku,
+        })
+        .from(digitalCredentials)
+        .innerJoin(products, eq(digitalCredentials.productId, products.id))
+        .leftJoin(productVariants, eq(digitalCredentials.variantId, productVariants.id))
+        .where(
+          and(eq(digitalCredentials.userId, user.id), eq(digitalCredentials.status, 'assigned')),
+        )
+        .orderBy(desc(digitalCredentials.createdAt));
+
+      const credentials = rawCredentials.map((cred) => {
+        let plaintext = '';
+        try {
+          plaintext = decryptCredential(cred.encryptedData, cred.iv, cred.authTag);
+        } catch (_e) {
+          plaintext = '[Gagal mendekripsi kredensial]';
+        }
+        return {
+          id: cred.id,
+          orderItemId: cred.orderItemId,
+          productName: cred.productName,
+          variantName: cred.variantName,
+          credentialData: plaintext,
+          createdAt: cred.createdAt,
+        };
+      });
+
       return c.json({
         data: {
           entitlements: items,
+          credentials,
           pagination: {
             page,
             limit,

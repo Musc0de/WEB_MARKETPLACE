@@ -5,7 +5,6 @@ import { z } from 'zod';
 import { client } from '../../lib/rpc.ts';
 import { goeyToast as toast } from 'goey-toast';
 import { Camera, Globe, Loader2, Save } from 'lucide-react';
-import { PageHeader } from '../../components/admin-ui.tsx';
 
 function Field(
   { label, error, children }: {
@@ -46,13 +45,12 @@ function SectionCard(
 const formSchema = z.object({
   siteTitle: z.string().min(1, 'Site Title is required'),
   siteDescription: z.string().nullable().optional(),
-  activePaymentGateway: z.string().optional(),
 });
 type FormValues = z.infer<typeof formSchema>;
 
-export function SettingsForm() {
+export function GeneralSettingsForm() {
   const [activeApp, setActiveApp] = useState(() =>
-    localStorage.getItem('admin_settings_active_app') || ''
+    localStorage.getItem('admin_settings_active_app') || 'storefront'
   );
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -78,7 +76,6 @@ export function SettingsForm() {
         reset({
           siteTitle: json.data?.siteTitle || '',
           siteDescription: json.data?.siteDescription || '',
-          activePaymentGateway: json.data?.activePaymentGateway || 'sandbox',
         });
         setFaviconUrl(json.data?.faviconUrl || null);
       }
@@ -102,7 +99,6 @@ export function SettingsForm() {
           appId: activeApp,
           siteTitle: values.siteTitle,
           siteDescription: values.siteDescription,
-          activePaymentGateway: values.activePaymentGateway,
           faviconUrl,
         },
       });
@@ -175,20 +171,22 @@ export function SettingsForm() {
   }
 
   return (
-    <div className='max-w-4xl mx-auto space-y-6 pb-24'>
-      <div className='flex flex-col md:flex-row md:items-end justify-between gap-4'>
-        <PageHeader
-          icon={Globe}
-          title='Pengaturan Situs Global'
-          description='Kelola SEO dan pengaturan dasar untuk situs Anda.'
-          badge='Sistem'
-          badgeColor='bg-blue-50 text-blue-700 ring-blue-600/20'
-        />
+    <div className='space-y-6 pb-24'>
+      <div className='flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm'>
+        <div className='flex items-center gap-3'>
+          <Globe className='w-6 h-6 text-gray-500' />
+          <div>
+            <h2 className='text-lg font-bold text-gray-900'>General & SEO</h2>
+            <p className='text-sm text-gray-500'>
+              Konfigurasi identitas situs dan SEO per aplikasi.
+            </p>
+          </div>
+        </div>
         <div className='flex gap-2'>
           <button
             type='button'
             onClick={handleSubmit(onSubmit)}
-            disabled={isSaving || isUploading || (!isDirty && true)} // Note: favicon change makes form technically dirty manually but we rely on the user clicking save
+            disabled={isSaving || isUploading || (!isDirty && true)}
             className='inline-flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 disabled:opacity-50 transition'
           >
             {isSaving ? <Loader2 className='h-4 w-4 animate-spin' /> : <Save className='h-4 w-4' />}
@@ -238,16 +236,6 @@ export function SettingsForm() {
                 placeholder='Tuliskan deskripsi singkat tentang situs ini...'
                 className='w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500 outline-none transition-all resize-y'
               />
-            </Field>
-
-            <Field label='Active Payment Gateway' error={errors.activePaymentGateway?.message}>
-              <select
-                {...register('activePaymentGateway')}
-                className='w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500 outline-none transition-all'
-              >
-                <option value='sandbox'>Sandbox (Testing)</option>
-                <option value='louvin'>Louvin Payment Gateway (Production)</option>
-              </select>
             </Field>
           </div>
         </SectionCard>

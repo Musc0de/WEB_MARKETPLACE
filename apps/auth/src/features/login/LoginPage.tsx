@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@starsuperscare/ui';
 import { Input } from '../../components/ui/Input.tsx';
@@ -16,6 +16,34 @@ export function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [searchParams] = useSearchParams();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await apiClient.v1.me.profile.$get();
+        if (res.ok) {
+          const returnTo = searchParams.get('return_to');
+          const dashboardUrl = (import.meta as any).env?.VITE_DASHBOARD_URL;
+
+          if (returnTo) {
+            if (returnTo.startsWith('/') && !returnTo.startsWith('//')) {
+              if (dashboardUrl) {
+                globalThis.location.href = `${dashboardUrl}${returnTo}`;
+              }
+            } else {
+              globalThis.location.href = returnTo;
+            }
+          } else if (dashboardUrl) {
+            globalThis.location.href = dashboardUrl;
+          }
+        }
+      } catch (_e) {
+        // Not logged in or network error, stay on login page
+      }
+    };
+    checkAuth();
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

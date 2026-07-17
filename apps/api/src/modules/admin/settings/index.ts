@@ -16,7 +16,13 @@ app.get('/', async (c) => {
     .limit(1);
   return c.json({
     data: settings ||
-      { siteTitle: null, siteDescription: null, faviconUrl: null, activePaymentGateway: 'sandbox' },
+      {
+        siteTitle: null,
+        siteDescription: null,
+        faviconUrl: null,
+        activePaymentGateway: 'sandbox',
+        paymentGatewayConfigs: {},
+      },
     meta: { request_id: c.get('requestId') },
     error: null,
   });
@@ -32,6 +38,13 @@ app.put(
       siteDescription: z.string().nullable().optional(),
       faviconUrl: z.string().nullable().optional(),
       activePaymentGateway: z.string().optional(),
+      paymentGatewayConfigs: z.record(
+        z.string(),
+        z.object({
+          mode: z.enum(['sandbox', 'production']),
+          config: z.any().optional(),
+        }),
+      ).optional(),
     }),
   ),
   async (c) => {
@@ -48,6 +61,9 @@ app.put(
     if (payload.faviconUrl !== undefined) updatePayload.faviconUrl = payload.faviconUrl;
     if (payload.activePaymentGateway !== undefined) {
       updatePayload.activePaymentGateway = payload.activePaymentGateway;
+    }
+    if (payload.paymentGatewayConfigs !== undefined) {
+      updatePayload.paymentGatewayConfigs = payload.paymentGatewayConfigs;
     }
 
     let result;

@@ -7,7 +7,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
+  Copy,
   Download,
+  Key,
   Loader2,
   PackageOpen,
 } from 'lucide-react';
@@ -77,153 +79,236 @@ export const DownloadsPage = () => {
         </div>
       </div>
 
-      {isLoading
-        ? (
-          <div className='grid gap-4'>
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className='animate-pulse bg-white/5 border-white/10 h-24' />
+      {/* Digital Credentials Section */}
+      {data?.credentials && data.credentials.length > 0 && (
+        <div className='mb-10'>
+          <h3 className='text-xl font-extrabold mb-5 flex items-center gap-2.5 text-gray-900 dark:text-white'>
+            <div className='p-2 bg-indigo-500/10 rounded-lg'>
+              <Key className='w-5 h-5 text-indigo-400' />
+            </div>
+            Kredensial & Akun
+          </h3>
+          <div className='grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>
+            {data.credentials.map((cred: any) => (
+              <Card
+                key={cred.id}
+                className='bg-white dark:bg-gradient-to-b dark:from-[#13161c] dark:to-[#0f1115] border-gray-200 dark:border-white/5 hover:border-gray-300 dark:hover:border-white/15 transition-all overflow-hidden flex flex-col justify-between shadow-sm dark:shadow-xl dark:shadow-black/40'
+              >
+                <div className='p-5 border-b border-gray-100 dark:border-white/5 relative overflow-hidden'>
+                  <div className='absolute top-0 right-0 w-32 h-32 bg-indigo-50 dark:bg-indigo-500/10 rounded-bl-full -mr-8 -mt-8 blur-2xl pointer-events-none'>
+                  </div>
+                  <h4
+                    className='font-bold text-gray-900 dark:text-white text-[17px] leading-tight tracking-wide line-clamp-2 relative z-10'
+                    title={cred.productName}
+                  >
+                    {cred.productName || 'Produk Digital'}
+                  </h4>
+                  {cred.variantName && cred.variantName !== 'Default' && (
+                    <Badge
+                      variant='outline'
+                      className='mt-3 bg-indigo-50 dark:bg-white/5 border-indigo-100 dark:border-white/10 text-indigo-700 dark:text-indigo-300 font-medium px-2.5 py-0.5 rounded-full text-xs'
+                    >
+                      {cred.variantName}
+                    </Badge>
+                  )}
+                </div>
+                <div className='p-5 bg-gray-50/50 dark:bg-white/[0.01] flex-1 flex flex-col justify-end'>
+                  <div className='bg-gray-900 dark:bg-[#050608] border border-gray-800 dark:border-white/5 rounded-xl p-4 font-mono text-[13px] leading-relaxed text-emerald-400 whitespace-pre-wrap break-all relative group shadow-inner'>
+                    {cred.credentialData}
+                    <button
+                      type='button'
+                      onClick={() => {
+                        navigator.clipboard.writeText(cred.credentialData);
+                        toast.success('Disalin ke clipboard');
+                      }}
+                      className='absolute top-2.5 right-2.5 p-2 bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white rounded-md opacity-0 group-hover:opacity-100 transition-all duration-200 backdrop-blur-md'
+                      title='Salin Teks'
+                    >
+                      <Copy className='w-4 h-4' />
+                    </button>
+                  </div>
+                  <div className='mt-5 flex items-center justify-between text-[11px] text-gray-500 dark:text-muted-foreground uppercase tracking-widest font-bold'>
+                    <span>Tgl. Pembelian</span>
+                    <span className='text-gray-900 dark:text-gray-300'>
+                      {new Date(cred.createdAt).toLocaleDateString('id-ID', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </span>
+                  </div>
+                </div>
+              </Card>
             ))}
           </div>
-        )
-        : error
-        ? (
-          <div className='text-center py-10 bg-red-500/10 text-red-400 rounded-lg border border-red-500/20'>
-            <p>Gagal memuat unduhan. Silakan coba lagi.</p>
-          </div>
-        )
-        : data?.entitlements?.length === 0
-        ? (
-          <div className='text-center py-20 bg-white/5 rounded-xl border border-white/10'>
-            <PackageOpen className='w-12 h-12 mx-auto text-muted-foreground mb-4 opacity-50' />
-            <h3 className='text-lg font-medium text-white mb-2'>Belum Ada Unduhan</h3>
-            <p className='text-muted-foreground text-sm mb-6'>
-              Anda belum membeli produk digital apapun.
-            </p>
-          </div>
-        )
-        : (
-          <div className='grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>
-            {data?.entitlements.map((item: any) => {
-              const isExpired = item.expiresAt && new Date(item.expiresAt) < new Date();
-              const isLimitReached = item.downloadLimit !== null &&
-                item.downloadCount >= item.downloadLimit;
-              const canDownload = item.status === 'active' && !isExpired && !isLimitReached;
+        </div>
+      )}
 
-              return (
-                <Card
-                  key={item.id}
-                  className={`bg-[#0f1115] border-white/10 hover:border-white/20 transition-all overflow-hidden flex flex-col justify-between ${
-                    !canDownload ? 'opacity-70' : ''
-                  }`}
-                >
-                  <div className='p-4 border-b border-white/5'>
-                    <div className='flex items-start justify-between gap-2'>
-                      <div>
-                        <h3
-                          className='font-semibold text-white line-clamp-2'
-                          title={item.productName}
-                        >
-                          {item.productName || 'Produk Digital'}
-                        </h3>
-                        {item.variantName && item.variantName !== 'Default' && (
-                          <p className='text-xs text-muted-foreground mt-1'>
-                            Variant: {item.variantName}
-                          </p>
-                        )}
-                        {item.version && (
-                          <Badge variant='outline' className='mt-2 bg-white/5 border-white/10'>
-                            v{item.version}
-                          </Badge>
-                        )}
+      {/* Downloadable Files Section */}
+      <div>
+        <h3 className='text-xl font-extrabold mb-5 flex items-center gap-2.5 text-gray-900 dark:text-white'>
+          <div className='p-2 bg-sky-500/10 rounded-lg'>
+            <Download className='w-5 h-5 text-sky-400' />
+          </div>
+          File Unduhan
+        </h3>
+        {isLoading
+          ? (
+            <div className='grid gap-4'>
+              {[1, 2, 3].map((i) => (
+                <Card key={i} className='animate-pulse bg-white/5 border-white/10 h-24' />
+              ))}
+            </div>
+          )
+          : error
+          ? (
+            <div className='text-center py-10 bg-red-500/10 text-red-400 rounded-lg border border-red-500/20'>
+              <p>Gagal memuat unduhan. Silakan coba lagi.</p>
+            </div>
+          )
+          : data?.entitlements?.length === 0
+          ? (
+            <div className='text-center py-20 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10'>
+              <PackageOpen className='w-12 h-12 mx-auto text-gray-400 dark:text-muted-foreground mb-4 dark:opacity-50' />
+              <h3 className='text-lg font-medium text-gray-900 dark:text-white mb-2'>
+                Belum Ada Unduhan
+              </h3>
+              <p className='text-muted-foreground text-sm mb-6'>
+                Anda belum membeli produk digital apapun.
+              </p>
+            </div>
+          )
+          : (
+            <div className='grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>
+              {data?.entitlements.map((item: any) => {
+                const isExpired = item.expiresAt && new Date(item.expiresAt) < new Date();
+                const isLimitReached = item.downloadLimit !== null &&
+                  item.downloadCount >= item.downloadLimit;
+                const canDownload = item.status === 'active' && !isExpired && !isLimitReached;
+
+                return (
+                  <Card
+                    key={item.id}
+                    className={`bg-white dark:bg-gradient-to-b dark:from-[#13161c] dark:to-[#0f1115] border-gray-200 dark:border-white/5 hover:border-gray-300 dark:hover:border-white/15 transition-all overflow-hidden flex flex-col justify-between shadow-sm dark:shadow-xl dark:shadow-black/40 ${
+                      !canDownload ? 'opacity-60 grayscale-[30%]' : ''
+                    }`}
+                  >
+                    <div className='p-5 border-b border-gray-100 dark:border-white/5 relative overflow-hidden'>
+                      <div className='absolute top-0 right-0 w-32 h-32 bg-sky-50 dark:bg-sky-500/10 rounded-bl-full -mr-8 -mt-8 blur-2xl pointer-events-none'>
+                      </div>
+                      <div className='flex items-start justify-between gap-2 relative z-10'>
+                        <div>
+                          <h3
+                            className='font-bold text-gray-900 dark:text-white text-[17px] leading-tight tracking-wide line-clamp-2'
+                            title={item.productName}
+                          >
+                            {item.productName || 'Produk Digital'}
+                          </h3>
+                          {item.variantName && item.variantName !== 'Default' && (
+                            <Badge
+                              variant='outline'
+                              className='mt-3 bg-sky-50 dark:bg-white/5 border-sky-100 dark:border-white/10 text-sky-700 dark:text-sky-300 font-medium px-2.5 py-0.5 rounded-full text-xs'
+                            >
+                              {item.variantName}
+                            </Badge>
+                          )}
+                          {item.version && (
+                            <Badge
+                              variant='outline'
+                              className='mt-3 ml-2 bg-sky-50 dark:bg-sky-500/10 border-sky-200 dark:border-sky-500/20 text-sky-600 dark:text-sky-400 font-medium px-2 py-0.5 rounded-full text-xs'
+                            >
+                              v{item.version}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className='p-4 bg-white/[0.02] space-y-3 flex-1 flex flex-col justify-end'>
-                    <div className='flex items-center justify-between text-xs text-muted-foreground'>
-                      <div className='flex items-center gap-1.5'>
-                        <Download className='w-3.5 h-3.5' />
-                        <span>
-                          {item.downloadCount} {item.downloadLimit ? `/ ${item.downloadLimit}` : ''}
-                          {' '}
-                          diunduh
-                        </span>
+                    <div className='p-5 bg-gray-50/50 dark:bg-white/[0.01] space-y-4 flex-1 flex flex-col justify-end'>
+                      <div className='flex items-center justify-between text-xs text-muted-foreground'>
+                        <div className='flex items-center gap-1.5'>
+                          <Download className='w-3.5 h-3.5' />
+                          <span>
+                            {item.downloadCount}{' '}
+                            {item.downloadLimit ? `/ ${item.downloadLimit}` : ''} diunduh
+                          </span>
+                        </div>
+                        {item.expiresAt && (
+                          <div
+                            className='flex items-center gap-1.5'
+                            title={`Berakhir pada ${
+                              new Date(item.expiresAt).toLocaleString('id-ID')
+                            }`}
+                          >
+                            <Clock className='w-3.5 h-3.5' />
+                            <span>
+                              {isExpired
+                                ? 'Kedaluwarsa'
+                                : new Date(item.expiresAt).toLocaleDateString('id-ID')}
+                            </span>
+                          </div>
+                        )}
                       </div>
-                      {item.expiresAt && (
-                        <div
-                          className='flex items-center gap-1.5'
-                          title={`Berakhir pada ${
-                            new Date(item.expiresAt).toLocaleString('id-ID')
-                          }`}
-                        >
-                          <Clock className='w-3.5 h-3.5' />
+
+                      {!canDownload && (
+                        <div className='flex items-center gap-2 text-xs text-amber-500 bg-amber-500/10 p-2 rounded border border-amber-500/20'>
+                          <AlertTriangle className='w-4 h-4 shrink-0' />
                           <span>
                             {isExpired
-                              ? 'Kedaluwarsa'
-                              : new Date(item.expiresAt).toLocaleDateString('id-ID')}
+                              ? 'Akses telah kedaluwarsa'
+                              : isLimitReached
+                              ? 'Limit unduhan tercapai'
+                              : 'Akses dicabut'}
                           </span>
                         </div>
                       )}
+
+                      <Button
+                        variant={canDownload ? 'default' : 'outline'}
+                        disabled={!canDownload || downloadingId === item.id}
+                        onClick={() => handleDownload(item.id, item.productName || 'download')}
+                        className={`w-full ${!canDownload ? 'opacity-50' : ''}`}
+                      >
+                        {downloadingId === item.id
+                          ? <Loader2 className='w-4 h-4 mr-2 animate-spin' />
+                          : <Download className='w-4 h-4 mr-2' />}
+                        {canDownload ? 'Unduh File' : 'Tidak Tersedia'}
+                      </Button>
                     </div>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
 
-                    {!canDownload && (
-                      <div className='flex items-center gap-2 text-xs text-amber-500 bg-amber-500/10 p-2 rounded border border-amber-500/20'>
-                        <AlertTriangle className='w-4 h-4 shrink-0' />
-                        <span>
-                          {isExpired
-                            ? 'Akses telah kedaluwarsa'
-                            : isLimitReached
-                            ? 'Limit unduhan tercapai'
-                            : 'Akses dicabut'}
-                        </span>
-                      </div>
-                    )}
-
-                    <Button
-                      variant={canDownload ? 'default' : 'outline'}
-                      disabled={!canDownload || downloadingId === item.id}
-                      onClick={() => handleDownload(item.id, item.productName || 'download')}
-                      className={`w-full ${!canDownload ? 'opacity-50' : ''}`}
-                    >
-                      {downloadingId === item.id
-                        ? <Loader2 className='w-4 h-4 mr-2 animate-spin' />
-                        : <Download className='w-4 h-4 mr-2' />}
-                      {canDownload ? 'Unduh File' : 'Tidak Tersedia'}
-                    </Button>
-                  </div>
-                </Card>
-              );
-            })}
+        {/* Pagination */}
+        {(data?.pagination?.totalPages ?? 0) > 1 && (
+          <div className='flex justify-center items-center gap-4 mt-8'>
+            <Button
+              variant='outline'
+              size='icon'
+              disabled={page === 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              className='border-white/20 hover:bg-white/10'
+            >
+              <ChevronLeft className='w-4 h-4' />
+            </Button>
+            <span className='text-sm text-muted-foreground'>
+              Halaman <span className='text-white font-medium'>{page}</span> dari{' '}
+              {data?.pagination?.totalPages}
+            </span>
+            <Button
+              variant='outline'
+              size='icon'
+              disabled={page === data?.pagination?.totalPages}
+              onClick={() => setPage((p) => Math.min(data?.pagination?.totalPages || 1, p + 1))}
+              className='border-white/20 hover:bg-white/10'
+            >
+              <ChevronRight className='w-4 h-4' />
+            </Button>
           </div>
         )}
-
-      {/* Pagination */}
-      {(data?.pagination?.totalPages ?? 0) > 1 && (
-        <div className='flex justify-center items-center gap-4 mt-8'>
-          <Button
-            variant='outline'
-            size='icon'
-            disabled={page === 1}
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            className='border-white/20 hover:bg-white/10'
-          >
-            <ChevronLeft className='w-4 h-4' />
-          </Button>
-          <span className='text-sm text-muted-foreground'>
-            Halaman <span className='text-white font-medium'>{page}</span> dari{' '}
-            {data?.pagination?.totalPages}
-          </span>
-          <Button
-            variant='outline'
-            size='icon'
-            disabled={page === data?.pagination?.totalPages}
-            onClick={() => setPage((p) => Math.min(data?.pagination?.totalPages || 1, p + 1))}
-            className='border-white/20 hover:bg-white/10'
-          >
-            <ChevronRight className='w-4 h-4' />
-          </Button>
-        </div>
-      )}
+      </div>
     </div>
   );
 };

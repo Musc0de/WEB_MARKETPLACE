@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { db } from '@starsuperscare/database';
 import {
+  digitalCredentials,
   inventoryLevels,
   inventoryMovements,
   orderItems,
@@ -9,8 +10,9 @@ import {
   outboxEvents,
   paymentEvents,
   payments,
+  products,
 } from '@starsuperscare/database';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { WebhookPayloadSchema } from '@starsuperscare/contracts';
 import { louvinPaymentProvider, paymentProvider } from '../../modules/payments/provider.ts';
 
@@ -173,13 +175,46 @@ webhooksRouter.post('/', async (c) => {
       });
 
       // Fulfillment of reservation
-      const items = await tx.select().from(orderItems).where(
-        eq(orderItems.orderId, payment.orderId),
-      );
+      const items = await tx.select({
+        id: orderItems.id,
+        productId: orderItems.productId,
+        variantId: orderItems.variantId,
+        quantity: orderItems.quantity,
+        type: products.type,
+      }).from(orderItems)
+        .innerJoin(products, eq(orderItems.productId, products.id))
+        .where(eq(orderItems.orderId, payment.orderId));
+
       for (const item of items) {
         await tx.update(inventoryLevels)
           .set({ reserved: sql`${inventoryLevels.reserved} - ${item.quantity}` })
           .where(eq(inventoryLevels.variantId, item.variantId));
+
+        if (item.type === 'digital' || item.type === 'service') {
+          // Assign digital credentials if available
+          const availableCreds = await tx.select()
+            .from(digitalCredentials)
+            .where(
+              and(
+                eq(digitalCredentials.productId, item.productId),
+                eq(digitalCredentials.status, 'available'),
+                // If variantId is specified in order, match it, or if it's null, ignore
+              ),
+            )
+            .limit(item.quantity);
+
+          if (availableCreds.length > 0) {
+            const credIds = availableCreds.map((c) => c.id);
+            await tx.update(digitalCredentials)
+              .set({
+                status: 'assigned',
+                orderItemId: item.id,
+                userId: fullOrder.userId,
+                updatedAt: new Date().toISOString(),
+              })
+              .where(sql`${digitalCredentials.id} IN ${credIds}`);
+          }
+        }
       }
     } else if (
       (data.type === 'payment_failed' || data.type === 'payment.failed' ||

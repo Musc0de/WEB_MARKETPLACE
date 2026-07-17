@@ -1,5 +1,5 @@
 import { ErrorBoundary } from 'react-error-boundary';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './features/auth/AuthContext.tsx';
 import { AuthGuard } from './features/auth/AuthGuard.tsx';
@@ -27,7 +27,9 @@ import { DashboardCards } from './features/overview/DashboardCards.tsx';
 import { ReviewsList } from './features/reviews/ReviewsList.tsx';
 import { AuditLogViewer } from './features/audit/AuditLogViewer.tsx';
 import { ReportsPage } from './features/reports/ReportsPage.tsx';
-import { SettingsForm } from './features/settings/SettingsForm.tsx';
+import { SettingsLayout } from './features/settings/SettingsLayout.tsx';
+import { GeneralSettingsForm } from './features/settings/GeneralSettingsForm.tsx';
+import { PaymentGatewaysForm } from './features/settings/PaymentGatewaysForm.tsx';
 import 'goey-toast/styles.css';
 
 const queryClient = new QueryClient();
@@ -142,7 +144,11 @@ export default function App() {
                 <Route path='refunds' element={<RefundsList />} />
 
                 <Route path='reports' element={<ReportsPage />} />
-                <Route path='settings' element={<SettingsForm />} />
+                <Route path='settings' element={<SettingsLayout />}>
+                  <Route index element={<Navigate to='general' replace />} />
+                  <Route path='general' element={<GeneralSettingsForm />} />
+                  <Route path='payment-gateways' element={<PaymentGatewaysForm />} />
+                </Route>
 
                 {/* Fallback */}
                 <Route path='*' element={<NotFound />} />

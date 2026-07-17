@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@starsuperscare/ui';
 import { Input } from '../../components/ui/Input.tsx';
 import { notify } from '@starsuperscare/ui';
@@ -17,6 +17,35 @@ export function SignupPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [searchParams] = useSearchParams();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await apiClient.v1.me.profile.$get();
+        if (res.ok) {
+          const returnTo = searchParams.get('return_to');
+          const dashboardUrl = (import.meta as any).env?.VITE_DASHBOARD_URL;
+
+          if (returnTo) {
+            if (returnTo.startsWith('/') && !returnTo.startsWith('//')) {
+              if (dashboardUrl) {
+                globalThis.location.href = `${dashboardUrl}${returnTo}`;
+              }
+            } else {
+              globalThis.location.href = returnTo;
+            }
+          } else if (dashboardUrl) {
+            globalThis.location.href = dashboardUrl;
+          }
+        }
+      } catch (_e) {
+        // Not logged in or network error
+      }
+    };
+    checkAuth();
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
