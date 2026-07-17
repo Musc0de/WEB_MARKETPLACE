@@ -67,6 +67,31 @@ const STATUS_CONFIG: Record<string, { style: string; dot: string; label: string 
     dot: 'bg-rose-500',
     label: 'Dikembalikan',
   },
+  cancellation_requested: {
+    style: 'text-orange-700 bg-orange-50 border-orange-200',
+    dot: 'bg-orange-500',
+    label: 'Pengajuan Pembatalan',
+  },
+  return_requested: {
+    style: 'text-purple-700 bg-purple-50 border-purple-200',
+    dot: 'bg-purple-500',
+    label: 'Pengajuan Pengembalian',
+  },
+  cancellation_rejected: {
+    style: 'text-red-700 bg-red-50 border-red-200',
+    dot: 'bg-red-500',
+    label: 'Batal Ditolak',
+  },
+  return_rejected: {
+    style: 'text-red-700 bg-red-50 border-red-200',
+    dot: 'bg-red-500',
+    label: 'Retur Ditolak',
+  },
+  refund_processed: {
+    style: 'text-teal-700 bg-teal-50 border-teal-200',
+    dot: 'bg-teal-500',
+    label: 'Refund Diproses',
+  },
 };
 
 const getStatusCfg = (s: string) =>
@@ -87,8 +112,14 @@ const variantLabel = (optionValues: any): string => {
 const timelineIcon = (status: string) => {
   if (status === 'delivered') return <CheckCircle2 className='w-4 h-4 text-emerald-600' />;
   if (status === 'shipped') return <Truck className='w-4 h-4 text-indigo-600' />;
-  if (status === 'cancelled' || status === 'refunded') {
+  if (
+    status === 'cancelled' || status === 'refunded' || status === 'cancellation_requested' ||
+    status === 'return_rejected' || status === 'cancellation_rejected'
+  ) {
     return <XCircle className='w-4 h-4 text-red-500' />;
+  }
+  if (status === 'return_requested' || status === 'refund_processed') {
+    return <RefreshCcw className='w-4 h-4 text-purple-600' />;
   }
   return <Clock className='w-4 h-4 text-blue-500' />;
 };
@@ -96,7 +127,13 @@ const timelineIcon = (status: string) => {
 const timelineDotColor = (status: string) => {
   if (status === 'delivered') return 'border-emerald-400 bg-emerald-50';
   if (status === 'shipped') return 'border-indigo-400 bg-indigo-50';
-  if (status === 'cancelled' || status === 'refunded') return 'border-red-400 bg-red-50';
+  if (
+    status === 'cancelled' || status === 'refunded' || status === 'cancellation_requested' ||
+    status === 'return_rejected' || status === 'cancellation_rejected'
+  ) return 'border-red-400 bg-red-50';
+  if (status === 'return_requested' || status === 'refund_processed') {
+    return 'border-purple-400 bg-purple-50';
+  }
   return 'border-blue-400 bg-blue-50';
 };
 
@@ -111,6 +148,17 @@ export const OrderDetailPage = () => {
   const { data, error, isLoading } = useSWR(
     id ? ['/api/orders', id] : null,
     ([, orderId]) => fetchOrderDetail(orderId),
+  );
+
+  const { data: eligibilityData } = useSWR(
+    id ? ['/api/orders', id, 'resolution-eligibility'] : null,
+    async ([, orderId]) => {
+      const res = await client.v1.orders[':id']['resolution-eligibility'].$get({
+        param: { id: orderId },
+      });
+      if (res.ok) return (await res.json()).data;
+      return null;
+    },
   );
 
   const handleBuyAgain = async () => {
@@ -205,7 +253,22 @@ export const OrderDetailPage = () => {
     );
   }
 
-  const { order, items, addresses, history } = data;
+  const { order, items, addresses } = data;
+  const history = [...(data.history || [])].sort((a: any, b: any) => {
+    const tA = new Date(a.createdAt).getTime();
+    const tB = new Date(b.createdAt).getTime();
+    if (tA !== tB) return tB - tA;
+    const w: Record<string, number> = {
+      pending: 1,
+      paid: 2,
+      processing: 3,
+      shipped: 4,
+      delivered: 5,
+      cancelled: 6,
+      refunded: 7,
+    };
+    return (w[b.status] || 0) - (w[a.status] || 0);
+  });
   const shipping: any = addresses?.shippingSnapshot;
   const cfg = getStatusCfg(order.status);
 
@@ -362,6 +425,82 @@ export const OrderDetailPage = () => {
               })}
             </div>
           </div>
+
+          {/* Help Card */}
+          {eligibilityData && (
+            <div className='bg-white border border-rose-100 rounded-2xl overflow-hidden shadow-sm'>
+              <div className='px-5 py-4 border-b border-rose-100 flex items-center gap-2 bg-gradient-to-r from-rose-50/50 to-transparent'>
+                <Copy className='w-4 h-4 text-rose-500' />
+                <h3 className='text-sm font-bold text-gray-900'>
+                  Butuh Bantuan dengan Pesanan Ini?
+                </h3>
+              </div>
+              <div className='p-5 flex flex-col gap-4'>
+                {/* Cancellation Section */}
+                {/* Cancellation Section */}
+                <div>
+                  {eligibilityData.cancellationEligibility?.eligible
+                    ? (
+                      <button
+                        type='button'
+                        onClick={() => navigate(`/returns/new?orderId=${id}&type=cancel`)}
+                        className='w-full py-2.5 rounded-xl font-bold transition active:scale-95 bg-rose-50 text-rose-600 hover:bg-rose-100'
+                      >
+                        Ajukan Pembatalan
+                      </button>
+                    )
+                    : (
+                      <div className='w-full py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-center px-4'>
+                        <p className='text-xs font-medium text-gray-500 leading-snug'>
+                          {eligibilityData.cancellationEligibility?.reasonMessage ||
+                            'Pesanan tidak dapat dibatalkan.'}
+                        </p>
+                      </div>
+                    )}
+                </div>
+
+                {/* Return/Refund Section */}
+                <div className='border-t border-gray-100 pt-4'>
+                  {eligibilityData.returnEligibility?.eligible
+                    ? (
+                      <button
+                        type='button'
+                        onClick={() => navigate(`/returns/new?orderId=${id}`)}
+                        className='w-full py-2.5 rounded-xl font-bold transition active:scale-95 bg-orange-50 text-orange-600 hover:bg-orange-100'
+                      >
+                        Ajukan Pengembalian Barang / Dana
+                      </button>
+                    )
+                    : eligibilityData.returnEligibility?.reasonCode === 'active_request_exists'
+                    ? (
+                      <div className='flex flex-col gap-2'>
+                        <div className='w-full py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-center px-4'>
+                          <p className='text-xs font-medium text-gray-500 leading-snug'>
+                            {eligibilityData.returnEligibility?.reasonMessage ||
+                              'Terdapat riwayat pengajuan pengembalian.'}
+                          </p>
+                        </div>
+                        <button
+                          type='button'
+                          onClick={() => navigate(`/returns`)}
+                          className='w-full py-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-xl text-xs font-bold transition active:scale-95'
+                        >
+                          Lihat Status Pengembalian
+                        </button>
+                      </div>
+                    )
+                    : (
+                      <div className='w-full py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-center px-4'>
+                        <p className='text-xs font-medium text-gray-500 leading-snug'>
+                          {eligibilityData.returnEligibility?.reasonMessage ||
+                            'Tidak tersedia untuk status saat ini.'}
+                        </p>
+                      </div>
+                    )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Timeline Card */}
           <div className='bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm'>
@@ -562,10 +701,12 @@ export const OrderDetailPage = () => {
                     <User className='w-4 h-4 text-orange-400' />
                   </div>
                   <div>
-                    <p className='font-bold text-gray-900 text-sm'>{shipping.recipientName}</p>
+                    <p className='font-bold text-gray-900 text-sm'>
+                      {shipping.fullName || shipping.recipientName}
+                    </p>
                     <p className='text-xs text-gray-400 flex items-center gap-1 mt-0.5'>
                       <Phone className='w-3 h-3' />
-                      {shipping.phone}
+                      {shipping.phoneNumber || shipping.phone}
                     </p>
                   </div>
                 </div>
@@ -577,10 +718,10 @@ export const OrderDetailPage = () => {
                   </div>
                   <div className='text-sm text-gray-600 leading-relaxed'>
                     <p className='font-medium text-gray-800'>
-                      {shipping.addressLine1}
+                      {shipping.streetAddress || shipping.addressLine1}
                       {shipping.addressLine2 ? `, ${shipping.addressLine2}` : ''}
                     </p>
-                    <p>{shipping.district}, {shipping.city}</p>
+                    <p>{shipping.district ? `${shipping.district}, ` : ''}{shipping.city}</p>
                     <p className='text-gray-400 text-xs mt-0.5'>
                       {shipping.province} {shipping.postalCode}
                     </p>

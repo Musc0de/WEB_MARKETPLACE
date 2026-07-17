@@ -1,17 +1,11 @@
 import { Hono } from 'hono';
 import { zValidator } from '../../middleware/validator.ts';
 import { AuthContext, authMiddleware } from '../../middleware/auth.ts';
-import {
-  db,
-  orderItems,
-  orders,
-  productImages,
-  returnItems,
-  returns,
-} from '@starsuperscare/database';
-import { and, desc, eq, sql } from 'drizzle-orm';
+import { db, returnItems, returns } from '@starsuperscare/database';
+import { and, desc, eq } from 'drizzle-orm';
 import { createReturnRequestSchema } from '@starsuperscare/contracts';
-import { storageAdapter } from '../../adapters/storage.ts';
+import { EligibilityService } from './services/eligibility.service.ts';
+import { returnEvents } from '@starsuperscare/database';
 
 type AppContext = {
   Variables: AuthContext['Variables'] & {
@@ -22,57 +16,6 @@ type AppContext = {
 const app = new Hono<AppContext>();
 
 app.use('*', authMiddleware);
-
-// GET /v1/returns/eligible
-// Returns order items that belong to the user, are from delivered orders, and are within 7 days
-app.get('/eligible', async (c) => {
-  const userId = c.get('user').id;
-
-  // We can fetch eligible items based on order status
-  const items = await db.select({
-    orderItemId: orderItems.id,
-    orderId: orders.id,
-    orderNumber: orders.orderNumber,
-    productId: orderItems.productId,
-    variantId: orderItems.variantId,
-    productName: orderItems.productNameSnapshot,
-    variantSku: orderItems.variantSkuSnapshot,
-    purchasedAt: orders.createdAt,
-    price: orderItems.priceSnapshot,
-    quantity: orderItems.quantity,
-    primaryImage: sql<string>`(
-      SELECT object_key FROM ${productImages}
-      WHERE product_id = ${orderItems.productId}
-      ORDER BY sort_order ASC
-      LIMIT 1
-    )`,
-  })
-    .from(orderItems)
-    .innerJoin(orders, eq(orders.id, orderItems.orderId))
-    .where(
-      and(
-        eq(orders.userId, userId),
-        eq(orders.status, 'delivered'),
-        // Return window (e.g. 14 days)
-        sql`${orders.updatedAt} >= NOW() - INTERVAL '14 days'`,
-      ),
-    )
-    .orderBy(desc(orders.createdAt));
-
-  const formattedItems = await Promise.all(items.map(async (item) => {
-    let primaryImage = null;
-    if (item.primaryImage) {
-      primaryImage = await storageAdapter.generatePresignedDownloadUrl(item.primaryImage);
-    }
-    return { ...item, primaryImage };
-  }));
-
-  return c.json({
-    data: formattedItems,
-    meta: { request_id: c.get('requestId') },
-    error: null,
-  });
-});
 
 // GET /v1/returns
 app.get('/', async (c) => {
@@ -128,40 +71,76 @@ app.post('/', zValidator('json', createReturnRequestSchema), async (c) => {
   const userId = c.get('user').id;
   const payload = c.req.valid('json');
 
-  // Verify ownership and eligibility of the order
-  const order = await db.query.orders.findFirst({
-    where: and(
-      eq(orders.id, payload.orderId),
-      eq(orders.userId, userId),
-      eq(orders.status, 'delivered'),
-    ),
-  });
+  // Verify ownership and eligibility of the order using EligibilityService
+  const eligibility = await EligibilityService.checkReturnEligibility(payload.orderId, userId);
 
-  if (!order) {
-    return c.json({ error: 'Order is not eligible for return' }, 400);
+  if (!eligibility.eligible) {
+    return c.json({
+      error: eligibility.reasonMessage || 'Pesanan tidak memenuhi syarat untuk pengembalian.',
+    }, 400);
   }
 
   // Create return and return items
   const result = await db.transaction(async (tx) => {
-    const [newReturn] = await tx.insert(returns)
-      .values({
-        userId,
-        orderId: payload.orderId,
-        status: 'pending',
-        resolution: payload.resolution,
-        reason: payload.reason || null,
-      })
-      .returning();
+    const returnNumber = `RET-${Date.now().toString().slice(-6)}`;
+
+    // Sum requested amount
+    let totalRequestedAmount = 0;
+    const itemsToInsert = [];
 
     for (const item of payload.items) {
-      await tx.insert(returnItems).values({
-        returnId: newReturn.id,
+      const eligibleItem = eligibility.eligibleItems.find((i) =>
+        i.orderItemId === item.orderItemId
+      );
+      if (!eligibleItem) {
+        throw new Error(`Item ${item.orderItemId} is not eligible`);
+      }
+      if (item.quantity > eligibleItem.remainingEligibleQuantity) {
+        throw new Error(
+          `Requested quantity exceeds eligible quantity for item ${item.orderItemId}`,
+        );
+      }
+
+      const itemRequestedAmount = eligibleItem.paidUnitAmount * item.quantity;
+      totalRequestedAmount += itemRequestedAmount;
+
+      itemsToInsert.push({
         orderItemId: item.orderItemId,
         quantity: item.quantity,
+        paidUnitAmount: eligibleItem.paidUnitAmount,
+        requestedRefundAmount: itemRequestedAmount,
         reasonDetail: item.reasonDetail || null,
         condition: item.condition || null,
       });
     }
+
+    const [newReturn] = await tx.insert(returns)
+      .values({
+        userId,
+        orderId: payload.orderId,
+        returnNumber,
+        status: 'under_review',
+        resolution: payload.resolution,
+        reasonCode: payload.reason || null,
+        requestedAmount: totalRequestedAmount,
+      })
+      .returning();
+
+    for (const itemInsert of itemsToInsert) {
+      await tx.insert(returnItems).values({
+        returnId: newReturn.id,
+        ...itemInsert,
+      });
+    }
+
+    // Add Timeline Event
+    await tx.insert(returnEvents).values({
+      returnId: newReturn.id,
+      eventType: 'return_requested',
+      actorType: 'customer',
+      actorId: userId,
+      description: 'Pengajuan pengembalian berhasil dibuat dan sedang ditinjau.',
+    });
 
     return newReturn;
   });

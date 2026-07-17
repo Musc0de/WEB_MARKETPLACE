@@ -321,7 +321,21 @@ export function OrderDetail() {
                   <div className='absolute left-3.5 top-2 bottom-2 w-px bg-gray-100' />
 
                   <div className='space-y-6'>
-                    {order.history.map((h: any, idx: number) => {
+                    {[...(order.history || [])].sort((a: any, b: any) => {
+                      const tA = new Date(a.createdAt).getTime();
+                      const tB = new Date(b.createdAt).getTime();
+                      if (tA !== tB) return tB - tA;
+                      const w: Record<string, number> = {
+                        pending: 1,
+                        paid: 2,
+                        processing: 3,
+                        shipped: 4,
+                        delivered: 5,
+                        cancelled: 6,
+                        refunded: 7,
+                      };
+                      return (w[b.status] || 0) - (w[a.status] || 0);
+                    }).map((h: any, idx: number) => {
                       const cfg = STATUS_CFG[h.status] ??
                         {
                           bg: 'bg-gray-100',

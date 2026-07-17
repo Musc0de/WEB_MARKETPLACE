@@ -1,24 +1,12 @@
-import { useState } from 'react';
 import useSWR from 'swr';
-import { API_URL, client } from '../../lib/api.ts';
-import { Button, Card } from '@starsuperscare/ui';
-import { Image as ImageIcon, Package, RotateCcw } from 'lucide-react';
-import { ReturnForm } from './ReturnForm.tsx';
+import { client } from '../../lib/api.ts';
+import { Package } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export const ReturnsPage = () => {
-  const [activeTab, setActiveTab] = useState<'eligible' | 'mine'>('eligible');
-  const [creatingReturnFor, setCreatingReturnFor] = useState<any | null>(null);
+  const navigate = useNavigate();
 
-  const { data: eligibleItems, mutate: mutateEligible, isLoading: isLoadingEligible } = useSWR(
-    '/api/returns/eligible',
-    async () => {
-      const res = await (client.v1 as any).returns.eligible.$get();
-      const json = await res.json();
-      return json.data || [];
-    },
-  );
-
-  const { data: myReturns, mutate: mutateReturns, isLoading: isLoadingReturns } = useSWR(
+  const { data: myReturns, mutate: _mutateReturns, isLoading: isLoadingReturns } = useSWR(
     '/api/returns',
     async () => {
       const res = await (client.v1 as any).returns.$get();
@@ -27,188 +15,81 @@ export const ReturnsPage = () => {
     },
   );
 
-  const getMediaUrl = (key: string | null) => {
-    if (!key) return null;
-    return `${API_URL}/v1/admin/assets/${key}`;
-  };
-
-  // Group eligible items by order
-  const eligibleOrders = eligibleItems?.reduce((acc: any, item: any) => {
-    if (!acc[item.orderId]) {
-      acc[item.orderId] = {
-        orderId: item.orderId,
-        orderNumber: item.orderNumber,
-        purchasedAt: item.purchasedAt,
-        items: [],
-      };
-    }
-    acc[item.orderId].items.push(item);
-    return acc;
-  }, {});
-
-  const orderList = eligibleOrders ? Object.values(eligibleOrders) : [];
-
   return (
     <div className='max-w-4xl mx-auto space-y-6 relative'>
       <div>
-        <h1 className='text-2xl font-bold text-white flex items-center gap-2'>
-          Pengembalian & Komplain
+        <h1 className='text-2xl font-bold text-gray-900 flex items-center gap-2'>
+          Riwayat Pengembalian & Komplain
         </h1>
-        <p className='text-muted-foreground mt-1'>
-          Ajukan pengembalian dana atau tukar barang untuk pesanan yang bermasalah.
+        <p className='text-gray-500 mt-1'>
+          Lacak status pengajuan pengembalian dana atau tukar barang Anda.
         </p>
       </div>
 
-      <div className='flex gap-4 border-b border-white/10'>
-        <button
-          type='button'
-          className={`pb-2 px-1 border-b-2 transition-colors ${
-            activeTab === 'eligible'
-              ? 'border-primary text-primary font-medium'
-              : 'border-transparent text-muted-foreground hover:text-white'
-          }`}
-          onClick={() => setActiveTab('eligible')}
-        >
-          Pesanan Memenuhi Syarat
-        </button>
-        <button
-          type='button'
-          className={`pb-2 px-1 border-b-2 transition-colors ${
-            activeTab === 'mine'
-              ? 'border-primary text-primary font-medium'
-              : 'border-transparent text-muted-foreground hover:text-white'
-          }`}
-          onClick={() => setActiveTab('mine')}
-        >
-          Riwayat Pengembalian
-        </button>
+      <div className='space-y-4'>
+        {isLoadingReturns
+          ? <div className='animate-pulse bg-gray-50 border border-gray-100 h-32 rounded-xl'></div>
+          : myReturns?.length === 0
+          ? (
+            <div className='text-center py-20 bg-gray-50 rounded-xl border border-gray-100'>
+              <Package className='w-12 h-12 mx-auto text-gray-300 mb-4' />
+              <h3 className='text-lg font-bold text-gray-900 mb-2'>Tidak Ada Riwayat</h3>
+              <p className='text-gray-500 text-sm mb-4'>
+                Anda belum pernah mengajukan pengembalian barang atau dana.
+              </p>
+              <button
+                type='button'
+                onClick={() => navigate('/orders')}
+                className='px-6 py-2 bg-orange-500 text-white rounded-full font-bold hover:bg-orange-600 transition'
+              >
+                Lihat Pesanan Saya
+              </button>
+            </div>
+          )
+          : (
+            myReturns?.map((ret: any) => (
+              <div
+                key={ret.id}
+                className='bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition'
+              >
+                <div className='flex items-center justify-between mb-4'>
+                  <div>
+                    <span className='text-xs font-bold text-gray-400'>ID PENGEMBALIAN</span>
+                    <p className='font-mono font-bold text-gray-900'>
+                      {ret.returnNumber || ret.id.split('-')[0].toUpperCase()}
+                    </p>
+                  </div>
+                  <div className='text-right'>
+                    <span className='inline-block px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-gray-100 text-gray-700'>
+                      {ret.status.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+                </div>
+
+                <div className='flex items-center gap-4 py-4 border-t border-gray-100'>
+                  <div className='flex-1'>
+                    <p className='text-sm text-gray-600 mb-1'>Solusi yang Diajukan:</p>
+                    <p className='font-bold text-gray-900 capitalize'>
+                      {ret.resolution.replace(/_/g, ' ')}
+                    </p>
+                  </div>
+                  <div className='flex-1 border-l border-gray-100 pl-4'>
+                    <p className='text-sm text-gray-600 mb-1'>Alasan:</p>
+                    <p className='font-bold text-gray-900 capitalize'>
+                      {ret.reasonCode?.replace(/_/g, ' ') || '-'}
+                    </p>
+                  </div>
+                  <div className='flex-1 border-l border-gray-100 pl-4'>
+                    <p className='text-sm text-gray-600 mb-1'>Nominal Diajukan:</p>
+                    <p className='font-bold text-orange-600'>
+                      Rp {ret.requestedAmount?.toLocaleString('id-ID') || 0}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
       </div>
-
-      {activeTab === 'eligible' && (
-        <div className='space-y-4'>
-          {isLoadingEligible
-            ? (
-              <div className='animate-pulse bg-white/5 border border-white/10 h-32 rounded-xl'>
-              </div>
-            )
-            : orderList.length === 0
-            ? (
-              <div className='text-center py-20 bg-white/5 rounded-xl border border-white/10'>
-                <Package className='w-12 h-12 mx-auto text-muted-foreground mb-4 opacity-50' />
-                <h3 className='text-lg font-medium text-white mb-2'>Tidak Ada Pesanan</h3>
-                <p className='text-muted-foreground text-sm'>
-                  Tidak ada pesanan yang memenuhi syarat untuk dikembalikan saat ini.
-                </p>
-              </div>
-            )
-            : (
-              orderList.map((order: any) => (
-                <Card
-                  key={order.orderId}
-                  className='p-4 bg-[#0f1115] border-white/10 flex flex-col sm:flex-row gap-4 justify-between items-start'
-                >
-                  <div className='flex-1 space-y-3'>
-                    <div>
-                      <h4 className='font-medium text-white'>Pesanan #{order.orderNumber}</h4>
-                      <p className='text-xs text-muted-foreground mt-1'>
-                        Diterima: {new Date(order.purchasedAt).toLocaleDateString('id-ID')}
-                      </p>
-                    </div>
-                    <div className='flex flex-wrap gap-2'>
-                      {order.items.map((item: any) => (
-                        <div
-                          key={item.orderItemId}
-                          className='flex items-center gap-2 bg-white/5 p-2 rounded-md border border-white/5'
-                        >
-                          <div className='w-8 h-8 bg-black/50 rounded flex items-center justify-center shrink-0 overflow-hidden'>
-                            {item.primaryImage
-                              ? (
-                                <img
-                                  src={getMediaUrl(item.primaryImage) || ''}
-                                  alt={item.productName}
-                                  className='w-full h-full object-cover'
-                                />
-                              )
-                              : <ImageIcon className='w-4 h-4 text-muted-foreground' />}
-                          </div>
-                          <div>
-                            <p className='text-xs font-medium text-white line-clamp-1'>
-                              {item.productName}
-                            </p>
-                            <p className='text-[10px] text-muted-foreground'>
-                              Qty: {item.quantity}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <Button onClick={() => setCreatingReturnFor(order)}>Ajukan Komplain</Button>
-                </Card>
-              ))
-            )}
-        </div>
-      )}
-
-      {activeTab === 'mine' && (
-        <div className='space-y-4'>
-          {isLoadingReturns
-            ? (
-              <div className='animate-pulse bg-white/5 border border-white/10 h-32 rounded-xl'>
-              </div>
-            )
-            : myReturns?.length === 0
-            ? (
-              <div className='text-center py-20 bg-white/5 rounded-xl border border-white/10'>
-                <RotateCcw className='w-12 h-12 mx-auto text-muted-foreground mb-4 opacity-50' />
-                <h3 className='text-lg font-medium text-white mb-2'>Belum Ada Riwayat</h3>
-                <p className='text-muted-foreground text-sm'>
-                  Anda belum pernah mengajukan pengembalian.
-                </p>
-              </div>
-            )
-            : (
-              myReturns?.map((ret: any) => (
-                <Card key={ret.id} className='p-4 bg-[#0f1115] border-white/10 space-y-4'>
-                  <div className='flex justify-between items-start'>
-                    <div>
-                      <div className='flex items-center gap-2 mb-2'>
-                        <span className='px-2 py-1 bg-white/10 rounded text-xs font-medium uppercase'>
-                          {ret.status}
-                        </span>
-                        <span className='px-2 py-1 bg-primary/20 text-primary rounded text-xs font-medium uppercase'>
-                          {ret.resolution.replace('_', ' ')}
-                        </span>
-                      </div>
-                      <p className='text-sm text-gray-300 mt-2'>
-                        Alasan: {ret.reason || 'Tidak ada alasan'}
-                      </p>
-                      <p className='text-xs text-muted-foreground mt-2'>
-                        Diajukan: {new Date(ret.createdAt).toLocaleDateString('id-ID')}
-                      </p>
-                    </div>
-                    <div>
-                      <Button variant='outline' size='sm' onClick={() => {}}>Detail</Button>
-                    </div>
-                  </div>
-                </Card>
-              ))
-            )}
-        </div>
-      )}
-
-      {creatingReturnFor && (
-        <ReturnForm
-          order={creatingReturnFor}
-          onClose={() => setCreatingReturnFor(null)}
-          onSuccess={() => {
-            mutateEligible();
-            mutateReturns();
-            setCreatingReturnFor(null);
-            setActiveTab('mine');
-          }}
-        />
-      )}
     </div>
   );
 };

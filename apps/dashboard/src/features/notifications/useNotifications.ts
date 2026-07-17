@@ -12,7 +12,9 @@ export function useNotifications() {
       return json.data || [];
     },
     {
-      refreshInterval: 60000, // Fallback polling every 60s
+      refreshInterval: 300000, // Poll every 5 min (SSE handles real-time updates)
+      revalidateOnFocus: false,
+      dedupingInterval: 30000,
     },
   );
 
@@ -24,7 +26,9 @@ export function useNotifications() {
       return (json as any).data?.count || 0;
     },
     {
-      refreshInterval: 60000,
+      refreshInterval: 300000, // Poll every 5 min
+      revalidateOnFocus: false,
+      dedupingInterval: 30000,
     },
   );
 

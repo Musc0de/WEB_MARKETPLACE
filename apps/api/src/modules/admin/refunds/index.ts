@@ -2,16 +2,8 @@ import { Hono } from 'hono';
 import { zValidator } from '../../../middleware/validator.ts';
 import { AuthContext, authMiddleware, requirePermission } from '../../../middleware/auth.ts';
 import { z } from 'zod';
-import {
-  db,
-  inventoryLevels,
-  orderItems,
-  productSalesStats,
-  refunds,
-  returnItems,
-  returns,
-} from '@starsuperscare/database';
-import { desc, eq, sql } from 'drizzle-orm';
+import { db, refunds, returns } from '@starsuperscare/database';
+import { desc, eq } from 'drizzle-orm';
 import { processRefundRequestSchema } from '@starsuperscare/contracts';
 
 const app = new Hono<AuthContext>();
@@ -25,9 +17,23 @@ app.get('/', async (c) => {
     orderBy: [desc(refunds.createdAt)],
   });
 
+  // Fetch returns manually since relation might not be defined
+  const returnIds = data.map((r) => r.returnId).filter(Boolean) as string[];
+  let returnsMap: Record<string, any> = {};
+  if (returnIds.length > 0) {
+    const rets = await db.query.returns.findMany({
+      where: (returns, { inArray }) => inArray(returns.id, returnIds),
+    });
+    returnsMap = rets.reduce((acc: any, r) => {
+      acc[r.id] = r;
+      return acc;
+    }, {});
+  }
+
   return c.json({
     data: data.map((r) => ({
       ...r,
+      returnReason: r.returnId && returnsMap[r.returnId] ? returnsMap[r.returnId].reasonCode : null,
       createdAt: new Date(r.createdAt).toISOString(),
       updatedAt: r.updatedAt ? new Date(r.updatedAt).toISOString() : new Date().toISOString(),
     })),
@@ -101,44 +107,8 @@ app.post('/:id/process', zValidator('json', processRefundRequestSchema), async (
       .where(eq(refunds.id, refundId))
       .returning();
 
-    // 2. Adjust sales stats if this is tied to a return
-    if (refund.returnId) {
-      const items = await tx.select({
-        productId: orderItems.productId,
-        variantId: orderItems.variantId,
-        quantity: returnItems.quantity,
-      })
-        .from(returnItems)
-        .innerJoin(orderItems, eq(orderItems.id, returnItems.orderItemId))
-        .where(eq(returnItems.returnId, refund.returnId));
-
-      for (const item of items) {
-        const productId = item.productId;
-        const variantId = item.variantId;
-        const qty = item.quantity;
-
-        // Update sales stats
-        await tx.execute(sql`
-          INSERT INTO ${productSalesStats} (product_id, refunded, net_sold, updated_at)
-          VALUES (${productId}, ${qty}, -${qty}, NOW())
-          ON CONFLICT (product_id) DO UPDATE SET
-            refunded = ${productSalesStats}.refunded + ${qty},
-            net_sold = ${productSalesStats}.net_sold - ${qty},
-            updated_at = NOW()
-        `);
-
-        // Update inventory if restock requested
-        if (payload.restockItems) {
-          await tx.execute(sql`
-            UPDATE ${inventoryLevels}
-            SET 
-              available = available + ${qty},
-              updated_at = NOW()
-            WHERE product_id = ${productId} AND variant_id = ${variantId}
-          `);
-        }
-      }
-    }
+    // 2. We no longer adjust sales stats or restock here.
+    // It is handled during the returns inspection process in admin/returns/index.ts
 
     return updatedRefund;
   });
@@ -149,5 +119,54 @@ app.post('/:id/process', zValidator('json', processRefundRequestSchema), async (
     error: null,
   });
 });
+
+// POST /v1/admin/refunds/:id/reject
+app.post(
+  '/:id/reject',
+  zValidator('json', z.object({ reason: z.string().optional() })),
+  async (c) => {
+    const refundId = c.req.param('id');
+    const payload = c.req.valid('json');
+
+    const refund = await db.query.refunds.findFirst({
+      where: eq(refunds.id, refundId),
+    });
+
+    if (!refund) {
+      return c.json({ error: 'Refund not found' }, 404);
+    }
+
+    if (refund.status === 'completed' || refund.status === 'rejected') {
+      return c.json({ error: 'Refund is already completed or rejected' }, 400);
+    }
+
+    const result = await db.transaction(async (tx) => {
+      // 1. Mark refund as rejected
+      const [updatedRefund] = await tx.update(refunds)
+        .set({
+          status: 'rejected',
+          failureReason: payload.reason || 'Ditolak oleh admin',
+          updatedAt: new Date().toISOString(),
+        })
+        .where(eq(refunds.id, refundId))
+        .returning();
+
+      // 2. Also reject the return if it's attached
+      if (refund.returnId) {
+        await tx.update(returns)
+          .set({ status: 'rejected', updatedAt: new Date().toISOString() })
+          .where(eq(returns.id, refund.returnId));
+      }
+
+      return updatedRefund;
+    });
+
+    return c.json({
+      data: result,
+      meta: { request_id: c.get('requestId') },
+      error: null,
+    });
+  },
+);
 
 export { app as adminRefundsRouter };

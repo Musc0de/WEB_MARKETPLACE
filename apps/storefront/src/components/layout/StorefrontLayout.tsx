@@ -95,7 +95,7 @@ const Header = () => {
           } as any,
         });
         if (res.ok) {
-          const payload = await res.json();
+          const payload: any = await res.json();
           setSuggestions(payload.data?.items || []);
         }
       } catch (_err) {
@@ -157,6 +157,12 @@ const Header = () => {
 
         {/* Mega Menu Placeholder (Desktop) */}
         <nav className='hidden md:flex gap-6 shrink-0'>
+          <a
+            href='/products'
+            className='text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors'
+          >
+            Semua Produk
+          </a>
           <a
             href='/categories'
             className='text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors'
@@ -355,8 +361,22 @@ const MobileBottomNav = () => {
         encodeURIComponent(globalThis.location.href)
       }`,
     );
-    // Ideally check session here too for correct account routing on mobile
   }, [location]);
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const res = await client.v1.auth.me.$get();
+        if (res.ok) {
+          const dashboardUrl = (import.meta as any).env?.VITE_DASHBOARD_URL;
+          setAccountUrl(dashboardUrl);
+        }
+      } catch (_err) {
+        // ignore error, default to login url
+      }
+    };
+    checkSession();
+  }, []);
 
   return (
     <nav className='md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 pb-safe'>

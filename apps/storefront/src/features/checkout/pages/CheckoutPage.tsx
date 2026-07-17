@@ -27,6 +27,7 @@ export function CheckoutPage() {
 
   // Validate on mount or when shipping/cart changes
   // For direct-buy: pass the directToken so the API uses the fresh isolated cart
+  const cartHash = JSON.stringify(cart?.items || []);
   useEffect(() => {
     const hasItems = directToken || cart?.items?.length;
     if (hasItems) {
@@ -36,11 +37,16 @@ export function CheckoutPage() {
         _cartToken: directToken ?? null,
       } as any).catch(() => {});
     }
-  }, [cart, shippingOptionId, directToken, validateCheckout]);
+  }, [cartHash, shippingOptionId, directToken, validateCheckout]);
 
-  // Show loader while normal cart is loading (only if not in direct-buy mode)
-  if (!directToken && isCartLoading) {
-    return <div className='p-8 text-center'>Memuat checkout...</div>;
+  // Show loader while normal cart is loading OR direct buy validation is pending
+  if ((!directToken && isCartLoading) || (directToken && !validationData)) {
+    return (
+      <div className='min-h-[50vh] flex flex-col items-center justify-center p-8 text-center'>
+        <div className='w-10 h-10 rounded-full border-4 border-gray-100 border-t-black animate-spin mb-4' />
+        <p className='text-gray-500 font-medium animate-pulse'>Menyiapkan checkout...</p>
+      </div>
+    );
   }
 
   // Show empty-cart screen only if NOT in direct-buy mode and cart is really empty
@@ -62,11 +68,15 @@ export function CheckoutPage() {
 
   const handleAddressSubmit = (data: ShippingAddress & { email: string }) => {
     setAddress(data);
-    setStep('shipping');
+    if (requiresShipping) {
+      setStep('shipping');
+    } else {
+      setStep('review');
+    }
   };
 
   const handleOrderSubmit = async () => {
-    if (!address || !shippingOptionId || !validationData?.isValid) {
+    if (!address || !validationData?.isValid || (requiresShipping && !shippingOptionId)) {
       toast.error('Lengkapi semua data dengan benar');
       return;
     }
@@ -75,7 +85,7 @@ export function CheckoutPage() {
       const res = await createOrder({
         idempotencyKey: crypto.randomUUID(),
         shippingAddress: address,
-        shippingOptionId,
+        shippingOptionId: requiresShipping ? shippingOptionId : null,
         emailSnapshot: address.email,
         voucherCode: null,
         _cartToken: directToken ?? null,
@@ -90,11 +100,20 @@ export function CheckoutPage() {
     }
   };
 
-  const steps: { id: CheckoutStep; label: string }[] = [
-    { id: 'address', label: 'Alamat' },
-    { id: 'shipping', label: 'Pengiriman' },
-    { id: 'review', label: 'Pembayaran' },
-  ];
+  const requiresShipping = directToken
+    ? (validationData?.items?.some((i: any) => i.productType === 'physical') ?? false)
+    : (cart?.items?.some((i: any) => i.product?.type === 'physical') ?? true);
+
+  const steps: { id: CheckoutStep; label: string }[] = requiresShipping
+    ? [
+      { id: 'address', label: 'Alamat Pengiriman' },
+      { id: 'shipping', label: 'Opsi Pengiriman' },
+      { id: 'review', label: 'Pembayaran' },
+    ]
+    : [
+      { id: 'address', label: 'Informasi Pembeli' },
+      { id: 'review', label: 'Pembayaran' },
+    ];
 
   return (
     <div className='max-w-6xl mx-auto px-4 py-8'>
@@ -147,8 +166,14 @@ export function CheckoutPage() {
         <div className='lg:col-span-2'>
           {step === 'address' && (
             <div className='bg-white p-6 rounded-2xl shadow-sm border border-gray-100'>
-              <h2 className='text-xl font-bold mb-6'>Alamat Pengiriman</h2>
-              <AddressForm initialValues={address || {}} onSubmit={handleAddressSubmit} />
+              <h2 className='text-xl font-bold mb-6'>
+                {requiresShipping ? 'Alamat Pengiriman' : 'Informasi Pembeli'}
+              </h2>
+              <AddressForm
+                initialValues={address || {}}
+                onSubmit={handleAddressSubmit}
+                isDigitalOnly={!requiresShipping}
+              />
             </div>
           )}
 
@@ -184,10 +209,10 @@ export function CheckoutPage() {
                 <h2 className='text-xl font-bold'>Review Pesanan</h2>
                 <button
                   type='button'
-                  onClick={() => setStep('shipping')}
+                  onClick={() => setStep(requiresShipping ? 'shipping' : 'address')}
                   className='text-sm text-blue-600'
                 >
-                  Ubah Pengiriman
+                  Ubah {requiresShipping ? 'Pengiriman' : 'Data Diri'}
                 </button>
               </div>
 
@@ -237,34 +262,72 @@ export function CheckoutPage() {
 
             {validationData
               ? (
-                <div className='space-y-4 text-sm'>
-                  <div className='flex justify-between'>
-                    <span className='text-gray-600'>Subtotal</span>
-                    <span className='font-medium'>
-                      {formatIDR(validationData.summary.subtotal)}
-                    </span>
+                <div className='flex flex-col text-sm'>
+                  <div className='space-y-4 mb-6 pb-6 border-b border-gray-200'>
+                    {validationData.items.map((item) => (
+                      <div key={item.id} className='flex gap-4'>
+                        <div className='w-16 h-16 bg-white rounded-xl border border-gray-200 overflow-hidden flex-shrink-0'>
+                          {item.primaryImage
+                            ? (
+                              <img
+                                src={item.primaryImage}
+                                alt={item.productName}
+                                className='w-full h-full object-cover'
+                              />
+                            )
+                            : (
+                              <div className='w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 text-xs'>
+                                No Img
+                              </div>
+                            )}
+                        </div>
+                        <div className='flex-1 min-w-0 flex flex-col justify-center'>
+                          <p className='font-bold text-gray-900 truncate'>{item.productName}</p>
+                          <p className='text-xs text-gray-500 truncate'>{item.variantSku}</p>
+                          <div className='flex justify-between items-center mt-1'>
+                            <span className='text-xs font-medium text-gray-500'>
+                              {item.quantity} x {formatIDR(item.priceSnapshot)}
+                            </span>
+                            <span className='font-bold text-gray-900'>
+                              {formatIDR(item.priceSnapshot * item.quantity)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  {validationData.summary.totalDiscount > 0 && (
-                    <div className='flex justify-between text-green-600'>
-                      <span>Diskon</span>
+
+                  <div className='space-y-4'>
+                    <div className='flex justify-between'>
+                      <span className='text-gray-600'>Subtotal</span>
                       <span className='font-medium'>
-                        -{formatIDR(validationData.summary.totalDiscount)}
+                        {formatIDR(validationData.summary.subtotal)}
                       </span>
                     </div>
-                  )}
-                  <div className='flex justify-between'>
-                    <span className='text-gray-600'>Ongkos Kirim</span>
-                    <span className='font-medium'>
-                      {validationData.summary.shippingCost > 0
-                        ? formatIDR(validationData.summary.shippingCost)
-                        : '-'}
-                    </span>
-                  </div>
-                  <div className='border-t pt-4 flex justify-between items-center'>
-                    <span className='font-bold text-lg'>Total Akhir</span>
-                    <span className='font-bold text-xl'>
-                      {formatIDR(validationData.summary.grandTotal)}
-                    </span>
+                    {validationData.summary.totalDiscount > 0 && (
+                      <div className='flex justify-between text-green-600'>
+                        <span>Diskon</span>
+                        <span className='font-medium'>
+                          -{formatIDR(validationData.summary.totalDiscount)}
+                        </span>
+                      </div>
+                    )}
+                    {requiresShipping && (
+                      <div className='flex justify-between'>
+                        <span className='text-gray-600'>Ongkos Kirim</span>
+                        <span className='font-medium'>
+                          {validationData.summary.shippingCost > 0
+                            ? formatIDR(validationData.summary.shippingCost)
+                            : '-'}
+                        </span>
+                      </div>
+                    )}
+                    <div className='border-t pt-4 flex justify-between items-center'>
+                      <span className='font-bold text-lg'>Total Akhir</span>
+                      <span className='font-bold text-xl'>
+                        {formatIDR(validationData.summary.grandTotal)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               )

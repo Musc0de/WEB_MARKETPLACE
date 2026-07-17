@@ -3,6 +3,7 @@ import { CartItemCard } from '../components/CartItemCard.tsx';
 import { CartSummary } from '../components/CartSummary.tsx';
 import { ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { ProductCarousel } from '../../catalog/components/ProductCarousel.tsx';
 
 export function CartPage() {
   const { cart, isLoading, isError, updateItem, removeItem, clearCart } = useCart();
@@ -118,6 +119,10 @@ export function CartPage() {
             onCheckout={() => navigate('/checkout')}
           />
         )}
+      </div>
+
+      <div className='mt-16 pt-8 border-t border-gray-200'>
+        <ProductCarousel title='Mungkin Anda Suka' limit={10} type='smart_recommendation' />
       </div>
     </div>
   );

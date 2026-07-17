@@ -21,12 +21,6 @@ export const ProductCard = (
   useEffect(() => {
     if (!product.images || product.images.length <= 1) return;
 
-    // Preload all images in the background to cache them for a smooth slider experience
-    product.images.forEach((src) => {
-      const img = new globalThis.Image();
-      img.src = src;
-    });
-
     // Randomize the interval between 3.5s and 5.5s so products don't slide in perfect sync
     const randomInterval = 3500 + Math.random() * 2000;
 

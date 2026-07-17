@@ -6,5 +6,6 @@ export const globalSettings = pgTable('sss_global_settings', {
   siteTitle: text('site_title').default('StarSuperScare Marketplace'),
   siteDescription: text('site_description'),
   faviconUrl: text('favicon_url'),
+  activePaymentGateway: text('active_payment_gateway').default('sandbox').notNull(),
   updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
 });

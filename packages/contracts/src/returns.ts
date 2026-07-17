@@ -42,7 +42,7 @@ export interface CreateReturnRequest {
 
 export const createReturnRequestSchema: z.ZodType<CreateReturnRequest> = z.object({
   orderId: z.string().uuid(),
-  resolution: z.enum(['refund', 'exchange', 'store_credit']),
+  resolution: z.enum(['refund_only', 'return_and_refund', 'replacement']),
   reason: z.string().optional().nullable(),
   items: z.array(z.object({
     orderItemId: z.string().uuid(),

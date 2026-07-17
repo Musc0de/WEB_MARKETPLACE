@@ -102,7 +102,7 @@ export function CartItemCard({ item, onUpdate, onRemove }: CartItemCardProps) {
             </p>
           </div>
 
-          <div className='flex flex-1 items-end justify-between text-sm mt-4'>
+          <div className='flex flex-1 flex-wrap items-end justify-between gap-4 text-sm mt-4'>
             {!item.saveForLater
               ? (
                 <div className='flex items-center border border-gray-300 rounded-md'>

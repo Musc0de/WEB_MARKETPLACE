@@ -36,6 +36,7 @@ export interface ProductListItem {
   id: string;
   name: string;
   slug: string;
+  productCode?: string | null | undefined;
   brandId?: string | null | undefined;
   type: string;
   status: string;
@@ -68,7 +69,7 @@ export interface ProductListQuery {
   max_price?: number | undefined;
   min_rating?: number | undefined;
   promo?: boolean | undefined;
-  sort: 'newest' | 'price_asc' | 'price_desc' | 'best_selling';
+  sort: 'newest' | 'price_asc' | 'price_desc' | 'best_selling' | 'most_viewed';
   in_stock: boolean;
 }
 
@@ -145,6 +146,7 @@ export const ProductListItemSchema: z.ZodType<ProductListItem> = z.object({
   id: z.string().uuid(),
   name: z.string(),
   slug: z.string(),
+  productCode: z.string().nullable().optional(),
   brandId: z.string().uuid().nullable().optional(),
   type: z.string(),
   status: z.string(),
@@ -176,7 +178,9 @@ export const ProductListQuerySchema: z.ZodType<ProductListQuery> = z.object({
   max_price: z.coerce.number().min(0).optional(),
   min_rating: z.coerce.number().min(1).max(5).optional(),
   promo: z.coerce.boolean().optional(),
-  sort: z.enum(['newest', 'price_asc', 'price_desc', 'best_selling']).default('newest'),
+  sort: z.enum(['newest', 'price_asc', 'price_desc', 'best_selling', 'most_viewed']).default(
+    'newest',
+  ),
   in_stock: z.coerce.boolean().default(false),
 });
 

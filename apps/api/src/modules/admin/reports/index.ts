@@ -221,7 +221,7 @@ const routes = app
         .select({
           id: returnsTable.id,
           orderId: returnsTable.orderId,
-          reason: returnsTable.reason,
+          reason: returnsTable.reasonCode,
           resolution: returnsTable.resolution,
           status: returnsTable.status,
           trackingNumber: returnsTable.trackingNumber,

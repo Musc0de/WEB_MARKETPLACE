@@ -17,6 +17,14 @@ export function CatalogFilters(
   const [categories, setCategories] = useState<{ slug: string; name: string }[]>([]);
   const [brands, setBrands] = useState<{ slug: string; name: string }[]>([]);
 
+  const [localMinPrice, setLocalMinPrice] = useState(filters.min_price?.toString() || '');
+  const [localMaxPrice, setLocalMaxPrice] = useState(filters.max_price?.toString() || '');
+
+  useEffect(() => {
+    setLocalMinPrice(filters.min_price?.toString() || '');
+    setLocalMaxPrice(filters.max_price?.toString() || '');
+  }, [filters.min_price, filters.max_price]);
+
   useEffect(() => {
     client.v1.catalog.categories.$get().then((res) => {
       if (res.ok) res.json().then((d) => setCategories(d.data));
@@ -75,16 +83,24 @@ export function CatalogFilters(
           <Input
             type='number'
             placeholder='Min'
-            value={filters.min_price || ''}
-            onChange={(e) => updateFilter('min_price', e.target.value)}
+            value={localMinPrice}
+            onChange={(e) => setLocalMinPrice(e.target.value)}
+            onBlur={() => updateFilter('min_price', localMinPrice)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') updateFilter('min_price', localMinPrice);
+            }}
             className='h-8 text-sm'
           />
           <span className='text-gray-400'>-</span>
           <Input
             type='number'
             placeholder='Max'
-            value={filters.max_price || ''}
-            onChange={(e) => updateFilter('max_price', e.target.value)}
+            value={localMaxPrice}
+            onChange={(e) => setLocalMaxPrice(e.target.value)}
+            onBlur={() => updateFilter('max_price', localMaxPrice)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') updateFilter('max_price', localMaxPrice);
+            }}
             className='h-8 text-sm'
           />
         </div>

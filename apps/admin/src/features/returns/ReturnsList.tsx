@@ -2,7 +2,7 @@ import { useState } from 'react';
 import useSWR from 'swr';
 import { client } from '../../lib/rpc.ts';
 import { toast } from '@starsuperscare/ui';
-import { CheckCircle2, DollarSign, PackageCheck, RotateCcw, XCircle } from 'lucide-react';
+import { CheckCircle2, PackageCheck, RotateCcw, XCircle } from 'lucide-react';
 import {
   DataTable,
   EmptyState,
@@ -12,7 +12,7 @@ import {
   StatusPill,
   TableSkeleton,
 } from '../../components/admin-ui.tsx';
-import { ConfirmModal, InputModal, useModalState } from '../../components/modal.tsx';
+import { ConfirmModal, useModalState } from '../../components/modal.tsx';
 import { formatDate } from '@starsuperscare/ui';
 import { Pagination } from '../../components/Pagination.tsx';
 
@@ -47,9 +47,7 @@ export const ReturnsList = () => {
   const approveModal = useModalState();
   const rejectModal = useModalState();
   const receiveModal = useModalState();
-  const refundAmountModal = useModalState();
   const [activeReturnId, setActiveReturnId] = useState<string | null>(null);
-  const [activeReturn, setActiveReturn] = useState<any>(null);
 
   const { data: returns, mutate, isLoading } = useSWR(
     '/api/v1/admin/returns',
@@ -71,21 +69,6 @@ export const ReturnsList = () => {
         mutate();
       } else {
         toast.error('Gagal memperbarui status retur');
-      }
-    } catch {
-      toast.error('Kesalahan jaringan, coba lagi');
-    }
-  };
-
-  const handleCreateRefund = async (returnItem: any, amount: number) => {
-    try {
-      const res = await (client.v1 as any).admin.refunds.$post({
-        json: { returnId: returnItem.id, amount },
-      });
-      if (res.ok) {
-        toast.success('Refund berhasil dibuat dan sedang diproses');
-      } else {
-        toast.error('Gagal membuat refund');
       }
     } catch {
       toast.error('Kesalahan jaringan, coba lagi');
@@ -143,10 +126,10 @@ export const ReturnsList = () => {
           )
           : (
             paginated.map((ret: any) => (
-              <tr key={ret.id} className='hover:bg-blue-50/20 transition-colors'>
+              <tr key={ret.id} className='group hover:bg-gray-50/50 transition-colors'>
                 <td className='px-5 py-3.5'>
-                  <span className='font-mono text-sm font-semibold text-blue-600'>
-                    {ret.id.slice(0, 8)}…
+                  <span className='font-mono text-sm font-semibold text-gray-900'>
+                    {ret.returnNumber || `${ret.id.slice(0, 8)}…`}
                   </span>
                 </td>
                 <td className='px-5 py-3.5'>
@@ -156,11 +139,11 @@ export const ReturnsList = () => {
                 </td>
                 <td className='px-5 py-3.5'>
                   <span className='inline-flex rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-700 capitalize'>
-                    {ret.resolution?.replace('_', ' ')}
+                    {ret.resolution?.replace(/_/g, ' ')}
                   </span>
                 </td>
                 <td className='px-5 py-3.5 text-sm text-gray-600 max-w-xs'>
-                  <span className='line-clamp-2'>{ret.reason || '—'}</span>
+                  <span className='line-clamp-2'>{ret.reasonCode || '—'}</span>
                 </td>
                 <td className='px-5 py-3.5'>
                   <StatusPill status={ret.status} />
@@ -168,7 +151,7 @@ export const ReturnsList = () => {
                 <td className='px-5 py-3.5 text-sm text-gray-400'>{formatDate(ret.createdAt)}</td>
                 <td className='px-5 py-3.5'>
                   <div className='flex items-center gap-1.5'>
-                    {ret.status === 'pending' && (
+                    {(ret.status === 'pending' || ret.status === 'under_review') && (
                       <>
                         <button
                           type='button'
@@ -204,22 +187,9 @@ export const ReturnsList = () => {
                         <PackageCheck className='h-3 w-3' /> Diterima
                       </button>
                     )}
-                    {(ret.status === 'approved' || ret.status === 'received') &&
-                      ret.resolution === 'refund' && (
-                      <button
-                        type='button'
-                        onClick={() => {
-                          setActiveReturn(ret);
-                          refundAmountModal.show();
-                        }}
-                        className='inline-flex items-center gap-1 rounded-lg border border-purple-200 bg-purple-50 px-2.5 py-1.5 text-xs font-semibold text-purple-700 hover:bg-purple-100 transition'
-                      >
-                        <DollarSign className='h-3 w-3' /> Buat Refund
-                      </button>
-                    )}
-                    {!['pending', 'approved', 'received'].includes(ret.status) && (
-                      <span className='text-xs text-gray-400'>—</span>
-                    )}
+
+                    {!['pending', 'under_review', 'approved', 'received', 'return_received']
+                      .includes(ret.status) && <span className='text-xs text-gray-400'>—</span>}
                   </div>
                 </td>
               </tr>
@@ -265,23 +235,6 @@ export const ReturnsList = () => {
         message='Konfirmasi bahwa barang retur dari pelanggan sudah diterima di gudang.'
         variant='info'
         confirmLabel='Konfirmasi Diterima'
-      />
-
-      <InputModal
-        open={refundAmountModal.open}
-        onClose={refundAmountModal.hide}
-        onConfirm={(val) => {
-          const amount = parseFloat(val) || 0;
-          if (activeReturn) handleCreateRefund(activeReturn, amount);
-        }}
-        title='Buat Refund'
-        message='Masukkan nominal refund yang akan dikembalikan kepada pelanggan. Masukkan 0 untuk refund penuh.'
-        label='Nominal Refund (Rp)'
-        placeholder='Contoh: 150000'
-        inputType='number'
-        defaultValue='0'
-        variant='info'
-        confirmLabel='Buat Refund'
       />
     </div>
   );

@@ -1,121 +1,106 @@
 {
-  "hash": "090eac71",
-  "configHash": "e0bccda9",
+  "hash": "4ab0b916",
+  "configHash": "62b2d8ad",
   "lockfileHash": "e3b0c442",
-  "browserHash": "6e2eafb2",
+  "browserHash": "2f8915ce",
   "optimized": {
     "react": {
       "src": "../../../../node_modules/.deno/react@18.3.1/node_modules/react/index.js",
       "file": "react.js",
-      "fileHash": "72319d6a",
+      "fileHash": "1f7a9db1",
       "needsInterop": true
     },
     "react-dom": {
       "src": "../../../../node_modules/.deno/react-dom@18.3.1/node_modules/react-dom/index.js",
       "file": "react-dom.js",
-      "fileHash": "d64a95f1",
+      "fileHash": "92ba943a",
       "needsInterop": true
     },
     "react/jsx-dev-runtime": {
       "src": "../../../../node_modules/.deno/react@18.3.1/node_modules/react/jsx-dev-runtime.js",
       "file": "react_jsx-dev-runtime.js",
-      "fileHash": "746af53a",
+      "fileHash": "9f818b27",
       "needsInterop": true
     },
     "react/jsx-runtime": {
       "src": "../../../../node_modules/.deno/react@18.3.1/node_modules/react/jsx-runtime.js",
       "file": "react_jsx-runtime.js",
-      "fileHash": "146484f1",
+      "fileHash": "1499bead",
       "needsInterop": true
+    },
+    "@hookform/resolvers/zod": {
+      "src": "../../../../node_modules/.deno/@hookform+resolvers@5.4.0/node_modules/@hookform/resolvers/zod/dist/zod.mjs",
+      "file": "@hookform_resolvers_zod.js",
+      "fileHash": "811c962e",
+      "needsInterop": false
     },
     "@tanstack/react-query": {
       "src": "../../../../node_modules/.deno/@tanstack+react-query@5.101.2/node_modules/@tanstack/react-query/build/modern/index.js",
       "file": "@tanstack_react-query.js",
-      "fileHash": "08e83ca2",
-      "needsInterop": false
-    },
-    "date-fns": {
-      "src": "../../../../node_modules/.deno/date-fns@4.4.0/node_modules/date-fns/index.js",
-      "file": "date-fns.js",
-      "fileHash": "1a0742e4",
-      "needsInterop": false
-    },
-    "date-fns/locale": {
-      "src": "../../../../node_modules/.deno/date-fns@4.4.0/node_modules/date-fns/locale.js",
-      "file": "date-fns_locale.js",
-      "fileHash": "a008392d",
+      "fileHash": "e4d0128b",
       "needsInterop": false
     },
     "goey-toast": {
       "src": "../../../../node_modules/.deno/goey-toast@0.5.0/node_modules/goey-toast/dist/index.js",
       "file": "goey-toast.js",
-      "fileHash": "f34a95ee",
+      "fileHash": "1848268f",
       "needsInterop": false
     },
     "hono/client": {
       "src": "../../../../node_modules/.deno/hono@4.12.29/node_modules/hono/dist/client/index.js",
       "file": "hono_client.js",
-      "fileHash": "dc1437bf",
+      "fileHash": "345514f2",
       "needsInterop": false
     },
     "lucide-react": {
       "src": "../../../../node_modules/.deno/lucide-react@1.24.0/node_modules/lucide-react/dist/esm/lucide-react.mjs",
       "file": "lucide-react.js",
-      "fileHash": "fff42012",
+      "fileHash": "6637fe7b",
       "needsInterop": false
     },
     "react-dom/client": {
       "src": "../../../../node_modules/.deno/react-dom@18.3.1/node_modules/react-dom/client.js",
       "file": "react-dom_client.js",
-      "fileHash": "335057a7",
+      "fileHash": "423908a2",
       "needsInterop": true
     },
     "react-error-boundary": {
       "src": "../../../../node_modules/.deno/react-error-boundary@4.1.2/node_modules/react-error-boundary/dist/react-error-boundary.development.esm.js",
       "file": "react-error-boundary.js",
-      "fileHash": "d562a9a0",
-      "needsInterop": false
-    },
-    "react-router-dom": {
-      "src": "../../../../node_modules/.deno/react-router-dom@6.30.4/node_modules/react-router-dom/dist/index.js",
-      "file": "react-router-dom.js",
-      "fileHash": "59bbbcfe",
-      "needsInterop": false
-    },
-    "swr": {
-      "src": "../../../../node_modules/.deno/swr@2.4.2/node_modules/swr/dist/index/index.mjs",
-      "file": "swr.js",
-      "fileHash": "e5a73348",
-      "needsInterop": false
-    },
-    "zod": {
-      "src": "../../../../node_modules/.deno/zod@4.4.3/node_modules/zod/index.js",
-      "file": "zod.js",
-      "fileHash": "9a93d435",
+      "fileHash": "888ad10f",
       "needsInterop": false
     },
     "react-hook-form": {
       "src": "../../../../node_modules/.deno/react-hook-form@7.81.0/node_modules/react-hook-form/dist/index.esm.mjs",
       "file": "react-hook-form.js",
-      "fileHash": "0667acfd",
+      "fileHash": "f3757c59",
       "needsInterop": false
     },
-    "@hookform/resolvers/zod": {
-      "src": "../../../../node_modules/.deno/@hookform+resolvers@5.4.0/node_modules/@hookform/resolvers/zod/dist/zod.mjs",
-      "file": "@hookform_resolvers_zod.js",
-      "fileHash": "79228553",
+    "react-router-dom": {
+      "src": "../../../../node_modules/.deno/react-router-dom@6.30.4/node_modules/react-router-dom/dist/index.js",
+      "file": "react-router-dom.js",
+      "fileHash": "8e686bab",
+      "needsInterop": false
+    },
+    "swr": {
+      "src": "../../../../node_modules/.deno/swr@2.4.2/node_modules/swr/dist/index/index.mjs",
+      "file": "swr.js",
+      "fileHash": "fafa04f1",
+      "needsInterop": false
+    },
+    "zod": {
+      "src": "../../../../node_modules/.deno/zod@4.4.3/node_modules/zod/index.js",
+      "file": "zod.js",
+      "fileHash": "6b37e39f",
       "needsInterop": false
     }
   },
   "chunks": {
-    "chunk-5H2XN3XK": {
-      "file": "chunk-5H2XN3XK.js"
+    "chunk-H4RGAL5O": {
+      "file": "chunk-H4RGAL5O.js"
     },
     "chunk-YD6PS2OE": {
       "file": "chunk-YD6PS2OE.js"
-    },
-    "chunk-H4RGAL5O": {
-      "file": "chunk-H4RGAL5O.js"
     },
     "chunk-2RTZBPYO": {
       "file": "chunk-2RTZBPYO.js"

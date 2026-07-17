@@ -50,12 +50,11 @@ export const SearchPage = (): JSX.Element => {
       setActionLoading(p.id);
       const res = await client.v1.catalog.products[':slug'].$get({ param: { slug: p.slug } });
       if (!res.ok) throw new Error('Produk tidak ditemukan');
-      const detail = (await res.json()).data;
+      const detail: any = (await res.json() as any).data;
       if (!detail.variants || detail.variants.length === 0) {
         toast.error('Produk tidak memiliki varian tersedia');
         return;
       }
-      await addItem(detail.variants[0].id, 1);
       if (isBuyNow) {
         const directToken = await createDirectBuyCart(detail.variants[0].id, 1);
         navigate(`/checkout?directToken=${encodeURIComponent(directToken)}`);
@@ -108,7 +107,7 @@ export const SearchPage = (): JSX.Element => {
 
       if (!res.ok) throw new Error('Gagal memuat produk dari server.');
 
-      const payload = await res.json();
+      const payload: any = await res.json();
       if (payload.error) throw new Error(payload.error || 'Terjadi kesalahan sistem.');
 
       setProducts(payload.data.items);

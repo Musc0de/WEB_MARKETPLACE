@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import {
+  cancellationRequests,
   cartItems,
   carts,
   db,
@@ -12,6 +13,7 @@ import {
   productImages,
   products,
   productVariants,
+  returns,
   shipments,
   userProfiles,
   users,
@@ -22,6 +24,7 @@ import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { AuthContext, authMiddleware } from '../../middleware/auth.ts';
 import { deleteInvoicePDF, generateInvoicePDF, uploadInvoicePDF } from './invoice-generator.ts';
+import { EligibilityService } from '../returns/services/eligibility.service.ts';
 
 /**
  * Parse optionValues JSON → human-readable string, e.g. "Merah · XL"
@@ -165,6 +168,35 @@ const routes = app
         items: itemsMap[o.id] || [],
       }));
 
+      if (orderIds.length > 0) {
+        const orderReturns = await db.query.returns.findMany({
+          where: inArray(returns.orderId, orderIds),
+        });
+        const orderCancellations = await db.query.cancellationRequests.findMany({
+          where: inArray(cancellationRequests.orderId, orderIds),
+        });
+
+        for (const order of enrichedOrders) {
+          const ret = orderReturns.find((r) => r.orderId === order.id);
+          if (ret) {
+            order.status = ret.status === 'resolved'
+              ? 'refunded'
+              : ret.status === 'rejected'
+              ? 'return_rejected'
+              : 'return_requested';
+          } else {
+            const cancel = orderCancellations.find((c) => c.orderId === order.id);
+            if (cancel) {
+              order.status = cancel.status === 'approved'
+                ? 'cancelled'
+                : cancel.status === 'rejected'
+                ? 'cancellation_rejected'
+                : 'cancellation_requested';
+            }
+          }
+        }
+      }
+
       return c.json({
         data: {
           orders: enrichedOrders,
@@ -175,6 +207,72 @@ const routes = app
             totalPages: Math.ceil(total / limit),
           },
         },
+        meta: { request_id: c.get('requestId') },
+        error: null,
+      });
+    },
+  )
+  .get('/:id/resolution-eligibility', async (c) => {
+    const user = c.get('user');
+    const orderId = c.req.param('id');
+    const eligibility = await EligibilityService.checkReturnEligibility(orderId, user.id);
+    const cancellation = await EligibilityService.checkCancellationEligibility(orderId, user.id);
+
+    return c.json({
+      data: {
+        returnEligibility: eligibility,
+        cancellationEligibility: cancellation,
+      },
+      meta: { request_id: c.get('requestId') },
+      error: null,
+    });
+  })
+  .post(
+    '/:id/cancellation-requests',
+    zValidator('json', z.object({ reason: z.string().min(5) })),
+    async (c) => {
+      const user = c.get('user');
+      const orderId = c.req.param('id');
+      const { reason } = c.req.valid('json');
+
+      const eligibility = await EligibilityService.checkCancellationEligibility(orderId, user.id);
+      if (!eligibility.eligible) {
+        return c.json(
+          { error: eligibility.reasonMessage || 'Pesanan tidak dapat dibatalkan.' },
+          400,
+        );
+      }
+
+      const result = await db.transaction(async (tx) => {
+        // Create request
+        const [request] = await tx.insert(cancellationRequests)
+          .values({
+            orderId,
+            userId: user.id,
+            reason,
+            status: eligibility.requireApproval ? 'under_review' : 'approved',
+          })
+          .returning();
+
+        if (!eligibility.requireApproval) {
+          // Automatically approve and mark order cancelled
+          await tx.update(orders)
+            .set({ status: 'cancelled', updatedAt: new Date().toISOString() })
+            .where(eq(orders.id, orderId));
+
+          await tx.insert(orderStatusHistory)
+            .values({
+              orderId,
+              status: 'cancelled',
+              note: `Dibatalkan otomatis oleh sistem (Alasan: ${reason})`,
+            });
+        }
+
+        return request;
+      });
+
+      return c.json({
+        data: result,
         meta: { request_id: c.get('requestId') },
         error: null,
       });
@@ -246,11 +344,108 @@ const routes = app
       .where(eq(orderAddresses.orderId, id))
       .limit(1);
 
-    const history = await db
+    let history = await db
       .select()
       .from(orderStatusHistory)
       .where(eq(orderStatusHistory.orderId, id))
       .orderBy(desc(orderStatusHistory.createdAt));
+
+    // Fetch cancellations
+    const orderCancellations = await db.query.cancellationRequests.findMany({
+      where: eq(cancellationRequests.orderId, id),
+    });
+    // Fetch returns
+    const orderReturns = await db.query.returns.findMany({
+      where: eq(returns.orderId, id),
+    });
+
+    const extraEvents: any[] = [];
+
+    for (const cancel of orderCancellations) {
+      extraEvents.push({
+        id: `cancellation-${cancel.id}`,
+        orderId: id,
+        status: 'cancellation_requested',
+        note: `Pengajuan Pembatalan: ${cancel.reason || 'Lainnya'}`,
+        createdAt: new Date(cancel.createdAt),
+      });
+
+      if (cancel.status === 'rejected') {
+        extraEvents.push({
+          id: `cancellation-rejected-${cancel.id}`,
+          orderId: id,
+          status: 'cancellation_rejected',
+          note: `Pembatalan Ditolak${cancel.rejectionReason ? `: ${cancel.rejectionReason}` : ''}`,
+          createdAt: new Date(cancel.updatedAt || cancel.createdAt),
+        });
+      } else if (cancel.status === 'approved') {
+        extraEvents.push({
+          id: `cancellation-approved-${cancel.id}`,
+          orderId: id,
+          status: 'cancelled',
+          note: `Pembatalan Disetujui`,
+          createdAt: new Date(cancel.updatedAt || cancel.createdAt),
+        });
+      }
+    }
+
+    for (const ret of orderReturns) {
+      extraEvents.push({
+        id: `return-${ret.id}`,
+        orderId: id,
+        status: 'return_requested',
+        note: `Pengajuan Pengembalian (Resolusi: ${
+          ret.resolution === 'refund_only'
+            ? 'Refund Dana'
+            : ret.resolution === 'return_and_refund'
+            ? 'Pengembalian Barang & Dana'
+            : ret.resolution
+        })`,
+        createdAt: new Date(ret.createdAt),
+      });
+      // Jika ditolak
+      if (ret.status === 'rejected') {
+        extraEvents.push({
+          id: `return-rejected-${ret.id}`,
+          orderId: id,
+          status: 'return_rejected',
+          note: `Retur Ditolak${ret.rejectionReason ? `: ${ret.rejectionReason}` : ''}`,
+          createdAt: new Date(ret.updatedAt || ret.createdAt),
+        });
+      }
+      // Jika sudah refund
+      if (ret.status === 'resolved') {
+        extraEvents.push({
+          id: `refund-${ret.id}`,
+          orderId: id,
+          status: 'refund_processed',
+          note: 'Pengembalian Dana telah diproses',
+          createdAt: new Date(ret.updatedAt || ret.createdAt),
+        });
+      }
+    }
+
+    history = [...history, ...extraEvents].sort((a: any, b: any) =>
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    const activeReturn = orderReturns.find((r) => r.orderId === order.id);
+    if (activeReturn) {
+      order.status = activeReturn.status === 'resolved'
+        ? 'refunded'
+        : activeReturn.status === 'rejected'
+        ? 'return_rejected'
+        : 'return_requested';
+    } else {
+      const activeCancel = orderCancellations.find((c) => c.orderId === order.id);
+      if (activeCancel) {
+        order.status = activeCancel.status === 'approved'
+          ? 'cancelled'
+          : activeCancel.status === 'rejected'
+          ? 'cancellation_rejected'
+          : 'cancellation_requested';
+      }
+    }
 
     return c.json({
       data: {

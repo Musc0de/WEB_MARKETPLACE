@@ -64,6 +64,8 @@ export const CheckoutValidateResponseSchema = z.object({
       priceSnapshot: z.number().int(),
       productName: z.string(),
       variantSku: z.string(),
+      productType: z.string(),
+      primaryImage: z.string().optional().nullable(),
     }),
   ),
   isValid: z.boolean(),
@@ -78,9 +80,9 @@ export type CheckoutValidateResponse = z.infer<typeof CheckoutValidateResponseSc
 
 export const CreateOrderRequestSchema = z.object({
   idempotencyKey: z.string().uuid(),
-  shippingAddress: ShippingAddressSchema,
+  shippingAddress: ShippingAddressSchema.optional().nullable(),
   billingAddress: ShippingAddressSchema.optional().nullable(), // Null means same as shipping
-  shippingOptionId: z.string(),
+  shippingOptionId: z.string().optional().nullable(),
   voucherCode: z.string().optional().nullable(),
   emailSnapshot: z.string().email('Email tidak valid'), // Guest needs to provide email
   paymentMethod: z.string().optional(), // For future use

@@ -5,9 +5,12 @@ interface AddressFormProps {
   initialValues?: Partial<ShippingAddress> & { email?: string };
   onSubmit: (data: ShippingAddress & { email: string }) => void;
   isLoading?: boolean;
+  isDigitalOnly?: boolean;
 }
 
-export function AddressForm({ initialValues, onSubmit, isLoading }: AddressFormProps) {
+export function AddressForm(
+  { initialValues, onSubmit, isLoading, isDigitalOnly }: AddressFormProps,
+) {
   const [formData, setFormData] = useState({
     fullName: initialValues?.fullName || '',
     email: initialValues?.email || '',
@@ -27,10 +30,13 @@ export function AddressForm({ initialValues, onSubmit, isLoading }: AddressFormP
     if (!formData.email) newErrors.email = 'Email wajib diisi';
     else if (!/^\S+@\S+\.\S+$/.test(formData.email)) newErrors.email = 'Email tidak valid';
     if (!formData.phoneNumber) newErrors.phoneNumber = 'No HP wajib diisi';
-    if (!formData.streetAddress) newErrors.streetAddress = 'Alamat wajib diisi';
-    if (!formData.province) newErrors.province = 'Provinsi wajib diisi';
-    if (!formData.city) newErrors.city = 'Kota wajib diisi';
-    if (!formData.postalCode) newErrors.postalCode = 'Kode pos wajib diisi';
+
+    if (!isDigitalOnly) {
+      if (!formData.streetAddress) newErrors.streetAddress = 'Alamat wajib diisi';
+      if (!formData.province) newErrors.province = 'Provinsi wajib diisi';
+      if (!formData.city) newErrors.city = 'Kota wajib diisi';
+      if (!formData.postalCode) newErrors.postalCode = 'Kode pos wajib diisi';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -163,7 +169,9 @@ export function AddressForm({ initialValues, onSubmit, isLoading }: AddressFormP
           disabled={isLoading}
           className='bg-black text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-800 disabled:opacity-50'
         >
-          {isLoading ? 'Menyimpan...' : 'Lanjutkan ke Pengiriman'}
+          {isLoading
+            ? 'Menyimpan...'
+            : (isDigitalOnly ? 'Lanjutkan ke Pembayaran' : 'Lanjutkan ke Pengiriman')}
         </button>
       </div>
     </form>

@@ -42,6 +42,10 @@ const STATUS_CONFIG: Record<string, { style: string; label: string }> = {
   delivered: { style: 'text-emerald-700 bg-emerald-50 border-emerald-200', label: 'Selesai' },
   cancelled: { style: 'text-red-700 bg-red-50 border-red-200', label: 'Dibatalkan' },
   refunded: { style: 'text-rose-700 bg-rose-50 border-rose-200', label: 'Dikembalikan' },
+  cancellation_requested: { style: 'text-red-700 bg-red-50 border-red-200', label: 'Proses Batal' },
+  return_requested: { style: 'text-rose-700 bg-rose-50 border-rose-200', label: 'Proses Retur' },
+  cancellation_rejected: { style: 'text-red-700 bg-red-50 border-red-200', label: 'Batal Ditolak' },
+  return_rejected: { style: 'text-red-700 bg-red-50 border-red-200', label: 'Retur Ditolak' },
 };
 
 const fmt = (n: number) => `Rp\u00a0${n.toLocaleString('id-ID')}`;

@@ -25,11 +25,30 @@ export function HelpPage() {
         </section>
 
         <section className='bg-white p-6 rounded-lg shadow-sm border border-gray-100'>
-          <h2 className='text-xl font-bold mb-3'>Apakah ada garansi pengiriman?</h2>
+          <h2 className='text-xl font-bold mb-3'>Bisakah saya membatalkan pesanan saya?</h2>
           <Text className='text-gray-600'>
-            Ya, kami memastikan setiap produk yang Anda beli sampai dengan aman di tangan Anda. Jika
-            ada kerusakan akibat pengiriman, silakan ajukan komplain melalui menu Pengembalian Dana
-            maksimal 2x24 jam setelah pesanan diterima.
+            Ya, pesanan dapat dibatalkan secara langsung melalui menu{' '}
+            <strong>Detail Pesanan</strong>{' '}
+            (bisa diakses via Lacak Pesanan), asalkan pesanan tersebut masih dalam status{' '}
+            <strong>Menunggu Pembayaran</strong> atau{' '}
+            <strong>Dibayar</strong>. Jika pesanan sudah diproses dan berstatus{' '}
+            <strong>Dikirim</strong>, fitur pembatalan tidak dapat lagi digunakan. Jika Anda sudah
+            membayar, dana akan otomatis di-refund ke metode pembayaran Anda.
+          </Text>
+        </section>
+
+        <section className='bg-white p-6 rounded-lg shadow-sm border border-gray-100'>
+          <h2 className='text-xl font-bold mb-3'>
+            Bagaimana cara mengajukan komplain atau retur barang?
+          </h2>
+          <Text className='text-gray-600'>
+            Kami memastikan setiap produk yang Anda beli sampai dengan aman di tangan Anda. Jika
+            terdapat ketidaksesuaian atau cacat produk, Anda dapat mengajukan{' '}
+            <strong>Pengembalian Barang</strong>{' '}
+            melalui halaman Detail Pesanan Anda secara online. Anda memiliki waktu maksimal{' '}
+            <strong>7 hari</strong>{' '}
+            setelah status pesanan berubah menjadi "Terkirim" / "Berhasil" untuk melakukan
+            pengajuan. Jangan lupa siapkan foto atau video bukti unboxing.
           </Text>
         </section>
       </div>

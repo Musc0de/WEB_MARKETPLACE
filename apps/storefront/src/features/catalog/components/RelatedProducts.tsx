@@ -74,9 +74,9 @@ export const RelatedProducts = ({ product }: { product: ProductDetail }) => {
         });
 
         if (res.ok) {
-          const payload = await res.json();
+          const payload: any = await res.json();
           const items = payload.data.items
-            .filter((p) => p.id !== product.id)
+            .filter((p: any) => p.id !== product.id)
             .slice(0, 8);
           setRelated(items);
         }
@@ -98,7 +98,7 @@ export const RelatedProducts = ({ product }: { product: ProductDetail }) => {
         param: { slug: p.slug },
       });
       if (!res.ok) throw new Error('Produk tidak ditemukan');
-      const detail = (await res.json()).data;
+      const detail: any = (await res.json() as any).data;
       if (!detail.variants || detail.variants.length === 0) {
         toast.error('Produk tidak memiliki varian tersedia');
         return;

@@ -6,6 +6,8 @@ import {
 } from '@starsuperscare/contracts';
 import {
   db,
+  inventoryLevels,
+  inventoryMovements,
   orderAddresses,
   orderItems,
   orders,
@@ -211,6 +213,36 @@ adminOrdersRouter.post(
         status,
         note: note || `Status updated to ${status} by admin`,
       });
+
+      // Release reservation if cancelled
+      if (status === 'cancelled') {
+        const items = await tx.select({
+          variantId: orderItems.variantId,
+          quantity: orderItems.quantity,
+          warehouseId: inventoryLevels.warehouseId,
+        }).from(orderItems)
+          .leftJoin(inventoryLevels, eq(orderItems.variantId, inventoryLevels.variantId))
+          .where(eq(orderItems.orderId, id));
+
+        for (const item of items) {
+          if (item.warehouseId) {
+            await tx.update(inventoryLevels)
+              .set({
+                available: sql`${inventoryLevels.available} + ${item.quantity}`,
+                reserved: sql`${inventoryLevels.reserved} - ${item.quantity}`,
+              })
+              .where(eq(inventoryLevels.variantId, item.variantId));
+
+            await tx.insert(inventoryMovements).values({
+              variantId: item.variantId,
+              warehouseId: item.warehouseId,
+              quantity: item.quantity,
+              type: 'release',
+              note: note || 'Cancelled by admin',
+            });
+          }
+        }
+      }
     });
 
     return c.json({ data: { success: true, status } });

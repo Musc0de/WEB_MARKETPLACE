@@ -12,18 +12,19 @@ import {
   StatusPill,
   TableSkeleton,
 } from '../../components/admin-ui.tsx';
-import { ModalShell, useModalState } from '../../components/modal.tsx';
+import { InputModal, ModalShell, useModalState } from '../../components/modal.tsx';
+import { XCircle } from 'lucide-react';
 import { formatDate, formatIDR } from '@starsuperscare/ui';
 import { Pagination } from '../../components/Pagination.tsx';
 
-type RefundStatus = 'all' | 'pending' | 'processing' | 'completed' | 'failed';
+type RefundStatus = 'all' | 'pending' | 'processing' | 'completed' | 'rejected';
 
 const STATUS_TABS: { key: RefundStatus; label: string }[] = [
   { key: 'all', label: 'Semua' },
   { key: 'pending', label: 'Menunggu' },
   { key: 'processing', label: 'Diproses' },
   { key: 'completed', label: 'Selesai' },
-  { key: 'failed', label: 'Gagal' },
+  { key: 'rejected', label: 'Ditolak' },
 ];
 
 const TABLE_HEADERS = [
@@ -45,6 +46,7 @@ export const RefundsList = () => {
 
   // Modal state
   const processModal = useModalState();
+  const rejectModal = useModalState();
   const [activeRefundId, setActiveRefundId] = useState<string | null>(null);
 
   const { data: refunds, mutate, isLoading } = useSWR(
@@ -57,33 +59,45 @@ export const RefundsList = () => {
   );
 
   const handleProcessRefund = async (
-    refundId: string,
+    id: string,
     amount: string,
     restockItems: boolean,
     proofImageUrl: string | null,
   ) => {
     try {
-      setProcessing(refundId);
-      const payload: any = { restockItems, proofImageUrl };
-      if (amount && !isNaN(parseFloat(amount))) {
-        payload.amount = parseFloat(amount);
-      }
+      setProcessing(id);
       const res = await (client.v1 as any).admin.refunds[':id'].process.$post({
-        param: { id: refundId },
-        json: payload,
+        param: { id },
+        json: {
+          amount: parseFloat(amount) || undefined,
+          restockItems,
+          proofImageUrl,
+        },
       });
-      if (res.ok) {
-        toast.success('Refund berhasil diproses dan dana sedang dikembalikan');
-        mutate();
-      } else {
-        const err = await res.json();
-        const errMsg = typeof err.error === 'string'
-          ? err.error
-          : err.error?.message ?? 'Gagal memproses refund';
-        toast.error(errMsg);
-      }
-    } catch {
-      toast.error('Kesalahan jaringan, coba lagi');
+
+      if (!res.ok) throw new Error('Gagal memproses refund');
+      toast.success('Refund berhasil diproses');
+      mutate();
+    } catch (err: any) {
+      toast.error(err.message || 'Terjadi kesalahan');
+    } finally {
+      setProcessing(null);
+    }
+  };
+
+  const handleRejectRefund = async (id: string, reason: string) => {
+    try {
+      setProcessing(id);
+      const res = await (client.v1 as any).admin.refunds[':id'].reject.$post({
+        param: { id },
+        json: { reason },
+      });
+
+      if (!res.ok) throw new Error('Gagal menolak refund');
+      toast.success('Refund berhasil ditolak');
+      mutate();
+    } catch (err: any) {
+      toast.error(err.message || 'Terjadi kesalahan');
     } finally {
       setProcessing(null);
     }
@@ -157,9 +171,19 @@ export const RefundsList = () => {
                     </span>
                   </p>
                   {refund.returnId && (
-                    <p className='text-xs text-gray-400'>
-                      Retur: <span className='font-mono'>{refund.returnId?.slice(0, 8)}…</span>
-                    </p>
+                    <>
+                      <p className='text-xs text-gray-400'>
+                        Retur: <span className='font-mono'>{refund.returnId?.slice(0, 8)}…</span>
+                      </p>
+                      {refund.returnReason && (
+                        <p
+                          className='text-xs text-red-500 italic mt-0.5 line-clamp-1'
+                          title={refund.returnReason}
+                        >
+                          Alasan: {refund.returnReason}
+                        </p>
+                      )}
+                    </>
                   )}
                 </td>
                 <td className='px-5 py-3.5'>
@@ -181,20 +205,33 @@ export const RefundsList = () => {
                 <td className='px-5 py-3.5'>
                   {refund.status === 'pending'
                     ? (
-                      <button
-                        type='button'
-                        disabled={processing === refund.id}
-                        onClick={() => {
-                          setActiveRefundId(refund.id);
-                          processModal.show();
-                        }}
-                        className='inline-flex items-center gap-1.5 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-amber-500 transition disabled:opacity-60'
-                      >
-                        {processing === refund.id
-                          ? <Loader2 className='h-3 w-3 animate-spin' />
-                          : <CreditCard className='h-3 w-3' />}
-                        Proses
-                      </button>
+                      <div className='flex items-center gap-2'>
+                        <button
+                          type='button'
+                          disabled={processing === refund.id}
+                          onClick={() => {
+                            setActiveRefundId(refund.id);
+                            processModal.show();
+                          }}
+                          className='inline-flex items-center gap-1.5 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-amber-500 transition disabled:opacity-60'
+                        >
+                          {processing === refund.id
+                            ? <Loader2 className='h-3 w-3 animate-spin' />
+                            : <CreditCard className='h-3 w-3' />}
+                          Proses
+                        </button>
+                        <button
+                          type='button'
+                          disabled={processing === refund.id}
+                          onClick={() => {
+                            setActiveRefundId(refund.id);
+                            rejectModal.show();
+                          }}
+                          className='inline-flex items-center gap-1.5 rounded-lg bg-red-50 text-red-700 px-3 py-1.5 text-xs font-semibold shadow-sm hover:bg-red-100 transition disabled:opacity-60'
+                        >
+                          <XCircle className='h-3 w-3' /> Tolak
+                        </button>
+                      </div>
                     )
                     : refund.proofImageUrl
                     ? (
@@ -239,6 +276,23 @@ export const RefundsList = () => {
           }
           processModal.hide();
         }}
+      />
+
+      <InputModal
+        open={rejectModal.open}
+        onClose={rejectModal.hide}
+        onConfirm={(reason) => {
+          if (activeRefundId) {
+            handleRejectRefund(activeRefundId, reason);
+          }
+        }}
+        title='Tolak Refund'
+        message='Berikan alasan mengapa permintaan pengembalian dana ini ditolak.'
+        label='Alasan Penolakan'
+        placeholder='Contoh: Produk digital telah diaktifkan'
+        inputType='text'
+        variant='danger'
+        confirmLabel='Tolak Refund'
       />
     </div>
   );

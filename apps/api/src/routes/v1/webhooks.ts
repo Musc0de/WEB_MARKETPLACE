@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { db } from '@starsuperscare/database';
 import {
   inventoryLevels,
+  inventoryMovements,
   orderItems,
   orders,
   orderStatusHistory,
@@ -11,7 +12,7 @@ import {
 } from '@starsuperscare/database';
 import { eq, sql } from 'drizzle-orm';
 import { WebhookPayloadSchema } from '@starsuperscare/contracts';
-import { paymentProvider } from '../../modules/payments/provider.ts';
+import { louvinPaymentProvider, paymentProvider } from '../../modules/payments/provider.ts';
 
 type AppContext = {
   Variables: {
@@ -26,14 +27,12 @@ webhooksRouter.post('/', async (c) => {
   const payloadText = await c.req.text();
   const signature = c.req.header('X-Signature');
 
-  if (!signature) {
-    return c.json({ error: { code: 'UNAUTHORIZED', message: 'Missing signature' } }, 401);
-  }
-
-  try {
-    paymentProvider.verifyWebhookSignature(payloadText, signature);
-  } catch (err: any) {
-    return c.json({ error: { code: 'UNAUTHORIZED', message: err.message } }, 401);
+  if (signature) {
+    try {
+      paymentProvider.verifyWebhookSignature(payloadText, signature);
+    } catch (err: any) {
+      return c.json({ error: { code: 'UNAUTHORIZED', message: err.message } }, 401);
+    }
   }
 
   // Parse payload
@@ -80,6 +79,36 @@ webhooksRouter.post('/', async (c) => {
 
   const payment = paymentList[0];
 
+  // If this is a Louvin payment, we MUST verify the status directly
+  if (payment.provider === 'louvin') {
+    try {
+      if (!louvinPaymentProvider.checkTransactionStatus) {
+        throw new Error('Louvin checkTransactionStatus not implemented');
+      }
+      const verifiedStatus = await louvinPaymentProvider.checkTransactionStatus(
+        payment.providerTransactionId as string,
+      );
+
+      // Override the data type based on the real status from Louvin to prevent spoofing
+      if (verifiedStatus === 'settled') {
+        data.type = 'payment_success';
+      } else if (verifiedStatus === 'failed') {
+        data.type = 'payment_failed';
+      } else if (verifiedStatus === 'expired') {
+        data.type = 'payment_expired';
+      } else {
+        return c.json({ data: { status: 'ignored_unsettled' } });
+      }
+    } catch (e: any) {
+      return c.json({
+        error: { code: 'UNAUTHORIZED', message: 'Louvin verification failed: ' + e.message },
+      }, 401);
+    }
+  } else if (!signature) {
+    // If it's a sandbox payment but there is no signature, reject
+    return c.json({ error: { code: 'UNAUTHORIZED', message: 'Missing signature' } }, 401);
+  }
+
   // Process event in a transaction
   await db.transaction(async (tx) => {
     // 1. Record event
@@ -90,10 +119,14 @@ webhooksRouter.post('/', async (c) => {
       payload: data.data,
     });
 
-    if (data.type === 'payment_success' && payment.status === 'pending') {
+    if (
+      (data.type === 'payment_success' || data.type === 'payment.settled') &&
+      payment.status === 'pending'
+    ) {
       // Update payment
       await tx.update(payments).set({
         status: 'success',
+        paidAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       }).where(eq(payments.id, payment.id));
 
@@ -148,9 +181,17 @@ webhooksRouter.post('/', async (c) => {
           .set({ reserved: sql`${inventoryLevels.reserved} - ${item.quantity}` })
           .where(eq(inventoryLevels.variantId, item.variantId));
       }
-    } else if (data.type === 'payment_failed' && payment.status === 'pending') {
+    } else if (
+      (data.type === 'payment_failed' || data.type === 'payment.failed' ||
+        data.type === 'payment_expired' || data.type === 'payment.expired') &&
+      payment.status === 'pending'
+    ) {
+      const isExpired = data.type.includes('expired');
+      const failureNote = isExpired ? 'Expired via webhook' : 'Failed via webhook';
+
       await tx.update(payments).set({
-        status: 'failed',
+        status: isExpired ? 'expired' : 'failed',
+        failureReason: failureNote,
         updatedAt: new Date().toISOString(),
       }).where(eq(payments.id, payment.id));
 
@@ -163,20 +204,35 @@ webhooksRouter.post('/', async (c) => {
       await tx.insert(orderStatusHistory).values({
         orderId: payment.orderId,
         status: 'cancelled',
-        note: 'Payment failed via webhook',
+        note: `Payment ${isExpired ? 'expired' : 'failed'} via webhook`,
       });
 
       // Release reservation (add back to available)
-      const items = await tx.select().from(orderItems).where(
-        eq(orderItems.orderId, payment.orderId),
-      );
+      const items = await tx.select({
+        variantId: orderItems.variantId,
+        quantity: orderItems.quantity,
+        warehouseId: inventoryLevels.warehouseId,
+      }).from(orderItems)
+        .leftJoin(inventoryLevels, eq(orderItems.variantId, inventoryLevels.variantId))
+        .where(eq(orderItems.orderId, payment.orderId));
+
       for (const item of items) {
-        await tx.update(inventoryLevels)
-          .set({
-            available: sql`${inventoryLevels.available} + ${item.quantity}`,
-            reserved: sql`${inventoryLevels.reserved} - ${item.quantity}`,
-          })
-          .where(eq(inventoryLevels.variantId, item.variantId));
+        if (item.warehouseId) {
+          await tx.update(inventoryLevels)
+            .set({
+              available: sql`${inventoryLevels.available} + ${item.quantity}`,
+              reserved: sql`${inventoryLevels.reserved} - ${item.quantity}`,
+            })
+            .where(eq(inventoryLevels.variantId, item.variantId));
+
+          await tx.insert(inventoryMovements).values({
+            variantId: item.variantId,
+            warehouseId: item.warehouseId,
+            quantity: item.quantity,
+            type: 'release',
+            note: `Payment ${isExpired ? 'expired' : 'failed'}`,
+          });
+        }
       }
     }
   });

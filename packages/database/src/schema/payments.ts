@@ -11,6 +11,14 @@ const payments = pgTable('sss_payments', {
   providerTransactionId: text('provider_transaction_id').unique(),
   amount: bigint('amount', { mode: 'number' }).notNull(),
   status: text('status').notNull(), // 'pending', 'success', 'failed'
+  paymentType: text('payment_type'), // e.g. 'VA', 'QRIS', 'EWALLET'
+  customerPaymentAmount: bigint('customer_payment_amount', { mode: 'number' }),
+  gatewayFee: bigint('gateway_fee', { mode: 'number' }),
+  merchantNetAmount: bigint('merchant_net_amount', { mode: 'number' }),
+  expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'string' }),
+  paidAt: timestamp('paid_at', { withTimezone: true, mode: 'string' }),
+  failureReason: text('failure_reason'),
+  instructionPayload: jsonb('instruction_payload'),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });

@@ -17,7 +17,6 @@ const STATUS_MAP: Record<string, { label: string; cls: string }> = {
   // Refunds
   initiated: { label: 'Diajukan', cls: 'bg-amber-100 text-amber-700' },
   processed: { label: 'Diproses', cls: 'bg-blue-100 text-blue-700' },
-  failed: { label: 'Gagal', cls: 'bg-red-100 text-red-700' },
   refunded: { label: 'Direfund', cls: 'bg-purple-100 text-purple-700' },
   // Payments
   paid: { label: 'Dibayar', cls: 'bg-emerald-100 text-emerald-700' },

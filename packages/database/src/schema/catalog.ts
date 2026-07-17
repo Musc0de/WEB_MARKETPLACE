@@ -59,6 +59,7 @@ const _products = pgTable('sss_products', {
   brandId: uuid('brand_id').references(() => brands.id),
   name: text('name').notNull(),
   slug: text('slug').notNull().unique(),
+  productCode: text('product_code'),
   type: text('type').notNull(), // 'physical', 'digital', 'service'
   description: text('description'),
   status: text('status').notNull().default('draft'), // draft, active, inactive, archived, discontinued
@@ -138,6 +139,7 @@ const _productSalesStats = pgTable('sss_product_sales_stats', {
   grossSold: integer('gross_sold').notNull().default(0),
   refunded: integer('refunded').notNull().default(0),
   netSold: integer('net_sold').notNull().default(0),
+  viewsCount: integer('views_count').notNull().default(0),
   updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });
 export type ProductSalesStatsTable = typeof _productSalesStats;

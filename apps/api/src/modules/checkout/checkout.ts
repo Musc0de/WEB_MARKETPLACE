@@ -7,13 +7,17 @@ import {
   cartItems,
   db,
   inventoryLevels,
+  inventoryMovements,
   orderAddresses,
   orderItems,
   orders,
+  orderStatusHistory,
+  productImages,
   products,
   productVariants,
 } from '@starsuperscare/database';
 import { and, eq, sql } from 'drizzle-orm';
+import { storageAdapter } from '../../adapters/storage.ts';
 import {
   CheckoutValidateRequestSchema,
   CreateOrderRequestSchema,
@@ -80,6 +84,13 @@ checkoutRouter.post('/validate', zValidator('json', CheckoutValidateRequestSchem
     price: productVariants.price,
     productName: products.name,
     variantSku: productVariants.sku,
+    productType: products.type,
+    primaryImage: sql<string>`(
+      SELECT object_key FROM ${productImages}
+      WHERE product_id = ${products.id}
+      ORDER BY sort_order ASC
+      LIMIT 1
+    )`,
     availableStock: sql<number>`COALESCE(${inventoryLevels.available}, 0)`.mapWith(Number),
   })
     .from(cartItems)
@@ -107,6 +118,11 @@ checkoutRouter.post('/validate', zValidator('json', CheckoutValidateRequestSchem
       errors.push(`Stok ${item.productName} tidak mencukupi (Tersedia: ${item.availableStock})`);
     }
 
+    let primaryImage = null;
+    if (item.primaryImage) {
+      primaryImage = await storageAdapter.generatePresignedDownloadUrl(item.primaryImage);
+    }
+
     subtotal += item.price * item.quantity;
     snapshotItems.push({
       id: item.id,
@@ -116,6 +132,8 @@ checkoutRouter.post('/validate', zValidator('json', CheckoutValidateRequestSchem
       priceSnapshot: item.price,
       productName: item.productName,
       variantSku: item.variantSku,
+      productType: item.productType,
+      primaryImage,
     });
   }
 
@@ -207,6 +225,8 @@ checkoutRouter.post('/orders', zValidator('json', CreateOrderRequestSchema), asy
     price: productVariants.price,
     productName: products.name,
     variantSku: productVariants.sku,
+    productType: products.type,
+    warehouseId: inventoryLevels.warehouseId,
     availableStock: sql<number>`COALESCE(${inventoryLevels.available}, 9999)`.mapWith(Number),
   })
     .from(cartItems)
@@ -236,11 +256,24 @@ checkoutRouter.post('/orders', zValidator('json', CreateOrderRequestSchema), asy
   if (req.voucherCode === 'STAR10') totalDiscount = Math.floor(subtotal * 0.1);
   else if (req.voucherCode === 'HEMAT50') totalDiscount = 50000;
 
-  const shipping = MOCK_SHIPPING_OPTIONS.find((s) => s.id === req.shippingOptionId);
-  if (!shipping) {
-    return c.json({ error: { code: 'BAD_REQUEST', message: 'Opsi pengiriman tidak valid' } }, 400);
+  let shippingCost = 0;
+  const requiresShipping = items.some((i) => i.productType === 'physical');
+
+  if (requiresShipping) {
+    if (!req.shippingOptionId || !req.shippingAddress) {
+      return c.json({
+        error: { code: 'BAD_REQUEST', message: 'Alamat dan opsi pengiriman wajib diisi' },
+      }, 400);
+    }
+    const shipping = MOCK_SHIPPING_OPTIONS.find((s) => s.id === req.shippingOptionId);
+    if (!shipping) {
+      return c.json(
+        { error: { code: 'BAD_REQUEST', message: 'Opsi pengiriman tidak valid' } },
+        400,
+      );
+    }
+    shippingCost = shipping.cost;
   }
-  const shippingCost = shipping.cost;
 
   const grandTotal = Math.max(0, subtotal - totalDiscount) + shippingCost;
   const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -257,6 +290,16 @@ checkoutRouter.post('/orders', zValidator('json', CreateOrderRequestSchema), asy
             reserved: sql`${inventoryLevels.reserved} + ${item.quantity}`,
           })
           .where(eq(inventoryLevels.variantId, item.variantId));
+
+        if (item.warehouseId) {
+          await tx.insert(inventoryMovements).values({
+            variantId: item.variantId,
+            warehouseId: item.warehouseId,
+            quantity: item.quantity,
+            type: 'reserve',
+            note: 'Order checkout',
+          });
+        }
       }
 
       // 2. Create Order
@@ -278,6 +321,12 @@ checkoutRouter.post('/orders', zValidator('json', CreateOrderRequestSchema), asy
         status: orders.status,
       });
 
+      await tx.insert(orderStatusHistory).values({
+        orderId: newOrder.id,
+        status: 'pending',
+        note: 'Pesanan dibuat, menunggu pembayaran',
+      });
+
       // 3. Insert Order Items
       const orderItemsToInsert = items.map((item) => ({
         orderId: newOrder.id,
@@ -293,12 +342,12 @@ checkoutRouter.post('/orders', zValidator('json', CreateOrderRequestSchema), asy
       // 4. Insert Address
       await tx.insert(orderAddresses).values({
         orderId: newOrder.id,
-        shippingSnapshot: req.shippingAddress,
-        billingSnapshot: req.billingAddress || req.shippingAddress,
+        shippingSnapshot: req.shippingAddress || {},
+        billingSnapshot: req.billingAddress || req.shippingAddress || {},
       });
 
       // 4.5. Automatically save address to user's address book if they are logged in
-      if (session?.userId) {
+      if (session?.userId && req.shippingAddress) {
         // Check if user already has any addresses
         const existingAddresses = await tx.select({ id: addresses.id }).from(addresses).where(
           eq(addresses.userId, session.userId),

@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "exports": "./src/index.ts",
   "tasks": {
-    "push": "drizzle-kit push",
-    "generate": "drizzle-kit generate",
+    "push": "deno run --env -A npm:drizzle-kit push",
+    "generate": "deno run --env -A npm:drizzle-kit generate",
     "migrate": "deno run -A src/migrate.ts",
     "db:smoke": "deno run -A ../../scripts/db-smoke.ts",
     "test:db": "deno test -A tests/",

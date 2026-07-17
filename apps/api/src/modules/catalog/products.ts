@@ -11,6 +11,7 @@ import {
   products,
   productSalesStats,
   productVariants,
+  redis,
 } from '@starsuperscare/database';
 import { and, asc, desc, eq, ilike, isNull, sql } from 'drizzle-orm';
 import { ProductListQuerySchema } from '@starsuperscare/contracts';
@@ -41,12 +42,22 @@ const routes = productsRouter
         max_price?: number;
         min_rating?: number;
         promo?: boolean;
-        sort: 'newest' | 'price_asc' | 'price_desc' | 'best_selling';
+        sort: 'newest' | 'price_asc' | 'price_desc' | 'best_selling' | 'most_viewed';
         in_stock: boolean;
       };
       const query = c.req.valid('query') as QueryType;
       const limit = query.per_page;
       const offset = (query.page - 1) * limit;
+
+      const cacheKey = `products_list:${JSON.stringify(query)}`;
+      try {
+        const cached = await redis.get(cacheKey);
+        if (cached) {
+          return c.json(JSON.parse(cached));
+        }
+      } catch (_e) {
+        // ignore redis errors
+      }
 
       // Only show 'published' products on storefront (single live status after migration)
       const whereClauses = [
@@ -94,7 +105,7 @@ const routes = productsRouter
       }
       if (query.min_rating !== undefined) {
         havingClauses.push(
-          sql`COALESCE(${productRatingStats.averageRating}, 0) >= ${query.min_rating}`,
+          sql`COALESCE(MAX(${productRatingStats.averageRating}), 0) >= ${query.min_rating}`,
         );
       }
 
@@ -183,6 +194,11 @@ const routes = productsRouter
           // Use MAX() since netSold is now aggregated
           finalQuery = finalQuery.orderBy(sql`COALESCE(MAX(${productSalesStats.netSold}), 0) DESC`);
           break;
+        case 'most_viewed':
+          finalQuery = finalQuery.orderBy(
+            sql`COALESCE(MAX(${productSalesStats.viewsCount}), 0) DESC`,
+          );
+          break;
         case 'newest':
         default:
           finalQuery = finalQuery.orderBy(desc(products.publishedAt));
@@ -222,7 +238,7 @@ const routes = productsRouter
         };
       }));
 
-      return c.json({
+      const response = {
         data: {
           items: mappedItems,
           total,
@@ -232,7 +248,109 @@ const routes = productsRouter
         },
         meta: { request_id: c.get('requestId') },
         error: null,
-      });
+      };
+
+      try {
+        await redis.set(cacheKey, JSON.stringify(response), 'EX', 60 * 5); // 5 mins cache
+      } catch (_e) {
+        // ignore
+      }
+
+      return c.json(response);
+    },
+  )
+  .get(
+    '/recommendations',
+    async (c) => {
+      const limit = 10;
+      const cacheKey = `products_recommendations`;
+      try {
+        const cached = await redis.get(cacheKey);
+        if (cached) return c.json(JSON.parse(cached));
+      } catch (_e) { /* ignore */ }
+
+      const baseQuery = db.select({
+        id: products.id,
+        name: products.name,
+        slug: products.slug,
+        brandId: products.brandId,
+        type: products.type,
+        status: products.status,
+        netSold: sql<number>`COALESCE(MAX(${productSalesStats.netSold}), 0)`,
+        averageRating: sql<number>`COALESCE(MAX(${productRatingStats.averageRating}), 0)`,
+        reviewCount: sql<number>`COALESCE(MAX(${productRatingStats.reviewCount}), 0)`,
+        primaryImage: sql<
+          string | null
+        >`(SELECT object_key FROM sss_product_images WHERE product_id = ${products.id} ORDER BY is_primary DESC, sort_order ASC, created_at ASC, id ASC LIMIT 1)`,
+        images: sql<
+          string[]
+        >`ARRAY(SELECT object_key FROM sss_product_images WHERE product_id = ${products.id} ORDER BY is_primary DESC, sort_order ASC, created_at ASC, id ASC LIMIT 10)`,
+        minPrice: sql<number>`COALESCE(MIN(${productVariants.price}), 0)`,
+        maxPrice: sql<number>`COALESCE(MAX(${productVariants.price}), 0)`,
+        maxComparePrice: sql<number | null>`MAX(${productVariants.comparePrice})`,
+        totalAvailableStock: sql<number>`COALESCE(SUM(${inventoryLevels.available}), 0)`,
+      })
+        .from(products)
+        .leftJoin(productSalesStats, eq(productSalesStats.productId, products.id))
+        .leftJoin(productRatingStats, eq(productRatingStats.productId, products.id))
+        .leftJoin(productVariants, eq(productVariants.productId, products.id))
+        .leftJoin(inventoryLevels, eq(inventoryLevels.variantId, productVariants.id))
+        .where(and(eq(products.status, 'published'), isNull(products.deletedAt)))
+        .groupBy(products.id)
+        .having(sql`COALESCE(SUM(${inventoryLevels.available}), 0) > 0`)
+        .orderBy(
+          sql`COALESCE(MAX(${productSalesStats.netSold}), 0) DESC`,
+          sql`COALESCE(MAX(${productSalesStats.viewsCount}), 0) DESC`,
+        )
+        .limit(limit);
+
+      const items = await baseQuery;
+
+      const mappedItems = await Promise.all(items.map(async (item) => {
+        let primaryImage = null;
+        if (item.primaryImage) {
+          primaryImage = await storageAdapter.generatePresignedDownloadUrl(item.primaryImage);
+        }
+        const images = await Promise.all(
+          (item.images || []).map((key) => storageAdapter.generatePresignedDownloadUrl(key)),
+        );
+        return {
+          id: item.id,
+          name: item.name,
+          slug: item.slug,
+          brandId: item.brandId,
+          type: item.type,
+          status: item.status,
+          netSold: item.netSold ?? 0,
+          averageRating: item.averageRating ?? 0,
+          reviewCount: item.reviewCount ?? 0,
+          primaryImage,
+          images,
+          variantsSummary: {
+            minPrice: Number(item.minPrice),
+            maxPrice: Number(item.maxPrice),
+            maxComparePrice: item.maxComparePrice ? Number(item.maxComparePrice) : null,
+            totalAvailableStock: Number(item.totalAvailableStock),
+          },
+        };
+      }));
+
+      const response = {
+        data: {
+          items: mappedItems,
+          total: items.length,
+          page: 1,
+          perPage: limit,
+          totalPages: 1,
+        },
+        meta: { request_id: c.get('requestId') },
+        error: null,
+      };
+
+      try {
+        await redis.set(cacheKey, JSON.stringify(response), 'EX', 60 * 5);
+      } catch (_e) { /* ignore */ }
+      return c.json(response);
     },
   )
   .get(

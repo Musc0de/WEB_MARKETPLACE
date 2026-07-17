@@ -81,6 +81,7 @@ export function ProductForm() {
   const [formData, setFormData] = useState({
     storeId: '',
     name: '',
+    productCode: '',
     type: 'physical',
     description: '',
     purchaseLimit: 0,
@@ -145,6 +146,7 @@ export function ProductForm() {
           setFormData({
             storeId: data.data.storeId ?? '',
             name: data.data.name ?? '',
+            productCode: data.data.productCode ?? '',
             type: data.data.type ?? 'physical',
             description: data.data.description ?? '',
             purchaseLimit: data.data.purchaseLimit ?? 0,
@@ -180,6 +182,7 @@ export function ProductForm() {
         const payload = {
           version: formData.version,
           name: formData.name,
+          productCode: formData.productCode || undefined,
           type: formData.type as 'physical' | 'digital' | 'service',
           description: formData.description,
           purchaseLimit: formData.purchaseLimit,
@@ -199,6 +202,7 @@ export function ProductForm() {
         const payload = {
           storeId: formData.storeId || undefined,
           name: formData.name,
+          productCode: formData.productCode || undefined,
           type: formData.type as 'physical' | 'digital' | 'service',
           description: formData.description,
           purchaseLimit: formData.purchaseLimit,
@@ -473,6 +477,20 @@ export function ProductForm() {
                 placeholder='cth: Kemeja Batik Premium Lengan Panjang'
                 className={inputCls}
                 required
+              />
+            </Field>
+
+            {/* Product Code */}
+            <Field
+              label='Kode Produk (Opsional)'
+              hint='Kode unik atau SKU untuk referensi internal produk'
+            >
+              <input
+                name='productCode'
+                value={formData.productCode}
+                onChange={handleChange}
+                placeholder='cth: BTK-001'
+                className={inputCls}
               />
             </Field>
 

@@ -3,7 +3,15 @@ import useSWR from 'swr';
 import { client } from '../../lib/api.ts';
 import { Badge, Button, Card, CardContent } from '@starsuperscare/ui';
 import { useNavigate } from 'react-router-dom';
-import { Activity, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Activity,
+  ArrowUpRight,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  SearchX,
+  ShoppingBag,
+} from 'lucide-react';
 
 const fetchHistory = async (_url: string, page: number, filters: any) => {
   const query: any = { page: String(page), limit: '5' };
@@ -12,7 +20,7 @@ const fetchHistory = async (_url: string, page: number, filters: any) => {
   if (filters.start_date) query.start_date = filters.start_date;
   if (filters.end_date) query.end_date = filters.end_date;
 
-  const res = await client.v1.history.$get({ query });
+  const res = await (client.v1 as any).history.$get({ query });
   if (res.ok) {
     const json = await res.json();
     return json.data;
@@ -35,31 +43,39 @@ export const HistoryPage = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending':
-        return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
+        return 'bg-amber-50 text-amber-700 border-amber-200';
       case 'paid':
       case 'processing':
-        return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+        return 'bg-blue-50 text-blue-700 border-blue-200';
       case 'shipped':
-        return 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20';
+        return 'bg-indigo-50 text-indigo-700 border-indigo-200';
       case 'delivered':
-        return 'bg-green-500/10 text-green-500 border-green-500/20';
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
       case 'cancelled':
       case 'refunded':
-        return 'bg-red-500/10 text-red-500 border-red-500/20';
+      case 'cancellation_requested':
+      case 'return_requested':
+      case 'cancellation_rejected':
+      case 'return_rejected':
+        return 'bg-rose-50 text-rose-700 border-rose-200';
       default:
-        return 'bg-gray-500/10 text-gray-500 border-gray-500/20';
+        return 'bg-gray-50 text-gray-700 border-gray-200';
     }
   };
 
   const getStatusLabel = (status: string) => {
     const labels: Record<string, string> = {
-      pending: 'Menunggu',
+      pending: 'Menunggu Pemb.',
       paid: 'Dibayar',
       processing: 'Diproses',
       shipped: 'Dikirim',
       delivered: 'Selesai',
-      cancelled: 'Batal',
+      cancelled: 'Dibatalkan',
       refunded: 'Refund',
+      cancellation_requested: 'Proses Batal',
+      return_requested: 'Proses Retur',
+      cancellation_rejected: 'Batal Ditolak',
+      return_rejected: 'Retur Ditolak',
     };
     return labels[status] || status;
   };
@@ -70,146 +86,204 @@ export const HistoryPage = () => {
   };
 
   return (
-    <div className='space-y-6'>
-      <div className='flex justify-between items-center'>
-        <div>
-          <h2 className='text-2xl font-bold tracking-tight'>Riwayat Transaksi</h2>
-          <p className='text-muted-foreground text-sm mt-1'>
-            Pantau semua riwayat dan ringkasan transaksi Anda.
-          </p>
-        </div>
+    <div className='max-w-5xl mx-auto space-y-8 pb-10'>
+      <div className='flex flex-col gap-2'>
+        <h2 className='text-3xl font-extrabold tracking-tight text-gray-900'>Riwayat Transaksi</h2>
+        <p className='text-muted-foreground text-base'>
+          Pantau semua pesanan dan aktivitas belanja Anda di sini.
+        </p>
       </div>
 
       {/* Summary Cards */}
-      <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-        <Card className='bg-[#0f1115] border-white/10'>
-          <CardContent className='p-4'>
-            <p className='text-sm text-muted-foreground'>Total Transaksi</p>
-            <p className='text-2xl font-bold text-white mt-1'>
-              {isLoading ? '-' : data?.summary?.totalTransactions ?? 0}
+      <div className='grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6'>
+        <Card className='bg-gradient-to-br from-blue-500 to-indigo-600 text-white border-0 shadow-lg shadow-blue-500/20 rounded-2xl hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-300 group'>
+          <CardContent className='p-4 md:p-5 relative overflow-hidden'>
+            <div className='absolute -right-4 -top-4 w-20 h-20 bg-white/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500' />
+            <div className='flex items-center gap-3 mb-2 relative z-10'>
+              <div className='p-2 bg-white/20 rounded-lg backdrop-blur-sm'>
+                <ShoppingBag className='w-5 h-5 text-white' />
+              </div>
+              <p className='text-xs md:text-sm font-medium text-blue-50'>Pesanan</p>
+            </div>
+            <p className='text-2xl font-bold text-white relative z-10'>
+              {isLoading ? '...' : data?.summary?.totalTransactions ?? 0}
             </p>
           </CardContent>
         </Card>
-        <Card className='bg-[#0f1115] border-white/10'>
-          <CardContent className='p-4'>
-            <p className='text-sm text-muted-foreground'>Total Nominal</p>
-            <p className='text-2xl font-bold text-white mt-1'>
-              Rp {isLoading ? '-' : (data?.summary?.totalNominal ?? 0).toLocaleString('id-ID')}
+
+        <Card className='bg-gradient-to-br from-emerald-500 to-teal-600 text-white border-0 shadow-lg shadow-emerald-500/20 rounded-2xl hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-300 group'>
+          <CardContent className='p-4 md:p-5 relative overflow-hidden'>
+            <div className='absolute -right-4 -top-4 w-20 h-20 bg-white/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500' />
+            <div className='flex items-center gap-3 mb-2 relative z-10'>
+              <div className='p-2 bg-white/20 rounded-lg backdrop-blur-sm'>
+                <Activity className='w-5 h-5 text-white' />
+              </div>
+              <p className='text-xs md:text-sm font-medium text-emerald-50'>Nominal</p>
+            </div>
+            <p className='text-lg md:text-xl font-bold text-white truncate relative z-10'>
+              Rp {isLoading ? '...' : (data?.summary?.totalNominal ?? 0).toLocaleString('id-ID')}
             </p>
           </CardContent>
         </Card>
-        <Card className='bg-[#0f1115] border-white/10'>
-          <CardContent className='p-4'>
-            <p className='text-sm text-muted-foreground'>Selesai</p>
-            <p className='text-2xl font-bold text-green-500 mt-1'>
-              {isLoading ? '-' : data?.summary?.completedCount ?? 0}
+
+        <Card className='bg-gradient-to-br from-purple-500 to-pink-600 text-white border-0 shadow-lg shadow-purple-500/20 rounded-2xl hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/40 transition-all duration-300 group'>
+          <CardContent className='p-4 md:p-5 relative overflow-hidden'>
+            <div className='absolute -right-4 -top-4 w-20 h-20 bg-white/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500' />
+            <div className='flex items-center gap-3 mb-2 relative z-10'>
+              <div className='p-2 bg-white/20 rounded-lg backdrop-blur-sm'>
+                <Activity className='w-5 h-5 text-white' />
+              </div>
+              <p className='text-xs md:text-sm font-medium text-purple-50'>Selesai</p>
+            </div>
+            <p className='text-2xl font-bold text-white relative z-10'>
+              {isLoading ? '...' : data?.summary?.completedCount ?? 0}
             </p>
           </CardContent>
         </Card>
-        <Card className='bg-[#0f1115] border-white/10'>
-          <CardContent className='p-4'>
-            <p className='text-sm text-muted-foreground'>Refund</p>
-            <p className='text-2xl font-bold text-red-500 mt-1'>
-              {isLoading ? '-' : data?.summary?.refundCount ?? 0}
+
+        <Card className='bg-gradient-to-br from-rose-500 to-red-600 text-white border-0 shadow-lg shadow-rose-500/20 rounded-2xl hover:-translate-y-1 hover:shadow-xl hover:shadow-rose-500/40 transition-all duration-300 group'>
+          <CardContent className='p-4 md:p-5 relative overflow-hidden'>
+            <div className='absolute -right-4 -top-4 w-20 h-20 bg-white/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500' />
+            <div className='flex items-center gap-3 mb-2 relative z-10'>
+              <div className='p-2 bg-white/20 rounded-lg backdrop-blur-sm'>
+                <Activity className='w-5 h-5 text-white' />
+              </div>
+              <p className='text-xs md:text-sm font-medium text-rose-50'>Batal/Refund</p>
+            </div>
+            <p className='text-2xl font-bold text-white relative z-10'>
+              {isLoading ? '...' : data?.summary?.refundCount ?? 0}
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filters */}
-      <div className='flex flex-wrap gap-4 items-center bg-[#0f1115] p-4 rounded-xl border border-white/10'>
-        <div className='flex flex-col gap-1'>
-          <label className='text-xs text-muted-foreground'>Status</label>
-          <select
-            className='bg-transparent border border-white/20 rounded p-2 text-sm text-white'
-            value={filters.status || ''}
-            onChange={(e) => updateFilter('status', e.target.value)}
-          >
-            <option value='' className='bg-black'>Semua Status</option>
-            <option value='delivered' className='bg-black'>Selesai</option>
-            <option value='refunded' className='bg-black'>Refund</option>
-            <option value='cancelled' className='bg-black'>Dibatalkan</option>
-          </select>
-        </div>
-        <div className='flex flex-col gap-1'>
-          <label className='text-xs text-muted-foreground'>Tahun</label>
-          <select
-            className='bg-transparent border border-white/20 rounded p-2 text-sm text-white'
-            value={filters.year || ''}
-            onChange={(e) => updateFilter('year', e.target.value)}
-          >
-            <option value='' className='bg-black'>Semua Waktu</option>
-            <option value='2026' className='bg-black'>2026</option>
-            <option value='2025' className='bg-black'>2025</option>
-          </select>
+      {/* Filters Area */}
+      <div className='bg-gray-50/80 p-4 md:p-5 rounded-2xl border border-gray-200/60 shadow-sm flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between'>
+        <div className='flex flex-col sm:flex-row gap-4 w-full sm:w-auto'>
+          <div className='flex flex-col gap-1.5 flex-1 sm:flex-none'>
+            <label className='text-[11px] font-semibold text-gray-500 uppercase tracking-wider'>
+              Status Pesanan
+            </label>
+            <select
+              className='bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900 font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer shadow-sm w-full sm:min-w-[160px]'
+              value={filters.status || ''}
+              onChange={(e) => updateFilter('status', e.target.value)}
+            >
+              <option value=''>Semua Status</option>
+              <option value='delivered'>Selesai</option>
+              <option value='refunded'>Refund & Retur</option>
+              <option value='cancelled'>Dibatalkan</option>
+            </select>
+          </div>
+          <div className='flex flex-col gap-1.5 flex-1 sm:flex-none'>
+            <label className='text-[11px] font-semibold text-gray-500 uppercase tracking-wider'>
+              Tahun Transaksi
+            </label>
+            <select
+              className='bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900 font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all cursor-pointer shadow-sm w-full sm:min-w-[140px]'
+              value={filters.year || ''}
+              onChange={(e) => updateFilter('year', e.target.value)}
+            >
+              <option value=''>Semua Waktu</option>
+              <option value='2026'>2026</option>
+              <option value='2025'>2025</option>
+            </select>
+          </div>
         </div>
       </div>
 
+      {/* List Area */}
       {isLoading
         ? (
-          <div className='grid gap-4'>
+          <div className='grid gap-5'>
             {[1, 2, 3].map((i) => (
-              <Card key={i} className='animate-pulse bg-white/5 border-white/10 h-24' />
+              <Card
+                key={i}
+                className='animate-pulse bg-gray-100 border-gray-200 h-32 rounded-2xl'
+              />
             ))}
           </div>
         )
         : error
         ? (
-          <div className='text-center py-10 bg-red-500/10 text-red-400 rounded-lg border border-red-500/20'>
-            <p>Gagal memuat riwayat. Silakan coba lagi.</p>
+          <div className='text-center py-12 bg-rose-50 text-rose-600 rounded-2xl border border-rose-200 shadow-sm'>
+            <p className='font-medium text-lg'>Gagal memuat riwayat transaksi.</p>
+            <p className='text-sm mt-1 opacity-80'>Silakan coba muat ulang halaman.</p>
           </div>
         )
         : data?.items?.length === 0
         ? (
-          <div className='text-center py-20 bg-white/5 rounded-xl border border-white/10'>
-            <Activity className='w-12 h-12 mx-auto text-muted-foreground mb-4 opacity-50' />
-            <h3 className='text-lg font-medium text-white mb-2'>Tidak Ada Riwayat</h3>
-            <p className='text-muted-foreground text-sm mb-6'>
-              Belum ada transaksi yang sesuai dengan filter Anda.
+          <div className='text-center py-20 bg-gray-50 rounded-3xl border border-dashed border-gray-300 flex flex-col items-center justify-center'>
+            <div className='w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-5'>
+              <SearchX className='w-8 h-8 text-gray-400' />
+            </div>
+            <h3 className='text-xl font-bold text-gray-900 mb-2'>Tidak Ada Riwayat</h3>
+            <p className='text-gray-500 text-sm max-w-sm px-4'>
+              Belum ada transaksi yang sesuai dengan filter Anda. Coba ubah filter atau lakukan
+              transaksi baru.
             </p>
           </div>
         )
         : (
-          <div className='grid gap-4'>
+          <div className='grid gap-5'>
             {data?.items.map((item: any) => (
               <Card
                 key={item.id}
-                className='bg-[#0f1115] border-white/10 hover:border-white/20 transition-all overflow-hidden'
+                className='bg-white border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-200 overflow-hidden rounded-2xl group'
               >
-                <div className='p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
-                  <div className='flex items-center gap-3'>
-                    <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0'>
-                      <Calendar className='w-5 h-5 text-primary' />
+                <div className='p-4 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-5'>
+                  {/* Left Section: Info */}
+                  <div className='flex items-start gap-4'>
+                    <div className='w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0 shadow-sm mt-1 md:mt-0'>
+                      <ShoppingBag className='w-5 h-5 md:w-6 md:h-6 text-blue-600' />
                     </div>
-                    <div>
-                      <div className='flex items-center gap-2 mb-1'>
-                        <span className='font-medium text-white'>{item.orderNumber}</span>
-                        <Badge variant='outline' className={getStatusColor(item.status)}>
+                    <div className='flex flex-col gap-1.5'>
+                      <div className='flex flex-col sm:flex-row sm:items-center gap-2 md:gap-3'>
+                        <span className='font-bold text-gray-900 text-base md:text-lg group-hover:text-blue-600 transition-colors'>
+                          {item.orderNumber}
+                        </span>
+                        <Badge
+                          variant='outline'
+                          className={`w-fit px-2.5 py-0.5 rounded-full border ${
+                            getStatusColor(item.status)
+                          }`}
+                        >
                           {getStatusLabel(item.status)}
                         </Badge>
                       </div>
-                      <p className='text-sm text-muted-foreground'>
-                        {new Date(item.createdAt).toLocaleString('id-ID', {
-                          timeZone: 'Asia/Jakarta',
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })} WIB
-                      </p>
+                      <div className='flex items-center gap-1.5 text-xs md:text-sm text-gray-500 mt-0.5'>
+                        <Calendar className='w-3.5 h-3.5 md:w-4 md:h-4' />
+                        <span>
+                          {new Date(item.createdAt).toLocaleString('id-ID', {
+                            timeZone: 'Asia/Jakarta',
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })} WIB
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  <div className='text-left sm:text-right w-full sm:w-auto flex sm:flex-col justify-between sm:justify-start items-center sm:items-end'>
-                    <p className='font-bold text-lg text-white'>
-                      Rp {item.totalAmount.toLocaleString('id-ID')}
-                    </p>
+
+                  {/* Right Section: Price & CTA */}
+                  <div className='w-full md:w-auto flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center gap-4 md:gap-3 border-t md:border-t-0 border-gray-100 pt-4 md:pt-0'>
+                    <div className='flex flex-col md:items-end text-left md:text-right'>
+                      <span className='text-[11px] md:text-xs text-gray-500 font-medium mb-0.5'>
+                        Total Belanja
+                      </span>
+                      <p className='font-extrabold text-lg md:text-xl text-gray-900'>
+                        Rp {item.totalAmount.toLocaleString('id-ID')}
+                      </p>
+                    </div>
                     <Button
-                      variant='link'
-                      className='px-0 text-primary h-auto'
+                      variant='default'
+                      className='bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-sm px-4 md:px-5 py-2 h-auto text-xs md:text-sm font-semibold flex items-center gap-1.5 transition-transform active:scale-95 whitespace-nowrap'
                       onClick={() => navigate(`/orders/${item.id}`)}
                     >
                       Lihat Detail
+                      <ArrowUpRight className='w-3.5 h-3.5 md:w-4 md:h-4 opacity-80' />
                     </Button>
                   </div>
                 </div>
@@ -218,18 +292,18 @@ export const HistoryPage = () => {
 
             {/* Pagination */}
             {(data?.pagination?.totalPages ?? 0) > 1 && (
-              <div className='flex justify-center items-center gap-4 mt-8'>
+              <div className='flex justify-center items-center gap-3 md:gap-4 mt-8 mb-4'>
                 <Button
                   variant='outline'
                   size='icon'
                   disabled={page === 1}
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  className='border-white/20 hover:bg-white/10'
+                  className='border-gray-200 text-gray-600 hover:bg-gray-50 rounded-xl w-9 h-9 md:w-10 md:h-10'
                 >
-                  <ChevronLeft className='w-4 h-4' />
+                  <ChevronLeft className='w-4 h-4 md:w-5 md:h-5' />
                 </Button>
-                <span className='text-sm text-muted-foreground'>
-                  Halaman <span className='text-white font-medium'>{page}</span> dari{' '}
+                <span className='text-xs md:text-sm font-medium text-gray-500 bg-white border border-gray-200 px-3 md:px-4 py-1.5 md:py-2 rounded-xl shadow-sm'>
+                  Hal <strong className='text-gray-900'>{page}</strong> /{' '}
                   {data?.pagination?.totalPages}
                 </span>
                 <Button
@@ -237,9 +311,9 @@ export const HistoryPage = () => {
                   size='icon'
                   disabled={page === data?.pagination?.totalPages}
                   onClick={() => setPage((p) => Math.min(data?.pagination?.totalPages || 1, p + 1))}
-                  className='border-white/20 hover:bg-white/10'
+                  className='border-gray-200 text-gray-600 hover:bg-gray-50 rounded-xl w-9 h-9 md:w-10 md:h-10'
                 >
-                  <ChevronRight className='w-4 h-4' />
+                  <ChevronRight className='w-4 h-4 md:w-5 md:h-5' />
                 </Button>
               </div>
             )}

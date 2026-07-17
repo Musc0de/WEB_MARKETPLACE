@@ -145,3 +145,14 @@ export function simulateWebhook(payload: WebhookPayload) {
     body: JSON.stringify(payload),
   }).then((res) => res.json());
 }
+
+export async function checkPaymentStatus(paymentId: string): Promise<string> {
+  try {
+    const res = await fetcher(`${BASE}/v1/payments/${paymentId}/status`, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+    return res.data.status;
+  } catch (_error) {
+    return 'pending';
+  }
+}

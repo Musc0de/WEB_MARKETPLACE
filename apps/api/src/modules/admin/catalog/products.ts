@@ -19,7 +19,7 @@ import {
 } from '@starsuperscare/contracts';
 import { AuthContext, authMiddleware, requirePermission } from '../../../middleware/auth.ts';
 import { logAudit } from '../../../utils/audit.ts';
-import { asc, desc, eq, isNull, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, isNull, sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 import { storageAdapter } from '../../../adapters/storage.ts';
 
@@ -106,7 +106,7 @@ const routes = app
     })
       .from(productVariants)
       .leftJoin(inventoryLevels, eq(inventoryLevels.variantId, productVariants.id))
-      .where(eq(productVariants.productId, id));
+      .where(and(eq(productVariants.productId, id), isNull(productVariants.deletedAt)));
 
     const list = listRaw.map((v) => ({
       ...v,
@@ -240,7 +240,9 @@ const routes = app
     requirePermission('catalog.write'),
     async (c) => {
       const variantId = c.req.param('variantId') as string;
-      const [deleted] = await db.delete(productVariants).where(eq(productVariants.id, variantId))
+      const [deleted] = await db.update(productVariants)
+        .set({ deletedAt: new Date().toISOString() })
+        .where(eq(productVariants.id, variantId))
         .returning();
       if (!deleted) throw new HTTPException(404, { message: 'Variant not found' });
       return c.json({
@@ -338,11 +340,11 @@ const routes = app
           version: existing.version + 1,
         } as any).where(eq(products.id, id)).returning();
 
-        if (data.categoryIds !== undefined) {
+        if (categoryIds !== undefined) {
           await tx.delete(productCategories).where(eq(productCategories.productId, id));
-          if (data.categoryIds.length > 0) {
+          if (categoryIds.length > 0) {
             await tx.insert(productCategories).values(
-              data.categoryIds.map((catId) => ({
+              categoryIds.map((catId) => ({
                 productId: id,
                 categoryId: catId,
               })),

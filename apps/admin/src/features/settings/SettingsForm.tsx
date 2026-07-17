@@ -46,6 +46,7 @@ function SectionCard(
 const formSchema = z.object({
   siteTitle: z.string().min(1, 'Site Title is required'),
   siteDescription: z.string().nullable().optional(),
+  activePaymentGateway: z.string().optional(),
 });
 type FormValues = z.infer<typeof formSchema>;
 
@@ -77,6 +78,7 @@ export function SettingsForm() {
         reset({
           siteTitle: json.data?.siteTitle || '',
           siteDescription: json.data?.siteDescription || '',
+          activePaymentGateway: json.data?.activePaymentGateway || 'sandbox',
         });
         setFaviconUrl(json.data?.faviconUrl || null);
       }
@@ -100,6 +102,7 @@ export function SettingsForm() {
           appId: activeApp,
           siteTitle: values.siteTitle,
           siteDescription: values.siteDescription,
+          activePaymentGateway: values.activePaymentGateway,
           faviconUrl,
         },
       });
@@ -235,6 +238,16 @@ export function SettingsForm() {
                 placeholder='Tuliskan deskripsi singkat tentang situs ini...'
                 className='w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500 outline-none transition-all resize-y'
               />
+            </Field>
+
+            <Field label='Active Payment Gateway' error={errors.activePaymentGateway?.message}>
+              <select
+                {...register('activePaymentGateway')}
+                className='w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500 outline-none transition-all'
+              >
+                <option value='sandbox'>Sandbox (Testing)</option>
+                <option value='louvin'>Louvin Payment Gateway (Production)</option>
+              </select>
             </Field>
           </div>
         </SectionCard>

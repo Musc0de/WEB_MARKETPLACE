@@ -59,6 +59,7 @@ import { WishlistPage } from './features/wishlist/WishlistPage.tsx';
 import { ReviewsPage } from './features/reviews/ReviewsPage.tsx';
 import { SettingsPage } from './features/settings/SettingsPage.tsx';
 import { ReturnsPage } from './features/returns/ReturnsPage.tsx';
+import { ReturnFormPage } from './features/returns/ReturnFormPage.tsx';
 import { SupportPage } from './features/support/SupportPage.tsx';
 import { TicketDetailPage } from './features/support/TicketDetailPage.tsx';
 const NotFound = () => (
@@ -90,6 +91,7 @@ export default function App() {
             <Route path='/wishlist' element={<WishlistPage />} />
             <Route path='/reviews' element={<ReviewsPage />} />
             <Route path='/returns' element={<ReturnsPage />} />
+            <Route path='/returns/new' element={<ReturnFormPage />} />
             <Route path='/support' element={<SupportPage />} />
             <Route path='/support/:id' element={<TicketDetailPage />} />
             <Route path='/settings' element={<SettingsPage />} />

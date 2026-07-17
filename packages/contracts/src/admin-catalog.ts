@@ -5,6 +5,7 @@ import { ProductDetailSchema } from './catalog.ts';
 export const AdminProductCreateSchema = z.object({
   storeId: z.string().uuid().optional(),
   name: z.string().min(2),
+  productCode: z.string().optional(),
   type: z.enum(['physical', 'digital', 'service']),
   description: z.string().optional(),
   brandId: z.string().uuid().optional(),
@@ -16,6 +17,7 @@ export type AdminProductCreate = z.infer<typeof AdminProductCreateSchema>;
 export const AdminProductUpdateSchema = z.object({
   version: z.number().min(1),
   name: z.string().min(2).optional(),
+  productCode: z.string().nullable().optional(),
   type: z.enum(['physical', 'digital', 'service']).optional(),
   description: z.string().optional(),
   brandId: z.string().uuid().nullable().optional(),

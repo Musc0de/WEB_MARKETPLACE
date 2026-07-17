@@ -59,3 +59,15 @@ export const trackingTokens = pgTable('sss_tracking_tokens', {
   revokedAt: timestamp('revoked_at', { withTimezone: true, mode: 'string' }),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });
+
+// @ts-ignore: Deno isolatedDeclarations workaround
+export const cancellationRequests = pgTable('sss_cancellation_requests', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  orderId: uuid('order_id').notNull().references(() => orders.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  reason: text('reason').notNull(),
+  status: text('status').notNull().default('requested'), // 'requested', 'under_review', 'approved', 'rejected'
+  rejectionReason: text('rejection_reason'),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+});
