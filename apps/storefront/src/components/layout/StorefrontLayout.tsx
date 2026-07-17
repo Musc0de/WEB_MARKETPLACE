@@ -176,7 +176,7 @@ const Header = () => {
             Promo
           </a>
           <a
-            href='/tracking'
+            href={(import.meta as any).env?.VITE_TRACKING_URL || ''}
             className='text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors'
           >
             Lacak Pesanan
@@ -482,7 +482,7 @@ const Footer = () => {
               </li>
               <li>
                 <a
-                  href='/tracking'
+                  href={(import.meta as any).env?.VITE_TRACKING_URL || '#'}
                   className='hover:text-blue-600 transition-colors'
                 >
                   Lacak Pesanan

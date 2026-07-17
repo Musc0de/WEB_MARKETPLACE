@@ -1,4 +1,7 @@
 import {
+  require_react_dom
+} from "./chunk-VVF5MN7A.js";
+import {
   AnimatePresence,
   animate,
   motion
@@ -6,9 +9,6 @@ import {
 import {
   require_jsx_runtime
 } from "./chunk-HIGNLTFM.js";
-import {
-  require_react_dom
-} from "./chunk-VVF5MN7A.js";
 import {
   require_react
 } from "./chunk-BX5ISVL4.js";

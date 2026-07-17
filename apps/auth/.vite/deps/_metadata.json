@@ -1,0 +1,97 @@
+{
+  "hash": "bb328407",
+  "configHash": "28a738ed",
+  "lockfileHash": "e3b0c442",
+  "browserHash": "d659bd07",
+  "optimized": {
+    "react": {
+      "src": "../../../../node_modules/.deno/react@18.3.1/node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "2eb82712",
+      "needsInterop": true
+    },
+    "react-dom": {
+      "src": "../../../../node_modules/.deno/react-dom@18.3.1/node_modules/react-dom/index.js",
+      "file": "react-dom.js",
+      "fileHash": "de21c37f",
+      "needsInterop": true
+    },
+    "react/jsx-dev-runtime": {
+      "src": "../../../../node_modules/.deno/react@18.3.1/node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "41ee345b",
+      "needsInterop": true
+    },
+    "react/jsx-runtime": {
+      "src": "../../../../node_modules/.deno/react@18.3.1/node_modules/react/jsx-runtime.js",
+      "file": "react_jsx-runtime.js",
+      "fileHash": "cdaa1105",
+      "needsInterop": true
+    },
+    "framer-motion": {
+      "src": "../../../../node_modules/.deno/framer-motion@11.18.2/node_modules/framer-motion/dist/es/index.mjs",
+      "file": "framer-motion.js",
+      "fileHash": "45bf3b94",
+      "needsInterop": false
+    },
+    "goey-toast": {
+      "src": "../../../../node_modules/.deno/goey-toast@0.5.0/node_modules/goey-toast/dist/index.js",
+      "file": "goey-toast.js",
+      "fileHash": "a5964236",
+      "needsInterop": false
+    },
+    "hono/client": {
+      "src": "../../../../node_modules/.deno/hono@4.12.29/node_modules/hono/dist/client/index.js",
+      "file": "hono_client.js",
+      "fileHash": "bb9ff232",
+      "needsInterop": false
+    },
+    "lucide-react": {
+      "src": "../../../../node_modules/.deno/lucide-react@1.24.0/node_modules/lucide-react/dist/esm/lucide-react.mjs",
+      "file": "lucide-react.js",
+      "fileHash": "08f34518",
+      "needsInterop": false
+    },
+    "react-dom/client": {
+      "src": "../../../../node_modules/.deno/react-dom@18.3.1/node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "55df2921",
+      "needsInterop": true
+    },
+    "react-error-boundary": {
+      "src": "../../../../node_modules/.deno/react-error-boundary@4.1.2/node_modules/react-error-boundary/dist/react-error-boundary.development.esm.js",
+      "file": "react-error-boundary.js",
+      "fileHash": "6205092c",
+      "needsInterop": false
+    },
+    "react-router-dom": {
+      "src": "../../../../node_modules/.deno/react-router-dom@6.30.4/node_modules/react-router-dom/dist/index.js",
+      "file": "react-router-dom.js",
+      "fileHash": "6f0d31c9",
+      "needsInterop": false
+    },
+    "zod": {
+      "src": "../../../../node_modules/.deno/zod@4.4.3/node_modules/zod/index.js",
+      "file": "zod.js",
+      "fileHash": "2c062824",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-VVF5MN7A": {
+      "file": "chunk-VVF5MN7A.js"
+    },
+    "chunk-Q4KJIZEK": {
+      "file": "chunk-Q4KJIZEK.js"
+    },
+    "chunk-HIGNLTFM": {
+      "file": "chunk-HIGNLTFM.js"
+    },
+    "chunk-BX5ISVL4": {
+      "file": "chunk-BX5ISVL4.js"
+    },
+    "chunk-DC5AMYBS": {
+      "file": "chunk-DC5AMYBS.js"
+    }
+  }
+}

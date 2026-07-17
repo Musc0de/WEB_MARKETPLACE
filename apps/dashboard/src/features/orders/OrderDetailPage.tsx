@@ -7,6 +7,7 @@ import {
   ArrowLeft,
   CheckCircle2,
   Clock,
+  Copy,
   CreditCard,
   Download,
   MapPin,
@@ -403,11 +404,53 @@ export const OrderDetailPage = () => {
                             })}
                           </span>
                         </div>
-                        {event.note && (
-                          <p className='mt-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-100 rounded-lg px-3 py-2'>
-                            {event.note}
-                          </p>
-                        )}
+                        {event.note && event.note.startsWith('[TRACKING]')
+                          ? (
+                            (() => {
+                              const infoStr = event.note.replace('[TRACKING]', '').trim();
+                              const parts = infoStr.split('|').map((s: string) => s.trim());
+                              const kurirPart = parts.find((p: string) => p.startsWith('Kurir:'))
+                                ?.replace('Kurir:', '').trim();
+                              const resiPart = parts.find((p: string) => p.startsWith('Resi:'))
+                                ?.replace('Resi:', '').trim();
+
+                              return (
+                                <div className='mt-2 bg-indigo-50/50 border border-indigo-100 rounded-lg p-3 flex items-center justify-between gap-3'>
+                                  <div className='flex flex-col'>
+                                    <span className='text-[10px] text-indigo-400 font-bold uppercase tracking-wider mb-0.5'>
+                                      Informasi Pengiriman
+                                    </span>
+                                    <span className='text-sm text-indigo-900 font-semibold'>
+                                      {kurirPart}{' '}
+                                      <span className='text-indigo-300 font-normal mx-1'>•</span>
+                                      {' '}
+                                      {resiPart}
+                                    </span>
+                                  </div>
+                                  {resiPart && resiPart !== 'N/A' && (
+                                    <button
+                                      type='button'
+                                      onClick={() => {
+                                        navigator.clipboard.writeText(resiPart);
+                                        toast.success('Nomor resi berhasil disalin!');
+                                      }}
+                                      className='p-2 text-indigo-600 hover:text-indigo-700 bg-white shadow-sm hover:shadow border border-indigo-100 rounded-lg transition-all active:scale-95'
+                                      title='Salin Resi'
+                                    >
+                                      <Copy className='w-4 h-4' />
+                                    </button>
+                                  )}
+                                </div>
+                              );
+                            })()
+                          )
+                          : event.note
+                          ? (
+                            <p className='mt-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-100 rounded-lg px-3 py-2'>
+                              {event.note}
+                            </p>
+                          )
+                          : null}
                       </div>
                     </div>
                   );
@@ -428,15 +471,32 @@ export const OrderDetailPage = () => {
             <div className='px-5 py-4 space-y-3'>
               {/* Subtotal */}
               <div className='flex justify-between items-center text-sm'>
-                <span className='text-gray-500'>Subtotal Produk</span>
+                <span className='text-gray-500'>Subtotal harga normal</span>
                 <span className='text-gray-800 font-medium tabular-nums'>
                   {fmt(order.subtotalAmount)}
                 </span>
               </div>
 
+              {/* Discount */}
+              {hasDiscount && (
+                <div className='flex justify-between items-center text-sm'>
+                  <span className='flex items-center gap-1.5 text-emerald-600 font-medium'>
+                    Diskon produk
+                    {discountPct > 0 && (
+                      <span className='text-[10px] bg-emerald-100 text-emerald-700 border border-emerald-200 rounded px-1.5 py-0.5 font-bold'>
+                        -{discountPct}%
+                      </span>
+                    )}
+                  </span>
+                  <span className='text-emerald-600 font-medium tabular-nums'>
+                    − {fmt(order.discountAmount)}
+                  </span>
+                </div>
+              )}
+
               {/* Shipping */}
               <div className='flex justify-between items-center text-sm'>
-                <span className='text-gray-500'>Ongkos Kirim</span>
+                <span className='text-gray-500'>Ongkos kirim</span>
                 <span className='text-gray-800 font-medium tabular-nums'>
                   {fmt(order.shippingAmount)}
                 </span>
@@ -452,37 +512,39 @@ export const OrderDetailPage = () => {
                 </div>
               )}
 
-              {/* Discount */}
-              {hasDiscount && (
-                <div className='flex justify-between items-center text-sm'>
-                  <span className='flex items-center gap-1.5 text-emerald-600 font-medium'>
-                    Diskon
-                    {discountPct > 0 && (
-                      <span className='text-[10px] bg-emerald-100 text-emerald-700 border border-emerald-200 rounded px-1.5 py-0.5 font-bold'>
-                        -{discountPct}%
-                      </span>
-                    )}
-                  </span>
-                  <span className='text-emerald-600 font-bold tabular-nums'>
-                    −{fmt(order.discountAmount)}
-                  </span>
-                </div>
-              )}
-
               {/* Total */}
               <div className='pt-3 mt-2 border-t-2 border-dashed border-gray-100'>
                 <div className='flex justify-between items-center'>
-                  <span className='font-bold text-gray-900 text-sm'>Total Belanja</span>
+                  <span className='font-bold text-gray-900 text-sm'>Total</span>
                   <span className='font-bold text-lg text-orange-600 tabular-nums'>
                     {fmt(order.totalAmount)}
                   </span>
                 </div>
-                {hasDiscount && (
-                  <p className='text-[11px] text-emerald-600 text-right mt-1 font-medium'>
-                    Kamu hemat {fmt(order.discountAmount)} 🎉
-                  </p>
-                )}
               </div>
+
+              {/* Payment Details */}
+              {(() => {
+                const isPaid = ['paid', 'processing', 'shipped', 'delivered'].includes(
+                  order.status,
+                );
+                const paidAmount = isPaid ? order.totalAmount : 0;
+                const remaining = order.totalAmount - paidAmount;
+
+                return (
+                  <div className='pt-2 space-y-2 border-t border-gray-100'>
+                    <div className='flex justify-between text-sm font-semibold'>
+                      <span className='text-gray-700'>Jumlah dibayar</span>
+                      <span className='text-emerald-600'>{fmt(paidAmount)}</span>
+                    </div>
+                    <div className='flex justify-between text-sm font-semibold'>
+                      <span className='text-gray-700'>Sisa pembayaran</span>
+                      <span className={remaining > 0 ? 'text-red-500' : 'text-emerald-600'}>
+                        {fmt(remaining)}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
 

@@ -10,12 +10,15 @@ import {
   orderItems,
   orders,
   orderStatusHistory,
+  productImages,
+  products,
+  productVariants,
   shipments,
   trackingTokens,
   userProfiles,
 } from '@starsuperscare/database';
 import { authMiddleware, requirePermission } from '../../../middleware/auth.ts';
-import { desc, eq, sql } from 'drizzle-orm';
+import { desc, eq, inArray, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
 const adminOrdersRouter = new Hono();
@@ -111,7 +114,49 @@ adminOrdersRouter.get('/:id', async (c) => {
   if (!orderResult.length) return c.json({ error: 'Order not found' }, 404);
   const order = orderResult[0];
 
-  const items = await db.select().from(orderItems).where(eq(orderItems.orderId, id));
+  const rawItems = await db
+    .select({
+      id: orderItems.id,
+      productId: orderItems.productId,
+      variantId: orderItems.variantId,
+      quantity: orderItems.quantity,
+      priceSnapshot: orderItems.priceSnapshot,
+      productNameSnapshot: orderItems.productNameSnapshot,
+      variantSkuSnapshot: orderItems.variantSkuSnapshot,
+      productSlug: products.slug,
+      comparePrice: productVariants.comparePrice,
+      optionValues: productVariants.optionValues,
+    })
+    .from(orderItems)
+    .leftJoin(products, eq(orderItems.productId, products.id))
+    .leftJoin(productVariants, eq(orderItems.variantId, productVariants.id))
+    .where(eq(orderItems.orderId, id));
+
+  // Fetch primary image for each unique product
+  const uniqueProductIds = [...new Set(rawItems.map((i) => i.productId))];
+  const r2Base = Deno.env.get('R2_PUBLIC_URL') || '';
+  const imageRows = uniqueProductIds.length > 0
+    ? await db
+      .select({
+        productId: productImages.productId,
+        objectKey: productImages.objectKey,
+        isPrimary: productImages.isPrimary,
+      })
+      .from(productImages)
+      .where(inArray(productImages.productId, uniqueProductIds))
+    : [];
+
+  const imageMap: Record<string, string> = {};
+  for (const img of imageRows) {
+    if (!imageMap[img.productId]) {
+      imageMap[img.productId] = `${r2Base}/${img.objectKey}`;
+    }
+  }
+
+  const items = rawItems.map((item) => ({
+    ...item,
+    imageUrl: imageMap[item.productId] ?? null,
+  }));
   const history = await db.select().from(orderStatusHistory).where(
     eq(orderStatusHistory.orderId, id),
   ).orderBy(desc(orderStatusHistory.createdAt));
@@ -183,11 +228,24 @@ adminOrdersRouter.post(
     const orderResult = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
     if (!orderResult.length) return c.json({ error: 'Order not found' }, 404);
 
-    await db.insert(shipments).values({
-      orderId: id,
-      carrier,
-      trackingNumber: trackingNumber || 'N/A',
-      status: trackingNumber ? 'in_transit' : 'pending',
+    await db.transaction(async (tx) => {
+      await tx.insert(shipments).values({
+        orderId: id,
+        carrier,
+        trackingNumber: trackingNumber || 'N/A',
+        status: trackingNumber ? 'in_transit' : 'pending',
+      });
+      await tx.insert(orderStatusHistory).values({
+        orderId: id,
+        status: trackingNumber ? 'shipped' : 'processing',
+        note: `[TRACKING] Kurir: ${carrier} | Resi: ${trackingNumber || 'N/A'}`,
+      });
+      if (trackingNumber) {
+        await tx.update(orders).set({
+          status: 'shipped',
+          updatedAt: new Date().toISOString(),
+        }).where(eq(orders.id, id));
+      }
     });
 
     return c.json({ success: true });

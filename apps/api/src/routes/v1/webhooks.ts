@@ -103,24 +103,27 @@ webhooksRouter.post('/', async (c) => {
         updatedAt: new Date().toISOString(),
       }).where(eq(orders.id, payment.orderId));
 
+      const now = new Date();
       // Record 'paid' in order history
       await tx.insert(orderStatusHistory).values({
         orderId: payment.orderId,
         status: 'paid',
         note: 'Payment received via webhook',
+        createdAt: now.toISOString(),
       });
 
       // ── AUTO-TRANSITION: paid → processing ──────────────────────────────
       // Immediately advance to 'processing' so admin sees order ready to fulfill
       await tx.update(orders).set({
         status: 'processing',
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date(now.getTime() + 100).toISOString(),
       }).where(eq(orders.id, payment.orderId));
 
       await tx.insert(orderStatusHistory).values({
         orderId: payment.orderId,
         status: 'processing',
         note: 'Auto-advanced to processing after payment confirmed',
+        createdAt: new Date(now.getTime() + 100).toISOString(),
       });
       // ────────────────────────────────────────────────────────────────────
 

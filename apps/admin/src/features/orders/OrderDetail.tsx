@@ -8,8 +8,8 @@ import {
   ArrowLeft,
   CheckCircle2,
   Clock,
+  Copy,
   ExternalLink,
-  Hash,
   Loader2,
   MapPin,
   Package,
@@ -33,6 +33,17 @@ const STATUS_CFG: Record<string, { label: string; bg: string; text: string; dot:
 };
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
+const variantLabel = (optionValues: any): string => {
+  if (!optionValues) return '';
+  try {
+    const parsed = typeof optionValues === 'string' ? JSON.parse(optionValues) : optionValues;
+    if (Array.isArray(parsed)) return parsed.map((v: any) => v.value ?? v).join(' · ');
+    return Object.values(parsed).join(' · ');
+  } catch {
+    return String(optionValues);
+  }
+};
+
 function StatusBadge({ status, size = 'md' }: { status: string; size?: 'sm' | 'md' | 'lg' }) {
   const cfg = STATUS_CFG[status] ??
     { label: status, bg: 'bg-gray-100', text: 'text-gray-600', dot: 'bg-gray-400' };
@@ -171,53 +182,132 @@ export function OrderDetail() {
           {/* Order Items */}
           <SectionCard title='Order Items' icon={<ShoppingBag className='w-4 h-4' />}>
             <div className='space-y-1'>
-              {order.items.map((item: any) => (
-                <div
-                  key={item.id}
-                  className='flex items-center justify-between py-3 border-b border-gray-50 last:border-0 gap-3'
-                >
-                  <div className='flex items-center gap-3 min-w-0'>
-                    <div className='w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0'>
-                      <Package className='w-4 h-4 text-gray-400' />
+              {order.items.map((item: any) => {
+                const label = variantLabel(item.optionValues);
+                const hasItemDiscount = item.comparePrice && item.comparePrice > item.priceSnapshot;
+                const lineTotal = item.quantity * item.priceSnapshot;
+                const savedAmount = hasItemDiscount
+                  ? item.quantity * (item.comparePrice - item.priceSnapshot)
+                  : 0;
+
+                return (
+                  <div
+                    key={item.id}
+                    className='px-5 py-4 flex gap-4 hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0'
+                  >
+                    {/* Image */}
+                    <div className='w-[76px] h-[76px] rounded-xl overflow-hidden shrink-0 bg-gray-100 border border-gray-200'>
+                      {item.imageUrl
+                        ? (
+                          <img
+                            src={item.imageUrl}
+                            alt={item.productNameSnapshot}
+                            loading='lazy'
+                            decoding='async'
+                            className='w-full h-full object-cover'
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        )
+                        : (
+                          <div className='w-full h-full flex items-center justify-center'>
+                            <Package className='w-7 h-7 text-gray-300' />
+                          </div>
+                        )}
                     </div>
-                    <div className='min-w-0'>
-                      <p className='text-sm font-medium text-gray-800 truncate'>
+
+                    {/* Info */}
+                    <div className='flex-1 min-w-0'>
+                      <p className='font-semibold text-gray-900 text-sm leading-snug line-clamp-2'>
                         {item.productNameSnapshot}
                       </p>
-                      <p className='text-xs text-gray-400 flex items-center gap-1 mt-0.5'>
-                        <Hash className='w-3 h-3' />
+                      <p className='text-[11px] text-gray-400 mt-0.5 font-mono'>
                         {item.variantSkuSnapshot}
-                        <span className='text-gray-300 mx-1'>·</span>
-                        Qty: <strong className='text-gray-600'>{item.quantity}</strong>
                       </p>
+                      {label && (
+                        <span className='inline-block mt-1 text-[11px] text-indigo-600 bg-indigo-50 border border-indigo-100 rounded px-2 py-0.5 font-medium'>
+                          {label}
+                        </span>
+                      )}
+                      <div className='mt-2 flex items-center gap-2'>
+                        {hasItemDiscount && (
+                          <span className='text-[11px] text-gray-400 line-through tabular-nums'>
+                            {formatIDR(item.comparePrice)}
+                          </span>
+                        )}
+                        <span className='text-sm font-bold text-orange-600 tabular-nums'>
+                          {formatIDR(item.priceSnapshot)}
+                        </span>
+                        <span className='text-xs text-gray-400'>× {item.quantity}</span>
+                        {savedAmount > 0 && (
+                          <span className='text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded px-1.5 py-0.5'>
+                            Hemat {formatIDR(savedAmount)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Line total */}
+                    <div className='shrink-0 text-right flex flex-col justify-end'>
+                      <span className='text-sm font-bold text-gray-900 tabular-nums'>
+                        {formatIDR(lineTotal)}
+                      </span>
                     </div>
                   </div>
-                  <span className='text-sm font-semibold text-gray-800 flex-shrink-0'>
-                    {formatIDR(item.priceSnapshot * item.quantity)}
-                  </span>
-                </div>
-              ))}
+                );
+              })}
 
-              {/* Totals */}
-              <div className='pt-4 mt-2 space-y-2 bg-gray-50 rounded-lg px-4 py-3 -mx-0'>
-                {[
-                  { label: 'Subtotal', value: order.subtotalAmount, show: true },
-                  { label: 'Diskon', value: -order.discountAmount, show: order.discountAmount > 0 },
-                  { label: 'Ongkos Kirim', value: order.shippingAmount, show: true },
-                  { label: 'Pajak', value: order.taxAmount, show: true },
-                ].filter((r) => r.show).map((row) => (
-                  <div key={row.label} className='flex justify-between text-sm text-gray-500'>
-                    <span>{row.label}</span>
-                    <span className={row.value < 0 ? 'text-green-600' : ''}>
-                      {row.value < 0 ? '-' : ''}
-                      {formatIDR(Math.abs(row.value))}
-                    </span>
-                  </div>
-                ))}
-                <div className='flex justify-between text-base font-bold text-gray-900 pt-2 border-t border-gray-200'>
-                  <span>Total</span>
-                  <span>{formatIDR(order.totalAmount)}</span>
+              {/* Totals Breakdown */}
+              <div className='pt-4 mt-2 space-y-2 bg-gray-50 rounded-lg px-4 py-4 border border-gray-100'>
+                <div className='flex justify-between text-sm text-gray-500'>
+                  <span>Subtotal harga normal</span>
+                  <span>{formatIDR(order.subtotalAmount)}</span>
                 </div>
+                {order.discountAmount > 0 && (
+                  <div className='flex justify-between text-sm text-green-600 font-medium'>
+                    <span>Diskon produk</span>
+                    <span>- {formatIDR(order.discountAmount)}</span>
+                  </div>
+                )}
+                <div className='flex justify-between text-sm text-gray-500'>
+                  <span>Ongkos kirim</span>
+                  <span>{formatIDR(order.shippingAmount)}</span>
+                </div>
+                {order.taxAmount > 0 && (
+                  <div className='flex justify-between text-sm text-gray-500'>
+                    <span>Pajak</span>
+                    <span>{formatIDR(order.taxAmount)}</span>
+                  </div>
+                )}
+
+                <div className='flex justify-between text-base font-bold pt-3 mt-3 border-t border-gray-200'>
+                  <span className='text-gray-900'>Total</span>
+                  <span className='text-orange-600'>{formatIDR(order.totalAmount)}</span>
+                </div>
+
+                {(() => {
+                  const isPaid = ['paid', 'processing', 'shipped', 'delivered'].includes(
+                    order.status,
+                  );
+                  const paidAmount = isPaid ? order.totalAmount : 0;
+                  const remaining = order.totalAmount - paidAmount;
+
+                  return (
+                    <div className='pt-1 space-y-1.5'>
+                      <div className='flex justify-between text-sm font-semibold'>
+                        <span className='text-gray-700'>Jumlah dibayar</span>
+                        <span className='text-green-600'>{formatIDR(paidAmount)}</span>
+                      </div>
+                      <div className='flex justify-between text-sm font-semibold'>
+                        <span className='text-gray-700'>Sisa pembayaran</span>
+                        <span className={remaining > 0 ? 'text-red-500' : 'text-green-600'}>
+                          {formatIDR(remaining)}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           </SectionCard>
@@ -271,11 +361,54 @@ export function OrderDetail() {
                                 })}
                               </time>
                             </div>
-                            {h.note && (
-                              <p className='text-xs text-gray-500 mt-1.5 leading-relaxed'>
-                                {h.note}
-                              </p>
-                            )}
+                            {h.note && h.note.startsWith('[TRACKING]')
+                              ? (
+                                (() => {
+                                  const infoStr = h.note.replace('[TRACKING]', '').trim();
+                                  const parts = infoStr.split('|').map((s: string) => s.trim());
+                                  const kurirPart = parts.find((p: string) =>
+                                    p.startsWith('Kurir:')
+                                  )?.replace('Kurir:', '').trim();
+                                  const resiPart = parts.find((p: string) => p.startsWith('Resi:'))
+                                    ?.replace('Resi:', '').trim();
+
+                                  return (
+                                    <div className='mt-2 bg-blue-50/60 border border-blue-100 rounded-lg p-2.5 flex items-center justify-between gap-3'>
+                                      <div className='flex flex-col'>
+                                        <span className='text-[10px] text-blue-500 font-bold uppercase tracking-wider mb-0.5'>
+                                          Info Pengiriman
+                                        </span>
+                                        <span className='text-sm text-blue-900 font-semibold'>
+                                          {kurirPart}{' '}
+                                          <span className='text-blue-300 font-normal mx-1'>•</span>
+                                          {' '}
+                                          {resiPart}
+                                        </span>
+                                      </div>
+                                      {resiPart && resiPart !== 'N/A' && (
+                                        <button
+                                          type='button'
+                                          onClick={() => {
+                                            navigator.clipboard.writeText(resiPart);
+                                            toast.success('Nomor resi berhasil disalin!');
+                                          }}
+                                          className='p-1.5 text-blue-600 hover:text-blue-700 bg-white shadow-sm hover:shadow border border-blue-100 rounded-md transition-all active:scale-95'
+                                          title='Salin Resi'
+                                        >
+                                          <Copy className='w-4 h-4' />
+                                        </button>
+                                      )}
+                                    </div>
+                                  );
+                                })()
+                              )
+                              : h.note
+                              ? (
+                                <p className='text-xs text-gray-500 mt-1.5 leading-relaxed'>
+                                  {h.note}
+                                </p>
+                              )
+                              : null}
                           </div>
                         </div>
                       );
@@ -384,60 +517,50 @@ export function OrderDetail() {
                   );
                 })}
               </div>
+              {newStatus === 'shipped' && (
+                <div className='mt-3 space-y-2 p-3 bg-blue-50/50 border border-blue-100 rounded-lg'>
+                  <label className='block text-[10px] font-bold text-blue-800 uppercase tracking-wide'>
+                    Detail Pengiriman (Wajib)
+                  </label>
+                  <input
+                    type='text'
+                    placeholder='Kurir (misal: JNE, SiCepat)'
+                    value={carrier}
+                    onChange={(e) => setCarrier(e.target.value)}
+                    className='w-full px-3 py-1.5 text-sm border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white placeholder:text-gray-400'
+                  />
+                  <input
+                    type='text'
+                    placeholder='Nomor Resi'
+                    value={tracking}
+                    onChange={(e) => setTracking(e.target.value)}
+                    className='w-full px-3 py-1.5 text-sm border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white placeholder:text-gray-400'
+                  />
+                </div>
+              )}
+
               <button
                 type='button'
-                disabled={!newStatus || updateStatus.isPending}
-                onClick={() => updateStatus.mutate(newStatus)}
-                className='w-full py-2 rounded-lg text-sm font-semibold bg-gray-900 text-white hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2'
+                disabled={!newStatus ||
+                  updateStatus.isPending ||
+                  attachShipment.isPending ||
+                  (newStatus === 'shipped' && (!carrier || !tracking))}
+                onClick={() => {
+                  if (newStatus === 'shipped') {
+                    attachShipment.mutate();
+                  } else {
+                    updateStatus.mutate(newStatus);
+                  }
+                }}
+                className='w-full mt-2 py-2 rounded-lg text-sm font-semibold bg-gray-900 text-white hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2'
               >
-                {updateStatus.isPending
+                {updateStatus.isPending || attachShipment.isPending
                   ? (
                     <>
                       <Loader2 className='w-4 h-4 animate-spin' /> Memperbarui...
                     </>
                   )
                   : 'Terapkan Perubahan'}
-              </button>
-            </div>
-
-            {/* Attach Shipment */}
-            <div className='mt-5 pt-5 border-t border-gray-100 space-y-3'>
-              <label className='block text-xs font-semibold text-gray-500 uppercase tracking-wide'>
-                Tambah Shipment
-              </label>
-              <div className='space-y-2'>
-                <input
-                  type='text'
-                  placeholder='Kurir (misal: JNE, SiCepat, FedEx)'
-                  value={carrier}
-                  onChange={(e) => setCarrier(e.target.value)}
-                  className='w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white placeholder:text-gray-400'
-                />
-                <input
-                  type='text'
-                  placeholder='Nomor Resi'
-                  value={tracking}
-                  onChange={(e) => setTracking(e.target.value)}
-                  className='w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white placeholder:text-gray-400'
-                />
-              </div>
-              <button
-                type='button'
-                disabled={!carrier || !tracking || attachShipment.isPending}
-                onClick={() => attachShipment.mutate()}
-                className='w-full py-2 rounded-lg text-sm font-semibold border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2'
-              >
-                {attachShipment.isPending
-                  ? (
-                    <>
-                      <Loader2 className='w-4 h-4 animate-spin' /> Menyimpan...
-                    </>
-                  )
-                  : (
-                    <>
-                      <Truck className='w-4 h-4' /> Simpan Shipment
-                    </>
-                  )}
               </button>
             </div>
           </SectionCard>
