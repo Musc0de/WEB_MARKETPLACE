@@ -21,7 +21,26 @@ import { HTTPException } from 'hono/http-exception';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { AuthContext, authMiddleware } from '../../middleware/auth.ts';
-import { generateInvoicePDF, uploadInvoicePDF } from './invoice-generator.ts';
+import { deleteInvoicePDF, generateInvoicePDF, uploadInvoicePDF } from './invoice-generator.ts';
+
+/**
+ * Parse optionValues JSON → human-readable string, e.g. "Merah · XL"
+ */
+function parseVariantName(optionValues: unknown): string {
+  if (!optionValues) return '';
+  try {
+    const parsed = typeof optionValues === 'string' ? JSON.parse(optionValues) : optionValues;
+    if (Array.isArray(parsed)) {
+      return parsed.map((v: any) => v.value ?? v.label ?? String(v)).filter(Boolean).join(' · ');
+    }
+    if (typeof parsed === 'object' && parsed !== null) {
+      return Object.values(parsed).filter(Boolean).join(' · ');
+    }
+    return String(parsed);
+  } catch {
+    return String(optionValues);
+  }
+}
 
 const app = new Hono<AuthContext>();
 
@@ -244,10 +263,13 @@ const routes = app
       error: null,
     });
   })
-  // ─── GET /:id/invoice — generate PDF, upload to R2 #2, redirect to CDN URL ──
+  // ─── GET /:id/invoice — check DB first, generate only once, redirect to CDN ──
   .get('/:id/invoice', async (c) => {
     const user = c.get('user');
     const id = c.req.param('id');
+
+    // clientTime dikirim dari browser client dalam format ISO — untuk tanggal/waktu 24 jam Indonesia
+    const clientTime = c.req.query('clientTime') ?? '';
 
     // 1. Verify order ownership
     const [order] = await db
@@ -258,26 +280,63 @@ const routes = app
 
     if (!order) throw new HTTPException(404, { message: 'Order not found' });
 
-    // 2. Fetch order items
+    // 2. Fetch Payment Info (untuk mengecek apakah perlu regenerasi invoice yang tadinya pending)
+    const [payment] = await db
+      .select()
+      .from(payments)
+      .where(eq(payments.orderId, id))
+      .orderBy(desc(payments.createdAt))
+      .limit(1);
+
+    const isPaymentPaid = payment?.status === 'success' || payment?.status === 'paid';
+
+    // 3. Cek apakah invoice PDF sudah pernah dibuat
+    const [existingInvoice] = await db
+      .select()
+      .from(invoices)
+      .where(eq(invoices.orderId, id))
+      .limit(1);
+
+    if (existingInvoice?.pdfObjectKey) {
+      // Jika invoice lama tercatat 'unpaid' padahal webhook sudah mengupdate payment menjadi lunas
+      if (existingInvoice.status === 'unpaid' && isPaymentPaid) {
+        try {
+          await deleteInvoicePDF(existingInvoice.pdfObjectKey);
+        } catch (_e) {
+          // ignore
+        }
+        await db.delete(invoices).where(eq(invoices.id, existingInvoice.id));
+      } else {
+        const publicUrlBase = Deno.env.get('R2_PUBLIC_URL_2') || '';
+        const publicUrl = `${publicUrlBase}/${existingInvoice.pdfObjectKey}`;
+        return c.redirect(publicUrl, 302);
+      }
+    }
+
+    // 4. Fetch order items — termasuk comparePrice dan optionValues untuk nama varian
     const orderItemRows = await db
       .select({
         productNameSnapshot: orderItems.productNameSnapshot,
         variantSkuSnapshot: orderItems.variantSkuSnapshot,
         quantity: orderItems.quantity,
         priceSnapshot: orderItems.priceSnapshot,
+        comparePrice: productVariants.comparePrice,
+        optionValues: productVariants.optionValues,
       })
       .from(orderItems)
+      .leftJoin(productVariants, eq(orderItems.variantId, productVariants.id))
       .where(eq(orderItems.orderId, id));
 
-    // 3. Fetch shipping address
+    // 5. Fetch shipping & billing addresses
     const [addresses] = await db
       .select()
       .from(orderAddresses)
       .where(eq(orderAddresses.orderId, id))
       .limit(1);
     const shipping: any = addresses?.shippingSnapshot;
+    const billing: any = addresses?.billingSnapshot;
 
-    // 4. Fetch customer name + email
+    // 5. Fetch customer name + email
     const [customer] = await db
       .select({ name: userProfiles.fullName, email: users.emailDisplay })
       .from(users)
@@ -288,41 +347,150 @@ const routes = app
     const customerName = customer?.name ?? 'Pelanggan';
     const customerEmail = customer?.email ?? user.id;
 
-    // 5. Build unique object key:
-    //    invoicebill/<safeName>_<safeEmail>/<orderNum>-<uuid8>.pdf
-    const safeName = customerName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-')
-      .substring(0, 30);
-    const safeEmail = customerEmail.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-')
-      .substring(0, 40);
+    // 6. Bangun object key unik privasi: invoicebill/<orderNum>/<uuid>.pdf
     const safeOrder = order.orderNumber.replace(/[^a-zA-Z0-9-]/g, '-');
-    const uniqueSuffix = crypto.randomUUID().substring(0, 8);
-    const objectKey = `invoicebill/${safeName}_${safeEmail}/${safeOrder}-${uniqueSuffix}.pdf`;
+    const objectKey = `invoicebill/${safeOrder}/${crypto.randomUUID()}.pdf`;
 
-    // 6. Generate PDF
+    // 7. Format clientTime ke waktu Indonesia 24 jam jika ada
+    let clientOrderTime: string | undefined;
+    if (clientTime) {
+      try {
+        const dt = new Date(clientTime);
+        clientOrderTime = dt.toLocaleString('id-ID', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+          timeZone: 'Asia/Jakarta',
+        });
+      } catch {
+        clientOrderTime = undefined;
+      }
+    }
+
+    // 8. Generate PDF
+    const invoiceNumber = `INV-${order.orderNumber}`;
     const pdfBytes = await generateInvoicePDF({
+      invoiceNumber,
+      orderId: order.id,
       orderNumber: order.orderNumber,
       createdAt: order.createdAt,
+      clientOrderTime,
       customerName,
       customerEmail,
+      orderStatus: order.status,
+      paymentInfo: payment
+        ? {
+          method: payment.provider,
+          status: (payment.status === 'success' ? 'paid' : payment.status) as any,
+          date: payment.createdAt,
+          reference: payment.providerTransactionId ?? undefined,
+          amountPaid: (payment.status === 'success' || payment.status === 'paid')
+            ? payment.amount
+            : 0,
+        }
+        : undefined,
       items: orderItemRows.map((it) => ({
         productName: it.productNameSnapshot,
-        variantSku: it.variantSkuSnapshot,
-        quantity: it.quantity,
+        variantName: parseVariantName(it.optionValues),
+        comparePrice: (it.comparePrice && it.comparePrice > it.priceSnapshot) ? it.comparePrice : 0,
         price: it.priceSnapshot,
+        quantity: it.quantity,
       })),
       subtotal: order.subtotalAmount,
       shipping: order.shippingAmount,
       tax: order.taxAmount,
+      serviceFee: order.serviceFeeAmount ?? 0,
       discount: order.discountAmount,
       total: order.totalAmount,
-      shippingAddress: shipping ?? undefined,
+      shippingAddress: shipping
+        ? {
+          recipientName: shipping.recipientName ?? shipping.fullName ?? '-',
+          phone: shipping.phone ?? shipping.phoneNumber ?? '-',
+          addressLine1: shipping.addressLine1 ?? shipping.streetAddress ?? '-',
+          addressLine2: shipping.addressLine2,
+          district: shipping.district,
+          city: shipping.city ?? '-',
+          province: shipping.province ?? '-',
+          postalCode: shipping.postalCode ?? '-',
+          notes: shipping.notes ?? shipping.note ?? undefined,
+        }
+        : undefined,
+      billingAddress: billing
+        ? {
+          recipientName: billing.recipientName ?? billing.fullName ?? '-',
+          phone: billing.phone ?? billing.phoneNumber ?? '-',
+          addressLine1: billing.addressLine1 ?? billing.streetAddress ?? '-',
+          addressLine2: billing.addressLine2,
+          district: billing.district,
+          city: billing.city ?? '-',
+          province: billing.province ?? '-',
+          postalCode: billing.postalCode ?? '-',
+        }
+        : undefined,
+      notes: shipping?.notes ?? shipping?.note ?? undefined,
     });
 
-    // 7. Upload to R2 invoice bucket and get public CDN URL
-    const publicUrl = await uploadInvoicePDF(pdfBytes, objectKey);
+    // 9. Upload ke R2 invoice bucket (private)
+    await uploadInvoicePDF(pdfBytes, objectKey);
+    const publicUrlBase = Deno.env.get('R2_PUBLIC_URL_2') || '';
+    const publicUrl = `${publicUrlBase}/${objectKey}`;
 
-    // 8. Redirect browser directly to the CDN PDF URL (opens in new tab)
+    // 10. Simpan record ke tabel invoices (untuk idempoten: generate sekali)
+    try {
+      await db.insert(invoices).values({
+        invoiceNumber,
+        orderId: order.id,
+        pdfObjectKey: objectKey,
+        status: payment?.status === 'paid' ? 'paid' : 'unpaid',
+      });
+    } catch {
+      // Abaikan jika sudah ada
+    }
+
+    // 11. Redirect ke CDN PDF URL
     return c.redirect(publicUrl, 302);
+  })
+  // ─── DELETE /:id/invoice — hapus PDF dari R2 dan record dari DB ──────────────
+  .delete('/:id/invoice', async (c) => {
+    const user = c.get('user');
+    const id = c.req.param('id');
+
+    // Verifikasi ownership order
+    const [order] = await db
+      .select()
+      .from(orders)
+      .where(and(eq(orders.id, id), eq(orders.userId, user.id)))
+      .limit(1);
+
+    if (!order) throw new HTTPException(404, { message: 'Order not found' });
+
+    // Cari invoice record
+    const [existingInvoice] = await db
+      .select()
+      .from(invoices)
+      .where(eq(invoices.orderId, id))
+      .limit(1);
+
+    if (existingInvoice?.pdfObjectKey) {
+      // Hapus file dari R2 (best-effort — tidak throw jika gagal)
+      try {
+        await deleteInvoicePDF(existingInvoice.pdfObjectKey);
+      } catch (_e) {
+        // File mungkin sudah tidak ada di R2 — lanjutkan
+      }
+
+      // Hapus record dari DB
+      await db.delete(invoices).where(eq(invoices.orderId, id));
+    }
+
+    return c.json({
+      data: { success: true, deleted: !!existingInvoice },
+      meta: { request_id: c.get('requestId') },
+      error: null,
+    });
   })
   .get('/:id/invoice-data', async (c) => {
     const user = c.get('user');

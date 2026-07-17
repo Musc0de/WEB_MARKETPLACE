@@ -112,14 +112,18 @@ app.get('/stream', (c) => {
       }
     }, 15000);
 
-    c.req.raw.signal.addEventListener('abort', () => {
+    stream.onAbort(() => {
       clearInterval(heartbeatInterval);
       subscriber.disconnect();
     });
 
     // Keep the stream alive until abort
-    while (!c.req.raw.signal.aborted) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+    while (true) {
+      try {
+        await stream.sleep(1000);
+      } catch {
+        break; // stream is aborted
+      }
     }
   });
 });

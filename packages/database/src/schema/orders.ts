@@ -15,6 +15,7 @@ export const orders = pgTable('sss_orders', {
   discountAmount: bigint('discount_amount', { mode: 'number' }).notNull().default(0),
   shippingAmount: bigint('shipping_amount', { mode: 'number' }).notNull().default(0),
   taxAmount: bigint('tax_amount', { mode: 'number' }).notNull().default(0),
+  serviceFeeAmount: bigint('service_fee_amount', { mode: 'number' }).notNull().default(0),
   status: text('status').notNull().default('pending'), // 'pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),

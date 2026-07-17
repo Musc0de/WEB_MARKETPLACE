@@ -6,7 +6,7 @@ import { resolve } from 'node:path';
 export default defineConfig(({ mode }) => {
   // Load env vars from the monorepo root (../../) so VITE_API_URL is available
   const env = loadEnv(mode, resolve(__dirname, '../../'), '');
-  const apiTarget = env.VITE_API_URL || 'http://localhost:8000';
+  const apiTarget = env.VITE_API_URL || '';
 
   return {
     envDir: '../../',

@@ -105,6 +105,7 @@ export const OrderDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [isBuyingAgain, setIsBuyingAgain] = useState(false);
+  const [isGeneratingInvoice, setIsGeneratingInvoice] = useState(false);
 
   const { data, error, isLoading } = useSWR(
     id ? ['/api/orders', id] : null,
@@ -130,6 +131,35 @@ export const OrderDetailPage = () => {
       toast.error('Terjadi kesalahan jaringan.');
     } finally {
       setIsBuyingAgain(false);
+    }
+  };
+
+  /**
+   * Flow invoice:
+   * 1. Hapus invoice lama (DELETE) agar bisa generate ulang
+   * 2. Generate baru (GET) dengan clientTime dari browser untuk format waktu Indonesia 24 jam
+   * 3. Buka PDF di tab baru
+   */
+  const handleInvoice = async () => {
+    if (!id || isGeneratingInvoice) return;
+    setIsGeneratingInvoice(true);
+    try {
+      // Step 1: Hapus invoice lama (Gunakan RPC Client agar auth cookie/token ikut terkirim)
+      await client.v1.orders[':id'].invoice.$delete({ param: { id } });
+
+      // Step 2: clientTime dari browser — format ISO dengan timezone offset lokal
+      // API akan konversi ke format Indonesia 24 jam (WIB/WITA/WIT auto)
+      const clientTime = new Date().toISOString();
+
+      // Step 3: Generate baru + redirect ke PDF
+      const invoiceUrl = `/api/v1/orders/${id}/invoice?clientTime=${
+        encodeURIComponent(clientTime)
+      }`;
+      globalThis.open(invoiceUrl, '_blank');
+    } catch {
+      toast.error('Gagal membuat invoice. Coba lagi.');
+    } finally {
+      setIsGeneratingInvoice(false);
     }
   };
 
@@ -219,11 +249,14 @@ export const OrderDetailPage = () => {
         <div className='flex items-center gap-2 pl-11 sm:pl-0 shrink-0'>
           <button
             type='button'
-            onClick={() => globalThis.open(`/api/v1/orders/${order.id}/invoice`, '_blank')}
-            className='inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-full border-2 border-gray-200 text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 active:scale-95 transition'
+            onClick={handleInvoice}
+            disabled={isGeneratingInvoice}
+            className='inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-full border-2 border-gray-200 text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 active:scale-95 transition disabled:opacity-60'
           >
-            <Download className='w-3.5 h-3.5' />
-            Invoice
+            {isGeneratingInvoice
+              ? <RefreshCcw className='w-3.5 h-3.5 animate-spin' />
+              : <Download className='w-3.5 h-3.5' />}
+            {isGeneratingInvoice ? 'Membuat...' : 'Invoice'}
           </button>
           <button
             type='button'
