@@ -52,7 +52,6 @@ import { AddressesPage } from './features/addresses/AddressesPage.tsx';
 import { PaymentMethodsPage } from './features/payment-methods/PaymentMethodsPage.tsx';
 import { OrderDetailPage, OrdersPage } from './features/orders/index.ts';
 import { HistoryPage } from './features/history/HistoryPage.tsx';
-import { InvoicesPage } from './features/invoices/InvoicesPage.tsx';
 import { DownloadsPage } from './features/downloads/DownloadsPage.tsx';
 import { NotificationsPage } from './features/notifications/NotificationsPage.tsx';
 import { WishlistPage } from './features/wishlist/WishlistPage.tsx';
@@ -81,7 +80,6 @@ export default function App() {
             <Route path='/orders' element={<OrdersPage />} />
             <Route path='/orders/:id' element={<OrderDetailPage />} />
             <Route path='/history' element={<HistoryPage />} />
-            <Route path='/invoices' element={<InvoicesPage />} />
             <Route path='/downloads' element={<DownloadsPage />} />
             <Route path='/profile' element={<ProfilePage />} />
             <Route path='/security' element={<SecurityPage />} />

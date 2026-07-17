@@ -3,7 +3,6 @@ import {
   Bell,
   CreditCard,
   Download,
-  FileText,
   Heart,
   HelpCircle,
   History,
@@ -33,7 +32,6 @@ const NAV_SECTIONS = [
     items: [
       { label: 'Pesanan Saya', href: '/orders', icon: Package },
       { label: 'Riwayat Pembelian', href: '/history', icon: History },
-      { label: 'Invoice', href: '/invoices', icon: FileText },
       { label: 'Download Digital', href: '/downloads', icon: Download },
       { label: 'Pengembalian', href: '/returns', icon: RefreshCcw },
       { label: 'Ulasan', href: '/reviews', icon: Star },

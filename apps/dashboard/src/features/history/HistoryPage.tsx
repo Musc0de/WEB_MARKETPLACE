@@ -170,6 +170,7 @@ export const HistoryPage = () => {
               onChange={(e) => updateFilter('status', e.target.value)}
             >
               <option value=''>Semua Status</option>
+              <option value='pending'>Menunggu Pembayaran</option>
               <option value='delivered'>Selesai</option>
               <option value='refunded'>Refund & Retur</option>
               <option value='cancelled'>Dibatalkan</option>
@@ -238,20 +239,38 @@ export const HistoryPage = () => {
                       <ShoppingBag className='w-5 h-5 md:w-6 md:h-6 text-blue-600' />
                     </div>
                     <div className='flex flex-col gap-1.5'>
-                      <div className='flex flex-col sm:flex-row sm:items-center gap-2 md:gap-3'>
-                        <span className='font-bold text-gray-900 text-base md:text-lg group-hover:text-blue-600 transition-colors'>
-                          {item.orderNumber}
-                        </span>
+                      <div className='flex flex-col sm:flex-row sm:items-start gap-2 md:gap-3'>
+                        <div className='flex flex-col'>
+                          <span className='font-bold text-gray-900 text-base md:text-lg group-hover:text-blue-600 transition-colors line-clamp-1'>
+                            {item.items?.[0]?.productNameSnapshot || item.orderNumber}
+                            {(item.items?.length ?? 0) > 1 && (
+                              <span className='text-sm font-normal text-gray-500 ml-1.5'>
+                                +{(item.items?.length ?? 0) - 1} lainnya
+                              </span>
+                            )}
+                          </span>
+                          {item.items?.[0]?.variantSkuSnapshot &&
+                            !item.items[0].variantSkuSnapshot.startsWith('SKU-') &&
+                            item.items[0].variantSkuSnapshot !== 'Default Title' && (
+                            <span className='text-xs text-gray-500 font-mono mt-0.5'>
+                              {item.items[0].variantSkuSnapshot}
+                            </span>
+                          )}
+                        </div>
                         <Badge
                           variant='outline'
-                          className={`w-fit px-2.5 py-0.5 rounded-full border ${
+                          className={`w-fit px-2.5 py-0.5 rounded-full border mt-1 sm:mt-0 ${
                             getStatusColor(item.status)
                           }`}
                         >
                           {getStatusLabel(item.status)}
                         </Badge>
                       </div>
-                      <div className='flex items-center gap-1.5 text-xs md:text-sm text-gray-500 mt-0.5'>
+                      <div className='flex items-center gap-2 text-xs md:text-sm text-gray-500 mt-0.5'>
+                        <span className='font-mono bg-gray-100/80 px-1.5 py-0.5 rounded border border-gray-200/50'>
+                          {item.orderNumber}
+                        </span>
+                        <span className='text-gray-300'>•</span>
                         <Calendar className='w-3.5 h-3.5 md:w-4 md:h-4' />
                         <span>
                           {new Date(item.createdAt).toLocaleString('id-ID', {

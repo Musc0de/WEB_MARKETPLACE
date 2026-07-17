@@ -58,26 +58,32 @@ export interface InvoiceData {
   serviceFee: number;
   discount: number;
   total: number;
-  shippingAddress?: {
-    recipientName: string;
-    phone: string;
-    addressLine1: string;
-    addressLine2?: string | undefined;
-    district?: string | undefined;
-    city: string;
-    province: string;
-    postalCode: string;
-    notes?: string | undefined;
-  } | undefined;
   billingAddress?: {
-    recipientName: string;
-    phone: string;
-    addressLine1: string;
-    addressLine2?: string | undefined;
-    district?: string | undefined;
+    recipientName?: string;
+    fullName?: string;
+    phone?: string;
+    phoneNumber?: string;
+    addressLine1?: string;
+    streetAddress?: string;
+    addressLine2?: string;
+    district?: string;
     city: string;
     province: string;
     postalCode: string;
+  } | undefined;
+  shippingAddress?: {
+    recipientName?: string;
+    fullName?: string;
+    phone?: string;
+    phoneNumber?: string;
+    addressLine1?: string;
+    streetAddress?: string;
+    addressLine2?: string;
+    district?: string;
+    city: string;
+    province: string;
+    postalCode: string;
+    notes?: string;
   } | undefined;
   notes?: string | undefined;
 }
@@ -256,21 +262,23 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Uint8Array>
   // Billing Address
   const ba = data.billingAddress || data.shippingAddress;
   if (ba) {
-    page.drawText(ba.recipientName ?? data.customerName ?? '-', {
+    page.drawText(ba.fullName ?? ba.recipientName ?? data.customerName ?? '-', {
       x: col1,
       y,
       size: 9,
       font: fontBold,
       color: DARK,
     });
-    page.drawText(`HP: ${ba.phone ?? '-'}`, {
+    page.drawText(`HP: ${ba.phoneNumber ?? ba.phone ?? '-'}`, {
       x: col1,
       y: y - 14,
       size: 8,
       font: fontReg,
       color: GRAY,
     });
-    const bAddr = `${ba.addressLine1 ?? ''}${ba.addressLine2 ? ', ' + ba.addressLine2 : ''}`;
+    const bAddr = `${ba.streetAddress ?? ba.addressLine1 ?? ''}${
+      ba.addressLine2 ? ', ' + ba.addressLine2 : ''
+    }`;
     const bAddrRows = bAddr.match(/.{1,35}(\s|$)/g) || [bAddr];
     let by = y - 28;
     bAddrRows.forEach((r) => {
@@ -296,21 +304,23 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Uint8Array>
   const sa = data.shippingAddress;
   const shipY = y;
   if (sa) {
-    page.drawText(sa.recipientName ?? '-', {
+    page.drawText(sa.fullName ?? sa.recipientName ?? data.customerName ?? '-', {
       x: col2,
       y: shipY,
       size: 9,
       font: fontBold,
       color: DARK,
     });
-    page.drawText(`HP: ${sa.phone ?? '-'}`, {
+    page.drawText(`HP: ${sa.phoneNumber ?? sa.phone ?? '-'}`, {
       x: col2,
       y: shipY - 14,
       size: 8,
       font: fontReg,
       color: GRAY,
     });
-    const sAddr = `${sa.addressLine1 ?? ''}${sa.addressLine2 ? ', ' + sa.addressLine2 : ''}`;
+    const sAddr = `${sa.streetAddress ?? sa.addressLine1 ?? ''}${
+      sa.addressLine2 ? ', ' + sa.addressLine2 : ''
+    }`;
     const sAddrRows = sAddr.match(/.{1,35}(\s|$)/g) || [sAddr];
     let sy = shipY - 28;
     sAddrRows.forEach((r) => {

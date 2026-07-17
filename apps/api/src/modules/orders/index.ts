@@ -578,7 +578,7 @@ const routes = app
       orderStatus: order.status,
       paymentInfo: payment
         ? {
-          method: payment.provider,
+          method: payment.paymentType || 'Belum dipilih',
           status: (payment.status === 'success' ? 'paid' : payment.status) as any,
           date: payment.createdAt,
           reference: payment.providerTransactionId ?? undefined,
@@ -586,7 +586,12 @@ const routes = app
             ? payment.amount
             : 0,
         }
-        : undefined,
+        : {
+          method: 'Belum dipilih',
+          status: 'pending',
+          date: order.createdAt,
+          amountPaid: 0,
+        },
       items: orderItemRows.map((it) => ({
         productName: it.productNameSnapshot,
         variantName: parseVariantName(it.optionValues),
