@@ -54,6 +54,7 @@ const routes = router.post(
         code: voucher.code,
         discountType: voucher.discountType,
         discountAmount: Number(voucher.discountAmount),
+        description: voucher.description,
       },
       meta: { request_id: c.get('requestId') },
       error: null,

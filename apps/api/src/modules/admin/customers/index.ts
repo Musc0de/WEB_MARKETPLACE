@@ -1,8 +1,28 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
-import { db, orders, userProfiles, users } from '@starsuperscare/database';
+import {
+  cancellationRequests,
+  db,
+  inventoryReservations,
+  invoices,
+  orders,
+  payments,
+  refunds,
+  returnEvents,
+  returns,
+  reviews,
+  roles,
+  shipments,
+  supportMessages,
+  supportTickets,
+  systemAuditLogs,
+  userProfiles,
+  userRoles,
+  users,
+  voucherRedemptions,
+} from '@starsuperscare/database';
 import { authMiddleware, requirePermission } from '../../../middleware/auth.ts';
-import { desc, eq, sql } from 'drizzle-orm';
+import { desc, eq, inArray, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
 const adminCustomersRouter = new Hono();
@@ -39,9 +59,13 @@ adminCustomersRouter.get(
       lastName: sql<string | null>`NULL`,
       status: users.status,
       createdAt: users.createdAt,
+      roleName: roles.name,
+      roleId: roles.id,
     })
       .from(users)
       .leftJoin(userProfiles, eq(users.id, userProfiles.userId))
+      .leftJoin(userRoles, eq(users.id, userRoles.userId))
+      .leftJoin(roles, eq(userRoles.roleId, roles.id))
       .where(whereClause)
       .limit(l)
       .offset(offset)
@@ -73,6 +97,111 @@ adminCustomersRouter.get(
       limit: l,
       statusCounts,
     });
+  },
+);
+
+adminCustomersRouter.get('/roles', async (c) => {
+  const allRoles = await db.select().from(roles).orderBy(roles.name);
+  // Filter out permissions that were mistakenly added as roles (they usually contain dots like order.read)
+  const filteredRoles = allRoles.filter((r) => !r.slug.includes('.') && !r.name.includes('.'));
+  return c.json({ data: filteredRoles });
+});
+
+adminCustomersRouter.post(
+  '/bulk-delete',
+  zValidator(
+    'json',
+    z.object({
+      ids: z.array(z.string().uuid()),
+    }),
+  ),
+  async (c) => {
+    const { ids } = c.req.valid('json');
+    if (ids.length > 0) {
+      await db.transaction(async (tx) => {
+        // 1. Reviews
+        await tx.delete(reviews).where(inArray(reviews.userId, ids));
+
+        // 2. Cancellation Requests
+        await tx.delete(cancellationRequests).where(inArray(cancellationRequests.userId, ids));
+
+        // 3. Voucher Redemptions
+        await tx.delete(voucherRedemptions).where(inArray(voucherRedemptions.userId, ids));
+
+        // 4. Aftercare (Tickets and Messages)
+        await tx.delete(supportMessages).where(inArray(supportMessages.senderId, ids));
+        await tx.delete(supportTickets).where(inArray(supportTickets.userId, ids));
+        await tx.delete(returnEvents).where(inArray(returnEvents.actorId, ids));
+
+        // 5. Returns and Refunds
+        const userReturns = await tx.select({ id: returns.id }).from(returns).where(
+          inArray(returns.userId, ids),
+        );
+        if (userReturns.length > 0) {
+          const returnIds = userReturns.map((r: any) => r.id);
+          await tx.delete(refunds).where(inArray(refunds.returnId, returnIds));
+        }
+        await tx.delete(returns).where(inArray(returns.userId, ids));
+        await tx.update(returns).set({ assignedAdminId: null }).where(
+          inArray(returns.assignedAdminId, ids),
+        );
+
+        // 6. Inventory Reservations
+        await tx.delete(inventoryReservations).where(inArray(inventoryReservations.userId, ids));
+
+        // 7. Audit Logs & Stock Movements (Set to null to preserve history)
+        await tx.update(systemAuditLogs).set({ actorId: null }).where(
+          inArray(systemAuditLogs.actorId, ids),
+        );
+
+        // 8. Orders and Payments
+        const userOrders = await tx.select({ id: orders.id }).from(orders).where(
+          inArray(orders.userId, ids),
+        );
+        if (userOrders.length > 0) {
+          const orderIds = userOrders.map((o: any) => o.id);
+          await tx.delete(refunds).where(inArray(refunds.orderId, orderIds));
+          await tx.delete(invoices).where(inArray(invoices.orderId, orderIds));
+          await tx.delete(shipments).where(inArray(shipments.orderId, orderIds));
+          await tx.delete(payments).where(inArray(payments.orderId, orderIds));
+          await tx.delete(orders).where(inArray(orders.id, orderIds));
+        }
+
+        // Finally, delete users
+        await tx.delete(users).where(inArray(users.id, ids));
+      });
+    }
+    return c.json({ success: true, count: ids.length });
+  },
+);
+
+adminCustomersRouter.patch(
+  '/:id',
+  zValidator(
+    'json',
+    z.object({
+      status: z.string().optional(),
+      roleId: z.string().uuid().nullable().optional(),
+    }),
+  ),
+  async (c) => {
+    const id = c.req.param('id');
+    const { status, roleId } = c.req.valid('json');
+
+    if (status) {
+      await db.update(users).set({ status, updatedAt: new Date().toISOString() }).where(
+        eq(users.id, id),
+      );
+    }
+
+    if (roleId !== undefined) {
+      await db.delete(userRoles).where(eq(userRoles.userId, id));
+      if (roleId) {
+        await db.insert(userRoles).values({ userId: id, roleId });
+      }
+    }
+
+    return c.json({ success: true });
   },
 );
 

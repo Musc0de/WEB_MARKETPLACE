@@ -98,6 +98,8 @@ const vouchers = pgTable('sss_vouchers', {
   validFrom: timestamp('valid_from', { withTimezone: true, mode: 'string' }),
   validTo: timestamp('valid_to', { withTimezone: true, mode: 'string' }),
   isActive: integer('is_active').notNull().default(1),
+  status: text('status').notNull().default('active'), // 'active', 'inactive', 'expired'
+  description: text('description'),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });
 export { vouchers };

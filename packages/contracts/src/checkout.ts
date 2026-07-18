@@ -68,6 +68,10 @@ export const CheckoutValidateResponseSchema = z.object({
       primaryImage: z.string().optional().nullable(),
     }),
   ),
+  appliedVoucher: z.object({
+    code: z.string(),
+    description: z.string().optional().nullable(),
+  }).optional().nullable(),
   isValid: z.boolean(),
   errors: z.array(z.string()).optional(),
 });

@@ -15,6 +15,8 @@ import {
   productImages,
   products,
   productVariants,
+  voucherRedemptions,
+  vouchers,
 } from '@starsuperscare/database';
 import { and, eq, sql } from 'drizzle-orm';
 import { storageAdapter } from '../../adapters/storage.ts';
@@ -68,6 +70,7 @@ checkoutRouter.post(
 
 checkoutRouter.post('/validate', zValidator('json', CheckoutValidateRequestSchema), async (c) => {
   const req = c.req.valid('json');
+  const session = c.get('session');
   const { cartId } = await resolveActiveCart(c, false);
 
   if (!cartId) {
@@ -138,15 +141,47 @@ checkoutRouter.post('/validate', zValidator('json', CheckoutValidateRequestSchem
   }
 
   // Handle Voucher
+  let appliedVoucherInfo = null;
   if (req.voucherCode) {
-    // Basic mock logic for vouchers (can integrate with actual voucher schema later)
-    if (req.voucherCode === 'STAR10') {
-      totalDiscount = Math.floor(subtotal * 0.1);
-    } else if (req.voucherCode === 'HEMAT50') {
-      totalDiscount = 50000;
-    } else {
+    if (!session?.userId) {
       isValid = false;
-      errors.push('Voucher tidak valid');
+      errors.push('Silakan login untuk menggunakan voucher');
+    } else {
+      const voucherList = await db.select().from(vouchers).where(eq(vouchers.code, req.voucherCode))
+        .limit(1);
+      if (voucherList.length === 0) {
+        isValid = false;
+        errors.push('Voucher tidak valid');
+      } else {
+        const voucher = voucherList[0];
+        const now = new Date();
+        if (voucher.isActive !== 1 || voucher.status !== 'active') {
+          isValid = false;
+          errors.push('Voucher tidak aktif');
+        } else if (voucher.validFrom && new Date(voucher.validFrom) > now) {
+          isValid = false;
+          errors.push('Voucher belum berlaku');
+        } else if (voucher.validTo && new Date(voucher.validTo) < now) {
+          isValid = false;
+          errors.push('Voucher sudah kadaluarsa');
+        } else if (voucher.maxUses !== null && voucher.currentUses >= voucher.maxUses) {
+          isValid = false;
+          errors.push('Voucher sudah mencapai batas maksimal penggunaan');
+        } else {
+          // Calculate discount
+          if (voucher.discountType === 'percentage') {
+            totalDiscount = Math.floor((subtotal * voucher.discountAmount) / 100);
+          } else {
+            totalDiscount = voucher.discountAmount;
+          }
+          // Cap discount at subtotal
+          if (totalDiscount > subtotal) totalDiscount = subtotal;
+          appliedVoucherInfo = {
+            code: voucher.code,
+            description: voucher.description,
+          };
+        }
+      }
     }
   }
 
@@ -175,6 +210,7 @@ checkoutRouter.post('/validate', zValidator('json', CheckoutValidateRequestSchem
         grandTotal,
       },
       items: snapshotItems,
+      appliedVoucher: appliedVoucherInfo,
       isValid,
       errors,
     },
@@ -253,8 +289,40 @@ checkoutRouter.post('/orders', zValidator('json', CreateOrderRequestSchema), asy
   }
 
   let totalDiscount = 0;
-  if (req.voucherCode === 'STAR10') totalDiscount = Math.floor(subtotal * 0.1);
-  else if (req.voucherCode === 'HEMAT50') totalDiscount = 50000;
+  let appliedVoucherId = null;
+  if (req.voucherCode) {
+    if (!session?.userId) {
+      return c.json({
+        error: { code: 'UNAUTHORIZED', message: 'Silakan login untuk menggunakan voucher' },
+      }, 401);
+    }
+    const voucherList = await db.select().from(vouchers).where(eq(vouchers.code, req.voucherCode))
+      .limit(1);
+    if (voucherList.length === 0) {
+      return c.json({ error: { code: 'BAD_REQUEST', message: 'Voucher tidak valid' } }, 400);
+    }
+    const voucher = voucherList[0];
+    const now = new Date();
+    if (voucher.isActive !== 1 || voucher.status !== 'active') {
+      return c.json({ error: { code: 'BAD_REQUEST', message: 'Voucher tidak aktif' } }, 400);
+    } else if (voucher.validFrom && new Date(voucher.validFrom) > now) {
+      return c.json({ error: { code: 'BAD_REQUEST', message: 'Voucher belum berlaku' } }, 400);
+    } else if (voucher.validTo && new Date(voucher.validTo) < now) {
+      return c.json({ error: { code: 'BAD_REQUEST', message: 'Voucher sudah kadaluarsa' } }, 400);
+    } else if (voucher.maxUses !== null && voucher.currentUses >= voucher.maxUses) {
+      return c.json({
+        error: { code: 'BAD_REQUEST', message: 'Voucher sudah mencapai batas penggunaan' },
+      }, 400);
+    } else {
+      if (voucher.discountType === 'percentage') {
+        totalDiscount = Math.floor((subtotal * voucher.discountAmount) / 100);
+      } else {
+        totalDiscount = voucher.discountAmount;
+      }
+      if (totalDiscount > subtotal) totalDiscount = subtotal;
+      appliedVoucherId = voucher.id;
+    }
+  }
 
   let shippingCost = 0;
   const requiresShipping = items.some((i) => i.productType === 'physical');
@@ -371,6 +439,19 @@ checkoutRouter.post('/orders', zValidator('json', CreateOrderRequestSchema), asy
       // 5. Delete active items from cart
       await tx.delete(cartItems)
         .where(and(eq(cartItems.cartId, cartId), eq(cartItems.saveForLater, 0)));
+
+      // 6. Record Voucher Redemption
+      if (appliedVoucherId && session?.userId) {
+        await tx.insert(voucherRedemptions).values({
+          voucherId: appliedVoucherId,
+          userId: session.userId,
+          orderId: newOrder.id,
+          discountApplied: totalDiscount,
+        });
+        await tx.update(vouchers)
+          .set({ currentUses: sql`${vouchers.currentUses} + 1` })
+          .where(eq(vouchers.id, appliedVoucherId));
+      }
 
       return newOrder;
     });

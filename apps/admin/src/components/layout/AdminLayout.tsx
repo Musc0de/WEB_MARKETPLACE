@@ -13,6 +13,7 @@ import {
   ShoppingCart,
   Tag,
   Tags,
+  Ticket,
   Undo2,
   Users,
   Warehouse,
@@ -31,11 +32,20 @@ const navItems = [
   { name: 'Inventory', href: '/inventory', icon: Warehouse },
   { name: 'Returns', href: '/returns', icon: Undo2 },
   { name: 'Refunds', href: '/refunds', icon: Banknote },
+  { name: 'Vouchers', href: '/vouchers', icon: Ticket },
   { name: 'Payments', href: '/payments', icon: CreditCard },
   { name: 'Invoices', href: '/invoices', icon: FileText },
   { name: 'Support', href: '/support', icon: LifeBuoy },
   { name: 'Laporan', href: '/reports', icon: BarChart3 },
-  { name: 'Settings', href: '/settings', icon: Globe },
+  {
+    name: 'Settings',
+    href: '/settings',
+    icon: Globe,
+    children: [
+      { name: 'General & SEO', href: '/settings/general' },
+      { name: 'Payment Gateways', href: '/settings/payment-gateways' },
+    ],
+  },
 ];
 
 export function AdminLayout() {
@@ -92,20 +102,47 @@ export function AdminLayout() {
             } else {
               isActive = location.pathname.startsWith(item.href);
             }
+            const isGroupActive = isActive;
+
             return (
-              <NavLink
-                key={item.href}
-                to={item.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                }`}
-              >
-                <item.icon size={18} className={isActive ? 'text-white' : 'text-gray-400'} />
-                {item.name}
-              </NavLink>
+              <div key={item.href} className='space-y-1'>
+                <NavLink
+                  to={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive && !item.children
+                      ? 'bg-blue-600 text-white'
+                      : isActive && item.children
+                      ? 'text-white'
+                      : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                  }`}
+                >
+                  <item.icon size={18} className={isActive ? 'text-white' : 'text-gray-400'} />
+                  {item.name}
+                </NavLink>
+
+                {item.children && isGroupActive && (
+                  <div className='pl-9 space-y-1 mt-1'>
+                    {item.children.map((child) => {
+                      const isChildActive = location.pathname === child.href;
+                      return (
+                        <NavLink
+                          key={child.href}
+                          to={child.href}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                            isChildActive
+                              ? 'bg-blue-600 text-white'
+                              : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                          }`}
+                        >
+                          {child.name}
+                        </NavLink>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             );
           })}
         </nav>

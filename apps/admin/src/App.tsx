@@ -21,6 +21,7 @@ import { CustomersList } from './features/customers/CustomersList.tsx';
 import { CustomerDetail } from './features/customers/CustomerDetail.tsx';
 import { PaymentsList } from './features/payments/PaymentsList.tsx';
 import { InvoicesList } from './features/payments/InvoicesList.tsx';
+import { VouchersList } from './features/vouchers/VouchersList.tsx';
 import { ResponsiveGooeyToaster } from '@starsuperscare/ui';
 import { SEO } from '@starsuperscare/ui';
 import { DashboardCards } from './features/overview/DashboardCards.tsx';
@@ -136,7 +137,7 @@ export default function App() {
 
                 <Route path='payments' element={<PaymentsList />} />
                 <Route path='invoices' element={<InvoicesList />} />
-
+                <Route path='vouchers' element={<VouchersList />} />
                 <Route path='reviews' element={<ReviewsList />} />
                 <Route path='audit' element={<AuditLogViewer />} />
 

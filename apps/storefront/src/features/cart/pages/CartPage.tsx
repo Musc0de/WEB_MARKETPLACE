@@ -116,7 +116,8 @@ export function CartPage() {
           <CartSummary
             summary={cart.summary}
             isEmpty={isEmpty}
-            onCheckout={() => navigate('/checkout')}
+            onCheckout={(voucherCode) =>
+              navigate('/checkout', { state: { appliedVoucherCode: voucherCode } })}
           />
         )}
       </div>

@@ -42,6 +42,7 @@ import adminReviewsRouter from './modules/admin/reviews/index.ts';
 import adminAuditRouter from './modules/admin/audit/index.ts';
 import adminReportsRouter from './modules/admin/reports/index.ts';
 import adminOverviewRouter from './modules/admin/overview/index.ts';
+import { adminVouchersRouter } from './modules/admin/vouchers/index.ts';
 import { adminSettingsRouter } from './modules/admin/settings/index.ts';
 import { settingsRouter } from './modules/settings/index.ts';
 
@@ -209,6 +210,7 @@ const v1 = new Hono<AppContext>()
       .route('/returns', adminReturnsRouter)
       .route('/refunds', adminRefundsRouter)
       .route('/support', adminSupportRouter)
+      .route('/vouchers', adminVouchersRouter)
       .route('/orders', adminOrdersRouter)
       .route('/customers', adminCustomersRouter)
       .route('/payments', adminPaymentsRouter)
