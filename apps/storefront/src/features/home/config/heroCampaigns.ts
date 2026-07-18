@@ -31,7 +31,8 @@ export const SIDE_PROMOS: StorefrontPromoCard[] = [
     ctaLabel: 'Klaim Sekarang',
     ctaHref: '/vouchers',
     iconName: 'truck',
-    backgroundColorClass: 'bg-green-50 text-green-900 border-green-200',
+    backgroundColorClass:
+      'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20',
   },
   {
     id: 'promo-2',
@@ -40,6 +41,6 @@ export const SIDE_PROMOS: StorefrontPromoCard[] = [
     ctaLabel: 'Pakai Voucher',
     ctaHref: '/vouchers',
     iconName: 'gift',
-    backgroundColorClass: 'bg-orange-50 text-orange-900 border-orange-200',
+    backgroundColorClass: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20',
   },
 ];

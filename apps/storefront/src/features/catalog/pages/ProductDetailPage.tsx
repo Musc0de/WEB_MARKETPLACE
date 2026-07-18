@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { ProductDetail } from '@starsuperscare/contracts';
-import { Button, H3, Skeleton, Text } from '@starsuperscare/ui';
+import { Button, Skeleton } from '@starsuperscare/ui';
 
 import { client } from '../../../lib/api.ts';
 import { ProductGallery } from '../components/ProductGallery.tsx';
@@ -94,10 +94,18 @@ export const ProductDetailPage = (): JSX.Element => {
 
   if (error || !product) {
     return (
-      <div className='flex flex-col items-center justify-center py-20 text-center'>
-        <H3 className='text-red-500 mb-2'>Terjadi Kesalahan</H3>
-        <Text className='text-gray-500 mb-6'>{error || 'Produk tidak ditemukan'}</Text>
-        <Button onClick={() => navigate('/products')} variant='default'>Kembali ke Katalog</Button>
+      <div className='flex flex-col items-center justify-center py-24 text-center bg-destructive/10 rounded-3xl border border-destructive/20'>
+        <h3 className='text-xl font-bold text-destructive mb-2'>Terjadi Kesalahan</h3>
+        <p className='text-muted-foreground mb-6 font-medium'>
+          {error || 'Produk tidak ditemukan'}
+        </p>
+        <Button
+          onClick={() => navigate('/products')}
+          variant='default'
+          className='rounded-full px-8 font-bold shadow-sm'
+        >
+          Kembali ke Katalog
+        </Button>
       </div>
     );
   }
@@ -122,9 +130,10 @@ export const ProductDetailPage = (): JSX.Element => {
 
       {/* Related Products */}
       <div className='mt-16'>
-        <H3 className='text-xl md:text-2xl font-bold mb-6 text-gray-900 border-l-4 border-blue-600 pl-3'>
+        <h3 className='text-xl md:text-2xl font-black mb-6 text-foreground flex items-center gap-3'>
+          <div className='w-1.5 h-6 bg-indigo-500 rounded-full' />
           Produk Serupa
-        </H3>
+        </h3>
         <RelatedProducts product={product} />
       </div>
     </div>

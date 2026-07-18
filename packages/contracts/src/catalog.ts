@@ -38,6 +38,8 @@ export interface ProductListItem {
   slug: string;
   productCode?: string | null | undefined;
   brandId?: string | null | undefined;
+  brandName?: string | null | undefined;
+  categoryName?: string | null | undefined;
   type: string;
   status: string;
   netSold: number;

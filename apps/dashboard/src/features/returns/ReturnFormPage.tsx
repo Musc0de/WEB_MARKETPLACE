@@ -52,14 +52,14 @@ export function ReturnFormPage() {
   if (!el?.eligible) {
     return (
       <div className='max-w-2xl mx-auto py-12 px-6 text-center'>
-        <h2 className='text-xl font-bold text-gray-900 mb-2'>Tidak Memenuhi Syarat</h2>
-        <p className='text-gray-500 mb-6'>
+        <h2 className='text-xl font-bold text-foreground mb-2'>Tidak Memenuhi Syarat</h2>
+        <p className='text-muted-foreground mb-6'>
           {el?.reasonMessage || 'Pesanan ini tidak dapat diproses saat ini.'}
         </p>
         <button
           type='button'
           onClick={() => navigate(`/orders/${orderId}`)}
-          className='px-6 py-2 bg-gray-100 rounded-full font-bold'
+          className='px-6 py-2 bg-muted rounded-full font-bold'
         >
           Kembali ke Pesanan
         </button>
@@ -135,18 +135,18 @@ export function ReturnFormPage() {
         <button
           type='button'
           onClick={() => navigate(-1)}
-          className='flex items-center gap-2 text-gray-500 hover:text-gray-900 font-medium'
+          className='flex items-center gap-2 text-muted-foreground hover:text-foreground font-medium'
         >
           <ArrowLeft className='w-4 h-4' /> Batal
         </button>
-        <div className='bg-white p-6 rounded-2xl border border-gray-200 shadow-sm'>
-          <h1 className='text-xl font-bold text-gray-900 mb-1'>Ajukan Pembatalan</h1>
-          <p className='text-sm text-gray-500 mb-6'>
+        <div className='bg-card p-6 rounded-2xl border border-border/60 shadow-sm'>
+          <h1 className='text-xl font-bold text-foreground mb-1'>Ajukan Pembatalan</h1>
+          <p className='text-sm text-muted-foreground mb-6'>
             Tolong beritahu kami alasan Anda membatalkan pesanan ini.
           </p>
 
           <textarea
-            className='w-full border border-gray-200 rounded-xl p-4 min-h-[120px] focus:ring-2 focus:ring-rose-500 outline-none mb-6'
+            className='w-full border border-border/60 rounded-xl p-4 min-h-[120px] focus:ring-2 focus:ring-rose-500 outline-none mb-6'
             placeholder='Alasan pembatalan...'
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -188,14 +188,14 @@ export function ReturnFormPage() {
       <button
         type='button'
         onClick={() => navigate(-1)}
-        className='flex items-center gap-2 text-gray-500 hover:text-gray-900 font-medium'
+        className='flex items-center gap-2 text-muted-foreground hover:text-foreground font-medium'
       >
         <ArrowLeft className='w-4 h-4' /> Batal
       </button>
 
-      <div className='bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden'>
+      <div className='bg-card rounded-2xl border border-border/60 shadow-sm overflow-hidden'>
         {/* Header / Stepper */}
-        <div className='bg-orange-50/50 p-6 border-b border-gray-100 flex gap-4'>
+        <div className='bg-orange-50/50 p-6 border-b border-border/40 flex gap-4'>
           {[1, 2, 3].map((s) => (
             <div
               key={s}
@@ -209,12 +209,12 @@ export function ReturnFormPage() {
                     ? 'bg-orange-500 text-white'
                     : step > s
                     ? 'bg-emerald-500 text-white'
-                    : 'bg-gray-200 text-gray-500'
+                    : 'bg-muted text-muted-foreground'
                 }`}
               >
                 {step > s ? <CheckCircle2 className='w-4 h-4' /> : s}
               </div>
-              <span className='text-xs font-semibold text-gray-600 text-center'>
+              <span className='text-xs font-semibold text-muted-foreground text-center'>
                 {s === 1 ? 'Pilih Produk' : s === 2 ? 'Detail' : 'Konfirmasi'}
               </span>
             </div>
@@ -231,7 +231,7 @@ export function ReturnFormPage() {
                   return (
                     <div
                       key={item.orderItemId}
-                      className={`p-4 flex gap-4 ${isSelected ? 'bg-orange-50' : 'bg-white'}`}
+                      className={`p-4 flex gap-4 ${isSelected ? 'bg-orange-50' : 'bg-card'}`}
                     >
                       <input
                         type='checkbox'
@@ -249,13 +249,13 @@ export function ReturnFormPage() {
                           />
                         )
                         : (
-                          <div className='w-16 h-16 rounded bg-gray-100 flex items-center justify-center'>
-                            <Package className='w-6 h-6 text-gray-300' />
+                          <div className='w-16 h-16 rounded bg-muted flex items-center justify-center'>
+                            <Package className='w-6 h-6 text-muted-foreground/50' />
                           </div>
                         )}
                       <div className='flex-1'>
                         <p className='font-semibold text-sm line-clamp-1'>{item.productName}</p>
-                        <p className='text-xs text-gray-500 mt-1'>
+                        <p className='text-xs text-muted-foreground mt-1'>
                           Maks: {item.remainingEligibleQuantity}
                         </p>
                         {isSelected && (
@@ -306,11 +306,11 @@ export function ReturnFormPage() {
                     type='button'
                     onClick={() => setResolution('refund_only')}
                     className={`p-4 border rounded-xl text-left ${
-                      resolution === 'refund_only' ? 'border-orange-500 bg-orange-50' : 'bg-white'
+                      resolution === 'refund_only' ? 'border-orange-500 bg-orange-50' : 'bg-card'
                     }`}
                   >
                     <span className='block font-bold'>Hanya Refund</span>
-                    <span className='text-xs text-gray-500'>
+                    <span className='text-xs text-muted-foreground'>
                       Barang tidak perlu dikembalikan (Syarat berlaku)
                     </span>
                   </button>
@@ -320,11 +320,11 @@ export function ReturnFormPage() {
                     className={`p-4 border rounded-xl text-left ${
                       resolution === 'return_and_refund'
                         ? 'border-orange-500 bg-orange-50'
-                        : 'bg-white'
+                        : 'bg-card'
                     }`}
                   >
                     <span className='block font-bold'>Return & Refund</span>
-                    <span className='text-xs text-gray-500'>
+                    <span className='text-xs text-muted-foreground'>
                       Kembalikan barang dan dapatkan dana
                     </span>
                   </button>
@@ -336,7 +336,7 @@ export function ReturnFormPage() {
                 <select
                   value={reasonCode}
                   onChange={(e) => setReasonCode(e.target.value)}
-                  className='w-full border rounded-xl p-3 bg-white'
+                  className='w-full border rounded-xl p-3 bg-card'
                 >
                   <option value=''>Pilih alasan...</option>
                   <option value='damaged'>Barang rusak/cacat</option>
@@ -359,7 +359,7 @@ export function ReturnFormPage() {
                 <button
                   type='button'
                   onClick={() => setStep(1)}
-                  className='flex-1 border bg-white font-bold py-3 rounded-xl'
+                  className='flex-1 border bg-card font-bold py-3 rounded-xl'
                 >
                   Kembali
                 </button>
@@ -384,13 +384,13 @@ export function ReturnFormPage() {
             <div className='space-y-6'>
               <h2 className='text-lg font-bold text-center'>Konfirmasi Pengajuan</h2>
 
-              <div className='bg-gray-50 p-6 rounded-xl border border-gray-200'>
+              <div className='bg-muted/50 p-6 rounded-xl border border-border/60'>
                 <div className='flex justify-between mb-2'>
-                  <span className='text-gray-600'>Total Item:</span>
+                  <span className='text-muted-foreground'>Total Item:</span>
                   <span className='font-bold'>{Object.keys(selectedItems).length}</span>
                 </div>
                 <div className='flex justify-between mb-2'>
-                  <span className='text-gray-600'>Solusi:</span>
+                  <span className='text-muted-foreground'>Solusi:</span>
                   <span className='font-bold'>
                     {resolution === 'refund_only'
                       ? 'Hanya Pengembalian Dana'
@@ -398,16 +398,16 @@ export function ReturnFormPage() {
                   </span>
                 </div>
                 <div className='flex justify-between mb-4 pb-4 border-b'>
-                  <span className='text-gray-600'>Alasan:</span>
+                  <span className='text-muted-foreground'>Alasan:</span>
                   <span className='font-bold capitalize'>{reasonCode.replace('_', ' ')}</span>
                 </div>
                 <div className='flex justify-between items-center text-lg'>
-                  <span className='font-bold text-gray-900'>Maks. Pengembalian Dana:</span>
+                  <span className='font-bold text-foreground'>Maks. Pengembalian Dana:</span>
                   <span className='font-bold text-orange-600'>
                     Rp {calculateMaxRefund().toLocaleString('id-ID')}
                   </span>
                 </div>
-                <p className='text-xs text-gray-400 mt-2 text-right'>
+                <p className='text-xs text-muted-foreground/80 mt-2 text-right'>
                   * Nilai pasti ditentukan oleh admin setelah ditinjau
                 </p>
               </div>
@@ -416,7 +416,7 @@ export function ReturnFormPage() {
                 <button
                   type='button'
                   onClick={() => setStep(2)}
-                  className='flex-1 border bg-white font-bold py-3 rounded-xl'
+                  className='flex-1 border bg-card font-bold py-3 rounded-xl'
                 >
                   Kembali
                 </button>

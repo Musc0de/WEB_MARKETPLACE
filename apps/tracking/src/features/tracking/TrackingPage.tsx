@@ -130,46 +130,48 @@ export function TrackingPage() {
 
   if (error || results.length === 0) {
     return (
-      <div className='max-w-3xl mx-auto px-4 py-12'>
+      <div className='max-w-3xl mx-auto px-4 py-12 animate-in fade-in duration-500'>
         <button
           type='button'
           onClick={() => navigate(-1)}
-          className='flex items-center text-blue-600 hover:text-blue-800 mb-6 font-medium transition-colors'
+          className='flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 mb-6 font-bold transition-colors'
         >
           <ChevronLeft size={20} className='mr-1' /> Kembali
         </button>
-        <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center'>
-          <div className='w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4'>
-            <PackageX size={32} />
+        <div className='bg-card rounded-3xl shadow-sm border border-border/60 p-8 text-center'>
+          <div className='w-20 h-20 bg-destructive/10 text-destructive rounded-full flex items-center justify-center mx-auto mb-6'>
+            <PackageX size={40} />
           </div>
-          <h2 className='text-xl font-bold text-gray-900 mb-2'>
+          <h2 className='text-2xl font-black text-foreground mb-3 tracking-tight'>
             {error || 'Paket tidak ditemukan'}
           </h2>
-          <p className='text-gray-500'>Silakan periksa kembali Nomor Resi atau Tautan Anda.</p>
+          <p className='text-muted-foreground font-medium'>
+            Silakan periksa kembali Nomor Resi atau Tautan Anda.
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className='max-w-3xl mx-auto px-4 py-8 md:py-12 space-y-6'>
+    <div className='max-w-3xl mx-auto px-4 py-8 md:py-12 space-y-8 animate-in fade-in duration-500'>
       <div className='flex items-center gap-4 pb-2'>
         <button
           type='button'
           onClick={() => navigate(-1)}
-          className='flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors border border-blue-100 bg-blue-50/50 hover:bg-blue-100 px-3 py-1.5 rounded-md'
+          className='flex items-center text-indigo-600 dark:text-indigo-400 font-bold transition-colors border border-indigo-500/20 bg-indigo-500/10 hover:bg-indigo-500/20 px-4 py-2 rounded-xl active:scale-95'
         >
           <ChevronLeft size={18} className='mr-1' /> Kembali
         </button>
       </div>
 
-      <div className='flex items-center gap-4 border-b border-gray-200 pb-6'>
-        <div className='p-3 bg-blue-100 text-blue-600 rounded-lg'>
-          <Truck size={24} />
+      <div className='flex items-center gap-5 border-b border-border/60 pb-8'>
+        <div className='p-4 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-2xl'>
+          <Truck size={32} />
         </div>
         <div>
-          <H3 className='!mt-0'>Pelacakan Paket</H3>
-          <p className='text-gray-500 text-sm'>
+          <H3 className='!mt-0 tracking-tight'>Pelacakan Paket</H3>
+          <p className='text-muted-foreground font-medium'>
             {results.length > 1
               ? `Menampilkan ${results.length} resi secara bulk`
               : 'Detail pengiriman Anda'}
@@ -186,25 +188,29 @@ export function TrackingPage() {
           return (
             <Card
               key={result.token}
-              className={`shadow-sm border-gray-100 overflow-hidden transition-all duration-200 ${
-                isOpen ? 'ring-2 ring-blue-50' : 'hover:border-blue-200'
+              className={`shadow-sm border-border/60 overflow-hidden transition-all duration-300 rounded-3xl ${
+                isOpen ? 'ring-2 ring-indigo-500/50' : 'hover:border-indigo-500/30 hover:shadow-md'
               }`}
             >
               <div
-                className='p-4 md:p-5 flex items-center justify-between cursor-pointer bg-white hover:bg-gray-50 transition-colors select-none group'
+                className='p-5 md:p-6 flex items-center justify-between cursor-pointer bg-card hover:bg-muted/30 transition-colors select-none group'
                 onClick={() => togglePanel(result.token)}
               >
                 <div className='flex items-center gap-4'>
                   <div
-                    className={`p-2 rounded-md ${
-                      hasError ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-600'
+                    className={`p-3 rounded-2xl ${
+                      hasError
+                        ? 'bg-destructive/10 text-destructive'
+                        : 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
                     }`}
                   >
-                    {hasError ? <PackageX size={20} /> : <Package size={20} />}
+                    {hasError ? <PackageX size={24} /> : <Package size={24} />}
                   </div>
                   <div>
-                    <div className='font-bold text-gray-900'>{result.token}</div>
-                    <div className='text-sm text-gray-500'>
+                    <div className='font-black text-lg text-foreground tracking-tight'>
+                      {result.token}
+                    </div>
+                    <div className='text-sm font-medium text-muted-foreground'>
                       {hasError
                         ? 'Gagal dilacak'
                         : (data?.shipment?.courier || 'Informasi kurir tidak tersedia')}
@@ -215,19 +221,19 @@ export function TrackingPage() {
                   {!hasError && data?.shipment?.status && (
                     <Badge
                       variant='outline'
-                      className='bg-green-50 text-green-700 border-green-200 hidden sm:inline-flex'
+                      className='bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20 hidden sm:inline-flex font-bold px-3 py-1 rounded-lg'
                     >
                       {data.shipment.status.toUpperCase().replace(/_/g, ' ')}
                     </Badge>
                   )}
                   <div
-                    className={`p-1 rounded-full group-hover:bg-gray-200 transition-colors ${
-                      isOpen ? 'bg-gray-100' : ''
+                    className={`p-2 rounded-xl group-hover:bg-muted/50 transition-colors ${
+                      isOpen ? 'bg-muted' : ''
                     }`}
                   >
                     <ChevronDown
-                      size={20}
-                      className={`text-gray-500 transition-transform duration-200 ${
+                      size={24}
+                      className={`text-muted-foreground transition-transform duration-300 ${
                         isOpen ? 'rotate-180' : ''
                       }`}
                     />
@@ -236,22 +242,24 @@ export function TrackingPage() {
               </div>
 
               {isOpen && (
-                <div className='border-t border-gray-100 animate-in slide-in-from-top-2 fade-in duration-200'>
+                <div className='border-t border-border/60 animate-in slide-in-from-top-4 fade-in duration-300'>
                   {hasError
                     ? (
-                      <div className='p-8 text-center text-gray-500 bg-gray-50'>
-                        <PackageX size={24} className='mx-auto mb-2 text-gray-400' />
+                      <div className='p-10 text-center text-muted-foreground bg-muted/20 font-medium'>
+                        <PackageX size={32} className='mx-auto mb-3 opacity-50' />
                         {result.error}
                       </div>
                     )
                     : (
                       <>
-                        <CardContent className='space-y-4 pt-6'>
-                          <div className='flex items-center justify-between border-b border-gray-100 pb-4'>
-                            <Small className='text-gray-500'>Status Pesanan</Small>
+                        <CardContent className='space-y-5 pt-8 px-6'>
+                          <div className='flex items-center justify-between border-b border-border/60 pb-5'>
+                            <Small className='text-muted-foreground font-bold uppercase tracking-wider'>
+                              Status Pesanan
+                            </Small>
                             <Badge
                               variant='outline'
-                              className='bg-blue-50 text-blue-700 border-blue-200'
+                              className='bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-500/20 font-bold px-3 py-1 rounded-lg'
                             >
                               {data.orderStatus.toUpperCase().replace(/_/g, ' ')}
                             </Badge>
@@ -260,8 +268,10 @@ export function TrackingPage() {
                           {data.shipment
                             ? (
                               <>
-                                <div className='flex items-center justify-between border-b border-gray-100 pb-4'>
-                                  <Small className='text-gray-500'>Kurir</Small>
+                                <div className='flex items-center justify-between border-b border-border/60 pb-5'>
+                                  <Small className='text-muted-foreground font-bold uppercase tracking-wider'>
+                                    Kurir
+                                  </Small>
                                   <div className='flex items-center gap-3'>
                                     <CourierLogo courier={data.shipment.courier} />
                                     <Text className='font-semibold !mt-0'>
@@ -270,16 +280,20 @@ export function TrackingPage() {
                                   </div>
                                 </div>
 
-                                <div className='flex justify-between border-b border-gray-100 pb-4'>
-                                  <Small className='text-gray-500'>Nomor Resi</Small>
-                                  <Text className='font-mono bg-gray-100 px-2 py-1 rounded text-sm'>
+                                <div className='flex justify-between border-b border-border/60 pb-5'>
+                                  <Small className='text-muted-foreground font-bold uppercase tracking-wider'>
+                                    Nomor Resi
+                                  </Small>
+                                  <Text className='font-mono bg-muted px-3 py-1.5 rounded-lg text-sm font-bold text-foreground border border-border/60'>
                                     {data.shipment.trackingNumber}
                                   </Text>
                                 </div>
 
-                                <div className='flex justify-between pb-2'>
-                                  <Small className='text-gray-500'>Estimasi Tiba</Small>
-                                  <Text className='!mt-0 font-medium text-gray-900'>
+                                <div className='flex justify-between pb-3'>
+                                  <Small className='text-muted-foreground font-bold uppercase tracking-wider'>
+                                    Estimasi Tiba
+                                  </Small>
+                                  <Text className='!mt-0 font-black text-foreground'>
                                     {data.shipment.estimatedDeliveryAt
                                       ? new Date(data.shipment.estimatedDeliveryAt)
                                         .toLocaleDateString('id-ID', {
@@ -294,44 +308,51 @@ export function TrackingPage() {
                               </>
                             )
                             : (
-                              <div className='py-4 text-center text-gray-500'>
+                              <div className='py-6 text-center text-muted-foreground font-medium'>
                                 Belum ada informasi pengiriman untuk pesanan ini.
                               </div>
                             )}
                         </CardContent>
 
                         {data.shipment && data.shipment.events.length > 0 && (
-                          <div className='border-t border-gray-100 bg-gray-50/30'>
-                            <CardHeader className='pb-4 pt-6'>
-                              <CardTitle className='text-md flex items-center gap-2'>
-                                <MapPin size={18} className='text-gray-500' />
+                          <div className='border-t border-border/60 bg-muted/10'>
+                            <CardHeader className='pb-6 pt-8'>
+                              <CardTitle className='text-lg flex items-center gap-3 font-black tracking-tight'>
+                                <div className='p-2 bg-indigo-500/10 rounded-lg'>
+                                  <MapPin
+                                    size={20}
+                                    className='text-indigo-600 dark:text-indigo-400'
+                                  />
+                                </div>
                                 Riwayat Perjalanan
                               </CardTitle>
                             </CardHeader>
                             <CardContent>
-                              <div className='space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 before:to-transparent pb-6'>
+                              <div className='space-y-10 relative before:absolute before:inset-0 before:ml-[1.4rem] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-border/80 before:to-transparent pb-8'>
                                 {data.shipment.events.map((event: any, index: number) => (
                                   <div
                                     key={index}
                                     className='relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active'
                                   >
                                     <div
-                                      className={`flex items-center justify-center w-10 h-10 rounded-full border-4 border-white shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm ${
+                                      className={`flex items-center justify-center w-12 h-12 rounded-full border-4 border-card shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm ${
                                         index === 0
-                                          ? 'bg-blue-500 text-white'
-                                          : 'bg-gray-200 text-gray-500'
+                                          ? 'bg-indigo-600 text-white'
+                                          : 'bg-muted text-muted-foreground'
                                       }`}
                                     >
                                       {index === 0
-                                        ? <CheckCircle2 size={16} />
-                                        : <div className='w-2 h-2 rounded-full bg-gray-400' />}
+                                        ? <CheckCircle2 size={20} />
+                                        : (
+                                          <div className='w-2.5 h-2.5 rounded-full bg-muted-foreground/40' />
+                                        )}
                                     </div>
-                                    <div className='w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition-shadow'>
-                                      <div className='flex flex-col xl:flex-row xl:items-center justify-between mb-2 gap-1'>
-                                        <div className='font-bold text-gray-900'>
+                                    <div className='w-[calc(100%-4.5rem)] md:w-[calc(50%-3rem)] p-5 rounded-2xl border border-border/60 bg-card shadow-sm hover:shadow-md hover:border-indigo-500/30 transition-all duration-300'>
+                                      <div className='flex flex-col xl:flex-row xl:items-center justify-between mb-3 gap-2'>
+                                        <div className='font-black text-foreground tracking-tight'>
                                           {event.status}
                                         </div>
-                                        <time className='text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full w-fit'>
+                                        <time className='text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-lg w-fit shrink-0'>
                                           {new Date(event.occurredAt).toLocaleString('id-ID', {
                                             day: '2-digit',
                                             month: 'short',
@@ -340,12 +361,12 @@ export function TrackingPage() {
                                           })}
                                         </time>
                                       </div>
-                                      <div className='text-gray-600 text-sm leading-relaxed'>
+                                      <div className='text-muted-foreground text-sm leading-relaxed font-medium'>
                                         {event.description}
                                       </div>
                                       {event.location && (
-                                        <div className='text-xs text-gray-400 mt-3 flex items-center gap-1.5 bg-gray-50 p-1.5 rounded-md w-fit'>
-                                          <MapPin size={12} className='shrink-0' />{' '}
+                                        <div className='text-xs text-muted-foreground/80 mt-4 flex items-center gap-2 bg-muted/30 p-2 rounded-lg w-fit font-bold border border-border/30'>
+                                          <MapPin size={14} className='shrink-0' />{' '}
                                           <span className='truncate max-w-[200px]'>
                                             {event.location}
                                           </span>

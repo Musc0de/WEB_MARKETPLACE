@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Category } from '@starsuperscare/contracts';
-import { H1, Skeleton, Text, toast } from '@starsuperscare/ui';
+import { Skeleton, toast } from '@starsuperscare/ui';
 import { client } from '../../../lib/api.ts';
+import { Grid, Tag } from 'lucide-react';
 
 export function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -31,47 +32,59 @@ export function CategoriesPage() {
   }, []);
 
   return (
-    <div className='max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-12'>
-      <div className='text-center space-y-4'>
-        <H1>Kategori Produk</H1>
-        <Text className='text-gray-500 max-w-2xl mx-auto'>
+    <div className='max-w-7xl mx-auto py-8 lg:py-12 px-4 sm:px-6 lg:px-8 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700'>
+      <div className='text-center space-y-3'>
+        <h1 className='text-2xl lg:text-3xl font-black text-foreground tracking-tight inline-flex items-center gap-3'>
+          <Grid className='w-6 h-6 lg:w-8 lg:h-8 text-indigo-500' />
+          Kategori Produk
+        </h1>
+        <p className='text-sm lg:text-base font-medium text-muted-foreground max-w-2xl mx-auto'>
           Jelajahi berbagai kategori produk unggulan kami dan temukan apa yang Anda butuhkan dengan
           mudah.
-        </Text>
+        </p>
       </div>
 
       {loading
         ? (
-          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
-            {Array.from({ length: 8 }).map((_, i) => (
-              <Skeleton key={i} className='h-32 w-full rounded-xl' />
+          <div className='grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 lg:gap-4'>
+            {Array.from({ length: 12 }).map((_, i) => (
+              <Skeleton key={i} className='h-24 w-full rounded-2xl' />
             ))}
           </div>
         )
         : categories.length > 0
         ? (
-          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
+          <div className='grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 lg:gap-4'>
             {categories.map((category) => (
-              <div
+              <button
                 key={category.id}
+                type='button'
                 onClick={() => navigate(`/categories/${category.slug}`)}
-                className='bg-white border rounded-xl p-6 shadow-sm hover:shadow-md hover:border-blue-500 transition-all cursor-pointer flex flex-col justify-center items-center text-center space-y-2 group'
+                className='bg-card border border-border/60 rounded-2xl p-3 lg:p-4 shadow-sm hover:shadow-lg hover:border-indigo-500/50 transition-all cursor-pointer flex flex-col justify-center items-center text-center space-y-2 group active:scale-95'
               >
-                <h3 className='text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors'>
-                  {category.name}
-                </h3>
-                {category.description && (
-                  <Text className='text-sm text-gray-500 line-clamp-2'>
-                    {category.description}
-                  </Text>
-                )}
-              </div>
+                <div className='w-8 h-8 lg:w-10 lg:h-10 bg-indigo-500/10 text-indigo-500 rounded-full flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-300 shadow-inner'>
+                  <Tag className='w-4 h-4 lg:w-5 lg:h-5' />
+                </div>
+                <div>
+                  <h3 className='text-[11px] lg:text-sm font-bold text-foreground group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1'>
+                    {category.name}
+                  </h3>
+                  {category.description && (
+                    <p className='text-[9px] lg:text-xs font-medium text-muted-foreground line-clamp-1 mt-0.5 leading-snug hidden sm:block'>
+                      {category.description}
+                    </p>
+                  )}
+                </div>
+              </button>
             ))}
           </div>
         )
         : (
-          <div className='py-12 text-center border rounded-lg bg-gray-50 w-full'>
-            <Text className='text-gray-500'>Belum ada kategori yang tersedia.</Text>
+          <div className='py-16 text-center border border-border/60 rounded-3xl bg-muted/20 w-full flex flex-col items-center justify-center gap-3'>
+            <Tag className='w-10 h-10 text-muted-foreground/40' />
+            <p className='text-sm font-bold text-muted-foreground'>
+              Belum ada kategori yang tersedia.
+            </p>
           </div>
         )}
     </div>

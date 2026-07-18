@@ -6,8 +6,8 @@ import { AddressForm } from '../components/AddressForm.tsx';
 import { AddressBookSelector } from '../components/AddressBookSelector.tsx';
 import { ShippingOptions } from '../components/ShippingOptions.tsx';
 import type { ShippingAddress } from '@starsuperscare/contracts';
-import { formatIDR, SEO, toast } from '@starsuperscare/ui';
-import { CheckCircle2, Info, Ticket, X } from 'lucide-react';
+import { Button, formatIDR, SEO, toast } from '@starsuperscare/ui';
+import { CheckCircle2, Info, ShoppingBag, Ticket, X } from 'lucide-react';
 import { useAuth } from '../../auth/api/useAuth.ts';
 import { useAddresses } from '../../me/api/useAddresses.ts';
 
@@ -19,7 +19,6 @@ export function CheckoutPage() {
   const location = useLocation();
   const initialVoucher = location.state?.appliedVoucherCode || null;
 
-  // directToken: present when user clicks "Beli Langsung" — isolated cart session
   const directToken = searchParams.get('directToken');
 
   const { cart, isLoading: isCartLoading } = useCart();
@@ -37,7 +36,6 @@ export function CheckoutPage() {
   const userEmail = user?.email || null;
   const { addresses: savedAddresses, isLoading: isAddressesLoading } = useAddresses(!!userEmail);
 
-  // Set default address when addresses are loaded
   useEffect(() => {
     if (userEmail && savedAddresses.length > 0 && !address) {
       const primary = savedAddresses.find((a: any) => a.isPrimaryShipping) ||
@@ -60,8 +58,6 @@ export function CheckoutPage() {
     }
   }, [userEmail, savedAddresses, address]);
 
-  // Validate on mount or when shipping/cart changes
-  // For direct-buy: pass the directToken so the API uses the fresh isolated cart
   const cartHash = JSON.stringify(cart?.items || []);
   useEffect(() => {
     const hasItems = directToken || cart?.items?.length;
@@ -71,7 +67,6 @@ export function CheckoutPage() {
         voucherCode: appliedVoucher,
         _cartToken: directToken ?? null,
       } as any).catch(() => {
-        // If validation fails after applying voucher, probably means voucher expired/invalid
         if (appliedVoucher) handleRemoveVoucher();
       });
     }
@@ -83,12 +78,20 @@ export function CheckoutPage() {
     setIsApplyingVoucher(true);
 
     try {
-      await validateCheckout({
+      const result = await validateCheckout({
         shippingOptionId,
         voucherCode: voucherInput.trim(),
         _cartToken: directToken ?? null,
       } as any);
-      setAppliedVoucher(voucherInput.trim());
+
+      if (!result.appliedVoucher) {
+        const voucherError = result.errors?.find((e: string) =>
+          e.toLowerCase().includes('voucher')
+        ) || 'Voucher tidak valid';
+        throw new Error(voucherError);
+      }
+
+      setAppliedVoucher(result.appliedVoucher.code);
       toast.success('Voucher berhasil digunakan');
     } catch (err: any) {
       toast.error(err.message || 'Voucher tidak valid');
@@ -109,36 +112,38 @@ export function CheckoutPage() {
 
   useEffect(() => {
     if (isAuthLoading) return;
-
-    // Auto-advance logic ONLY for digital products and logged-in users WITH A SAVED PRIMARY ADDRESS
     if (userEmail && step === 'address' && !requiresShipping && address) {
       setStep('review');
     }
   }, [isAuthLoading, userEmail, step, address, requiresShipping]);
 
-  // Show loader while normal cart is loading OR direct buy validation is pending
   if ((!directToken && isCartLoading) || (directToken && !validationData)) {
     return (
       <div className='min-h-[50vh] flex flex-col items-center justify-center p-8 text-center'>
-        <div className='w-10 h-10 rounded-full border-4 border-gray-100 border-t-black animate-spin mb-4' />
-        <p className='text-gray-500 font-medium animate-pulse'>Menyiapkan checkout...</p>
+        <div className='w-10 h-10 rounded-full border-4 border-muted border-t-indigo-600 animate-spin mb-4' />
+        <p className='text-muted-foreground font-medium animate-pulse'>Menyiapkan checkout...</p>
       </div>
     );
   }
 
-  // Show empty-cart screen only if NOT in direct-buy mode and cart is really empty
   if (!directToken && (!cart || cart.items.length === 0)) {
     return (
-      <div className='max-w-2xl mx-auto p-8 text-center'>
-        <h1 className='text-2xl font-bold mb-4'>Keranjang Kosong</h1>
-        <p className='mb-6'>Anda tidak memiliki barang untuk dicheckout.</p>
-        <button
-          type='button'
+      <div className='max-w-2xl mx-auto p-8 text-center mt-16 bg-card border border-border/60 rounded-3xl shadow-sm py-16'>
+        <div className='w-20 h-20 bg-muted/50 rounded-full flex items-center justify-center mx-auto mb-6'>
+          <ShoppingBag className='w-10 h-10 text-muted-foreground/40' />
+        </div>
+        <h1 className='text-2xl font-black mb-2 text-foreground tracking-tight'>
+          Keranjang Kosong
+        </h1>
+        <p className='mb-8 text-muted-foreground font-medium'>
+          Anda tidak memiliki barang untuk dicheckout.
+        </p>
+        <Button
           onClick={() => navigate('/products')}
-          className='bg-black text-white px-6 py-2 rounded-lg'
+          className='rounded-xl font-bold px-8 shadow-sm active:scale-95'
         >
           Belanja Sekarang
-        </button>
+        </Button>
       </div>
     );
   }
@@ -199,20 +204,19 @@ export function CheckoutPage() {
   }
 
   return (
-    <div className='max-w-6xl mx-auto px-4 py-8'>
+    <div className='max-w-3xl mx-auto px-4 py-8 animate-in fade-in duration-500'>
       <SEO title={pageTitle} />
-      <h1 className='text-3xl font-bold mb-8'>Checkout</h1>
+      <h1 className='text-3xl font-black tracking-tight mb-8 text-foreground'>Checkout</h1>
 
-      {/* Direct Buy Indicator */}
       {directToken && (
-        <div className='mb-6 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700 flex items-center gap-2'>
-          <CheckCircle2 className='w-4 h-4' />
+        <div className='mb-8 px-5 py-4 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl text-sm font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-3 shadow-sm'>
+          <CheckCircle2 className='w-5 h-5 shrink-0' />
           <span>Checkout langsung — hanya produk yang dipilih</span>
         </div>
       )}
 
       {/* Progress Bar */}
-      <div className='flex items-center mb-12 overflow-x-auto pb-4'>
+      <div className='flex items-center mb-12 overflow-x-auto pb-4 no-scrollbar'>
         {steps.map((s, idx) => {
           const isActive = step === s.id;
           const isPast = steps.findIndex((x) => x.id === step) > idx;
@@ -220,334 +224,343 @@ export function CheckoutPage() {
           return (
             <div key={s.id} className='flex items-center'>
               <div
-                className={`flex items-center justify-center w-8 h-8 rounded-full border-2 font-medium ${
-                  isActive
-                    ? 'border-black bg-black text-white'
-                    : isPast
-                    ? 'border-black bg-black text-white'
-                    : 'border-gray-300 text-gray-400'
+                className={`flex items-center justify-center w-8 h-8 rounded-full border-2 font-black shadow-sm shrink-0 transition-colors ${
+                  isActive || isPast
+                    ? 'border-indigo-600 bg-indigo-600 text-white'
+                    : 'border-border/60 bg-card text-muted-foreground'
                 }`}
               >
                 {isPast ? <CheckCircle2 className='w-5 h-5' /> : idx + 1}
               </div>
               <span
-                className={`ml-3 font-medium ${
-                  isActive || isPast ? 'text-black' : 'text-gray-400'
+                className={`ml-3 font-bold whitespace-nowrap transition-colors ${
+                  isActive || isPast ? 'text-foreground' : 'text-muted-foreground/60'
                 }`}
               >
                 {s.label}
               </span>
               {idx < steps.length - 1 && (
-                <div className={`w-12 h-px mx-4 ${isPast ? 'bg-black' : 'bg-gray-300'}`} />
+                <div
+                  className={`w-8 lg:w-16 h-1 mx-4 rounded-full transition-colors ${
+                    isPast ? 'bg-indigo-600' : 'bg-border/60'
+                  }`}
+                />
               )}
             </div>
           );
         })}
       </div>
 
-      <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
-        {/* Main Content */}
-        <div className='lg:col-span-2'>
-          {step === 'address' && (
-            <div className='bg-white p-6 rounded-2xl shadow-sm border border-gray-100'>
-              <h2 className='text-xl font-bold mb-6'>
-                {requiresShipping ? 'Alamat Pengiriman' : 'Informasi Pembeli'}
+      <div className='flex flex-col gap-6'>
+        {step === 'address' && (
+          <div className='bg-card p-6 lg:p-8 rounded-3xl shadow-sm border border-border/60'>
+            <h2 className='text-xl font-black mb-6 text-foreground tracking-tight flex items-center gap-2'>
+              <div className='w-1.5 h-5 bg-indigo-500 rounded-full' />
+              {requiresShipping ? 'Alamat Pengiriman' : 'Informasi Pembeli'}
+            </h2>
+            {(isAuthLoading || isAddressesLoading)
+              ? (
+                <div className='flex justify-center py-12'>
+                  <div className='animate-spin w-8 h-8 border-4 border-indigo-600/20 border-t-indigo-600 rounded-full' />
+                </div>
+              )
+              : (userEmail && requiresShipping)
+              ? (
+                <AddressBookSelector
+                  userEmail={userEmail}
+                  onSelect={handleAddressSubmit}
+                />
+              )
+              : (
+                <AddressForm
+                  initialValues={address || { email: userEmail || '' }}
+                  onSubmit={handleAddressSubmit}
+                  isDigitalOnly={!requiresShipping}
+                  hideEmail={!!userEmail}
+                />
+              )}
+          </div>
+        )}
+
+        {step === 'shipping' && (
+          <div className='bg-card p-6 lg:p-8 rounded-3xl shadow-sm border border-border/60'>
+            <div className='flex justify-between items-center mb-6'>
+              <h2 className='text-xl font-black text-foreground tracking-tight flex items-center gap-2'>
+                <div className='w-1.5 h-5 bg-indigo-500 rounded-full' />
+                Opsi Pengiriman
               </h2>
-              {(isAuthLoading || isAddressesLoading)
-                ? (
-                  <div className='flex justify-center py-8'>
-                    <div className='animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full' />
+              <button
+                type='button'
+                onClick={() => setStep('address')}
+                className='text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:underline'
+              >
+                Ubah Alamat
+              </button>
+            </div>
+            {address
+              ? (
+                <ShippingOptions
+                  province={address.province}
+                  city={address.city}
+                  selectedOptionId={shippingOptionId}
+                  onSelect={setShippingOptionId}
+                  onNext={() => setStep('review')}
+                />
+              )
+              : <p className='text-muted-foreground font-medium'>Alamat belum diisi.</p>}
+          </div>
+        )}
+
+        {step === 'review' && (
+          <div className='bg-card p-6 lg:p-8 rounded-3xl shadow-sm border border-border/60'>
+            <div className='flex justify-between items-center mb-6 border-b border-border/60 pb-6'>
+              <h2 className='text-xl font-black text-foreground tracking-tight flex items-center gap-2'>
+                <div className='w-1.5 h-5 bg-indigo-500 rounded-full' />
+                Review Pesanan & Checkout
+              </h2>
+              <button
+                type='button'
+                onClick={() => setStep(requiresShipping ? 'shipping' : 'address')}
+                className='text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:underline'
+              >
+                Ubah {requiresShipping ? 'Pengiriman' : 'Data Diri'}
+              </button>
+            </div>
+
+            {validationData && (
+              <div className='space-y-6'>
+                {/* Information Alerts */}
+                {validationData.items.some((i) =>
+                  i.productType === 'digital' || i.productType === 'service'
+                ) && (
+                  <div className='bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-5 flex gap-4 items-start shadow-sm'>
+                    <Info className='w-6 h-6 text-indigo-600 dark:text-indigo-400 mt-0.5 shrink-0' />
+                    <div>
+                      <h4 className='text-sm font-black text-indigo-700 dark:text-indigo-300 mb-2'>
+                        Informasi Akses Produk
+                      </h4>
+                      <p className='text-xs text-indigo-700/80 dark:text-indigo-300/80 font-medium leading-relaxed'>
+                        Anda dapat melihat dan mengunduh produk digital/layanan pesanan Anda melalui
+                        halaman{' '}
+                        <a
+                          href='/downloads'
+                          target='_blank'
+                          rel='noopener noreferrer'
+                          className='font-bold underline hover:text-indigo-600 dark:hover:text-indigo-400'
+                        >
+                          Downloads
+                        </a>.
+                        <br />
+                        <br />
+                        <strong className='text-indigo-800 dark:text-indigo-200'>Penting:</strong>
+                        {' '}
+                        Pastikan Anda telah <strong>Login</strong> dan{' '}
+                        <strong>Verifikasi Email</strong>. Jika email belum terverifikasi, Anda
+                        tidak akan bisa login maupun mengunduh produk ini.
+                      </p>
+                    </div>
                   </div>
-                )
-                : (userEmail && requiresShipping)
-                ? (
-                  <AddressBookSelector
-                    userEmail={userEmail}
-                    onSelect={handleAddressSubmit}
-                  />
-                )
-                : (
-                  <AddressForm
-                    initialValues={address || { email: userEmail || '' }}
-                    onSubmit={handleAddressSubmit}
-                    isDigitalOnly={!requiresShipping}
-                    hideEmail={!!userEmail}
-                  />
                 )}
-            </div>
-          )}
 
-          {step === 'shipping' && (
-            <div className='bg-white p-6 rounded-2xl shadow-sm border border-gray-100'>
-              <div className='flex justify-between items-center mb-6'>
-                <h2 className='text-xl font-bold'>Opsi Pengiriman</h2>
-                <button
-                  type='button'
-                  onClick={() => setStep('address')}
-                  className='text-sm text-blue-600'
-                >
-                  Ubah Alamat
-                </button>
-              </div>
-              {address
-                ? (
-                  <ShippingOptions
-                    province={address.province}
-                    city={address.city}
-                    selectedOptionId={shippingOptionId}
-                    onSelect={setShippingOptionId}
-                    onNext={() => setStep('review')}
-                  />
-                )
-                : <p>Alamat belum diisi.</p>}
-            </div>
-          )}
-
-          {step === 'review' && (
-            <div className='bg-white p-6 rounded-2xl shadow-sm border border-gray-100'>
-              <div className='flex justify-between items-center mb-6'>
-                <h2 className='text-xl font-bold'>Review Pesanan</h2>
-                <button
-                  type='button'
-                  onClick={() => setStep(requiresShipping ? 'shipping' : 'address')}
-                  className='text-sm text-blue-600'
-                >
-                  Ubah {requiresShipping ? 'Pengiriman' : 'Data Diri'}
-                </button>
-              </div>
-
-              {validationData && (
-                <div className='space-y-4'>
-                  {validationData.items.some((i) =>
-                    i.productType === 'digital' || i.productType === 'service'
-                  ) && (
-                    <div className='bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3 items-start'>
-                      <Info className='w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0' />
-                      <div>
-                        <h4 className='text-sm font-bold text-blue-900 mb-1'>
-                          Informasi Akses Produk
-                        </h4>
-                        <p className='text-xs text-blue-800 leading-relaxed'>
-                          Anda dapat melihat dan mengunduh produk digital/layanan pesanan Anda
-                          melalui halaman{' '}
-                          <a
-                            href='/downloads'
-                            target='_blank'
-                            rel='noopener noreferrer'
-                            className='font-bold underline hover:text-blue-600'
+                {requiresShipping && (
+                  <div className='bg-amber-500/10 border border-amber-500/20 rounded-2xl p-5 flex gap-4 items-start shadow-sm'>
+                    <Info className='w-6 h-6 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0' />
+                    <div>
+                      <h4 className='text-sm font-black text-amber-700 dark:text-amber-300 mb-2'>
+                        Informasi Pengiriman & Kebijakan Retur
+                      </h4>
+                      <div className='text-xs text-amber-700/80 dark:text-amber-300/80 font-medium leading-relaxed space-y-3'>
+                        <p>
+                          <strong className='text-amber-800 dark:text-amber-200'>Penting:</strong>
+                          {''}
+                          Mohon pastikan <strong>Alamat Pengiriman</strong>
+                          {''}
+                          Anda sudah benar. Jika ingin mengganti, klik{' '}
+                          <button
+                            type='button'
+                            onClick={() => setStep('address')}
+                            className='font-bold underline hover:text-amber-900 dark:hover:text-amber-100 transition-colors'
                           >
-                            Downloads
-                          </a>.
-                          <br />
-                          <br />
-                          <strong>Penting:</strong> Pastikan Anda telah <strong>Login</strong> dan
-                          {' '}
-                          <strong>Verifikasi Email</strong>. Jika email belum terverifikasi, Anda
-                          tidak akan bisa login maupun mengunduh produk ini.
+                            Ubah Alamat
+                          </button>{' '}
+                          untuk memilih atau menambahkan alamat terbaru sebelum melakukan
+                          pembayaran.
+                        </p>
+                        <p>
+                          <strong className='text-amber-800 dark:text-amber-200'>
+                            Status Pengiriman:
+                          </strong>
+                          {''}
+                          Pesanan Anda akan diproses dan dikirim sesuai estimasi kurir. Anda dapat
+                          melacak resi dan melihat detail pesanan kapan saja.
+                        </p>
+                        <p>
+                          <strong className='text-amber-800 dark:text-amber-200'>
+                            Kebijakan Refund & Return:
+                          </strong>
+                          {''}
+                          Segala bentuk komplain barang rusak atau kurang{' '}
+                          <strong>WAJIB menyertakan Video Unboxing lengkap</strong>
+                          {''}
+                          (tanpa jeda/edit sejak paket masih tersegel).
                         </p>
                       </div>
                     </div>
-                  )}
+                  </div>
+                )}
 
-                  {requiresShipping && (
-                    <div className='bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3 items-start'>
-                      <Info className='w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0' />
-                      <div>
-                        <h4 className='text-sm font-bold text-amber-900 mb-1'>
-                          Informasi Pengiriman & Kebijakan Retur
-                        </h4>
-                        <div className='text-xs text-amber-900 leading-relaxed space-y-2'>
-                          <p>
-                            <strong>Status Pengiriman:</strong>{' '}
-                            Pesanan Anda akan diproses dan dikirim sesuai estimasi kurir. Anda dapat
-                            melacak resi dan melihat detail pesanan kapan saja melalui menu
-                            riwayat/lacak pesanan.
-                          </p>
-                          <p>
-                            <strong>Kebijakan Refund & Return:</strong>{' '}
-                            Segala bentuk komplain barang rusak atau kurang{' '}
-                            <strong>WAJIB menyertakan Video Unboxing lengkap</strong>{' '}
-                            (tanpa jeda/edit sejak paket masih tersegel). Pengecekan klaim akan
-                            dilakukan secara manual oleh tim kami sebelum disetujui.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
+                {/* Items List */}
+                <div className='flex flex-col gap-4'>
                   {validationData.items.map((item) => (
                     <div
                       key={item.id}
-                      className='flex justify-between items-center p-4 border rounded-xl'
+                      className='flex gap-4 p-4 border border-border/60 rounded-2xl bg-muted/20'
                     >
-                      <div>
-                        <p className='font-medium'>{item.productName}</p>
-                        <p className='text-sm text-gray-500'>Qty: {item.quantity}</p>
+                      <div className='w-16 h-16 bg-muted rounded-xl border border-border/60 overflow-hidden shrink-0'>
+                        {item.primaryImage
+                          ? (
+                            <img
+                              src={item.primaryImage}
+                              alt={item.productName}
+                              className='w-full h-full object-cover'
+                            />
+                          )
+                          : (
+                            <div className='w-full h-full flex items-center justify-center text-muted-foreground/40 font-bold text-xs'>
+                              No Img
+                            </div>
+                          )}
                       </div>
-                      <p className='font-medium'>{formatIDR(item.priceSnapshot * item.quantity)}</p>
+                      <div className='flex-1 min-w-0 flex flex-col justify-center'>
+                        <p className='font-bold text-foreground text-sm truncate'>
+                          {item.productName}
+                        </p>
+                        <p className='text-xs text-muted-foreground font-medium truncate mb-1'>
+                          {item.variantSku}
+                        </p>
+                        <div className='flex justify-between items-center gap-3 mt-1'>
+                          <span className='text-xs font-bold text-muted-foreground shrink-0'>
+                            Qty: {item.quantity} x {formatIDR(item.priceSnapshot)}
+                          </span>
+                          <span className='font-black text-foreground truncate'>
+                            {formatIDR(item.priceSnapshot * item.quantity)}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   ))}
+                </div>
 
-                  {!validationData.isValid && validationData.errors && (
-                    <div className='p-4 bg-red-50 text-red-600 rounded-xl'>
-                      <ul className='list-disc pl-5'>
-                        {validationData.errors.map((e, i) => <li key={i}>{e}</li>)}
-                      </ul>
+                <hr className='border-border/60' />
+
+                {/* Voucher Section */}
+                <div>
+                  {appliedVoucher
+                    ? (
+                      <div className='flex items-center justify-between bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-4 shadow-sm'>
+                        <div className='flex items-center gap-3 text-emerald-700 dark:text-emerald-400'>
+                          <Ticket className='w-5 h-5 shrink-0' />
+                          <div>
+                            <p className='text-sm font-black uppercase tracking-widest'>
+                              {appliedVoucher}
+                            </p>
+                            <p className='text-xs font-bold opacity-80'>
+                              Voucher berhasil digunakan
+                            </p>
+                            {validationData.appliedVoucher?.description && (
+                              <p className='text-xs opacity-70 mt-1 max-w-[200px] leading-relaxed font-medium'>
+                                {validationData.appliedVoucher.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <button
+                          type='button'
+                          onClick={handleRemoveVoucher}
+                          className='p-2 hover:bg-emerald-500/20 rounded-xl transition-colors shrink-0'
+                          title='Batalkan Voucher'
+                        >
+                          <X className='w-5 h-5' />
+                        </button>
+                      </div>
+                    )
+                    : (
+                      <form onSubmit={handleApplyVoucher} className='flex gap-2'>
+                        <input
+                          type='text'
+                          value={voucherInput}
+                          onChange={(e) => setVoucherInput(e.target.value)}
+                          placeholder='Masukkan kode voucher'
+                          className='flex-1 rounded-xl bg-muted/20 border-border/60 focus:border-indigo-500 focus:ring-indigo-500 text-sm px-4 py-3 font-medium transition-colors outline-none border'
+                          disabled={isApplyingVoucher}
+                        />
+                        <Button
+                          type='submit'
+                          disabled={isApplyingVoucher || !voucherInput.trim()}
+                          className='rounded-xl font-bold px-6 shadow-sm active:scale-95'
+                        >
+                          {isApplyingVoucher ? 'Cek...' : 'Terapkan'}
+                        </Button>
+                      </form>
+                    )}
+                </div>
+
+                {/* Price Breakdown */}
+                <div className='space-y-4 font-medium bg-muted/20 p-5 rounded-2xl border border-border/40'>
+                  <div className='flex justify-between items-center text-muted-foreground gap-4'>
+                    <span className='shrink-0'>Subtotal Produk</span>
+                    <span className='font-bold text-foreground truncate'>
+                      {formatIDR(validationData.summary.subtotal)}
+                    </span>
+                  </div>
+                  {validationData.summary.totalDiscount > 0 && (
+                    <div className='flex justify-between items-center text-emerald-600 dark:text-emerald-400 gap-4'>
+                      <span className='font-bold shrink-0'>Diskon Voucher</span>
+                      <span className='font-black bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20 truncate'>
+                        -{formatIDR(validationData.summary.totalDiscount)}
+                      </span>
                     </div>
                   )}
-
-                  <div className='pt-6'>
-                    <button
-                      type='button'
-                      onClick={handleOrderSubmit}
-                      disabled={!validationData.isValid || isCreatingOrder}
-                      className='w-full bg-black text-white px-6 py-4 rounded-xl font-bold text-lg hover:bg-gray-800 disabled:opacity-50'
-                    >
-                      {isCreatingOrder ? 'Memproses Pesanan...' : 'Bayar Sekarang'}
-                    </button>
+                  {requiresShipping && (
+                    <div className='flex justify-between items-center text-muted-foreground gap-4'>
+                      <span className='shrink-0'>Ongkos Kirim</span>
+                      <span className='font-bold text-foreground truncate'>
+                        {validationData.summary.shippingCost > 0
+                          ? formatIDR(validationData.summary.shippingCost)
+                          : '-'}
+                      </span>
+                    </div>
+                  )}
+                  <div className='border-t border-border/60 pt-5 mt-2 flex justify-between items-center gap-4'>
+                    <span className='font-black text-lg text-foreground shrink-0'>Total Akhir</span>
+                    <span className='font-black text-xl text-indigo-600 dark:text-indigo-400 truncate'>
+                      {formatIDR(validationData.summary.grandTotal)}
+                    </span>
                   </div>
                 </div>
-              )}
-            </div>
-          )}
-        </div>
 
-        {/* Order Summary */}
-        <div className='lg:col-span-1'>
-          <div className='bg-gray-50 p-6 rounded-2xl sticky top-8'>
-            <h2 className='text-xl font-bold mb-6'>Ringkasan Checkout</h2>
-
-            {validationData
-              ? (
-                <div className='flex flex-col text-sm'>
-                  <div className='space-y-4 mb-6 pb-6 border-b border-gray-200'>
-                    {validationData.items.map((item) => (
-                      <div key={item.id} className='flex gap-4'>
-                        <div className='w-16 h-16 bg-white rounded-xl border border-gray-200 overflow-hidden flex-shrink-0'>
-                          {item.primaryImage
-                            ? (
-                              <img
-                                src={item.primaryImage}
-                                alt={item.productName}
-                                className='w-full h-full object-cover'
-                              />
-                            )
-                            : (
-                              <div className='w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 text-xs'>
-                                No Img
-                              </div>
-                            )}
-                        </div>
-                        <div className='flex-1 min-w-0 flex flex-col justify-center'>
-                          <p className='font-bold text-gray-900 truncate'>{item.productName}</p>
-                          <p className='text-xs text-gray-500 truncate'>{item.variantSku}</p>
-                          <div className='flex justify-between items-center mt-1'>
-                            <span className='text-xs font-medium text-gray-500'>
-                              {item.quantity} x {formatIDR(item.priceSnapshot)}
-                            </span>
-                            <span className='font-bold text-gray-900'>
-                              {formatIDR(item.priceSnapshot * item.quantity)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className='my-6 pt-6 border-t border-gray-200'>
-                    {appliedVoucher
-                      ? (
-                        <div className='flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-3'>
-                          <div className='flex items-center gap-2 text-blue-700'>
-                            <Ticket className='w-4 h-4' />
-                            <div>
-                              <p className='text-sm font-bold uppercase tracking-wider'>
-                                {appliedVoucher}
-                              </p>
-                              <p className='text-xs text-blue-600 font-medium'>
-                                Voucher berhasil digunakan
-                              </p>
-                              {validationData.appliedVoucher?.description && (
-                                <p className='text-xs text-blue-600/80 mt-0.5 max-w-[200px] leading-tight'>
-                                  {validationData.appliedVoucher.description}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                          <button
-                            type='button'
-                            onClick={handleRemoveVoucher}
-                            className='p-1.5 hover:bg-blue-100 rounded-md text-blue-600 transition-colors'
-                            title='Batalkan Voucher'
-                          >
-                            <X className='w-4 h-4' />
-                          </button>
-                        </div>
-                      )
+                <div className='pt-6 border-t border-border/60'>
+                  <Button
+                    onClick={handleOrderSubmit}
+                    disabled={!validationData.isValid || isCreatingOrder}
+                    className='w-full rounded-xl font-bold text-lg h-14 shadow-md active:scale-[0.98]'
+                  >
+                    {isCreatingOrder
+                      ? 'Memproses Pesanan...'
                       : (
-                        <form onSubmit={handleApplyVoucher} className='flex gap-2'>
-                          <input
-                            type='text'
-                            value={voucherInput}
-                            onChange={(e) => setVoucherInput(e.target.value)}
-                            placeholder='Masukkan kode voucher'
-                            className='flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border'
-                            disabled={isApplyingVoucher}
-                          />
-                          <button
-                            type='submit'
-                            disabled={isApplyingVoucher || !voucherInput.trim()}
-                            className='rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 disabled:opacity-50'
-                          >
-                            {isApplyingVoucher ? 'Cek...' : 'Terapkan'}
-                          </button>
-                        </form>
+                        <div className='flex justify-between items-center w-full px-2 gap-4'>
+                          <span className='shrink-0'>Bayar Sekarang</span>
+                          <span className='truncate'>
+                            {formatIDR(validationData.summary.grandTotal)}
+                          </span>
+                        </div>
                       )}
-                  </div>
-
-                  <div className='space-y-4'>
-                    <div className='flex justify-between'>
-                      <span className='text-gray-600'>Subtotal</span>
-                      <span className='font-medium'>
-                        {formatIDR(validationData.summary.subtotal)}
-                      </span>
-                    </div>
-                    {validationData.summary.totalDiscount > 0 && (
-                      <div className='flex justify-between text-green-600'>
-                        <span>Diskon</span>
-                        <span className='font-medium'>
-                          -{formatIDR(validationData.summary.totalDiscount)}
-                        </span>
-                      </div>
-                    )}
-                    {requiresShipping && (
-                      <div className='flex justify-between'>
-                        <span className='text-gray-600'>Ongkos Kirim</span>
-                        <span className='font-medium'>
-                          {validationData.summary.shippingCost > 0
-                            ? formatIDR(validationData.summary.shippingCost)
-                            : '-'}
-                        </span>
-                      </div>
-                    )}
-                    <div className='border-t pt-4 flex justify-between items-center'>
-                      <span className='font-bold text-lg'>Total Akhir</span>
-                      <span className='font-bold text-xl'>
-                        {formatIDR(validationData.summary.grandTotal)}
-                      </span>
-                    </div>
-                  </div>
+                  </Button>
                 </div>
-              )
-              : (
-                <div className='animate-pulse space-y-4'>
-                  <div className='h-4 bg-gray-200 rounded w-full'></div>
-                  <div className='h-4 bg-gray-200 rounded w-3/4'></div>
-                  <div className='h-6 bg-gray-200 rounded w-1/2 mt-4'></div>
-                </div>
-              )}
+              </div>
+            )}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

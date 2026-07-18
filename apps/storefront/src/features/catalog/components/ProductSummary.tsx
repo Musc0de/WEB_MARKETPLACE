@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { ProductDetail, ProductVariant } from '@starsuperscare/contracts';
-import { Button, formatIndonesianSold, H1, H3, Text } from '@starsuperscare/ui';
+import { Button, formatIndonesianSold } from '@starsuperscare/ui';
 import { toast } from '@starsuperscare/ui';
 import { Check, Loader2, ShieldCheck, ShoppingCart, Star } from 'lucide-react';
 import { WishlistButton } from '../../wishlist/components/WishlistButton.tsx';
@@ -22,7 +22,6 @@ export const ProductSummary = ({ product }: { product: ProductDetail }) => {
     product.variants.find((v: ProductVariant) => v.id === selectedVariantId) || product.variants[0];
 
   const price = selectedVariant?.price || product.variantsSummary.minPrice;
-  // Fall back to maxComparePrice if no variant is selected
   const comparePrice = selectedVariant?.comparePrice || product.variantsSummary.maxComparePrice ||
     null;
 
@@ -37,7 +36,6 @@ export const ProductSummary = ({ product }: { product: ProductDetail }) => {
     let newQty = quantity + amount;
     if (newQty < 1) newQty = 1;
 
-    // Clamp to available stock or purchase limit
     const maxQty = product.purchaseLimit > 0 ? Math.min(stock, product.purchaseLimit) : stock;
     if (newQty > maxQty) newQty = maxQty;
 
@@ -50,7 +48,6 @@ export const ProductSummary = ({ product }: { product: ProductDetail }) => {
     try {
       await addItem(selectedVariantId, quantity);
       setAddedToCart(true);
-      // Reset checkmark after 2 seconds
       setTimeout(() => setAddedToCart(false), 2000);
     } catch (_err) {
       toast.error('Gagal menambahkan ke keranjang');
@@ -63,8 +60,6 @@ export const ProductSummary = ({ product }: { product: ProductDetail }) => {
     if (!selectedVariantId || addingToCart) return;
     setAddingToCart(true);
     try {
-      // Direct buy: create a fresh isolated cart with ONLY this product
-      // so checkout shows only this item, not the user's entire cart
       const directToken = await createDirectBuyCart(selectedVariantId, quantity);
       navigate(`/checkout?directToken=${encodeURIComponent(directToken)}`);
     } catch (_err) {
@@ -77,49 +72,51 @@ export const ProductSummary = ({ product }: { product: ProductDetail }) => {
     <div className='flex flex-col'>
       {/* Brand · Rating · Sold row */}
       <div className='flex items-center flex-wrap gap-x-2 gap-y-1 mb-2'>
-        <span className='text-xs font-semibold text-blue-600 hover:underline cursor-pointer'>
+        <span className='text-[11px] font-black tracking-widest uppercase text-indigo-500 hover:text-indigo-600 transition-colors cursor-pointer'>
           {product.brand?.name || 'Unbranded'}
         </span>
-        <span className='text-gray-300 text-xs'>|</span>
-        <span className='flex items-center gap-0.5 text-xs text-yellow-500'>
+        <span className='text-muted-foreground/30 text-xs'>•</span>
+        <span className='flex items-center gap-0.5 text-xs text-amber-500'>
           <Star className='w-3.5 h-3.5 fill-current' />
-          <span className='text-gray-700 font-medium'>
+          <span className='text-foreground font-bold ml-1'>
             {product.reviewCount > 0 ? product.averageRating.toFixed(1) : 'Belum ada rating'}
           </span>
           {product.reviewCount > 0 && (
-            <span className='text-gray-400'>
-              ({product.reviewCount} ulasan)
+            <span className='text-muted-foreground font-medium'>
+              ({product.reviewCount})
             </span>
           )}
         </span>
-        <span className='text-gray-300 text-xs'>|</span>
-        <span className='text-xs text-gray-500'>
+        <span className='text-muted-foreground/30 text-xs'>•</span>
+        <span className='text-xs font-medium text-muted-foreground'>
           {product.netSold > 0
             ? `${formatIndonesianSold(product.netSold)} terjual`
             : 'Belum ada penjualan'}
         </span>
       </div>
 
-      <H1 className='text-2xl md:text-3xl font-bold mb-4 text-gray-900'>{product.name}</H1>
+      <h1 className='text-2xl md:text-3xl font-black mb-4 text-foreground leading-tight tracking-tight'>
+        {product.name}
+      </h1>
 
-      <div className='bg-gray-50 p-4 rounded-lg mb-6 border border-gray-100 flex flex-col gap-2'>
-        <div className='flex items-center gap-3 flex-wrap'>
-          <H3 className='text-3xl font-bold text-blue-700'>
+      <div className='bg-muted/10 p-4 lg:p-5 rounded-2xl mb-6 border border-border/60 flex flex-col gap-2'>
+        <div className='flex items-end gap-3 flex-wrap'>
+          <h3 className='text-3xl lg:text-4xl font-black text-indigo-600 dark:text-indigo-400 tracking-tighter'>
             Rp {price.toLocaleString('id-ID')}
-          </H3>
+          </h3>
           {hasDiscount && (
-            <>
-              <span className='text-base line-through text-gray-400'>
+            <div className='flex items-center gap-2 mb-1'>
+              <span className='text-sm lg:text-base font-bold line-through text-muted-foreground/60'>
                 Rp {comparePrice.toLocaleString('id-ID')}
               </span>
-              <span className='bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded'>
+              <span className='bg-rose-500 text-white text-[10px] lg:text-xs font-black px-2 py-0.5 rounded-md shadow-sm shadow-rose-500/20 tracking-wider'>
                 -{discountPct}%
               </span>
-            </>
+            </div>
           )}
         </div>
         {hasDiscount && (
-          <div className='w-max bg-red-100 text-red-600 font-semibold px-2.5 py-1 rounded-md border border-red-200 text-xs shadow-sm'>
+          <div className='w-max bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold px-2.5 py-1 rounded-md border border-emerald-500/20 text-[11px] shadow-sm mt-1'>
             Hemat Rp {savings.toLocaleString('id-ID')}
           </div>
         )}
@@ -128,7 +125,7 @@ export const ProductSummary = ({ product }: { product: ProductDetail }) => {
       {/* Variants Selector */}
       {product.variants.length > 1 && (
         <div className='mb-6'>
-          <Text className='font-bold mb-3 text-gray-800'>Pilih Varian:</Text>
+          <p className='font-bold mb-3 text-foreground text-sm'>Pilih Varian:</p>
           <div className='flex flex-wrap gap-2'>
             {product.variants.map((v: ProductVariant) => (
               <button
@@ -140,12 +137,12 @@ export const ProductSummary = ({ product }: { product: ProductDetail }) => {
                   setAddedToCart(false);
                 }}
                 disabled={v.availableStock <= 0}
-                className={`px-4 py-2 rounded-md border text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-xl border text-sm font-bold transition-all active:scale-95 ${
                   selectedVariantId === v.id
-                    ? 'border-blue-600 bg-blue-50 text-blue-700'
+                    ? 'border-indigo-500 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shadow-sm'
                     : v.availableStock <= 0
-                    ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
-                    : 'border-gray-300 bg-white text-gray-700 hover:border-blue-400'
+                    ? 'border-border/30 bg-muted/30 text-muted-foreground/40 cursor-not-allowed'
+                    : 'border-border/60 bg-card text-foreground hover:border-indigo-400 shadow-sm'
                 }`}
               >
                 {v.name ? v.name : v.sku}
@@ -157,73 +154,75 @@ export const ProductSummary = ({ product }: { product: ProductDetail }) => {
       )}
 
       {/* Quantity & Actions */}
-      <div className='flex flex-col gap-4 py-6 border-t border-b border-gray-100 mb-6'>
+      <div className='flex flex-col gap-5 py-6 border-t border-b border-border/60 mb-6'>
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-3'>
-            <Text className='font-bold text-gray-800'>Atur Jumlah:</Text>
-            <div className='flex items-center border border-gray-300 rounded-md'>
+            <p className='font-bold text-foreground text-sm'>Atur Jumlah:</p>
+            <div className='flex items-center border border-border/60 rounded-xl bg-card shadow-sm overflow-hidden'>
               <button
                 type='button'
                 onClick={() => handleQuantityChange(-1)}
                 disabled={isOutOfStock || quantity <= 1}
-                className='px-3 py-1 text-xl text-gray-600 disabled:text-gray-300 hover:bg-gray-100 rounded-l-md'
+                className='px-3.5 py-1.5 text-xl font-medium text-foreground disabled:text-muted-foreground/30 hover:bg-muted active:bg-muted/80 transition-colors'
               >
                 -
               </button>
-              <span className='w-12 text-center font-medium'>{quantity}</span>
+              <span className='w-10 text-center font-bold text-sm'>{quantity}</span>
               <button
                 type='button'
                 onClick={() => handleQuantityChange(1)}
                 disabled={isOutOfStock || quantity >= stock ||
                   (product.purchaseLimit > 0 && quantity >= product.purchaseLimit)}
-                className='px-3 py-1 text-xl text-gray-600 disabled:text-gray-300 hover:bg-gray-100 rounded-r-md'
+                className='px-3.5 py-1.5 text-xl font-medium text-foreground disabled:text-muted-foreground/30 hover:bg-muted active:bg-muted/80 transition-colors'
               >
                 +
               </button>
             </div>
           </div>
-          <Text className='text-sm text-gray-500'>
-            Sisa stok: <span className='font-bold text-gray-900'>{stock}</span>
-          </Text>
+          <p className='text-xs font-medium text-muted-foreground'>
+            Sisa stok: <span className='font-black text-foreground'>{stock}</span>
+          </p>
         </div>
 
-        <div className='flex gap-3 mt-4'>
+        <div className='flex gap-2 mt-2'>
           <Button
             variant='outline'
-            size='lg'
-            className={`flex-1 flex items-center justify-center gap-2 transition-all ${
+            className={`flex-1 flex flex-row items-center justify-center gap-1.5 transition-all font-bold rounded-xl active:scale-95 shadow-sm border-2 h-12 px-1 sm:px-4 ${
               addedToCart
-                ? 'border-green-500 text-green-600 bg-green-50 hover:bg-green-50'
-                : 'border-blue-600 text-blue-600 hover:bg-blue-50'
+                ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20'
+                : 'border-indigo-600 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/10'
             }`}
             onClick={handleAddToCart}
             disabled={isOutOfStock || addingToCart}
           >
             {addingToCart
-              ? <Loader2 className='w-5 h-5 animate-spin' />
+              ? <Loader2 className='w-4 h-4 sm:w-5 sm:h-5 animate-spin shrink-0' />
               : addedToCart
-              ? <Check className='w-5 h-5' />
-              : <ShoppingCart className='w-5 h-5' />}
-            {addedToCart ? 'Ditambahkan!' : '+ Keranjang'}
+              ? <Check className='w-4 h-4 sm:w-5 sm:h-5 shrink-0' />
+              : <ShoppingCart className='w-4 h-4 sm:w-5 sm:h-5 shrink-0' />}
+            <span className='whitespace-nowrap text-xs sm:text-sm'>
+              {addedToCart ? 'Berhasil' : '+ Keranjang'}
+            </span>
           </Button>
           <Button
-            size='lg'
-            className='flex-1 bg-blue-600 hover:bg-blue-700 text-white'
+            className='flex-1 flex flex-row items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl active:scale-95 shadow-md shadow-indigo-500/20 transition-all h-12 px-1 sm:px-4'
             onClick={handleBuyNow}
             disabled={isOutOfStock || addingToCart}
           >
-            {addingToCart ? <Loader2 className='w-5 h-5 animate-spin' /> : 'Beli Langsung'}
+            {addingToCart
+              ? <Loader2 className='w-4 h-4 sm:w-5 sm:h-5 animate-spin shrink-0' />
+              : <span className='whitespace-nowrap text-xs sm:text-sm'>Beli Langsung</span>}
           </Button>
           <WishlistButton
             productId={product.id}
-            className='p-3 w-[46px] h-[46px] border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center justify-center'
+            className='w-12 h-12 flex-shrink-0 border-2 border-border/60 rounded-xl hover:bg-muted transition-colors flex items-center justify-center shadow-sm text-foreground active:scale-95'
             iconClassName='w-6 h-6'
           />
         </div>
       </div>
 
-      <div className='flex items-center gap-2 text-sm text-gray-600 bg-green-50 p-3 rounded-md border border-green-100'>
-        <ShieldCheck className='w-5 h-5 text-green-600' />
+      <div className='flex items-center gap-2 text-xs font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 p-3.5 rounded-xl border border-emerald-500/20'>
+        <ShieldCheck className='w-5 h-5 text-emerald-600 dark:text-emerald-400' />
         <span>Jaminan aman berbelanja di StarSuperScare. 100% Ori.</span>
       </div>
     </div>

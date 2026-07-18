@@ -37,12 +37,12 @@ export function CatalogFilters(
   return (
     <div className='flex flex-col gap-6'>
       <div className='flex items-center justify-between'>
-        <Text className='font-bold text-lg text-gray-800'>Filter</Text>
+        <Text className='font-bold text-lg text-foreground'>Filter</Text>
         <Button
           variant='ghost'
           size='sm'
           onClick={resetFilters}
-          className='text-gray-500 h-8 px-2 text-xs'
+          className='text-muted-foreground h-8 px-2 text-xs font-bold hover:text-foreground hover:bg-muted/50'
         >
           <FilterX className='w-3 h-3 mr-1' />
           Reset
@@ -53,7 +53,7 @@ export function CatalogFilters(
         <div className='flex flex-col gap-2'>
           <Text className='font-semibold text-sm'>Kategori</Text>
           <select
-            className='w-full border border-gray-300 rounded-md p-2 text-sm'
+            className='w-full border border-input bg-background text-foreground rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-shadow font-medium shadow-sm'
             value={filters.category}
             onChange={(e) => updateFilter('category', e.target.value)}
           >
@@ -67,7 +67,7 @@ export function CatalogFilters(
         <div className='flex flex-col gap-2'>
           <Text className='font-semibold text-sm'>Brand</Text>
           <select
-            className='w-full border border-gray-300 rounded-md p-2 text-sm'
+            className='w-full border border-input bg-background text-foreground rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-shadow font-medium shadow-sm'
             value={filters.brand}
             onChange={(e) => updateFilter('brand', e.target.value)}
           >
@@ -91,7 +91,7 @@ export function CatalogFilters(
             }}
             className='h-8 text-sm'
           />
-          <span className='text-gray-400'>-</span>
+          <span className='text-muted-foreground font-bold'>-</span>
           <Input
             type='number'
             placeholder='Max'

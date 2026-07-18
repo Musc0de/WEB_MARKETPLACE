@@ -40,7 +40,12 @@ const Header = () => {
   const [isSuggestionsLoading, setIsSuggestionsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  const [accountUrl, setAccountUrl] = useState(`${(import.meta as any).env.VITE_AUTH_URL}/login`);
+  const authUrl = (import.meta as any).env?.VITE_AUTH_URL || '';
+  const dashboardUrl = (import.meta as any).env?.VITE_DASHBOARD_URL || '';
+  const [accountUrl, setAccountUrl] = useState(`${authUrl}/login`);
+  const [wishlistUrl, setWishlistUrl] = useState(
+    `${authUrl}/login?returnUrl=${encodeURIComponent(`${dashboardUrl}/wishlist`)}`,
+  );
   const { cart } = useCart();
   // Use TOTAL QUANTITY (sum of all item quantities) so the badge animates
   // every time any item is added — even if it's a quantity increment.
@@ -54,8 +59,8 @@ const Header = () => {
       try {
         const res = await client.v1.auth.me.$get();
         if (res.ok) {
-          const dashboardUrl = (import.meta as any).env?.VITE_DASHBOARD_URL;
           setAccountUrl(dashboardUrl);
+          setWishlistUrl(`${dashboardUrl}/wishlist`);
         }
       } catch (_err) {
         // ignore error, default to login url
@@ -287,7 +292,7 @@ const Header = () => {
         {/* Action Icons (Desktop) */}
         <div className='hidden md:flex items-center gap-2 shrink-0'>
           <a
-            href='/wishlist'
+            href={wishlistUrl}
             className='p-2 text-gray-600 hover:bg-gray-100 hover:text-blue-600 rounded-full transition-colors'
           >
             <svg
@@ -353,13 +358,18 @@ const Header = () => {
 
 const MobileBottomNav = () => {
   const location = useLocation();
-  const [accountUrl, setAccountUrl] = useState(`${(import.meta as any).env.VITE_AUTH_URL}/login`);
+  const authUrl = (import.meta as any).env?.VITE_AUTH_URL || '';
+  const dashboardUrl = (import.meta as any).env?.VITE_DASHBOARD_URL || '';
+  const [accountUrl, setAccountUrl] = useState(
+    `${authUrl}/login?return_to=${encodeURIComponent(globalThis.location?.href || '')}`,
+  );
+  const [wishlistUrl, setWishlistUrl] = useState(
+    `${authUrl}/login?returnUrl=${encodeURIComponent(`${dashboardUrl}/wishlist`)}`,
+  );
 
   useEffect(() => {
     setAccountUrl(
-      `${(import.meta as any).env.VITE_AUTH_URL}/login?return_to=${
-        encodeURIComponent(globalThis.location.href)
-      }`,
+      `${authUrl}/login?return_to=${encodeURIComponent(globalThis.location?.href || '')}`,
     );
   }, [location]);
 
@@ -368,8 +378,8 @@ const MobileBottomNav = () => {
       try {
         const res = await client.v1.auth.me.$get();
         if (res.ok) {
-          const dashboardUrl = (import.meta as any).env?.VITE_DASHBOARD_URL;
           setAccountUrl(dashboardUrl);
+          setWishlistUrl(`${dashboardUrl}/wishlist`);
         }
       } catch (_err) {
         // ignore error, default to login url
@@ -379,12 +389,14 @@ const MobileBottomNav = () => {
   }, []);
 
   return (
-    <nav className='md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 pb-safe'>
+    <nav className='md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border/60 pb-safe'>
       <div className='flex justify-around items-center h-14'>
         <a
           href='/'
-          className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${
-            location.pathname === '/' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-900'
+          className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
+            location.pathname === '/'
+              ? 'text-indigo-600 dark:text-indigo-400 font-bold'
+              : 'text-muted-foreground hover:text-foreground font-medium'
           }`}
         >
           <svg
@@ -405,10 +417,10 @@ const MobileBottomNav = () => {
         </a>
         <a
           href='/categories'
-          className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${
+          className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
             location.pathname.startsWith('/categories')
-              ? 'text-blue-600'
-              : 'text-gray-500 hover:text-gray-900'
+              ? 'text-indigo-600 dark:text-indigo-400 font-bold'
+              : 'text-muted-foreground hover:text-foreground font-medium'
           }`}
         >
           <svg
@@ -430,11 +442,11 @@ const MobileBottomNav = () => {
           <span className='text-[10px] font-medium'>Kategori</span>
         </a>
         <a
-          href='/wishlist'
-          className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${
+          href={wishlistUrl}
+          className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
             location.pathname === '/wishlist'
-              ? 'text-blue-600'
-              : 'text-gray-500 hover:text-gray-900'
+              ? 'text-indigo-600 dark:text-indigo-400 font-bold'
+              : 'text-muted-foreground hover:text-foreground font-medium'
           }`}
         >
           <svg
@@ -454,7 +466,7 @@ const MobileBottomNav = () => {
         </a>
         <a
           href={accountUrl}
-          className={`flex flex-col items-center justify-center w-full h-full space-y-1 text-gray-500 hover:text-gray-900`}
+          className={`flex flex-col items-center justify-center w-full h-full space-y-1 text-muted-foreground hover:text-foreground font-medium transition-colors`}
         >
           <svg
             xmlns='http://www.w3.org/2000/svg'
@@ -479,31 +491,41 @@ const MobileBottomNav = () => {
 
 const Footer = () => {
   return (
-    <footer className='border-t bg-white mt-12 pt-12 pb-24 md:pb-12'>
+    <footer className='border-t border-border/60 bg-card mt-12 pt-12 pb-24 md:pb-12 shadow-sm'>
       <div className='max-w-[1360px] mx-auto px-4 sm:px-8'>
         <div className='grid grid-cols-1 md:grid-cols-4 gap-8 mb-8'>
           <div className='col-span-1 md:col-span-2'>
-            <h3 className='font-bold text-lg mb-4 text-blue-600'>StarSuperScare</h3>
-            <p className='text-gray-500 text-sm max-w-sm'>
+            <h3 className='font-black text-xl tracking-tight mb-4 text-indigo-600 dark:text-indigo-400'>
+              StarSuperScare
+            </h3>
+            <p className='text-muted-foreground font-medium text-sm max-w-sm leading-relaxed'>
               Marketplace terpercaya untuk segala kebutuhan digital dan fisik Anda. Belanja aman,
               cepat, dan nyaman.
             </p>
           </div>
           <div>
-            <h4 className='font-semibold text-gray-900 mb-4'>Layanan Pelanggan</h4>
-            <ul className='space-y-2 text-sm text-gray-500'>
+            <h4 className='font-bold text-foreground mb-4 tracking-tight'>Layanan Pelanggan</h4>
+            <ul className='space-y-3 text-sm font-medium text-muted-foreground'>
               <li>
-                <a href='/help' className='hover:text-blue-600 transition-colors'>Bantuan</a>
+                <a
+                  href='/help'
+                  className='hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors'
+                >
+                  Bantuan
+                </a>
               </li>
               <li>
-                <a href='/returns' className='hover:text-blue-600 transition-colors'>
+                <a
+                  href='/returns'
+                  className='hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors'
+                >
                   Pengembalian Dana
                 </a>
               </li>
               <li>
                 <a
                   href={(import.meta as any).env?.VITE_TRACKING_URL || '#'}
-                  className='hover:text-blue-600 transition-colors'
+                  className='hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors'
                 >
                   Lacak Pesanan
                 </a>
@@ -511,25 +533,36 @@ const Footer = () => {
             </ul>
           </div>
           <div>
-            <h4 className='font-semibold text-gray-900 mb-4'>Jelajahi</h4>
-            <ul className='space-y-2 text-sm text-gray-500'>
+            <h4 className='font-bold text-foreground mb-4 tracking-tight'>Jelajahi</h4>
+            <ul className='space-y-3 text-sm font-medium text-muted-foreground'>
               <li>
-                <a href='/about' className='hover:text-blue-600 transition-colors'>Tentang Kami</a>
+                <a
+                  href='/about'
+                  className='hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors'
+                >
+                  Tentang Kami
+                </a>
               </li>
               <li>
-                <a href='/terms' className='hover:text-blue-600 transition-colors'>
+                <a
+                  href='/terms'
+                  className='hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors'
+                >
                   Syarat & Ketentuan
                 </a>
               </li>
               <li>
-                <a href='/privacy' className='hover:text-blue-600 transition-colors'>
+                <a
+                  href='/privacy'
+                  className='hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors'
+                >
                   Kebijakan Privasi
                 </a>
               </li>
             </ul>
           </div>
         </div>
-        <div className='border-t pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400'>
+        <div className='border-t border-border/60 pt-8 flex flex-col md:flex-row justify-between items-center text-sm font-bold text-muted-foreground/60'>
           <p>&copy; {new Date().getFullYear()} StarSuperScare. All rights reserved.</p>
         </div>
       </div>
@@ -539,15 +572,17 @@ const Footer = () => {
 
 export const StorefrontLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className='min-h-screen flex flex-col font-sans bg-gray-50 text-gray-900 pb-14 md:pb-0'>
+    <div className='min-h-screen flex flex-col font-sans bg-background text-foreground pb-14 md:pb-0'>
       <SEO appId='storefront' />
       <Header />
       <main className='flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-8 py-6'>
         <ErrorBoundary
           fallback={
-            <div className='p-6 bg-red-50 text-red-900 rounded-lg border border-red-200 shadow-sm'>
-              <h3 className='font-semibold mb-2'>Terjadi Kesalahan</h3>
-              <p className='text-sm'>Gagal memuat komponen. Silakan muat ulang halaman.</p>
+            <div className='p-6 bg-destructive/10 text-destructive rounded-xl border border-destructive/20 shadow-sm'>
+              <h3 className='font-bold mb-2'>Terjadi Kesalahan</h3>
+              <p className='text-sm font-medium'>
+                Gagal memuat komponen. Silakan muat ulang halaman.
+              </p>
             </div>
           }
         >

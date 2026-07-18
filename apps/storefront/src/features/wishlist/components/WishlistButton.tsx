@@ -16,10 +16,10 @@ export function WishlistButton({ productId, className, iconClassName }: Wishlist
     return (
       <button
         type='button'
-        className={cn('p-2 rounded-full hover:bg-zinc-100 transition-colors', className)}
+        className={cn('p-1.5 rounded-full transition-transform active:scale-95', className)}
         disabled
       >
-        <Heart className={cn('w-5 h-5 text-zinc-300', iconClassName)} />
+        <Heart className={cn('w-5 h-5 text-muted-foreground/50', iconClassName)} />
       </button>
     );
   }
@@ -35,7 +35,7 @@ export function WishlistButton({ productId, className, iconClassName }: Wishlist
         toggle(productId);
       }}
       className={cn(
-        'p-2 rounded-full hover:bg-zinc-100 transition-colors focus:outline-none focus:ring-2 focus:ring-black',
+        'p-1.5 rounded-full transition-transform active:scale-95 focus:outline-none',
         className,
       )}
       aria-label={isWished ? 'Remove from wishlist' : 'Add to wishlist'}
@@ -43,7 +43,9 @@ export function WishlistButton({ productId, className, iconClassName }: Wishlist
       <Heart
         className={cn(
           'w-5 h-5 transition-colors',
-          isWished ? 'fill-red-500 text-red-500' : 'text-zinc-500 hover:text-black',
+          isWished
+            ? 'fill-rose-500 text-rose-500'
+            : 'text-muted-foreground/70 hover:text-rose-500 dark:text-muted-foreground hover:dark:text-rose-400 drop-shadow-sm',
           iconClassName,
         )}
       />

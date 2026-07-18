@@ -8,60 +8,68 @@ export function MobileNav() {
   const storefrontUrl = (import.meta as any).env?.VITE_STOREFRONT_URL || 'http://localhost:5173';
 
   return (
-    <nav className='fixed bottom-0 left-0 right-0 z-50 flex h-14 items-center justify-between border-t bg-white px-6 pb-safe md:hidden shadow-[0_-2px_10px_rgba(0,0,0,0.05)]'>
+    <nav className='fixed bottom-0 left-0 right-0 z-50 flex h-14 items-center justify-between border-t border-border/60 bg-card px-6 pb-safe md:hidden'>
       <Link
         to='/'
-        className={`flex flex-col items-center gap-1 ${
-          pathname === '/' ? 'text-blue-600' : 'text-gray-500'
+        className={`flex flex-col items-center gap-1 transition-colors ${
+          pathname === '/'
+            ? 'text-indigo-600 dark:text-indigo-400 font-bold'
+            : 'text-muted-foreground hover:text-foreground font-medium'
         }`}
       >
         <Home className='h-5 w-5' />
-        <span className='text-[10px] font-medium'>Home</span>
+        <span className='text-[10px]'>Home</span>
       </Link>
 
       <Link
         to='/orders'
-        className={`flex flex-col items-center gap-1 ${
-          pathname === '/orders' ? 'text-blue-600' : 'text-gray-500'
+        className={`flex flex-col items-center gap-1 transition-colors ${
+          pathname === '/orders'
+            ? 'text-indigo-600 dark:text-indigo-400 font-bold'
+            : 'text-muted-foreground hover:text-foreground font-medium'
         }`}
       >
         <Package className='h-5 w-5' />
-        <span className='text-[10px] font-medium'>Orders</span>
+        <span className='text-[10px]'>Orders</span>
       </Link>
 
       <a
         href={`${storefrontUrl}/cart`}
-        className='flex flex-col items-center gap-1 text-gray-500 hover:text-blue-600'
+        className='flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground font-medium transition-colors'
       >
         <ShoppingCart className='h-5 w-5' />
-        <span className='text-[10px] font-medium'>Cart</span>
+        <span className='text-[10px]'>Cart</span>
       </a>
 
       <Link
         to='/notifications'
-        className={`flex flex-col items-center gap-1 ${
-          pathname === '/notifications' ? 'text-blue-600' : 'text-gray-500'
+        className={`flex flex-col items-center gap-1 transition-colors ${
+          pathname === '/notifications'
+            ? 'text-indigo-600 dark:text-indigo-400 font-bold'
+            : 'text-muted-foreground hover:text-foreground font-medium'
         }`}
       >
         <div className='relative'>
           <Bell className='h-5 w-5' />
           {(unreadCount ?? 0) > 0 && (
-            <span className='absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white border border-white'>
+            <span className='absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-destructive text-[8px] font-bold text-destructive-foreground border border-background'>
               {unreadCount! > 9 ? '9+' : unreadCount}
             </span>
           )}
         </div>
-        <span className='text-[10px] font-medium'>Notif</span>
+        <span className='text-[10px]'>Notif</span>
       </Link>
 
       <Link
         to='/profile'
-        className={`flex flex-col items-center gap-1 ${
-          pathname === '/profile' ? 'text-blue-600' : 'text-gray-500'
+        className={`flex flex-col items-center gap-1 transition-colors ${
+          pathname === '/profile'
+            ? 'text-indigo-600 dark:text-indigo-400 font-bold'
+            : 'text-muted-foreground hover:text-foreground font-medium'
         }`}
       >
         <User className='h-5 w-5' />
-        <span className='text-[10px] font-medium'>Account</span>
+        <span className='text-[10px]'>Account</span>
       </Link>
     </nav>
   );

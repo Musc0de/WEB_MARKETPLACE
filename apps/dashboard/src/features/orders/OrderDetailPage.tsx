@@ -33,62 +33,62 @@ const fmt = (n: number) => `Rp\u00a0${n.toLocaleString('id-ID')}`;
 
 const STATUS_CONFIG: Record<string, { style: string; dot: string; label: string }> = {
   pending: {
-    style: 'text-amber-700 bg-amber-50 border-amber-200',
+    style: 'text-amber-700 dark:text-amber-400 bg-amber-500/10 border-amber-500/20',
     dot: 'bg-amber-500',
     label: 'Menunggu Pembayaran',
   },
   paid: {
-    style: 'text-blue-700 bg-blue-50 border-blue-200',
+    style: 'text-blue-700 dark:text-blue-400 bg-blue-500/10 border-blue-500/20',
     dot: 'bg-blue-500',
     label: 'Dibayar',
   },
   processing: {
-    style: 'text-sky-700 bg-sky-50 border-sky-200',
+    style: 'text-sky-700 dark:text-sky-400 bg-sky-500/10 border-sky-500/20',
     dot: 'bg-sky-500',
     label: 'Diproses',
   },
   shipped: {
-    style: 'text-indigo-700 bg-indigo-50 border-indigo-200',
+    style: 'text-indigo-700 dark:text-indigo-400 bg-indigo-500/10 border-indigo-500/20',
     dot: 'bg-indigo-500',
     label: 'Dikirim',
   },
   delivered: {
-    style: 'text-emerald-700 bg-emerald-50 border-emerald-200',
+    style: 'text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
     dot: 'bg-emerald-500',
     label: 'Selesai',
   },
   cancelled: {
-    style: 'text-red-700 bg-red-50 border-red-200',
-    dot: 'bg-red-500',
+    style: 'text-rose-700 dark:text-rose-400 bg-rose-500/10 border-rose-500/20',
+    dot: 'bg-rose-500',
     label: 'Dibatalkan',
   },
   refunded: {
-    style: 'text-rose-700 bg-rose-50 border-rose-200',
-    dot: 'bg-rose-500',
+    style: 'text-purple-700 dark:text-purple-400 bg-purple-500/10 border-purple-500/20',
+    dot: 'bg-purple-500',
     label: 'Dikembalikan',
   },
   cancellation_requested: {
-    style: 'text-orange-700 bg-orange-50 border-orange-200',
+    style: 'text-orange-700 dark:text-orange-400 bg-orange-500/10 border-orange-500/20',
     dot: 'bg-orange-500',
     label: 'Pengajuan Pembatalan',
   },
   return_requested: {
-    style: 'text-purple-700 bg-purple-50 border-purple-200',
-    dot: 'bg-purple-500',
+    style: 'text-orange-700 dark:text-orange-400 bg-orange-500/10 border-orange-500/20',
+    dot: 'bg-orange-500',
     label: 'Pengajuan Pengembalian',
   },
   cancellation_rejected: {
-    style: 'text-red-700 bg-red-50 border-red-200',
-    dot: 'bg-red-500',
+    style: 'text-rose-700 dark:text-rose-400 bg-rose-500/10 border-rose-500/20',
+    dot: 'bg-rose-500',
     label: 'Batal Ditolak',
   },
   return_rejected: {
-    style: 'text-red-700 bg-red-50 border-red-200',
-    dot: 'bg-red-500',
+    style: 'text-rose-700 dark:text-rose-400 bg-rose-500/10 border-rose-500/20',
+    dot: 'bg-rose-500',
     label: 'Retur Ditolak',
   },
   refund_processed: {
-    style: 'text-teal-700 bg-teal-50 border-teal-200',
+    style: 'text-teal-700 dark:text-teal-400 bg-teal-500/10 border-teal-500/20',
     dot: 'bg-teal-500',
     label: 'Refund Diproses',
   },
@@ -96,7 +96,7 @@ const STATUS_CONFIG: Record<string, { style: string; dot: string; label: string 
 
 const getStatusCfg = (s: string) =>
   STATUS_CONFIG[s] ??
-    { style: 'text-gray-700 bg-gray-50 border-gray-200', dot: 'bg-gray-400', label: s };
+    { style: 'text-muted-foreground bg-muted border-border', dot: 'bg-muted-foreground', label: s };
 
 const variantLabel = (optionValues: any): string => {
   if (!optionValues) return '';
@@ -110,31 +110,35 @@ const variantLabel = (optionValues: any): string => {
 };
 
 const timelineIcon = (status: string) => {
-  if (status === 'delivered') return <CheckCircle2 className='w-4 h-4 text-emerald-600' />;
-  if (status === 'shipped') return <Truck className='w-4 h-4 text-indigo-600' />;
+  if (status === 'delivered') {
+    return <CheckCircle2 className='w-4 h-4 text-emerald-600 dark:text-emerald-400' />;
+  }
+  if (status === 'shipped') {
+    return <Truck className='w-4 h-4 text-indigo-600 dark:text-indigo-400' />;
+  }
   if (
     status === 'cancelled' || status === 'refunded' || status === 'cancellation_requested' ||
     status === 'return_rejected' || status === 'cancellation_rejected'
   ) {
-    return <XCircle className='w-4 h-4 text-red-500' />;
+    return <XCircle className='w-4 h-4 text-rose-500 dark:text-rose-400' />;
   }
   if (status === 'return_requested' || status === 'refund_processed') {
-    return <RefreshCcw className='w-4 h-4 text-purple-600' />;
+    return <RefreshCcw className='w-4 h-4 text-purple-600 dark:text-purple-400' />;
   }
-  return <Clock className='w-4 h-4 text-blue-500' />;
+  return <Clock className='w-4 h-4 text-blue-500 dark:text-blue-400' />;
 };
 
 const timelineDotColor = (status: string) => {
-  if (status === 'delivered') return 'border-emerald-400 bg-emerald-50';
-  if (status === 'shipped') return 'border-indigo-400 bg-indigo-50';
+  if (status === 'delivered') return 'border-emerald-500/40 bg-emerald-500/10';
+  if (status === 'shipped') return 'border-indigo-500/40 bg-indigo-500/10';
   if (
     status === 'cancelled' || status === 'refunded' || status === 'cancellation_requested' ||
     status === 'return_rejected' || status === 'cancellation_rejected'
-  ) return 'border-red-400 bg-red-50';
+  ) return 'border-rose-500/40 bg-rose-500/10';
   if (status === 'return_requested' || status === 'refund_processed') {
-    return 'border-purple-400 bg-purple-50';
+    return 'border-purple-500/40 bg-purple-500/10';
   }
-  return 'border-blue-400 bg-blue-50';
+  return 'border-blue-500/40 bg-blue-500/10';
 };
 
 // ─── component ──────────────────────────────────────────────────────────────
@@ -216,16 +220,16 @@ export const OrderDetailPage = () => {
   if (isLoading) {
     return (
       <div className='max-w-5xl mx-auto space-y-5 animate-pulse pb-10'>
-        <div className='h-8 w-52 bg-gray-100 rounded-xl' />
-        <div className='h-4 w-80 bg-gray-100 rounded-xl' />
+        <div className='h-8 w-52 bg-muted rounded-xl' />
+        <div className='h-4 w-80 bg-muted rounded-xl' />
         <div className='grid grid-cols-1 lg:grid-cols-3 gap-5 mt-4'>
           <div className='lg:col-span-2 space-y-5'>
-            <div className='h-56 bg-gray-100 rounded-2xl' />
-            <div className='h-44 bg-gray-100 rounded-2xl' />
+            <div className='h-56 bg-muted rounded-2xl' />
+            <div className='h-44 bg-muted rounded-2xl' />
           </div>
           <div className='space-y-5'>
-            <div className='h-52 bg-gray-100 rounded-2xl' />
-            <div className='h-44 bg-gray-100 rounded-2xl' />
+            <div className='h-52 bg-muted rounded-2xl' />
+            <div className='h-44 bg-muted rounded-2xl' />
           </div>
         </div>
       </div>
@@ -235,16 +239,18 @@ export const OrderDetailPage = () => {
   /* ── Error ── */
   if (error || !data) {
     return (
-      <div className='text-center py-24 max-w-sm mx-auto'>
-        <div className='w-16 h-16 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center mx-auto mb-5'>
-          <Package className='w-8 h-8 text-red-300' />
+      <div className='text-center py-24 max-w-sm mx-auto bg-card rounded-3xl border border-border/60 shadow-sm mt-10'>
+        <div className='w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mx-auto mb-5'>
+          <Package className='w-8 h-8 text-rose-500/60' />
         </div>
-        <p className='text-base font-bold text-gray-800 mb-1'>Pesanan Tidak Ditemukan</p>
-        <p className='text-sm text-gray-400 mb-6'>Pesanan yang Anda cari tidak tersedia.</p>
+        <p className='text-lg font-bold text-foreground mb-1'>Pesanan Tidak Ditemukan</p>
+        <p className='text-sm text-muted-foreground mb-6'>
+          Pesanan yang Anda cari tidak tersedia atau mungkin sudah dihapus.
+        </p>
         <button
           type='button'
           onClick={() => navigate('/orders')}
-          className='inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full border-2 border-gray-200 text-gray-700 hover:bg-gray-50 transition'
+          className='inline-flex items-center gap-2 px-6 py-2.5 text-sm font-bold rounded-full border-2 border-border text-foreground hover:bg-muted transition active:scale-95'
         >
           <ArrowLeft className='w-4 h-4' />
           Kembali ke Pesanan
@@ -278,29 +284,29 @@ export const OrderDetailPage = () => {
     : 0;
 
   return (
-    <div className='space-y-6 max-w-5xl mx-auto pb-10'>
+    <div className='space-y-6 max-w-5xl mx-auto pb-12 animate-in fade-in slide-in-from-bottom-4 duration-700'>
       {/* ══════════ Header ══════════ */}
       <div className='flex flex-col sm:flex-row sm:items-start justify-between gap-4'>
         <div className='flex items-start gap-3'>
           <button
             type='button'
             onClick={() => navigate('/orders')}
-            className='mt-0.5 p-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 active:scale-95 transition shrink-0'
+            className='mt-0.5 p-2 rounded-xl border border-border bg-card hover:bg-muted active:scale-95 transition shrink-0 shadow-sm'
           >
-            <ArrowLeft className='w-4 h-4 text-gray-600' />
+            <ArrowLeft className='w-4 h-4 text-foreground' />
           </button>
           <div>
             <div className='flex items-center gap-2.5 flex-wrap'>
-              <h2 className='text-lg font-bold text-gray-900'>{order.orderNumber}</h2>
+              <h2 className='text-lg font-black text-foreground'>{order.orderNumber}</h2>
               <Badge
                 variant='outline'
-                className={`${cfg.style} border rounded-full px-3 py-0.5 text-xs font-bold`}
+                className={`${cfg.style} border rounded-full px-3 py-0.5 text-xs font-bold tracking-wider uppercase`}
               >
                 {cfg.label}
               </Badge>
             </div>
-            <p className='text-xs text-gray-400 mt-1 flex items-center gap-1.5'>
-              <Clock className='w-3 h-3' />
+            <p className='text-xs font-medium text-muted-foreground mt-1 flex items-center gap-1.5'>
+              <Clock className='w-3.5 h-3.5' />
               Dibuat {new Date(order.createdAt).toLocaleString('id-ID', {
                 dateStyle: 'long',
                 timeStyle: 'short',
@@ -310,12 +316,12 @@ export const OrderDetailPage = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className='flex items-center gap-2 pl-11 sm:pl-0 shrink-0'>
+        <div className='flex flex-wrap sm:flex-nowrap items-center gap-2 pl-12 sm:pl-0 shrink-0 w-full sm:w-auto'>
           <button
             type='button'
             onClick={handleInvoice}
             disabled={isGeneratingInvoice}
-            className='inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-full border-2 border-gray-200 text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 active:scale-95 transition disabled:opacity-60'
+            className='flex-1 sm:flex-none inline-flex justify-center items-center gap-1.5 px-4 py-2.5 text-xs font-bold rounded-full border-2 border-border text-foreground bg-card hover:bg-muted active:scale-95 transition disabled:opacity-60 shadow-sm'
           >
             {isGeneratingInvoice
               ? <RefreshCcw className='w-3.5 h-3.5 animate-spin' />
@@ -326,7 +332,7 @@ export const OrderDetailPage = () => {
             type='button'
             onClick={handleBuyAgain}
             disabled={isBuyingAgain}
-            className='inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-full bg-orange-500 text-white hover:bg-orange-600 active:scale-95 transition disabled:opacity-50 shadow-sm shadow-orange-200'
+            className='flex-1 sm:flex-none inline-flex justify-center items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-full bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 transition disabled:opacity-50 shadow-md shadow-indigo-600/20'
           >
             {isBuyingAgain
               ? <RefreshCcw className='w-3.5 h-3.5 animate-spin' />
@@ -337,17 +343,19 @@ export const OrderDetailPage = () => {
       </div>
 
       {/* ══════════ Main Grid ══════════ */}
-      <div className='grid grid-cols-1 lg:grid-cols-3 gap-5'>
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
         {/* ── Left column ── */}
-        <div className='lg:col-span-2 space-y-5'>
+        <div className='lg:col-span-2 space-y-6'>
           {/* Products Card */}
-          <div className='bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm'>
-            <div className='px-5 py-4 border-b border-gray-100 flex items-center gap-2 bg-gradient-to-r from-orange-50/50 to-transparent'>
-              <Package className='w-4 h-4 text-orange-500' />
-              <h3 className='text-sm font-bold text-gray-900'>Detail Produk</h3>
-              <span className='text-xs text-gray-400 font-normal'>({items.length} item)</span>
+          <div className='bg-card border border-border/60 rounded-3xl overflow-hidden shadow-sm'>
+            <div className='px-5 py-4 border-b border-border/40 flex items-center gap-2 bg-indigo-500/5'>
+              <Package className='w-4 h-4 text-indigo-500' />
+              <h3 className='text-sm font-bold text-foreground'>Detail Produk</h3>
+              <span className='text-[11px] text-muted-foreground font-semibold'>
+                ({items.length} item)
+              </span>
             </div>
-            <div className='divide-y divide-gray-100'>
+            <div className='divide-y divide-border/40'>
               {items.map((item: any) => {
                 const label = variantLabel(item.optionValues);
                 const hasItemDiscount = item.comparePrice && item.comparePrice > item.priceSnapshot;
@@ -359,64 +367,71 @@ export const OrderDetailPage = () => {
                 return (
                   <div
                     key={item.id}
-                    className='px-5 py-4 flex gap-4 hover:bg-gray-50/50 transition-colors'
+                    className='px-4 sm:px-5 py-5 flex flex-col sm:flex-row gap-4 hover:bg-muted/30 transition-colors'
                   >
-                    {/* Image */}
-                    <div className='w-[76px] h-[76px] rounded-xl overflow-hidden shrink-0 bg-gray-100 border border-gray-200'>
-                      {item.imageUrl
-                        ? (
-                          <img
-                            src={item.imageUrl}
-                            alt={item.productNameSnapshot}
-                            loading='lazy'
-                            decoding='async'
-                            className='w-full h-full object-cover'
-                            onError={(e) => {
-                              (e.currentTarget as HTMLImageElement).style.display = 'none';
-                            }}
-                          />
-                        )
-                        : (
-                          <div className='w-full h-full flex items-center justify-center'>
-                            <Package className='w-7 h-7 text-gray-300' />
-                          </div>
-                        )}
-                    </div>
+                    <div className='flex gap-4 flex-1 min-w-0'>
+                      {/* Image */}
+                      <div className='w-16 h-16 sm:w-[76px] sm:h-[76px] rounded-xl overflow-hidden shrink-0 bg-muted/50 border border-border/40'>
+                        {item.imageUrl
+                          ? (
+                            <img
+                              src={item.imageUrl}
+                              alt={item.productNameSnapshot}
+                              loading='lazy'
+                              decoding='async'
+                              className='w-full h-full object-cover'
+                              onError={(e) => {
+                                (e.currentTarget as HTMLImageElement).style.display = 'none';
+                              }}
+                            />
+                          )
+                          : (
+                            <div className='w-full h-full flex items-center justify-center'>
+                              <Package className='w-6 h-6 sm:w-7 sm:h-7 text-muted-foreground/50' />
+                            </div>
+                          )}
+                      </div>
 
-                    {/* Info */}
-                    <div className='flex-1 min-w-0'>
-                      <p className='font-semibold text-gray-900 text-sm leading-snug line-clamp-2'>
-                        {item.productNameSnapshot}
-                      </p>
-                      <p className='text-[11px] text-gray-400 mt-0.5 font-mono'>
-                        {item.variantSkuSnapshot}
-                      </p>
-                      {label && (
-                        <span className='inline-block mt-1 text-[11px] text-indigo-600 bg-indigo-50 border border-indigo-100 rounded px-2 py-0.5 font-medium'>
-                          {label}
-                        </span>
-                      )}
-                      <div className='mt-2 flex items-center gap-2'>
-                        {hasItemDiscount && (
-                          <span className='text-[11px] text-gray-400 line-through tabular-nums'>
-                            {fmt(item.comparePrice)}
+                      {/* Info */}
+                      <div className='flex-1 min-w-0'>
+                        <p className='font-bold text-foreground text-sm leading-snug line-clamp-2'>
+                          {item.productNameSnapshot}
+                        </p>
+                        <p className='text-[10px] sm:text-[11px] text-muted-foreground mt-0.5 font-mono uppercase'>
+                          {item.variantSkuSnapshot}
+                        </p>
+                        {label && (
+                          <span className='inline-block mt-1.5 text-[10px] text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 rounded px-2 py-0.5 font-bold uppercase tracking-wider'>
+                            {label}
                           </span>
                         )}
-                        <span className='text-sm font-bold text-orange-600 tabular-nums'>
-                          {fmt(item.priceSnapshot)}
-                        </span>
-                        <span className='text-xs text-gray-400'>× {item.quantity}</span>
-                        {savedAmount > 0 && (
-                          <span className='text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded px-1.5 py-0.5'>
-                            Hemat {fmt(savedAmount)}
+                        <div className='mt-2.5 flex flex-wrap items-center gap-1.5 sm:gap-2'>
+                          {hasItemDiscount && (
+                            <span className='text-[10px] sm:text-[11px] text-muted-foreground/70 line-through tabular-nums'>
+                              {fmt(item.comparePrice)}
+                            </span>
+                          )}
+                          <span className='text-sm font-black text-indigo-600 dark:text-indigo-400 tabular-nums'>
+                            {fmt(item.priceSnapshot)}
                           </span>
-                        )}
+                          <span className='text-xs font-semibold text-muted-foreground mx-0.5'>
+                            × {item.quantity}
+                          </span>
+                          {savedAmount > 0 && (
+                            <span className='text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded px-1.5 py-0.5 uppercase tracking-wider mt-1 sm:mt-0 block sm:inline-block'>
+                              Hemat {fmt(savedAmount)}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
 
                     {/* Line total */}
-                    <div className='shrink-0 text-right flex flex-col justify-end'>
-                      <span className='text-sm font-bold text-gray-900 tabular-nums'>
+                    <div className='shrink-0 sm:text-right flex flex-row sm:flex-col justify-between sm:justify-end items-end sm:items-end border-t sm:border-t-0 border-border/40 pt-3 sm:pt-0 mt-2 sm:mt-0'>
+                      <span className='text-[11px] text-muted-foreground font-semibold sm:hidden'>
+                        Subtotal Barang
+                      </span>
+                      <span className='text-sm sm:text-base font-black text-foreground tabular-nums'>
                         {fmt(lineTotal)}
                       </span>
                     </div>
@@ -428,15 +443,14 @@ export const OrderDetailPage = () => {
 
           {/* Help Card */}
           {eligibilityData && (
-            <div className='bg-white border border-rose-100 rounded-2xl overflow-hidden shadow-sm'>
-              <div className='px-5 py-4 border-b border-rose-100 flex items-center gap-2 bg-gradient-to-r from-rose-50/50 to-transparent'>
+            <div className='bg-card border border-rose-500/20 rounded-3xl overflow-hidden shadow-sm'>
+              <div className='px-5 py-4 border-b border-rose-500/20 flex items-center gap-2 bg-rose-500/5'>
                 <Copy className='w-4 h-4 text-rose-500' />
-                <h3 className='text-sm font-bold text-gray-900'>
+                <h3 className='text-sm font-bold text-foreground'>
                   Butuh Bantuan dengan Pesanan Ini?
                 </h3>
               </div>
               <div className='p-5 flex flex-col gap-4'>
-                {/* Cancellation Section */}
                 {/* Cancellation Section */}
                 <div>
                   {eligibilityData.cancellationEligibility?.eligible
@@ -444,14 +458,14 @@ export const OrderDetailPage = () => {
                       <button
                         type='button'
                         onClick={() => navigate(`/returns/new?orderId=${id}&type=cancel`)}
-                        className='w-full py-2.5 rounded-xl font-bold transition active:scale-95 bg-rose-50 text-rose-600 hover:bg-rose-100'
+                        className='w-full py-2.5 rounded-full font-bold transition active:scale-95 bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 text-xs sm:text-sm'
                       >
                         Ajukan Pembatalan
                       </button>
                     )
                     : (
-                      <div className='w-full py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-center px-4'>
-                        <p className='text-xs font-medium text-gray-500 leading-snug'>
+                      <div className='w-full py-3 bg-muted/40 border border-border/60 rounded-xl text-center px-4'>
+                        <p className='text-xs font-semibold text-muted-foreground leading-snug'>
                           {eligibilityData.cancellationEligibility?.reasonMessage ||
                             'Pesanan tidak dapat dibatalkan.'}
                         </p>
@@ -460,22 +474,22 @@ export const OrderDetailPage = () => {
                 </div>
 
                 {/* Return/Refund Section */}
-                <div className='border-t border-gray-100 pt-4'>
+                <div className='border-t border-border/40 pt-4'>
                   {eligibilityData.returnEligibility?.eligible
                     ? (
                       <button
                         type='button'
                         onClick={() => navigate(`/returns/new?orderId=${id}`)}
-                        className='w-full py-2.5 rounded-xl font-bold transition active:scale-95 bg-orange-50 text-orange-600 hover:bg-orange-100'
+                        className='w-full py-2.5 rounded-full font-bold transition active:scale-95 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 text-xs sm:text-sm'
                       >
                         Ajukan Pengembalian Barang / Dana
                       </button>
                     )
                     : eligibilityData.returnEligibility?.reasonCode === 'active_request_exists'
                     ? (
-                      <div className='flex flex-col gap-2'>
-                        <div className='w-full py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-center px-4'>
-                          <p className='text-xs font-medium text-gray-500 leading-snug'>
+                      <div className='flex flex-col gap-3'>
+                        <div className='w-full py-3 bg-muted/40 border border-border/60 rounded-xl text-center px-4'>
+                          <p className='text-xs font-semibold text-muted-foreground leading-snug'>
                             {eligibilityData.returnEligibility?.reasonMessage ||
                               'Terdapat riwayat pengajuan pengembalian.'}
                           </p>
@@ -483,15 +497,15 @@ export const OrderDetailPage = () => {
                         <button
                           type='button'
                           onClick={() => navigate(`/returns`)}
-                          className='w-full py-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-xl text-xs font-bold transition active:scale-95'
+                          className='w-full py-2.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20 rounded-full text-xs font-bold transition active:scale-95'
                         >
                           Lihat Status Pengembalian
                         </button>
                       </div>
                     )
                     : (
-                      <div className='w-full py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-center px-4'>
-                        <p className='text-xs font-medium text-gray-500 leading-snug'>
+                      <div className='w-full py-3 bg-muted/40 border border-border/60 rounded-xl text-center px-4'>
+                        <p className='text-xs font-semibold text-muted-foreground leading-snug'>
                           {eligibilityData.returnEligibility?.reasonMessage ||
                             'Tidak tersedia untuk status saat ini.'}
                         </p>
@@ -503,12 +517,12 @@ export const OrderDetailPage = () => {
           )}
 
           {/* Timeline Card */}
-          <div className='bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm'>
-            <div className='px-5 py-4 border-b border-gray-100 flex items-center gap-2 bg-gradient-to-r from-indigo-50/50 to-transparent'>
+          <div className='bg-card border border-border/60 rounded-3xl overflow-hidden shadow-sm'>
+            <div className='px-5 py-4 border-b border-border/40 flex items-center gap-2 bg-indigo-500/5'>
               <Truck className='w-4 h-4 text-indigo-500' />
-              <h3 className='text-sm font-bold text-gray-900'>Lacak Pesanan</h3>
+              <h3 className='text-sm font-bold text-foreground'>Lacak Pesanan</h3>
             </div>
-            <div className='px-5 py-5'>
+            <div className='px-5 py-6'>
               <div className='space-y-0'>
                 {history.map((event: any, idx: number) => {
                   const isLast = idx === history.length - 1;
@@ -520,22 +534,22 @@ export const OrderDetailPage = () => {
                         <div
                           className={`w-8 h-8 rounded-full border-2 ${
                             timelineDotColor(event.status)
-                          } flex items-center justify-center shrink-0`}
+                          } flex items-center justify-center shrink-0 shadow-sm`}
                         >
                           {timelineIcon(event.status)}
                         </div>
-                        {!isLast && <div className='w-px flex-1 bg-gray-100 my-1.5 min-h-[20px]' />}
+                        {!isLast && <div className='w-px flex-1 bg-border/60 my-2 min-h-[24px]' />}
                       </div>
                       {/* content */}
-                      <div className={`flex-1 pb-5 ${isLast ? 'pb-0' : ''}`}>
+                      <div className={`flex-1 pb-6 ${isLast ? 'pb-0' : ''}`}>
                         <div className='flex items-center gap-2 flex-wrap'>
                           <Badge
                             variant='outline'
-                            className={`${evtCfg.style} border rounded-full px-2 py-0 text-[11px] font-bold`}
+                            className={`${evtCfg.style} border rounded-full px-2 py-0 text-[10px] font-bold uppercase tracking-wider`}
                           >
                             {evtCfg.label}
                           </Badge>
-                          <span className='text-[11px] text-gray-400 flex items-center gap-1'>
+                          <span className='text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5'>
                             <Clock className='w-3 h-3' />
                             {new Date(event.createdAt).toLocaleString('id-ID', {
                               dateStyle: 'medium',
@@ -548,21 +562,24 @@ export const OrderDetailPage = () => {
                             (() => {
                               const infoStr = event.note.replace('[TRACKING]', '').trim();
                               const parts = infoStr.split('|').map((s: string) => s.trim());
-                              const kurirPart = parts.find((p: string) => p.startsWith('Kurir:'))
+                              const kurirPart = parts.find((p: string) =>
+                                p.startsWith('Kurir:')
+                              )
                                 ?.replace('Kurir:', '').trim();
                               const resiPart = parts.find((p: string) => p.startsWith('Resi:'))
                                 ?.replace('Resi:', '').trim();
 
                               return (
-                                <div className='mt-2 bg-indigo-50/50 border border-indigo-100 rounded-lg p-3 flex items-center justify-between gap-3'>
+                                <div className='mt-3 bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-4 flex items-center justify-between gap-3'>
                                   <div className='flex flex-col'>
-                                    <span className='text-[10px] text-indigo-400 font-bold uppercase tracking-wider mb-0.5'>
+                                    <span className='text-[10px] text-indigo-600/80 dark:text-indigo-400/80 font-bold uppercase tracking-widest mb-1'>
                                       Informasi Pengiriman
                                     </span>
-                                    <span className='text-sm text-indigo-900 font-semibold'>
+                                    <span className='text-sm sm:text-base text-indigo-700 dark:text-indigo-300 font-black'>
                                       {kurirPart}{' '}
-                                      <span className='text-indigo-300 font-normal mx-1'>•</span>
-                                      {' '}
+                                      <span className='text-indigo-500/40 font-normal mx-1.5'>
+                                        •
+                                      </span>{' '}
                                       {resiPart}
                                     </span>
                                   </div>
@@ -573,7 +590,7 @@ export const OrderDetailPage = () => {
                                         navigator.clipboard.writeText(resiPart);
                                         toast.success('Nomor resi berhasil disalin!');
                                       }}
-                                      className='p-2 text-indigo-600 hover:text-indigo-700 bg-white shadow-sm hover:shadow border border-indigo-100 rounded-lg transition-all active:scale-95'
+                                      className='p-2.5 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 bg-card shadow-sm hover:shadow-md border border-indigo-500/20 rounded-xl transition-all active:scale-95'
                                       title='Salin Resi'
                                     >
                                       <Copy className='w-4 h-4' />
@@ -585,7 +602,7 @@ export const OrderDetailPage = () => {
                           )
                           : event.note
                           ? (
-                            <p className='mt-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-100 rounded-lg px-3 py-2'>
+                            <p className='mt-2 text-xs sm:text-sm font-medium text-muted-foreground bg-muted/40 border border-border/40 rounded-xl px-4 py-3 leading-relaxed'>
                               {event.note}
                             </p>
                           )
@@ -600,18 +617,18 @@ export const OrderDetailPage = () => {
         </div>
 
         {/* ── Right sidebar ── */}
-        <div className='space-y-5'>
+        <div className='space-y-6'>
           {/* Payment Summary Card */}
-          <div className='bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm'>
-            <div className='px-5 py-4 border-b border-gray-100 flex items-center gap-2 bg-gradient-to-r from-blue-50/50 to-transparent'>
-              <CreditCard className='w-4 h-4 text-blue-500' />
-              <h3 className='text-sm font-bold text-gray-900'>Rincian Pembayaran</h3>
+          <div className='bg-card border border-border/60 rounded-3xl overflow-hidden shadow-sm'>
+            <div className='px-5 py-4 border-b border-border/40 flex items-center gap-2 bg-emerald-500/5'>
+              <CreditCard className='w-4 h-4 text-emerald-500' />
+              <h3 className='text-sm font-bold text-foreground'>Rincian Pembayaran</h3>
             </div>
-            <div className='px-5 py-4 space-y-3'>
+            <div className='px-5 py-5 space-y-3.5'>
               {/* Subtotal */}
               <div className='flex justify-between items-center text-sm'>
-                <span className='text-gray-500'>Subtotal harga normal</span>
-                <span className='text-gray-800 font-medium tabular-nums'>
+                <span className='text-muted-foreground font-medium'>Subtotal produk</span>
+                <span className='text-foreground font-semibold tabular-nums'>
                   {fmt(order.subtotalAmount)}
                 </span>
               </div>
@@ -619,15 +636,15 @@ export const OrderDetailPage = () => {
               {/* Discount */}
               {hasDiscount && (
                 <div className='flex justify-between items-center text-sm'>
-                  <span className='flex items-center gap-1.5 text-emerald-600 font-medium'>
+                  <span className='flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold'>
                     Diskon produk
                     {discountPct > 0 && (
-                      <span className='text-[10px] bg-emerald-100 text-emerald-700 border border-emerald-200 rounded px-1.5 py-0.5 font-bold'>
+                      <span className='text-[10px] bg-emerald-500/10 border border-emerald-500/20 rounded px-1.5 py-0.5 font-black tracking-wider uppercase'>
                         -{discountPct}%
                       </span>
                     )}
                   </span>
-                  <span className='text-emerald-600 font-medium tabular-nums'>
+                  <span className='text-emerald-600 dark:text-emerald-400 font-bold tabular-nums'>
                     − {fmt(order.discountAmount)}
                   </span>
                 </div>
@@ -635,8 +652,8 @@ export const OrderDetailPage = () => {
 
               {/* Shipping */}
               <div className='flex justify-between items-center text-sm'>
-                <span className='text-gray-500'>Ongkos kirim</span>
-                <span className='text-gray-800 font-medium tabular-nums'>
+                <span className='text-muted-foreground font-medium'>Ongkos kirim</span>
+                <span className='text-foreground font-semibold tabular-nums'>
                   {fmt(order.shippingAmount)}
                 </span>
               </div>
@@ -644,18 +661,20 @@ export const OrderDetailPage = () => {
               {/* Tax */}
               {((order as any).taxAmount || 0) > 0 && (
                 <div className='flex justify-between items-center text-sm'>
-                  <span className='text-gray-500'>Pajak</span>
-                  <span className='text-gray-800 font-medium tabular-nums'>
+                  <span className='text-muted-foreground font-medium'>Pajak</span>
+                  <span className='text-foreground font-semibold tabular-nums'>
                     {fmt((order as any).taxAmount)}
                   </span>
                 </div>
               )}
 
               {/* Total */}
-              <div className='pt-3 mt-2 border-t-2 border-dashed border-gray-100'>
+              <div className='pt-4 mt-3 border-t-2 border-dashed border-border/60'>
                 <div className='flex justify-between items-center'>
-                  <span className='font-bold text-gray-900 text-sm'>Total</span>
-                  <span className='font-bold text-lg text-orange-600 tabular-nums'>
+                  <span className='font-black text-foreground text-sm uppercase tracking-widest'>
+                    Total Belanja
+                  </span>
+                  <span className='font-black text-xl text-indigo-600 dark:text-indigo-400 tabular-nums'>
                     {fmt(order.totalAmount)}
                   </span>
                 </div>
@@ -670,14 +689,20 @@ export const OrderDetailPage = () => {
                 const remaining = order.totalAmount - paidAmount;
 
                 return (
-                  <div className='pt-2 space-y-2 border-t border-gray-100'>
-                    <div className='flex justify-between text-sm font-semibold'>
-                      <span className='text-gray-700'>Jumlah dibayar</span>
-                      <span className='text-emerald-600'>{fmt(paidAmount)}</span>
+                  <div className='pt-3 space-y-2 border-t border-border/40 mt-1'>
+                    <div className='flex justify-between text-[13px] font-bold'>
+                      <span className='text-muted-foreground'>Jumlah dibayar</span>
+                      <span className='text-emerald-600 dark:text-emerald-400'>
+                        {fmt(paidAmount)}
+                      </span>
                     </div>
-                    <div className='flex justify-between text-sm font-semibold'>
-                      <span className='text-gray-700'>Sisa pembayaran</span>
-                      <span className={remaining > 0 ? 'text-red-500' : 'text-emerald-600'}>
+                    <div className='flex justify-between text-[13px] font-bold'>
+                      <span className='text-muted-foreground'>Sisa pembayaran</span>
+                      <span
+                        className={remaining > 0
+                          ? 'text-rose-500 dark:text-rose-400'
+                          : 'text-emerald-600 dark:text-emerald-400'}
+                      >
                         {fmt(remaining)}
                       </span>
                     </div>
@@ -689,22 +714,22 @@ export const OrderDetailPage = () => {
 
           {/* Shipping Address Card */}
           {shipping && (
-            <div className='bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm'>
-              <div className='px-5 py-4 border-b border-gray-100 flex items-center gap-2 bg-gradient-to-r from-emerald-50/50 to-transparent'>
-                <MapPin className='w-4 h-4 text-emerald-500' />
-                <h3 className='text-sm font-bold text-gray-900'>Alamat Pengiriman</h3>
+            <div className='bg-card border border-border/60 rounded-3xl overflow-hidden shadow-sm'>
+              <div className='px-5 py-4 border-b border-border/40 flex items-center gap-2 bg-amber-500/5'>
+                <MapPin className='w-4 h-4 text-amber-500' />
+                <h3 className='text-sm font-bold text-foreground'>Alamat Pengiriman</h3>
               </div>
-              <div className='px-5 py-4 space-y-4'>
+              <div className='px-5 py-5 space-y-4'>
                 {/* Recipient */}
-                <div className='flex gap-3'>
-                  <div className='w-8 h-8 rounded-lg bg-orange-50 border border-orange-100 flex items-center justify-center shrink-0'>
-                    <User className='w-4 h-4 text-orange-400' />
+                <div className='flex gap-4'>
+                  <div className='w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center shrink-0'>
+                    <User className='w-4.5 h-4.5 text-indigo-500' />
                   </div>
-                  <div>
-                    <p className='font-bold text-gray-900 text-sm'>
+                  <div className='flex-1'>
+                    <p className='font-black text-foreground text-sm tracking-wide'>
                       {shipping.fullName || shipping.recipientName}
                     </p>
-                    <p className='text-xs text-gray-400 flex items-center gap-1 mt-0.5'>
+                    <p className='text-xs font-semibold text-muted-foreground flex items-center gap-1.5 mt-1'>
                       <Phone className='w-3 h-3' />
                       {shipping.phoneNumber || shipping.phone}
                     </p>
@@ -712,17 +737,17 @@ export const OrderDetailPage = () => {
                 </div>
 
                 {/* Address */}
-                <div className='flex gap-3'>
-                  <div className='w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 mt-0.5'>
-                    <MapPin className='w-4 h-4 text-emerald-400' />
+                <div className='flex gap-4'>
+                  <div className='w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0 mt-0.5'>
+                    <MapPin className='w-4.5 h-4.5 text-amber-500' />
                   </div>
-                  <div className='text-sm text-gray-600 leading-relaxed'>
-                    <p className='font-medium text-gray-800'>
+                  <div className='text-[13px] text-muted-foreground font-medium leading-relaxed flex-1'>
+                    <p className='font-bold text-foreground mb-1'>
                       {shipping.streetAddress || shipping.addressLine1}
                       {shipping.addressLine2 ? `, ${shipping.addressLine2}` : ''}
                     </p>
                     <p>{shipping.district ? `${shipping.district}, ` : ''}{shipping.city}</p>
-                    <p className='text-gray-400 text-xs mt-0.5'>
+                    <p className='text-muted-foreground/70 text-[11px] font-bold mt-1 uppercase tracking-wider'>
                       {shipping.province} {shipping.postalCode}
                     </p>
                   </div>

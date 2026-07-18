@@ -27,26 +27,26 @@ const routes = router.post(
     const voucherList = await db.select().from(vouchers).where(eq(vouchers.code, code)).limit(1);
 
     if (voucherList.length === 0) {
-      return c.json({ error: 'Voucher not found' }, 404);
+      return c.json({ error: 'Voucher tidak ditemukan atau tidak valid' }, 404);
     }
 
     const voucher = voucherList[0];
 
     // Rule Engine
     if (voucher.isActive !== 1) {
-      return c.json({ error: 'Voucher is inactive' }, 400);
+      return c.json({ error: 'Voucher sudah tidak aktif' }, 400);
     }
 
     const now = new Date();
     if (voucher.validFrom && new Date(voucher.validFrom) > now) {
-      return c.json({ error: 'Voucher is not yet valid' }, 400);
+      return c.json({ error: 'Voucher belum dapat digunakan' }, 400);
     }
     if (voucher.validTo && new Date(voucher.validTo) < now) {
-      return c.json({ error: 'Voucher has expired' }, 400);
+      return c.json({ error: 'Voucher sudah kadaluarsa' }, 400);
     }
 
     if (voucher.maxUses !== null && voucher.currentUses >= voucher.maxUses) {
-      return c.json({ error: 'Voucher usage limit reached' }, 400);
+      return c.json({ error: 'Kuota penggunaan voucher sudah habis' }, 400);
     }
 
     return c.json({

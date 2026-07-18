@@ -14,14 +14,14 @@ export function CampaignPromoCard({ promo }: { promo: StorefrontPromoCard }) {
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl p-5 md:p-6 border flex flex-col justify-between h-full shadow-sm hover:shadow-md transition-shadow ${
-        promo.backgroundColorClass || 'bg-white border-slate-200'
+      className={`relative overflow-hidden rounded-3xl p-5 md:p-6 border-2 flex flex-col justify-between h-full shadow-sm hover:shadow-md transition-all ${
+        promo.backgroundColorClass || 'bg-card border-border/60 text-foreground'
       }`}
     >
       <div>
         <div className='flex items-center space-x-3 mb-3'>
-          <div className='p-2 bg-white/50 rounded-lg'>
-            <Icon size={20} className='opacity-80' />
+          <div className='p-2 bg-background/50 rounded-xl backdrop-blur-sm'>
+            <Icon size={20} className='opacity-90' />
           </div>
           <h3 className='font-semibold text-lg leading-tight'>{promo.title}</h3>
         </div>

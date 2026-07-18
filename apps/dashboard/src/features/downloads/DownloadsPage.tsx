@@ -82,7 +82,7 @@ export const DownloadsPage = () => {
       {/* Digital Credentials Section */}
       {data?.credentials && data.credentials.length > 0 && (
         <div className='mb-10'>
-          <h3 className='text-xl font-extrabold mb-5 flex items-center gap-2.5 text-gray-900 dark:text-white'>
+          <h3 className='text-xl font-extrabold mb-5 flex items-center gap-2.5 text-foreground dark:text-white'>
             <div className='p-2 bg-indigo-500/10 rounded-lg'>
               <Key className='w-5 h-5 text-indigo-400' />
             </div>
@@ -92,13 +92,13 @@ export const DownloadsPage = () => {
             {data.credentials.map((cred: any) => (
               <Card
                 key={cred.id}
-                className='bg-white dark:bg-gradient-to-b dark:from-[#13161c] dark:to-[#0f1115] border-gray-200 dark:border-white/5 hover:border-gray-300 dark:hover:border-white/15 transition-all overflow-hidden flex flex-col justify-between shadow-sm dark:shadow-xl dark:shadow-black/40'
+                className='bg-card dark:bg-gradient-to-b dark:from-[#13161c] dark:to-[#0f1115] border-border/60 dark:border-white/5 hover:border-border dark:hover:border-white/15 transition-all overflow-hidden flex flex-col justify-between shadow-sm dark:shadow-xl dark:shadow-black/40'
               >
-                <div className='p-5 border-b border-gray-100 dark:border-white/5 relative overflow-hidden'>
+                <div className='p-5 border-b border-border/40 dark:border-white/5 relative overflow-hidden'>
                   <div className='absolute top-0 right-0 w-32 h-32 bg-indigo-50 dark:bg-indigo-500/10 rounded-bl-full -mr-8 -mt-8 blur-2xl pointer-events-none'>
                   </div>
                   <h4
-                    className='font-bold text-gray-900 dark:text-white text-[17px] leading-tight tracking-wide line-clamp-2 relative z-10'
+                    className='font-bold text-foreground dark:text-white text-[17px] leading-tight tracking-wide line-clamp-2 relative z-10'
                     title={cred.productName}
                   >
                     {cred.productName || 'Produk Digital'}
@@ -106,13 +106,13 @@ export const DownloadsPage = () => {
                   {cred.variantName && cred.variantName !== 'Default' && (
                     <Badge
                       variant='outline'
-                      className='mt-3 bg-indigo-50 dark:bg-white/5 border-indigo-100 dark:border-white/10 text-indigo-700 dark:text-indigo-300 font-medium px-2.5 py-0.5 rounded-full text-xs'
+                      className='mt-3 bg-indigo-50 dark:bg-card/5 border-indigo-100 dark:border-white/10 text-indigo-700 dark:text-indigo-300 font-medium px-2.5 py-0.5 rounded-full text-xs'
                     >
                       {cred.variantName}
                     </Badge>
                   )}
                 </div>
-                <div className='p-5 bg-gray-50/50 dark:bg-white/[0.01] flex-1 flex flex-col justify-end'>
+                <div className='p-5 bg-muted/50 dark:bg-card/[0.01] flex-1 flex flex-col justify-end'>
                   <div className='bg-gray-900 dark:bg-[#050608] border border-gray-800 dark:border-white/5 rounded-xl p-4 font-mono text-[13px] leading-relaxed text-emerald-400 whitespace-pre-wrap break-all relative group shadow-inner'>
                     {cred.credentialData}
                     <button
@@ -121,15 +121,15 @@ export const DownloadsPage = () => {
                         navigator.clipboard.writeText(cred.credentialData);
                         toast.success('Disalin ke clipboard');
                       }}
-                      className='absolute top-2.5 right-2.5 p-2 bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white rounded-md opacity-0 group-hover:opacity-100 transition-all duration-200 backdrop-blur-md'
+                      className='absolute top-2.5 right-2.5 p-2 bg-card/10 hover:bg-card/20 text-muted-foreground/50 hover:text-white rounded-md opacity-0 group-hover:opacity-100 transition-all duration-200 backdrop-blur-md'
                       title='Salin Teks'
                     >
                       <Copy className='w-4 h-4' />
                     </button>
                   </div>
-                  <div className='mt-5 flex items-center justify-between text-[11px] text-gray-500 dark:text-muted-foreground uppercase tracking-widest font-bold'>
+                  <div className='mt-5 flex items-center justify-between text-[11px] text-muted-foreground dark:text-muted-foreground uppercase tracking-widest font-bold'>
                     <span>Tgl. Pembelian</span>
-                    <span className='text-gray-900 dark:text-gray-300'>
+                    <span className='text-foreground dark:text-muted-foreground/50'>
                       {new Date(cred.createdAt).toLocaleDateString('id-ID', {
                         year: 'numeric',
                         month: 'short',
@@ -146,7 +146,7 @@ export const DownloadsPage = () => {
 
       {/* Downloadable Files Section */}
       <div>
-        <h3 className='text-xl font-extrabold mb-5 flex items-center gap-2.5 text-gray-900 dark:text-white'>
+        <h3 className='text-xl font-extrabold mb-5 flex items-center gap-2.5 text-foreground dark:text-white'>
           <div className='p-2 bg-sky-500/10 rounded-lg'>
             <Download className='w-5 h-5 text-sky-400' />
           </div>
@@ -156,7 +156,7 @@ export const DownloadsPage = () => {
           ? (
             <div className='grid gap-4'>
               {[1, 2, 3].map((i) => (
-                <Card key={i} className='animate-pulse bg-white/5 border-white/10 h-24' />
+                <Card key={i} className='animate-pulse bg-card/5 border-white/10 h-24' />
               ))}
             </div>
           )
@@ -168,9 +168,9 @@ export const DownloadsPage = () => {
           )
           : data?.entitlements?.length === 0
           ? (
-            <div className='text-center py-20 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10'>
-              <PackageOpen className='w-12 h-12 mx-auto text-gray-400 dark:text-muted-foreground mb-4 dark:opacity-50' />
-              <h3 className='text-lg font-medium text-gray-900 dark:text-white mb-2'>
+            <div className='text-center py-20 bg-muted/50 dark:bg-card/5 rounded-xl border border-border/60 dark:border-white/10'>
+              <PackageOpen className='w-12 h-12 mx-auto text-muted-foreground/80 dark:text-muted-foreground mb-4 dark:opacity-50' />
+              <h3 className='text-lg font-medium text-foreground dark:text-white mb-2'>
                 Belum Ada Unduhan
               </h3>
               <p className='text-muted-foreground text-sm mb-6'>
@@ -189,17 +189,17 @@ export const DownloadsPage = () => {
                 return (
                   <Card
                     key={item.id}
-                    className={`bg-white dark:bg-gradient-to-b dark:from-[#13161c] dark:to-[#0f1115] border-gray-200 dark:border-white/5 hover:border-gray-300 dark:hover:border-white/15 transition-all overflow-hidden flex flex-col justify-between shadow-sm dark:shadow-xl dark:shadow-black/40 ${
+                    className={`bg-card dark:bg-gradient-to-b dark:from-[#13161c] dark:to-[#0f1115] border-border/60 dark:border-white/5 hover:border-border dark:hover:border-white/15 transition-all overflow-hidden flex flex-col justify-between shadow-sm dark:shadow-xl dark:shadow-black/40 ${
                       !canDownload ? 'opacity-60 grayscale-[30%]' : ''
                     }`}
                   >
-                    <div className='p-5 border-b border-gray-100 dark:border-white/5 relative overflow-hidden'>
+                    <div className='p-5 border-b border-border/40 dark:border-white/5 relative overflow-hidden'>
                       <div className='absolute top-0 right-0 w-32 h-32 bg-sky-50 dark:bg-sky-500/10 rounded-bl-full -mr-8 -mt-8 blur-2xl pointer-events-none'>
                       </div>
                       <div className='flex items-start justify-between gap-2 relative z-10'>
                         <div>
                           <h3
-                            className='font-bold text-gray-900 dark:text-white text-[17px] leading-tight tracking-wide line-clamp-2'
+                            className='font-bold text-foreground dark:text-white text-[17px] leading-tight tracking-wide line-clamp-2'
                             title={item.productName}
                           >
                             {item.productName || 'Produk Digital'}
@@ -207,7 +207,7 @@ export const DownloadsPage = () => {
                           {item.variantName && item.variantName !== 'Default' && (
                             <Badge
                               variant='outline'
-                              className='mt-3 bg-sky-50 dark:bg-white/5 border-sky-100 dark:border-white/10 text-sky-700 dark:text-sky-300 font-medium px-2.5 py-0.5 rounded-full text-xs'
+                              className='mt-3 bg-sky-50 dark:bg-card/5 border-sky-100 dark:border-white/10 text-sky-700 dark:text-sky-300 font-medium px-2.5 py-0.5 rounded-full text-xs'
                             >
                               {item.variantName}
                             </Badge>
@@ -224,7 +224,7 @@ export const DownloadsPage = () => {
                       </div>
                     </div>
 
-                    <div className='p-5 bg-gray-50/50 dark:bg-white/[0.01] space-y-4 flex-1 flex flex-col justify-end'>
+                    <div className='p-5 bg-muted/50 dark:bg-card/[0.01] space-y-4 flex-1 flex flex-col justify-end'>
                       <div className='flex items-center justify-between text-xs text-muted-foreground'>
                         <div className='flex items-center gap-1.5'>
                           <Download className='w-3.5 h-3.5' />
@@ -289,7 +289,7 @@ export const DownloadsPage = () => {
               size='icon'
               disabled={page === 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className='border-white/20 hover:bg-white/10'
+              className='border-white/20 hover:bg-card/10'
             >
               <ChevronLeft className='w-4 h-4' />
             </Button>
@@ -302,7 +302,7 @@ export const DownloadsPage = () => {
               size='icon'
               disabled={page === data?.pagination?.totalPages}
               onClick={() => setPage((p) => Math.min(data?.pagination?.totalPages || 1, p + 1))}
-              className='border-white/20 hover:bg-white/10'
+              className='border-white/20 hover:bg-card/10'
             >
               <ChevronRight className='w-4 h-4' />
             </Button>

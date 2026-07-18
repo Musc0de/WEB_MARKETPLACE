@@ -33,26 +33,26 @@ export const TrackingLayout: React.FC<{ children: React.ReactNode }> = ({ childr
   }
 
   return (
-    <div className='min-h-screen bg-gray-50 flex flex-col font-sans text-gray-900'>
+    <div className='min-h-screen bg-background flex flex-col font-sans text-foreground'>
       {/* Minimal Header */}
-      <header className='bg-white border-b border-gray-200'>
+      <header className='bg-card border-b border-border/60'>
         <div className='max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between'>
           <a
             href={storefrontUrl}
-            className='font-bold text-xl tracking-tight text-blue-600 hover:text-blue-700 transition-colors'
+            className='font-black text-xl tracking-tight text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 transition-colors'
           >
             StarSuperScare
           </a>
-          <nav className='flex items-center gap-4 text-sm font-medium'>
+          <nav className='flex items-center gap-4 text-sm font-bold'>
             <a
               href={`${authUrl}/help`}
-              className='text-gray-500 hover:text-gray-900 transition-colors'
+              className='text-muted-foreground hover:text-foreground transition-colors'
             >
               Bantuan
             </a>
             <a
               href={dashboardUrl}
-              className='text-gray-500 hover:text-gray-900 transition-colors'
+              className='text-muted-foreground hover:text-foreground transition-colors'
             >
               Dasbor
             </a>
@@ -63,14 +63,14 @@ export const TrackingLayout: React.FC<{ children: React.ReactNode }> = ({ childr
       {/* Main Content Area - Centered Card Style */}
       <main className='flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 py-8 md:py-12'>
         <ErrorBoundary FallbackComponent={TrackingFallback}>
-          <div className='bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden min-h-[400px]'>
+          <div className='bg-card rounded-3xl shadow-sm border border-border/60 overflow-hidden min-h-[400px]'>
             {children}
           </div>
         </ErrorBoundary>
       </main>
 
       {/* Minimal Footer */}
-      <footer className='py-8 text-center text-xs text-gray-400'>
+      <footer className='py-8 text-center text-xs text-muted-foreground font-medium'>
         <p>&copy; {new Date().getFullYear()} StarSuperScare. Seluruh hak cipta dilindungi.</p>
       </footer>
     </div>

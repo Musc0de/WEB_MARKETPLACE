@@ -18,10 +18,10 @@ type Tab = 'semua' | 'aktif' | 'selesai' | 'dibatalkan' | 'refund';
 
 const TABS: { value: Tab; label: string; color: string }[] = [
   { value: 'semua', label: 'Semua', color: '' },
-  { value: 'aktif', label: 'Aktif', color: 'text-orange-500' },
-  { value: 'selesai', label: 'Selesai', color: 'text-green-600' },
-  { value: 'dibatalkan', label: 'Dibatalkan', color: 'text-red-500' },
-  { value: 'refund', label: 'Refund', color: 'text-purple-500' },
+  { value: 'aktif', label: 'Aktif', color: 'text-indigo-500 dark:text-indigo-400' },
+  { value: 'selesai', label: 'Selesai', color: 'text-emerald-600 dark:text-emerald-400' },
+  { value: 'dibatalkan', label: 'Dibatalkan', color: 'text-rose-500 dark:text-rose-400' },
+  { value: 'refund', label: 'Refund', color: 'text-purple-500 dark:text-purple-400' },
 ];
 
 const fetchOrders = async (_url: string, tab: Tab, page: number) => {
@@ -35,17 +35,50 @@ const fetchOrders = async (_url: string, tab: Tab, page: number) => {
 
 /** Status badge config */
 const STATUS_CONFIG: Record<string, { style: string; label: string }> = {
-  pending: { style: 'text-amber-700 bg-amber-50 border-amber-200', label: 'Menunggu Bayar' },
-  paid: { style: 'text-blue-700 bg-blue-50 border-blue-200', label: 'Dibayar' },
-  processing: { style: 'text-sky-700 bg-sky-50 border-sky-200', label: 'Diproses' },
-  shipped: { style: 'text-indigo-700 bg-indigo-50 border-indigo-200', label: 'Dikirim' },
-  delivered: { style: 'text-emerald-700 bg-emerald-50 border-emerald-200', label: 'Selesai' },
-  cancelled: { style: 'text-red-700 bg-red-50 border-red-200', label: 'Dibatalkan' },
-  refunded: { style: 'text-rose-700 bg-rose-50 border-rose-200', label: 'Dikembalikan' },
-  cancellation_requested: { style: 'text-red-700 bg-red-50 border-red-200', label: 'Proses Batal' },
-  return_requested: { style: 'text-rose-700 bg-rose-50 border-rose-200', label: 'Proses Retur' },
-  cancellation_rejected: { style: 'text-red-700 bg-red-50 border-red-200', label: 'Batal Ditolak' },
-  return_rejected: { style: 'text-red-700 bg-red-50 border-red-200', label: 'Retur Ditolak' },
+  pending: {
+    style: 'text-amber-700 dark:text-amber-400 bg-amber-500/10 border-amber-500/20',
+    label: 'Menunggu Bayar',
+  },
+  paid: {
+    style: 'text-blue-700 dark:text-blue-400 bg-blue-500/10 border-blue-500/20',
+    label: 'Dibayar',
+  },
+  processing: {
+    style: 'text-sky-700 dark:text-sky-400 bg-sky-500/10 border-sky-500/20',
+    label: 'Diproses',
+  },
+  shipped: {
+    style: 'text-indigo-700 dark:text-indigo-400 bg-indigo-500/10 border-indigo-500/20',
+    label: 'Dikirim',
+  },
+  delivered: {
+    style: 'text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+    label: 'Selesai',
+  },
+  cancelled: {
+    style: 'text-rose-700 dark:text-rose-400 bg-rose-500/10 border-rose-500/20',
+    label: 'Dibatalkan',
+  },
+  refunded: {
+    style: 'text-purple-700 dark:text-purple-400 bg-purple-500/10 border-purple-500/20',
+    label: 'Dikembalikan',
+  },
+  cancellation_requested: {
+    style: 'text-rose-700 dark:text-rose-400 bg-rose-500/10 border-rose-500/20',
+    label: 'Proses Batal',
+  },
+  return_requested: {
+    style: 'text-orange-700 dark:text-orange-400 bg-orange-500/10 border-orange-500/20',
+    label: 'Proses Retur',
+  },
+  cancellation_rejected: {
+    style: 'text-rose-700 dark:text-rose-400 bg-rose-500/10 border-rose-500/20',
+    label: 'Batal Ditolak',
+  },
+  return_rejected: {
+    style: 'text-rose-700 dark:text-rose-400 bg-rose-500/10 border-rose-500/20',
+    label: 'Retur Ditolak',
+  },
 };
 
 const fmt = (n: number) => `Rp\u00a0${n.toLocaleString('id-ID')}`;
@@ -96,12 +129,13 @@ function BuyAgainButton({ orderId }: { orderId: string }) {
       type='button'
       onClick={handleClick}
       disabled={loading}
-      className='inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold rounded-full border-2 border-orange-400 text-orange-600 bg-orange-50 hover:bg-orange-100 hover:border-orange-500 active:scale-95 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed'
+      className='inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 text-xs font-bold rounded-full border-2 border-indigo-500/20 text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/20 hover:border-indigo-500/40 active:scale-95 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed'
     >
       {loading
         ? <RefreshCcw className='w-3 h-3 animate-spin' />
         : <ShoppingCart className='w-3.5 h-3.5' />}
-      Beli Lagi
+      <span className='hidden sm:inline'>Beli Lagi</span>
+      <span className='sm:hidden'>Beli</span>
     </button>
   );
 }
@@ -110,17 +144,17 @@ function BuyAgainButton({ orderId }: { orderId: string }) {
 function OrderCard({ order, onNavigate }: { order: any; onNavigate: (id: string) => void }) {
   const [expanded, setExpanded] = useState(false);
   const cfg = STATUS_CONFIG[order.status] ??
-    { style: 'text-gray-600 bg-gray-50 border-gray-200', label: order.status };
+    { style: 'text-muted-foreground bg-muted border-border', label: order.status };
   const itemCount = order.items?.length ?? 0;
 
   return (
-    <div className='bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:border-gray-200 transition-all duration-200'>
+    <div className='bg-card border border-border/60 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:border-border transition-all duration-200'>
       {/* ── Header bar ── */}
-      <div className='px-4 py-3 flex items-center justify-between bg-gradient-to-r from-gray-50 to-white border-b border-gray-100'>
+      <div className='px-4 py-3 flex items-center justify-between bg-muted/30 border-b border-border/40'>
         <div className='flex items-center gap-2 min-w-0'>
-          <span className='text-xs font-bold text-gray-700 truncate'>{order.orderNumber}</span>
-          <span className='text-gray-200'>·</span>
-          <span className='text-xs text-gray-400'>
+          <span className='text-xs font-bold text-foreground truncate'>{order.orderNumber}</span>
+          <span className='text-border'>·</span>
+          <span className='text-[11px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider'>
             {new Date(order.createdAt).toLocaleDateString('id-ID', {
               day: 'numeric',
               month: 'short',
@@ -130,7 +164,7 @@ function OrderCard({ order, onNavigate }: { order: any; onNavigate: (id: string)
         </div>
         <Badge
           variant='outline'
-          className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border shrink-0 ${cfg.style}`}
+          className={`text-[10px] sm:text-[11px] font-bold px-2.5 py-0.5 rounded-full border shrink-0 uppercase tracking-widest ${cfg.style}`}
         >
           {cfg.label}
         </Badge>
@@ -142,9 +176,12 @@ function OrderCard({ order, onNavigate }: { order: any; onNavigate: (id: string)
         const label = variantLabel(first.optionValues);
         const hasDiscount = first.comparePrice && first.comparePrice > first.priceSnapshot;
         return (
-          <div className='px-4 py-4 flex gap-3 items-start'>
+          <div
+            className='px-4 py-4 flex gap-3 sm:gap-4 items-start group cursor-pointer'
+            onClick={() => onNavigate(order.id)}
+          >
             {/* Image */}
-            <div className='w-[72px] h-[72px] rounded-xl overflow-hidden shrink-0 bg-gray-50 border border-gray-100'>
+            <div className='w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden shrink-0 bg-muted/50 border border-border/40'>
               {first.imageUrl
                 ? (
                   <img
@@ -152,7 +189,7 @@ function OrderCard({ order, onNavigate }: { order: any; onNavigate: (id: string)
                     alt={first.productName}
                     loading='lazy'
                     decoding='async'
-                    className='w-full h-full object-cover'
+                    className='w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300'
                     onError={(e) => {
                       (e.currentTarget as HTMLImageElement).style.display = 'none';
                     }}
@@ -160,30 +197,32 @@ function OrderCard({ order, onNavigate }: { order: any; onNavigate: (id: string)
                 )
                 : (
                   <div className='w-full h-full flex items-center justify-center'>
-                    <Package className='w-7 h-7 text-gray-300' />
+                    <Package className='w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground/50' />
                   </div>
                 )}
             </div>
             {/* Info */}
             <div className='flex-1 min-w-0'>
-              <p className='text-sm font-semibold text-gray-900 line-clamp-2 leading-snug'>
+              <p className='text-sm sm:text-base font-bold text-foreground line-clamp-2 leading-snug group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors'>
                 {first.productName}
               </p>
               {label && (
-                <span className='inline-block mt-1 text-[11px] text-gray-500 bg-gray-100 rounded px-1.5 py-0.5 border border-gray-200'>
+                <span className='inline-block mt-1.5 text-[10px] sm:text-[11px] font-semibold text-muted-foreground bg-muted/60 rounded px-1.5 py-0.5 border border-border/40'>
                   {label}
                 </span>
               )}
-              <div className='flex items-center gap-2 mt-1.5'>
+              <div className='flex flex-wrap items-center gap-1.5 sm:gap-2 mt-2'>
                 {hasDiscount && (
-                  <span className='text-[11px] text-gray-400 line-through tabular-nums'>
+                  <span className='text-[10px] sm:text-[11px] text-muted-foreground/70 line-through tabular-nums'>
                     {fmt(first.comparePrice)}
                   </span>
                 )}
-                <span className='text-sm font-bold text-orange-600 tabular-nums'>
+                <span className='text-sm sm:text-base font-black text-indigo-600 dark:text-indigo-400 tabular-nums'>
                   {fmt(first.priceSnapshot)}
                 </span>
-                <span className='text-xs text-gray-400'>× {first.quantity}</span>
+                <span className='text-xs font-medium text-muted-foreground ml-1'>
+                  × {first.quantity}
+                </span>
               </div>
             </div>
           </div>
@@ -194,16 +233,17 @@ function OrderCard({ order, onNavigate }: { order: any; onNavigate: (id: string)
       {itemCount > 1 && (
         <>
           {expanded && (
-            <div className='border-t border-dashed border-gray-100 divide-y divide-dashed divide-gray-100'>
+            <div className='border-t border-dashed border-border/60 divide-y divide-dashed divide-border/60'>
               {order.items.slice(1).map((item: any) => {
                 const label = variantLabel(item.optionValues);
                 const hasDiscount = item.comparePrice && item.comparePrice > item.priceSnapshot;
                 return (
                   <div
                     key={item.orderItemId}
-                    className='px-4 py-3 flex gap-3 items-start bg-gray-50/50'
+                    className='px-4 py-3 flex gap-3 sm:gap-4 items-start bg-muted/10 cursor-pointer hover:bg-muted/30 transition-colors'
+                    onClick={() => onNavigate(order.id)}
                   >
-                    <div className='w-14 h-14 rounded-lg overflow-hidden shrink-0 bg-gray-100 border border-gray-100'>
+                    <div className='w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden shrink-0 bg-muted/50 border border-border/40'>
                       {item.imageUrl
                         ? (
                           <img
@@ -219,29 +259,31 @@ function OrderCard({ order, onNavigate }: { order: any; onNavigate: (id: string)
                         )
                         : (
                           <div className='w-full h-full flex items-center justify-center'>
-                            <Package className='w-5 h-5 text-gray-300' />
+                            <Package className='w-5 h-5 text-muted-foreground/50' />
                           </div>
                         )}
                     </div>
                     <div className='flex-1 min-w-0'>
-                      <p className='text-sm font-medium text-gray-800 line-clamp-1'>
+                      <p className='text-xs sm:text-sm font-bold text-foreground line-clamp-2 leading-snug'>
                         {item.productName}
                       </p>
                       {label && (
-                        <span className='inline-block mt-0.5 text-[11px] text-gray-400 bg-gray-100 rounded px-1.5 py-0.5'>
+                        <span className='inline-block mt-1 text-[10px] font-semibold text-muted-foreground bg-muted/60 rounded px-1.5 py-0.5 border border-border/40'>
                           {label}
                         </span>
                       )}
-                      <div className='flex items-center gap-2 mt-1'>
+                      <div className='flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1.5'>
                         {hasDiscount && (
-                          <span className='text-[11px] text-gray-400 line-through tabular-nums'>
+                          <span className='text-[10px] text-muted-foreground/70 line-through tabular-nums'>
                             {fmt(item.comparePrice)}
                           </span>
                         )}
-                        <span className='text-xs font-bold text-orange-600 tabular-nums'>
+                        <span className='text-xs sm:text-sm font-black text-indigo-600 dark:text-indigo-400 tabular-nums'>
                           {fmt(item.priceSnapshot)}
                         </span>
-                        <span className='text-xs text-gray-400'>× {item.quantity}</span>
+                        <span className='text-[11px] font-medium text-muted-foreground ml-1'>
+                          × {item.quantity}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -254,7 +296,7 @@ function OrderCard({ order, onNavigate }: { order: any; onNavigate: (id: string)
           <button
             type='button'
             onClick={() => setExpanded((v) => !v)}
-            className='w-full flex items-center justify-center gap-1.5 py-2 text-xs font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors border-t border-dashed border-gray-100'
+            className='w-full flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors border-t border-dashed border-border/60'
           >
             {expanded
               ? (
@@ -274,12 +316,12 @@ function OrderCard({ order, onNavigate }: { order: any; onNavigate: (id: string)
       )}
 
       {/* ── Footer: Total + Actions ── */}
-      <div className='px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t border-gray-100 bg-gradient-to-r from-gray-50/60 to-white'>
+      <div className='px-4 py-3.5 flex flex-row items-center justify-between gap-3 border-t border-border/40 bg-muted/10'>
         <div className='flex flex-col'>
-          <span className='text-[11px] text-gray-400 uppercase tracking-wide font-medium'>
-            Total Belanja ({itemCount} produk)
+          <span className='text-[10px] sm:text-[11px] text-muted-foreground uppercase tracking-wider font-bold'>
+            Total ({itemCount} brg)
           </span>
-          <span className='text-base font-bold text-gray-900 tabular-nums mt-0.5'>
+          <span className='text-sm sm:text-base font-black text-foreground tabular-nums mt-0.5'>
             {fmt(order.totalAmount)}
           </span>
         </div>
@@ -288,9 +330,9 @@ function OrderCard({ order, onNavigate }: { order: any; onNavigate: (id: string)
           <button
             type='button'
             onClick={() => onNavigate(order.id)}
-            className='inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold rounded-full border-2 border-gray-300 text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 active:scale-95 transition-all duration-150'
+            className='inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 text-xs font-bold rounded-full border-2 border-border text-foreground bg-card hover:bg-muted active:scale-95 transition-all duration-150'
           >
-            Lihat Detail
+            Detail
           </button>
         </div>
       </div>
@@ -311,15 +353,17 @@ export const OrdersPage = () => {
   const totalPages = data?.pagination?.totalPages ?? 1;
 
   return (
-    <div className='space-y-0'>
+    <div className='space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-12 max-w-4xl mx-auto'>
       {/* ── Page Title ── */}
-      <div className='mb-5'>
-        <h2 className='text-xl font-bold text-gray-900'>Pesanan Saya</h2>
-        <p className='text-sm text-gray-400 mt-0.5'>Kelola dan lacak semua pesanan Anda</p>
+      <div>
+        <h2 className='text-3xl font-black text-foreground tracking-tight'>Pesanan Saya</h2>
+        <p className='text-sm font-medium text-muted-foreground mt-1'>
+          Kelola dan lacak semua pesanan belanja Anda.
+        </p>
       </div>
 
       {/* ── Tab Filter Bar ── */}
-      <div className='flex border-b border-gray-200 overflow-x-auto scrollbar-hide'>
+      <div className='flex border-b border-border/60 overflow-x-auto scrollbar-hide'>
         {TABS.map((tab) => {
           const active = activeTab === tab.value;
           return (
@@ -330,10 +374,10 @@ export const OrdersPage = () => {
                 setActiveTab(tab.value);
                 setPage(1);
               }}
-              className={`flex-shrink-0 px-5 py-3 text-sm font-semibold whitespace-nowrap transition-all border-b-2 -mb-px ${
+              className={`flex-shrink-0 px-4 sm:px-6 py-3.5 text-[13px] sm:text-sm font-bold whitespace-nowrap transition-all border-b-2 -mb-px ${
                 active
-                  ? `border-orange-500 text-orange-600`
-                  : `border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300`
+                  ? `border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400`
+                  : `border-transparent text-muted-foreground hover:text-foreground hover:border-border/80`
               }`}
             >
               {tab.label}
@@ -343,41 +387,44 @@ export const OrdersPage = () => {
       </div>
 
       {/* ── Content ── */}
-      <div className='pt-5 space-y-4'>
+      <div className='pt-2 space-y-4'>
         {isLoading
           ? (
             <>
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className='animate-pulse h-44 rounded-2xl bg-gray-100 border border-gray-200'
+                  className='animate-pulse h-44 rounded-2xl bg-muted/50 border border-border/40'
                 />
               ))}
             </>
           )
           : error
           ? (
-            <div className='text-center py-16 text-sm text-red-500 bg-red-50 rounded-2xl border border-red-100'>
-              <p className='font-semibold mb-1'>Gagal memuat pesanan</p>
-              <p className='text-red-400'>Silakan muat ulang halaman.</p>
+            <div className='text-center py-16 text-sm text-red-600 dark:text-red-400 bg-red-500/10 rounded-3xl border border-red-500/20'>
+              <p className='font-bold mb-1.5 text-lg'>Gagal memuat pesanan</p>
+              <p className='font-medium text-red-600/80 dark:text-red-400/80'>
+                Terjadi masalah jaringan. Silakan muat ulang halaman.
+              </p>
             </div>
           )
           : !data?.orders?.length
           ? (
-            <div className='text-center py-24 bg-white rounded-2xl border border-gray-200'>
-              <div className='w-16 h-16 rounded-2xl bg-orange-50 flex items-center justify-center mx-auto mb-5'>
-                <Package className='w-8 h-8 text-orange-300' />
+            <div className='text-center py-24 bg-card rounded-3xl border border-border/60 shadow-sm'>
+              <div className='w-20 h-20 rounded-full bg-indigo-500/10 flex items-center justify-center mx-auto mb-6 shadow-inner'>
+                <Package className='w-10 h-10 text-indigo-500/60' />
               </div>
-              <p className='text-base font-bold text-gray-800 mb-1.5'>Belum Ada Pesanan</p>
-              <p className='text-sm text-gray-400 mb-7'>
-                Mulai belanja dan temukan produk favorit Anda!
+              <p className='text-xl font-black text-foreground mb-2'>Belum Ada Pesanan</p>
+              <p className='text-sm font-medium text-muted-foreground mb-8 max-w-sm mx-auto'>
+                Anda belum memiliki pesanan di kategori ini. Mulai belanja dan temukan produk
+                incaran Anda!
               </p>
               <Button
                 onClick={() => navigate('/')}
-                className='rounded-full px-8 bg-orange-500 hover:bg-orange-600 text-white border-0'
+                className='rounded-full px-8 py-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-600/20 active:scale-95 transition-all'
               >
-                <ShoppingCart className='w-4 h-4 mr-2' />
-                Mulai Belanja
+                <ShoppingCart className='w-5 h-5 mr-2' />
+                Mulai Belanja Sekarang
               </Button>
             </div>
           )
@@ -395,32 +442,32 @@ export const OrdersPage = () => {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className='flex items-center justify-between pt-5 pb-2 border-t border-gray-100 mt-4'>
-                  <span className='text-xs text-gray-400'>
-                    Halaman <strong className='text-gray-700'>{page}</strong> dari{' '}
-                    <strong className='text-gray-700'>{totalPages}</strong>
-                    <span className='ml-1.5 text-gray-300'>
-                      ({data.pagination.total} pesanan)
+                <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-6 pb-2 mt-4'>
+                  <span className='text-[11px] sm:text-xs font-bold text-muted-foreground uppercase tracking-wider text-center sm:text-left'>
+                    Halaman <strong className='text-foreground'>{page}</strong> dari{' '}
+                    <strong className='text-foreground'>{totalPages}</strong>
+                    <span className='ml-1.5 text-muted-foreground/60'>
+                      ({data.pagination.total} total)
                     </span>
                   </span>
-                  <div className='flex items-center gap-2'>
+                  <div className='flex items-center justify-center sm:justify-end gap-2.5'>
                     <button
                       type='button'
                       disabled={page <= 1}
                       onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      className='inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-full border border-gray-200 text-gray-600 bg-white hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all'
+                      className='inline-flex items-center gap-1 px-4 py-2 text-xs font-bold rounded-full border-2 border-border text-foreground bg-card hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-all'
                     >
-                      <ChevronLeft className='w-3.5 h-3.5' />
+                      <ChevronLeft className='w-4 h-4' />
                       Sebelumnya
                     </button>
                     <button
                       type='button'
                       disabled={page >= totalPages}
                       onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                      className='inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-full border border-gray-200 text-gray-600 bg-white hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all'
+                      className='inline-flex items-center gap-1 px-4 py-2 text-xs font-bold rounded-full border-2 border-border text-foreground bg-card hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-all'
                     >
                       Berikutnya
-                      <ChevronRight className='w-3.5 h-3.5' />
+                      <ChevronRight className='w-4 h-4' />
                     </button>
                   </div>
                 </div>

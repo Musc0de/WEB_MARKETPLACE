@@ -1,6 +1,14 @@
 import { Hono } from 'hono';
 import { and, eq, isNull, notInArray, sql } from 'drizzle-orm';
-import { db, invoices, notifications, orders } from '@starsuperscare/database';
+import {
+  db,
+  invoices,
+  notifications,
+  orderItems,
+  orders,
+  products,
+  productVariants,
+} from '@starsuperscare/database';
 import { type AuthContext, authMiddleware } from '../../middleware/auth.ts';
 
 const home = new Hono<AuthContext>();
@@ -61,8 +69,8 @@ const routes = home.get('/', async (c) => {
     );
   const hasUnpaidInvoices = unpaidInvoicesQuery[0].count > 0;
 
-  // 5. Latest 3 active orders for quick view
-  const latestOrders = await db
+  // 5. Latest 3 orders for quick view (all statuses)
+  const latestOrdersQuery = await db
     .select({
       id: orders.id,
       orderNumber: orders.orderNumber,
@@ -71,14 +79,29 @@ const routes = home.get('/', async (c) => {
       createdAt: orders.createdAt,
     })
     .from(orders)
-    .where(
-      and(
-        eq(orders.userId, userId),
-        notInArray(orders.status, ['cancelled', 'refunded']),
-      ),
-    )
+    .where(eq(orders.userId, userId))
     .orderBy(sql`${orders.createdAt} DESC`)
     .limit(3);
+
+  const latestOrders = await Promise.all(latestOrdersQuery.map(async (order) => {
+    const items = await db
+      .select({
+        productName: orderItems.productNameSnapshot,
+        variantName: orderItems.variantSkuSnapshot,
+        quantity: orderItems.quantity,
+        productCode: products.productCode,
+        sku: productVariants.sku,
+      })
+      .from(orderItems)
+      .leftJoin(products, eq(orderItems.productId, products.id))
+      .leftJoin(productVariants, eq(orderItems.variantId, productVariants.id))
+      .where(eq(orderItems.orderId, order.id));
+
+    return {
+      ...order,
+      items,
+    };
+  }));
 
   return c.json({
     data: {

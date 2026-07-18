@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import { useSession } from '../../features/auth/useSession.ts';
 import { useNotifications } from '../../features/notifications/useNotifications.ts';
+import { client } from '../../lib/api.ts';
+import useSWR from 'swr';
 
 const NAV_SECTIONS = [
   {
@@ -61,11 +63,20 @@ export function Sidebar() {
   const { logout, session } = useSession();
   const { unreadCount } = useNotifications();
 
+  const fetchProfile = async () => {
+    const res = await client.v1.me.profile.$get();
+    if (!res.ok) return null;
+    const result = await res.json();
+    return result.data;
+  };
+
+  const { data: profile } = useSWR(session ? '/api/v1/me/profile' : null, fetchProfile);
+
   return (
     <aside className='hidden w-64 flex-col border-r bg-white md:flex'>
       <div className='flex h-16 items-center border-b px-6'>
         <a
-          href={(import.meta as any).env?.VITE_STOREFRONT_URL || 'http://localhost:5173'}
+          href={(import.meta as any).env?.VITE_STOREFRONT_URL || ''}
           className='flex items-center gap-2'
         >
           <span className='text-lg font-bold text-blue-600'>StarSuperScare</span>
@@ -74,9 +85,11 @@ export function Sidebar() {
 
       <div className='flex-1 overflow-y-auto py-4'>
         <div className='px-6 mb-6'>
-          <p className='text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1'>Halo,</p>
-          <p className='font-medium text-gray-900 truncate'>
-            {session?.user?.username || session?.user?.email || 'Guest'}
+          <p className='text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1'>
+            Halo,
+          </p>
+          <p className='font-bold text-foreground truncate'>
+            {profile?.fullName || session?.user?.username || session?.user?.email || 'Guest'}
           </p>
         </div>
 

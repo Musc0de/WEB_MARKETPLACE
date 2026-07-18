@@ -42,35 +42,35 @@ const Home = () => {
   };
 
   return (
-    <div className='flex flex-col items-center justify-center min-h-[50vh] text-center px-4'>
-      <div className='w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-6 shadow-sm border border-blue-200'>
-        <PackageSearch size={40} />
+    <div className='flex flex-col items-center justify-center min-h-[50vh] py-12 md:py-16 text-center px-4 animate-in fade-in duration-500'>
+      <div className='w-14 h-14 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-indigo-500/20'>
+        <PackageSearch size={28} />
       </div>
-      <h1 className='text-3xl font-bold text-gray-900 mb-4'>Lacak Paket Anda</h1>
-      <p className='text-gray-500 mb-8 max-w-md mx-auto'>
+      <h1 className='text-3xl font-black text-foreground mb-4 tracking-tight'>Lacak Paket Anda</h1>
+      <p className='text-muted-foreground font-medium mb-8 max-w-md mx-auto'>
         Masukkan nomor pelacakan Anda untuk melihat status pengiriman paket secara real-time. Anda
         dapat melacak hingga 10 resi sekaligus (pisahkan dengan koma).
       </p>
 
-      <form onSubmit={handleSearch} className='w-full max-w-lg mx-auto flex flex-col gap-3'>
-        <div className='flex flex-col gap-3'>
+      <form onSubmit={handleSearch} className='w-full max-w-lg mx-auto flex flex-col gap-4'>
+        <div className='flex flex-col gap-4'>
           <textarea
             value={token}
             onChange={(e) => setToken(e.target.value)}
             placeholder='Masukkan resi di sini...&#10;RESI123&#10;RESI456'
-            className='w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-y'
+            className='w-full px-5 py-4 rounded-2xl bg-card border border-border/60 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-y shadow-sm font-medium text-foreground'
             rows={4}
             required
           />
           <button
             type='submit'
-            className='w-full px-8 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-all shadow-sm'
+            className='w-full px-8 py-4 bg-indigo-600 text-white rounded-2xl font-bold text-lg hover:bg-indigo-500 focus:ring-4 focus:ring-indigo-500/30 transition-all shadow-md active:scale-[0.98]'
           >
             Lacak Paket
           </button>
         </div>
-        <div className='text-left px-1 mt-1'>
-          <span className='text-xs text-gray-400'>
+        <div className='text-left px-2 mt-1'>
+          <span className='text-xs text-muted-foreground font-medium opacity-80'>
             * Gunakan baris baru (Enter) atau tanda koma (,) untuk memisahkan resi. Maksimal 10
             resi.
           </span>
@@ -81,15 +81,15 @@ const Home = () => {
 };
 
 const NotFound = () => (
-  <div className='flex flex-col items-center justify-center min-h-[50vh] text-center px-4'>
-    <h1 className='text-4xl font-bold text-gray-900 mb-4'>404</h1>
-    <p className='text-xl text-gray-600 mb-8'>Halaman Tidak Ditemukan</p>
-    <p className='text-gray-500 mb-8 max-w-md mx-auto'>
+  <div className='flex flex-col items-center justify-center min-h-[50vh] text-center px-4 animate-in fade-in duration-500'>
+    <h1 className='text-5xl font-black text-foreground mb-4 tracking-tighter'>404</h1>
+    <p className='text-xl text-muted-foreground font-bold mb-6'>Halaman Tidak Ditemukan</p>
+    <p className='text-muted-foreground mb-8 max-w-md mx-auto font-medium'>
       Maaf, halaman yang Anda cari tidak ada atau telah dipindahkan.
     </p>
     <a
       href='/'
-      className='px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors'
+      className='px-8 py-3 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-500 transition-colors shadow-sm'
     >
       Kembali ke Beranda
     </a>

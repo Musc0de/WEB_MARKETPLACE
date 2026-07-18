@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Button, H3, Skeleton, Text } from '@starsuperscare/ui';
+import { Button, Skeleton } from '@starsuperscare/ui';
 import { client } from '../../../lib/api.ts';
-import { MessageSquare, Star } from 'lucide-react';
+import { BadgeCheck, MessageSquare, Star, Store } from 'lucide-react';
 
 interface Review {
   id: string;
@@ -35,7 +35,6 @@ export const ProductReviews = ({ productId }: { productId: string }) => {
         }
 
         const payload = await res.json();
-        // read.ts returns { data: [...reviews], meta: {...} } — data is the array directly
         setReviews(Array.isArray(payload.data) ? payload.data : (payload.data?.items ?? []));
       } catch (err: any) {
         setError(err.message || 'Gagal memuat ulasan');
@@ -49,75 +48,98 @@ export const ProductReviews = ({ productId }: { productId: string }) => {
 
   if (loading) {
     return (
-      <div className='flex flex-col gap-4 py-4'>
-        <Skeleton className='h-24 w-full' />
-        <Skeleton className='h-24 w-full' />
+      <div className='flex flex-col gap-4 py-4 bg-card border border-border/60 p-5 lg:p-6 rounded-3xl shadow-sm'>
+        <Skeleton className='h-24 w-full rounded-xl' />
+        <Skeleton className='h-24 w-full rounded-xl' />
       </div>
     );
   }
 
   if (error) {
-    return <Text className='text-red-500 py-4'>{error}</Text>;
+    return <p className='text-destructive font-medium py-4 px-2'>{error}</p>;
   }
 
   if (!reviews || reviews.length === 0) {
     return (
-      <div className='flex flex-col items-center justify-center py-10 text-center bg-gray-50 rounded-lg'>
-        <MessageSquare className='w-12 h-12 text-gray-300 mb-3' />
-        <Text className='text-gray-500 font-medium'>Belum ada ulasan untuk produk ini.</Text>
-        <Text className='text-sm text-gray-400'>
+      <div className='flex flex-col items-center justify-center py-16 text-center bg-card border border-border/60 rounded-3xl shadow-sm'>
+        <div className='w-16 h-16 bg-muted/50 rounded-full flex items-center justify-center mb-4'>
+          <MessageSquare className='w-8 h-8 text-muted-foreground/40' />
+        </div>
+        <p className='text-foreground font-black mb-1'>Belum ada ulasan untuk produk ini.</p>
+        <p className='text-sm text-muted-foreground font-medium'>
           Jadilah yang pertama memberikan ulasan setelah membeli!
-        </Text>
+        </p>
       </div>
     );
   }
 
   return (
-    <div className='flex flex-col gap-6 py-4'>
+    <div className='flex flex-col gap-4 py-2'>
       {reviews.map((review) => (
         <div
           key={review.id}
-          className='flex flex-col gap-2 pb-6 border-b border-gray-100 last:border-0'
+          className='flex flex-col gap-3 p-5 lg:p-6 bg-card border border-border/60 rounded-3xl shadow-sm hover:border-border transition-colors'
         >
-          <div className='flex items-center justify-between'>
-            <div className='flex items-center gap-2'>
-              <div className='flex items-center gap-1'>
+          <div className='flex items-center justify-between flex-wrap gap-2'>
+            <div className='flex items-center gap-3 flex-wrap'>
+              <div className='flex items-center gap-0.5 bg-muted/30 px-2 py-1 rounded-lg border border-border/40'>
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star
                     key={i}
-                    className={`w-4 h-4 ${
-                      i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+                    className={`w-3.5 h-3.5 ${
+                      i < review.rating
+                        ? 'fill-amber-400 text-amber-400'
+                        : 'text-muted-foreground/20'
                     }`}
                   />
                 ))}
               </div>
-              <span className='text-sm font-medium text-gray-900'>{review.user.username}</span>
+              <span className='text-sm font-black text-foreground'>{review.user.username}</span>
               {review.isVerifiedPurchase && (
-                <span className='text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium'>
+                <span className='flex items-center gap-1 text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-1 rounded-md font-bold uppercase tracking-widest border border-emerald-500/20'>
+                  <BadgeCheck className='w-3.5 h-3.5' />
                   Pembeli Terverifikasi
                 </span>
               )}
             </div>
             {review.publishedAt && (
-              <span className='text-xs text-gray-400'>
-                {new Date(review.publishedAt).toLocaleDateString('id-ID')}
+              <span className='text-[11px] font-medium text-muted-foreground'>
+                {new Date(review.publishedAt).toLocaleDateString('id-ID', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                })}
               </span>
             )}
           </div>
 
-          <H3 className='text-sm font-bold text-gray-800'>{review.title}</H3>
-          <Text className='text-gray-600 text-sm'>{review.content}</Text>
+          <div className='flex flex-col gap-1 mt-1'>
+            <h3 className='text-sm font-black text-foreground'>{review.title}</h3>
+            <p className='text-muted-foreground font-medium text-sm leading-relaxed'>
+              {review.content}
+            </p>
+          </div>
 
           {review.sellerResponse && (
-            <div className='mt-3 bg-gray-50 p-3 rounded text-sm text-gray-700 border-l-4 border-blue-400'>
-              <span className='font-bold text-gray-900 block mb-1'>Respons Penjual:</span>
-              {review.sellerResponse}
+            <div className='mt-2 bg-indigo-500/5 p-4 rounded-2xl text-sm text-muted-foreground border border-indigo-500/10 flex flex-col gap-1.5'>
+              <span className='font-black text-indigo-600 dark:text-indigo-400 flex items-center gap-2 text-xs uppercase tracking-widest'>
+                <Store className='w-4 h-4' />
+                Respons Penjual
+              </span>
+              <p className='leading-relaxed font-medium text-foreground text-sm'>
+                {review.sellerResponse}
+              </p>
             </div>
           )}
         </div>
       ))}
       {reviews.length >= 10 && (
-        <Button variant='outline' className='w-full mt-2'>Lihat Semua Ulasan</Button>
+        <Button
+          variant='outline'
+          className='w-full mt-4 rounded-2xl h-12 font-bold shadow-sm active:scale-[0.98] transition-transform'
+        >
+          Lihat Semua Ulasan
+        </Button>
       )}
     </div>
   );

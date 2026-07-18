@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import type { ProductListItem } from '@starsuperscare/contracts';
-import { Button, H1, H3, Pagination, Text } from '@starsuperscare/ui';
+import { Button, Pagination } from '@starsuperscare/ui';
 import { toast } from '@starsuperscare/ui';
 import { client } from '../../lib/api.ts';
 import { useCart } from '../cart/api/useCart.ts';
@@ -144,15 +144,17 @@ export const SearchPage = (): JSX.Element => {
   return (
     <div className='container mx-auto px-4 py-8'>
       <div className='mb-8'>
-        <H1 className='text-3xl font-bold capitalize'>{title.replace('-', ' ')}</H1>
-        <Text className='text-gray-500 mt-2'>
+        <h1 className='text-3xl font-black capitalize text-foreground'>
+          {title.replace('-', ' ')}
+        </h1>
+        <p className='text-muted-foreground mt-2 font-medium'>
           Temukan koleksi perlengkapan terbaik kami
-        </Text>
+        </p>
       </div>
 
       <div className='flex flex-col md:flex-row gap-8'>
         {/* Sidebar Desktop */}
-        <aside className='hidden md:block w-64 shrink-0 border-r border-gray-100 pr-6'>
+        <aside className='hidden md:block w-64 shrink-0 border-r border-border/60 pr-6'>
           <CatalogFilters
             fixedCategorySlug={isCategoryRoute ? slug : undefined}
             fixedBrandSlug={isBrandRoute ? slug : undefined}
@@ -169,7 +171,7 @@ export const SearchPage = (): JSX.Element => {
                 fixedBrandSlug={isBrandRoute ? slug : undefined}
               />
               <select
-                className='border border-gray-300 rounded-md p-2 flex-1 md:w-48 text-sm'
+                className='border border-input bg-background text-foreground rounded-lg p-2.5 flex-1 md:w-48 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-shadow font-medium shadow-sm'
                 value={filters.sort}
                 onChange={(e) => updateFilter('sort', e.target.value)}
               >
@@ -184,10 +186,16 @@ export const SearchPage = (): JSX.Element => {
           {/* Results Area */}
           {error
             ? (
-              <div className='flex flex-col items-center justify-center py-20 text-center'>
-                <H3 className='text-red-500 mb-2'>Terjadi Kesalahan</H3>
-                <Text className='text-gray-500 mb-6'>{error}</Text>
-                <Button onClick={() => fetchProducts()} variant='default'>Coba Lagi</Button>
+              <div className='flex flex-col items-center justify-center py-20 text-center bg-destructive/10 rounded-3xl border border-destructive/20'>
+                <h3 className='text-xl font-bold text-destructive mb-2'>Terjadi Kesalahan</h3>
+                <p className='text-muted-foreground mb-6 font-medium'>{error}</p>
+                <Button
+                  onClick={() => fetchProducts()}
+                  variant='default'
+                  className='rounded-full px-8 font-bold'
+                >
+                  Coba Lagi
+                </Button>
               </div>
             )
             : loading
@@ -202,14 +210,20 @@ export const SearchPage = (): JSX.Element => {
             )
             : products.length === 0
             ? (
-              <div className='flex flex-col items-center justify-center py-20 text-center bg-gray-50 rounded-lg'>
-                <SearchX className='w-16 h-16 text-gray-300 mb-4' />
-                <H3 className='mb-2'>Produk Tidak Ditemukan</H3>
-                <Text className='text-gray-500 max-w-md'>
+              <div className='flex flex-col items-center justify-center py-24 text-center bg-muted/20 rounded-3xl border border-border/60'>
+                <div className='w-20 h-20 bg-muted rounded-full flex items-center justify-center mb-6'>
+                  <SearchX className='w-10 h-10 text-muted-foreground/50' />
+                </div>
+                <h3 className='mb-2 text-xl font-black text-foreground'>Produk Tidak Ditemukan</h3>
+                <p className='text-muted-foreground max-w-md font-medium text-sm leading-relaxed'>
                   Kami tidak menemukan produk yang cocok dengan pencarian atau filter Anda. Coba
                   kurangi kata kunci atau ubah filter pencarian.
-                </Text>
-                <Button variant='outline' className='mt-6' onClick={() => updateFilter('q', '')}>
+                </p>
+                <Button
+                  variant='outline'
+                  className='mt-8 rounded-full px-8 font-bold border-border'
+                  onClick={() => updateFilter('q', '')}
+                >
                   Hapus Pencarian
                 </Button>
               </div>

@@ -11,12 +11,8 @@ export const ResponsiveGooeyToaster = (): JSX.Element => {
 
   useEffect(() => {
     const handleResize = () => {
-      // Use standard md breakpoint (768px)
-      if (globalThis.innerWidth < 768) {
-        setPosition('bottom-center');
-      } else {
-        setPosition('top-right');
-      }
+      // Always show toast at the top right, even on mobile devices.
+      setPosition('top-right');
     };
 
     // Set initial position

@@ -1,9 +1,10 @@
 import { useCart } from '../api/useCart.ts';
 import { CartItemCard } from '../components/CartItemCard.tsx';
 import { CartSummary } from '../components/CartSummary.tsx';
-import { ShoppingCart } from 'lucide-react';
+import { Box, RefreshCw, ShoppingCart, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ProductCarousel } from '../../catalog/components/ProductCarousel.tsx';
+import { Button } from '@starsuperscare/ui';
 
 export function CartPage() {
   const { cart, isLoading, isError, updateItem, removeItem, clearCart } = useCart();
@@ -12,7 +13,7 @@ export function CartPage() {
   if (isLoading) {
     return (
       <div className='flex h-96 items-center justify-center'>
-        <div className='h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-gray-900'>
+        <div className='h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-indigo-600 dark:border-indigo-400'>
         </div>
       </div>
     );
@@ -20,16 +21,20 @@ export function CartPage() {
 
   if (isError) {
     return (
-      <div className='py-24 text-center'>
-        <h2 className='text-xl font-bold text-red-600'>Gagal memuat keranjang</h2>
-        <p className='mt-2 text-gray-500'>Silakan coba lagi nanti atau muat ulang halaman.</p>
-        <button
-          type='button'
+      <div className='py-24 text-center flex flex-col items-center justify-center bg-destructive/10 border border-destructive/20 rounded-3xl p-8 max-w-xl mx-auto mt-16 shadow-sm'>
+        <h2 className='text-2xl font-black text-destructive tracking-tight mb-2'>
+          Gagal memuat keranjang
+        </h2>
+        <p className='text-muted-foreground font-medium mb-8'>
+          Silakan coba lagi nanti atau muat ulang halaman.
+        </p>
+        <Button
           onClick={() => globalThis.location?.reload()}
-          className='mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500'
+          className='rounded-xl font-bold shadow-sm active:scale-95'
         >
+          <RefreshCw className='w-4 h-4 mr-2' />
           Muat Ulang
-        </button>
+        </Button>
       </div>
     );
   }
@@ -40,69 +45,83 @@ export function CartPage() {
   const isEmpty = activeItems.length === 0;
 
   return (
-    <div className='mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8'>
-      <h1 className='text-3xl font-bold tracking-tight text-gray-900 mb-10'>Keranjang Belanja</h1>
+    <div className='mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 animate-in fade-in duration-500'>
+      <div className='flex items-center gap-3 mb-10'>
+        <ShoppingCart className='w-8 h-8 text-indigo-600 dark:text-indigo-400' />
+        <h1 className='text-3xl font-black tracking-tight text-foreground'>Keranjang Belanja</h1>
+      </div>
 
       <div className='flex flex-col lg:flex-row gap-12 items-start'>
         <div className='flex-1 w-full flex flex-col gap-8'>
           {items.length === 0
             ? (
-              <div className='flex flex-col items-center justify-center py-20 bg-gray-50 rounded-lg'>
-                <ShoppingCart className='w-16 h-16 text-gray-400 mb-4' />
-                <p className='text-lg text-gray-600 font-medium'>Keranjang masih kosong</p>
-                <p className='text-sm text-gray-500 mb-6'>
+              <div className='flex flex-col items-center justify-center py-24 bg-card border border-border/60 rounded-3xl shadow-sm'>
+                <div className='w-20 h-20 bg-muted/50 rounded-full flex items-center justify-center mb-6'>
+                  <Box className='w-10 h-10 text-muted-foreground/40' />
+                </div>
+                <p className='text-xl text-foreground font-black tracking-tight mb-2'>
+                  Keranjang masih kosong
+                </p>
+                <p className='text-sm text-muted-foreground font-medium mb-8'>
                   Yuk, mulai penuhi dengan barang impianmu!
                 </p>
-                <a
-                  href='/products'
-                  className='px-6 py-3 bg-gray-900 text-white rounded-md font-semibold hover:bg-gray-800'
+                <Button
+                  onClick={() => navigate('/products')}
+                  className='rounded-xl font-bold px-8 h-12 shadow-md active:scale-95'
                 >
                   Mulai Belanja
-                </a>
+                </Button>
               </div>
             )
             : (
               <>
                 {activeItems.length > 0 && (
-                  <div>
-                    <div className='flex justify-between items-center border-b border-gray-200 pb-4 mb-4'>
-                      <h2 className='text-xl font-semibold text-gray-900'>
+                  <div className='bg-card border border-border/60 rounded-3xl shadow-sm overflow-hidden p-5 lg:p-8'>
+                    <div className='flex justify-between items-center pb-5 mb-5 border-b border-border/60'>
+                      <h2 className='text-lg lg:text-xl font-black text-foreground flex items-center gap-2'>
+                        <div className='w-1.5 h-5 bg-indigo-500 rounded-full' />
                         Barang untuk Dibeli ({activeItems.length})
                       </h2>
                       <button
                         type='button'
                         onClick={clearCart}
-                        className='text-sm font-medium text-red-600 hover:text-red-500'
+                        className='text-sm font-bold text-rose-600 hover:text-rose-700 bg-rose-500/10 hover:bg-rose-500/20 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 active:scale-95'
                       >
-                        Kosongkan Keranjang
+                        <Trash2 className='w-4 h-4' />
+                        <span className='hidden sm:inline'>Kosongkan Keranjang</span>
                       </button>
                     </div>
-                    <div className='flex flex-col divide-y divide-gray-200'>
+                    <div className='flex flex-col divide-y divide-border/60 gap-4'>
                       {activeItems.map((item: any) => (
-                        <CartItemCard
-                          key={item.id}
-                          item={item}
-                          onUpdate={updateItem}
-                          onRemove={removeItem}
-                        />
+                        <div key={item.id} className='pt-4 first:pt-0'>
+                          <CartItemCard
+                            item={item}
+                            onUpdate={updateItem}
+                            onRemove={removeItem}
+                          />
+                        </div>
                       ))}
                     </div>
                   </div>
                 )}
 
                 {savedItems.length > 0 && (
-                  <div className='mt-8'>
-                    <h2 className='text-xl font-semibold text-gray-900 border-b border-gray-200 pb-4 mb-4'>
+                  <div className='mt-4 bg-muted/20 border border-border/40 rounded-3xl p-5 lg:p-8 opacity-80 hover:opacity-100 transition-opacity'>
+                    <h2 className='text-lg font-black text-muted-foreground pb-5 mb-5 border-b border-border/40 flex items-center gap-2'>
                       Disimpan untuk Nanti ({savedItems.length})
                     </h2>
-                    <div className='flex flex-col divide-y divide-gray-200 opacity-80'>
+                    <div className='flex flex-col divide-y divide-border/40 gap-4'>
                       {savedItems.map((item: any) => (
-                        <CartItemCard
+                        <div
                           key={item.id}
-                          item={item}
-                          onUpdate={updateItem}
-                          onRemove={removeItem}
-                        />
+                          className='pt-4 first:pt-0 grayscale hover:grayscale-0 transition-all'
+                        >
+                          <CartItemCard
+                            item={item}
+                            onUpdate={updateItem}
+                            onRemove={removeItem}
+                          />
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -122,7 +141,7 @@ export function CartPage() {
         )}
       </div>
 
-      <div className='mt-16 pt-8 border-t border-gray-200'>
+      <div className='mt-20 pt-10 border-t border-border/60'>
         <ProductCarousel title='Mungkin Anda Suka' limit={10} type='smart_recommendation' />
       </div>
     </div>

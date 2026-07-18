@@ -156,6 +156,8 @@ const routes = productsRouter
         type: products.type,
         status: products.status,
         publishedAt: products.publishedAt,
+        brandName: sql<string | null>`MAX(${brands.name})`,
+        categoryName: sql<string | null>`MAX(${categories.name})`,
         netSold: sql<number>`COALESCE(MAX(${productSalesStats.netSold}), 0)`,
         averageRating: sql<number>`COALESCE(MAX(${productRatingStats.averageRating}), 0)`,
         reviewCount: sql<number>`COALESCE(MAX(${productRatingStats.reviewCount}), 0)`,
@@ -222,6 +224,8 @@ const routes = productsRouter
           name: item.name,
           slug: item.slug,
           brandId: item.brandId,
+          brandName: item.brandName,
+          categoryName: item.categoryName,
           type: item.type,
           status: item.status,
           netSold: item.netSold ?? 0,
@@ -274,6 +278,8 @@ const routes = productsRouter
         name: products.name,
         slug: products.slug,
         brandId: products.brandId,
+        brandName: sql<string | null>`MAX(${brands.name})`,
+        categoryName: sql<string | null>`MAX(${categories.name})`,
         type: products.type,
         status: products.status,
         netSold: sql<number>`COALESCE(MAX(${productSalesStats.netSold}), 0)`,
@@ -295,6 +301,9 @@ const routes = productsRouter
         .leftJoin(productRatingStats, eq(productRatingStats.productId, products.id))
         .leftJoin(productVariants, eq(productVariants.productId, products.id))
         .leftJoin(inventoryLevels, eq(inventoryLevels.variantId, productVariants.id))
+        .leftJoin(productCategories, eq(productCategories.productId, products.id))
+        .leftJoin(categories, eq(categories.id, productCategories.categoryId))
+        .leftJoin(brands, eq(brands.id, products.brandId))
         .where(and(eq(products.status, 'published'), isNull(products.deletedAt)))
         .groupBy(products.id)
         .having(sql`COALESCE(SUM(${inventoryLevels.available}), 0) > 0`)
@@ -319,6 +328,8 @@ const routes = productsRouter
           name: item.name,
           slug: item.slug,
           brandId: item.brandId,
+          brandName: item.brandName,
+          categoryName: item.categoryName,
           type: item.type,
           status: item.status,
           netSold: item.netSold ?? 0,

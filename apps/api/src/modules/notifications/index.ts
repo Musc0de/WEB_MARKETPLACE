@@ -1,8 +1,7 @@
 import { Hono } from 'hono';
 import { z } from 'zod';
 import { zValidator } from '../../middleware/validator.ts';
-import { createRedisSubscriber, db, notifications } from '@starsuperscare/database';
-import { streamSSE } from 'hono/streaming';
+import { db, notifications } from '@starsuperscare/database';
 import { and, desc, eq, isNull } from 'drizzle-orm';
 import { AuthContext, authMiddleware } from '../../middleware/auth.ts';
 
@@ -75,57 +74,6 @@ app.post('/read-all', async (c) => {
   return c.json({ data: { success: true } });
 });
 
-// GET /v1/notifications/stream
-app.get('/stream', (c) => {
-  const userId = c.get('user').id;
-
-  return streamSSE(c, async (stream) => {
-    const subscriber = createRedisSubscriber();
-    const channel = `user-notifications:${userId}`;
-
-    await subscriber.subscribe(channel);
-
-    subscriber.on('message', async (chan: string, message: string) => {
-      if (chan === channel) {
-        try {
-          const payload = JSON.parse(message);
-          await stream.writeSSE({
-            data: JSON.stringify(payload),
-            event: 'notification',
-            id: payload.id,
-          });
-        } catch (e) {
-          console.error('Failed to stream notification:', e);
-        }
-      }
-    });
-
-    const heartbeatInterval = setInterval(async () => {
-      try {
-        await stream.writeSSE({
-          data: 'ping',
-          event: 'heartbeat',
-        });
-      } catch (_e) {
-        clearInterval(heartbeatInterval);
-        subscriber.disconnect();
-      }
-    }, 15000);
-
-    stream.onAbort(() => {
-      clearInterval(heartbeatInterval);
-      subscriber.disconnect();
-    });
-
-    // Keep the stream alive until abort
-    while (true) {
-      try {
-        await stream.sleep(1000);
-      } catch {
-        break; // stream is aborted
-      }
-    }
-  });
-});
+// Stream endpoint removed. We now use SWR polling for notifications.
 
 export default app;

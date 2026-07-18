@@ -81,7 +81,7 @@ export const ReturnForm = ({
         <h3 className='text-lg font-bold text-white mb-2'>
           Ajukan Pengembalian (Pesanan #{order.orderNumber})
         </h3>
-        <p className='text-sm text-gray-400 mb-6'>
+        <p className='text-sm text-muted-foreground/80 mb-6'>
           Pilih produk yang ingin Anda kembalikan beserta alasannya.
         </p>
 
@@ -93,7 +93,7 @@ export const ReturnForm = ({
                 <div
                   key={item.orderItemId}
                   className={`border rounded-lg p-4 transition-colors ${
-                    isSelected ? 'border-primary bg-primary/5' : 'border-white/10 bg-white/5'
+                    isSelected ? 'border-primary bg-primary/5' : 'border-white/10 bg-card/5'
                   }`}
                 >
                   <label className='flex items-start gap-3 cursor-pointer'>
@@ -105,7 +105,7 @@ export const ReturnForm = ({
                     />
                     <div className='flex-1'>
                       <p className='text-sm font-medium text-white'>{item.productName}</p>
-                      <p className='text-xs text-gray-400'>
+                      <p className='text-xs text-muted-foreground/80'>
                         SKU: {item.variantSku} • Max Qty: {item.quantity}
                       </p>
                     </div>
@@ -114,7 +114,7 @@ export const ReturnForm = ({
                   {isSelected && (
                     <div className='mt-4 pl-7 space-y-3'>
                       <div>
-                        <label className='text-xs text-gray-400 block mb-1'>
+                        <label className='text-xs text-muted-foreground/80 block mb-1'>
                           Kuantitas Dikembalikan
                         </label>
                         <input
@@ -128,7 +128,7 @@ export const ReturnForm = ({
                         />
                       </div>
                       <div>
-                        <label className='text-xs text-gray-400 block mb-1'>
+                        <label className='text-xs text-muted-foreground/80 block mb-1'>
                           Alasan Detail (Opsional)
                         </label>
                         <input
