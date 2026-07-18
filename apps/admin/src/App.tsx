@@ -31,6 +31,7 @@ import { ReportsPage } from './features/reports/ReportsPage.tsx';
 import { SettingsLayout } from './features/settings/SettingsLayout.tsx';
 import { GeneralSettingsForm } from './features/settings/GeneralSettingsForm.tsx';
 import { PaymentGatewaysForm } from './features/settings/PaymentGatewaysForm.tsx';
+import { CampaignBannersForm } from './features/settings/CampaignBannersForm.tsx';
 import 'goey-toast/styles.css';
 
 const queryClient = new QueryClient();
@@ -149,6 +150,7 @@ export default function App() {
                   <Route index element={<Navigate to='general' replace />} />
                   <Route path='general' element={<GeneralSettingsForm />} />
                   <Route path='payment-gateways' element={<PaymentGatewaysForm />} />
+                  <Route path='banners' element={<CampaignBannersForm />} />
                 </Route>
 
                 {/* Fallback */}

@@ -4,11 +4,14 @@ import { AuthContext, authMiddleware, requirePermission } from '../../../middlew
 import { z } from 'zod';
 import { db, globalSettings } from '@starsuperscare/database';
 import { eq } from 'drizzle-orm';
+import { adminSettingsCampaignsRouter } from './campaigns.ts';
 
 const app = new Hono<AuthContext>();
 
 app.use('/*', authMiddleware);
 app.use('/*', requirePermission('catalog.write')); // Require an admin-level permission
+
+app.route('/campaigns', adminSettingsCampaignsRouter);
 
 app.get('/', async (c) => {
   const appId = c.req.query('app') || '';

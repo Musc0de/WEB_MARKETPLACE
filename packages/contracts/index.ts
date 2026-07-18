@@ -24,6 +24,7 @@ export * from './src/refunds.ts';
 export * from './src/downloads.ts';
 export * from './src/notifications.ts';
 export * from './src/reviews.ts';
+export * from './src/settings.ts';
 export * from './src/support.ts';
 export * from './src/admin-orders.ts';
 export * from './src/admin-customers.ts';

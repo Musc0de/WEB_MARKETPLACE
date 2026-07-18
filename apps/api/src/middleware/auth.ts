@@ -33,7 +33,7 @@ export async function authMiddleware(c: Context<AuthContext>, next: Next) {
   }
 
   if (!rawToken) {
-    throw new HTTPException(401, { message: 'Unauthorized: No session token provided' });
+    throw new HTTPException(401, { message: 'Silakan masuk untuk melanjutkan.' });
   }
 
   const tokenHash = await hashSessionToken(rawToken);
@@ -57,7 +57,7 @@ export async function authMiddleware(c: Context<AuthContext>, next: Next) {
   const userRecord = result[0]?.user;
 
   if (!session || !userRecord) {
-    throw new HTTPException(401, { message: 'Unauthorized: Invalid or expired session' });
+    throw new HTTPException(401, { message: 'Sesi Anda telah berakhir, silakan masuk kembali.' });
   }
 
   if (userRecord.status === 'suspended' || userRecord.status === 'banned') {

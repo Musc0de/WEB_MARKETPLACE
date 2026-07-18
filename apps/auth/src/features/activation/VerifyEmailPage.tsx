@@ -42,21 +42,20 @@ export function VerifyEmailPage() {
           const meRes = await apiClient.v1.auth.me.$get();
           if (meRes.ok) {
             setRedirectingTo('storefront');
-            const storefrontUrl = (import.meta as any).env?.VITE_STOREFRONT_URL ||
-              'http://localhost:5173';
+            const storefrontUrl = (import.meta as any).env?.VITE_STOREFRONT_URL;
             setTimeout(() => {
               globalThis.location.href = storefrontUrl;
             }, 3000);
           } else {
             setRedirectingTo('auth');
-            const authUrl = (import.meta as any).env?.VITE_AUTH_URL || 'http://localhost:5174';
+            const authUrl = (import.meta as any).env?.VITE_AUTH_URL;
             setTimeout(() => {
               globalThis.location.href = `${authUrl}/login`;
             }, 3000);
           }
-        } catch (e) {
+        } catch (_e) {
           setRedirectingTo('auth');
-          const authUrl = (import.meta as any).env?.VITE_AUTH_URL || 'http://localhost:5174';
+          const authUrl = (import.meta as any).env?.VITE_AUTH_URL;
           setTimeout(() => {
             globalThis.location.href = `${authUrl}/login`;
           }, 3000);
@@ -142,6 +141,7 @@ export function VerifyEmailPage() {
           <h1 className='text-2xl font-bold text-gray-900 mb-2'>Verifikasi Gagal</h1>
           <p className='text-gray-500 mb-6'>{errorMessage}</p>
           <button
+            type='button'
             onClick={() => globalThis.location.href = '/login'}
             className='px-6 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors'
           >

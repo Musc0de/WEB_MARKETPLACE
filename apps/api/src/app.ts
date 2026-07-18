@@ -6,6 +6,7 @@ import { cors } from 'hono/cors';
 import { secureHeaders } from 'hono/secure-headers';
 import { csrfProtection } from './middleware/csrf.ts';
 import { rateLimiter } from './middleware/rate-limiter.ts';
+import { browserNavigationShield } from './middleware/browser-shield.ts';
 import { db } from '@starsuperscare/database';
 import { sql } from 'drizzle-orm';
 import authRouter from './routes/v1/auth.ts';
@@ -138,6 +139,9 @@ app.use(
   }),
 );
 
+// Block direct browser navigation to API routes (except exempt ones)
+app.use('*', browserNavigationShield);
+
 // System Routes
 app.get('/health', (c) => {
   return c.json({
@@ -166,15 +170,7 @@ app.get('/ready', async (c) => {
 
 // Domain Routes
 const v1 = new Hono<AppContext>()
-  .get(
-    '/',
-    (c) =>
-      c.json({
-        data: 'Welcome to StarSuperScare API v1',
-        meta: { request_id: c.get('requestId') },
-        error: null,
-      }),
-  )
+  .get('/', (c) => c.text('404 Not Found'))
   .post('/test-csrf', (c) => c.json({ data: 'success', error: null }))
   .use('/auth/*', rateLimiter({ limit: 10, windowMs: 30000 })) // Stricter limit on auth routes
   .route('/auth', authRouter)

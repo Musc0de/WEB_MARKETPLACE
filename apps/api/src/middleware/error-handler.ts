@@ -43,31 +43,22 @@ export const errorHandler = (err: Error, c: Context) => {
     );
   }
 
+  c.header('Content-Type', 'application/problem+json');
+  c.header('Cache-Control', 'no-store');
+
   return c.json(
     {
-      data: null,
-      meta: { request_id: reqId },
-      error: {
-        code,
-        message,
-        ...(details ? { details } : {}),
-      },
+      type: `https://starsuperscare.net/problems/${code.toLowerCase().replace(/_/g, '-')}`,
+      title: code,
+      status: status,
+      detail: message,
+      requestId: reqId,
+      ...(details ? { details } : {}),
     },
     status as any,
   );
 };
 
 export const notFoundHandler = (c: Context) => {
-  const reqId = c.get('requestId');
-  return c.json(
-    {
-      data: null,
-      meta: { request_id: reqId },
-      error: {
-        code: 'NOT_FOUND',
-        message: 'The requested resource could not be found.',
-      },
-    },
-    404,
-  );
+  return c.text('404 Not Found', 404);
 };

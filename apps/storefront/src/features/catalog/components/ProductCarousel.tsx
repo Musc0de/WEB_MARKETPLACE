@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { ProductListItem } from '@starsuperscare/contracts';
 import { H2, toast } from '@starsuperscare/ui';
@@ -22,6 +22,22 @@ export function ProductCarousel(
   const navigate = useNavigate();
   const { addItem } = useCart();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(Math.ceil(scrollLeft + clientWidth) < scrollWidth);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkScroll();
+    globalThis.addEventListener('resize', checkScroll);
+    return () => globalThis.removeEventListener('resize', checkScroll);
+  }, [checkScroll, products]);
 
   const scrollLeft = () => {
     if (scrollRef.current) scrollRef.current.scrollBy({ left: -400, behavior: 'smooth' });
@@ -95,29 +111,40 @@ export function ProductCarousel(
     <div className='py-8'>
       <div className='flex items-center justify-between mb-6'>
         <H2 className='font-bold tracking-tight'>{title}</H2>
-        {layout === 'slider' && products.length > 3 && (
+        {layout === 'slider' && (canScrollLeft || canScrollRight) && (
           <div className='hidden md:flex gap-2'>
             <button
               type='button'
               onClick={scrollLeft}
-              className='p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors'
+              disabled={!canScrollLeft}
+              className={`p-2 rounded-full border transition-colors ${
+                canScrollLeft
+                  ? 'border-gray-200 hover:bg-gray-50 text-gray-600'
+                  : 'border-gray-100 bg-gray-50 text-gray-300'
+              }`}
               aria-label='Scroll Left'
             >
-              <ChevronLeft className='w-5 h-5 text-gray-600' />
+              <ChevronLeft className='w-5 h-5' />
             </button>
             <button
               type='button'
               onClick={scrollRight}
-              className='p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors'
+              disabled={!canScrollRight}
+              className={`p-2 rounded-full border transition-colors ${
+                canScrollRight
+                  ? 'border-gray-200 hover:bg-gray-50 text-gray-600'
+                  : 'border-gray-100 bg-gray-50 text-gray-300'
+              }`}
               aria-label='Scroll Right'
             >
-              <ChevronRight className='w-5 h-5 text-gray-600' />
+              <ChevronRight className='w-5 h-5' />
             </button>
           </div>
         )}
       </div>
       <div
         ref={scrollRef}
+        onScroll={checkScroll}
         className={layout === 'slider'
           ? 'flex overflow-x-auto gap-3 pb-4 snap-x snap-mandatory scrollbar-hide'
           : 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4'}

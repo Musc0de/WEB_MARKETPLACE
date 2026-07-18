@@ -15,3 +15,4 @@ export * from './downloads.ts';
 export * from './payments.ts';
 export * from './notifications.ts';
 export * from './reviews.ts';
+export * from './settings.ts';

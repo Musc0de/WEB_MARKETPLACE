@@ -105,7 +105,7 @@ export class LouvinPaymentProvider implements PaymentProvider {
       try {
         const json = JSON.parse(errText);
         if (json.message) errMsg = json.message;
-      } catch (e) {
+      } catch (_e) {
         // ignore
       }
       throw new HTTPException(response.status === 503 ? 503 : 400, { message: errMsg });

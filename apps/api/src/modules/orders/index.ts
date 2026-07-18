@@ -25,6 +25,7 @@ import { z } from 'zod';
 import { AuthContext, authMiddleware } from '../../middleware/auth.ts';
 import { deleteInvoicePDF, generateInvoicePDF, uploadInvoicePDF } from './invoice-generator.ts';
 import { EligibilityService } from '../returns/services/eligibility.service.ts';
+import { serializeCustomerOrderListItem } from './dto.ts';
 
 /**
  * Parse optionValues JSON → human-readable string, e.g. "Merah · XL"
@@ -197,9 +198,12 @@ const routes = app
         }
       }
 
+      const dtoList = enrichedOrders.map(serializeCustomerOrderListItem);
+
+      c.header('Cache-Control', 'private, no-store');
       return c.json({
         data: {
-          orders: enrichedOrders,
+          orders: dtoList,
           pagination: {
             page,
             limit,
@@ -447,11 +451,31 @@ const routes = app
       }
     }
 
+    const sanitizedOrder = {
+      id: order.id,
+      orderNumber: order.orderNumber,
+      status: order.status,
+      totalAmount: order.totalAmount,
+      subtotalAmount: order.subtotalAmount,
+      shippingAmount: order.shippingAmount,
+      serviceFeeAmount: order.serviceFeeAmount,
+      discountAmount: order.discountAmount,
+      createdAt: order.createdAt,
+    };
+
+    const sanitizedAddresses = addresses
+      ? {
+        shippingSnapshot: addresses.shippingSnapshot,
+        billingSnapshot: addresses.billingSnapshot,
+      }
+      : null;
+
+    c.header('Cache-Control', 'private, no-store');
     return c.json({
       data: {
-        order,
+        order: sanitizedOrder,
         items,
-        addresses: addresses || null,
+        addresses: sanitizedAddresses,
         history,
       },
       meta: { request_id: c.get('requestId') },

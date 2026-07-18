@@ -64,11 +64,7 @@ webhooksRouter.post('/', async (c) => {
   ).limit(1);
   if (existingEvent.length > 0) {
     // Duplicate webhook, return success but don't process again
-    return c.json({
-      data: { status: 'ignored_duplicate' },
-      meta: { request_id: c.get('requestId') },
-      error: null,
-    });
+    return c.json({ received: true }, 200);
   }
 
   const paymentList = await db.select().from(payments).where(
@@ -99,7 +95,7 @@ webhooksRouter.post('/', async (c) => {
       } else if (verifiedStatus === 'expired') {
         data.type = 'payment_expired';
       } else {
-        return c.json({ data: { status: 'ignored_unsettled' } });
+        return c.json({ received: true }, 200);
       }
     } catch (e: any) {
       return c.json({
@@ -272,9 +268,5 @@ webhooksRouter.post('/', async (c) => {
     }
   });
 
-  return c.json({
-    data: { status: 'processed' },
-    meta: { request_id: c.get('requestId') },
-    error: null,
-  });
+  return c.json({ received: true }, 200);
 });

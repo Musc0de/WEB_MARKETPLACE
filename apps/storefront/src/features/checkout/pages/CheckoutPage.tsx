@@ -8,7 +8,8 @@ import { ShippingOptions } from '../components/ShippingOptions.tsx';
 import type { ShippingAddress } from '@starsuperscare/contracts';
 import { formatIDR, SEO, toast } from '@starsuperscare/ui';
 import { CheckCircle2, Info, Ticket, X } from 'lucide-react';
-import { client } from '../../../lib/api.ts';
+import { useAuth } from '../../auth/api/useAuth.ts';
+import { useAddresses } from '../../me/api/useAddresses.ts';
 
 type CheckoutStep = 'address' | 'shipping' | 'review';
 
@@ -32,48 +33,32 @@ export function CheckoutPage() {
   const [appliedVoucher, setAppliedVoucher] = useState<string | null>(initialVoucher);
   const [isApplyingVoucher, setIsApplyingVoucher] = useState(false);
 
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const { user, isLoading: isAuthLoading } = useAuth();
+  const userEmail = user?.email || null;
+  const { addresses: savedAddresses, isLoading: isAddressesLoading } = useAddresses(!!userEmail);
 
+  // Set default address when addresses are loaded
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await client.v1.auth.me.$get();
-        if (res.ok) {
-          const data = await res.json();
-          setUserEmail(data.data.user.email);
+    if (userEmail && savedAddresses.length > 0 && !address) {
+      const primary = savedAddresses.find((a: any) => a.isPrimaryShipping) ||
+        savedAddresses.find((a: any) => a.isPrimaryBilling) || savedAddresses[0];
 
-          const addrRes = await client.v1.me.addresses.$get();
-          if (addrRes.ok) {
-            const addrData = await addrRes.json();
-            const savedAddresses = addrData.data || [];
-            const primary = savedAddresses.find((a: any) => a.isPrimaryShipping) ||
-              savedAddresses.find((a: any) => a.isPrimaryBilling);
-
-            if (primary) {
-              setAddress({
-                fullName: primary.recipientName,
-                email: data.data.user.email,
-                phoneNumber: primary.phone,
-                streetAddress: primary.addressLine1 +
-                  (primary.addressLine2 ? ', ' + primary.addressLine2 : ''),
-                province: primary.province,
-                city: primary.city,
-                postalCode: primary.postalCode,
-                country: primary.country || 'ID',
-                notes: '',
-              });
-            }
-          }
-        }
-      } catch {
-        // ignore, user is guest
-      } finally {
-        setIsCheckingAuth(false);
+      if (primary) {
+        setAddress({
+          fullName: primary.recipientName,
+          email: userEmail,
+          phoneNumber: primary.phone,
+          streetAddress: primary.addressLine1 +
+            (primary.addressLine2 ? ', ' + primary.addressLine2 : ''),
+          province: primary.province,
+          city: primary.city,
+          postalCode: primary.postalCode,
+          country: primary.country || 'ID',
+          notes: '',
+        });
       }
-    };
-    checkAuth();
-  }, []);
+    }
+  }, [userEmail, savedAddresses, address]);
 
   // Validate on mount or when shipping/cart changes
   // For direct-buy: pass the directToken so the API uses the fresh isolated cart
@@ -117,6 +102,19 @@ export function CheckoutPage() {
     setVoucherInput('');
     toast.success('Voucher dibatalkan');
   };
+
+  const requiresShipping = directToken
+    ? (validationData?.items?.some((i: any) => i.productType === 'physical') ?? false)
+    : (cart?.items?.some((i: any) => i.product?.type === 'physical') ?? true);
+
+  useEffect(() => {
+    if (isAuthLoading) return;
+
+    // Auto-advance logic ONLY for digital products and logged-in users WITH A SAVED PRIMARY ADDRESS
+    if (userEmail && step === 'address' && !requiresShipping && address) {
+      setStep('review');
+    }
+  }, [isAuthLoading, userEmail, step, address, requiresShipping]);
 
   // Show loader while normal cart is loading OR direct buy validation is pending
   if ((!directToken && isCartLoading) || (directToken && !validationData)) {
@@ -179,19 +177,6 @@ export function CheckoutPage() {
       toast.error(err.message || 'Gagal membuat pesanan');
     }
   };
-
-  const requiresShipping = directToken
-    ? (validationData?.items?.some((i: any) => i.productType === 'physical') ?? false)
-    : (cart?.items?.some((i: any) => i.product?.type === 'physical') ?? true);
-
-  useEffect(() => {
-    if (isCheckingAuth) return;
-
-    // Auto-advance logic ONLY for digital products and logged-in users WITH A SAVED PRIMARY ADDRESS
-    if (userEmail && step === 'address' && !requiresShipping && address) {
-      setStep('review');
-    }
-  }, [isCheckingAuth, userEmail, step, address, requiresShipping]);
 
   const steps: { id: CheckoutStep; label: string }[] = requiresShipping
     ? [
@@ -268,7 +253,7 @@ export function CheckoutPage() {
               <h2 className='text-xl font-bold mb-6'>
                 {requiresShipping ? 'Alamat Pengiriman' : 'Informasi Pembeli'}
               </h2>
-              {isCheckingAuth
+              {(isAuthLoading || isAddressesLoading)
                 ? (
                   <div className='flex justify-center py-8'>
                     <div className='animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full' />

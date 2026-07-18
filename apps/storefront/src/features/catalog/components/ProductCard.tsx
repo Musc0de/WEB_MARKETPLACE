@@ -241,9 +241,7 @@ export const ProductCard = (
               : cartSuccess
               ? <CheckCircle className='w-3 h-3 shrink-0' />
               : <ShoppingCart className='w-3 h-3 shrink-0' />}
-            {!isLoading && !cartSuccess && (
-              <span className='truncate leading-none pt-0.5'>Keranjang</span>
-            )}
+            {!isLoading && !cartSuccess && <span className='truncate'>Keranjang</span>}
           </button>
         </div>
       </div>

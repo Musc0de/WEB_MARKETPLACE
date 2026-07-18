@@ -38,3 +38,12 @@ starsuperscare-ai-build-playbook/
 references/
 scripts/
 quality/
+packages/database/migrations/*
+
+
+
+
+
+
+
+

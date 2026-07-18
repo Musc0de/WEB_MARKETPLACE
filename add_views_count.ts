@@ -1,1 +1,0 @@
-import { db } from "./packages/database/src/index.ts"; import { sql } from "drizzle-orm"; await db.execute(sql`ALTER TABLE sss_product_sales_stats ADD COLUMN IF NOT EXISTS views_count integer NOT NULL DEFAULT 0;`); console.log("Done");

@@ -642,11 +642,11 @@ export const OrderDetailPage = () => {
               </div>
 
               {/* Tax */}
-              {order.taxAmount > 0 && (
+              {((order as any).taxAmount || 0) > 0 && (
                 <div className='flex justify-between items-center text-sm'>
                   <span className='text-gray-500'>Pajak</span>
                   <span className='text-gray-800 font-medium tabular-nums'>
-                    {fmt(order.taxAmount)}
+                    {fmt((order as any).taxAmount)}
                   </span>
                 </div>
               )}
