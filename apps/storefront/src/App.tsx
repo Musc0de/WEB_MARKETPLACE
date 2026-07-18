@@ -44,6 +44,7 @@ export default function App() {
             <Route path='/' element={<HomePage />} />
             <Route path='/products' element={<SearchPage />} />
             <Route path='/search' element={<SearchPage />} />
+            <Route path='/promo' element={<SearchPage />} />
             <Route path='/categories' element={<CategoriesPage />} />
             <Route path='/categories/:slug' element={<SearchPage />} />
             <Route path='/brands' element={<BrandsPage />} />

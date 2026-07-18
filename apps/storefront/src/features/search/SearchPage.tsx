@@ -30,6 +30,7 @@ export const SearchPage = (): JSX.Element => {
   const isCategoryRoute = location.pathname.startsWith('/categories');
   const isBrandRoute = location.pathname.startsWith('/brands');
   const isSearchRoute = location.pathname.startsWith('/search');
+  const isPromoRoute = location.pathname.startsWith('/promo');
 
   const { filters, updateFilter } = useSearchFilters();
   const debouncedSearch = useDebounce(filters.q, 500);
@@ -98,7 +99,7 @@ export const SearchPage = (): JSX.Element => {
       if (filters.min_price !== null) queryObj.min_price = filters.min_price.toString();
       if (filters.max_price !== null) queryObj.max_price = filters.max_price.toString();
       if (filters.min_rating !== null) queryObj.min_rating = filters.min_rating.toString();
-      if (filters.promo) queryObj.promo = 'true';
+      if (filters.promo || isPromoRoute) queryObj.promo = 'true';
 
       const res = await client.v1.catalog.products.$get(
         { query: queryObj as any },
@@ -119,7 +120,7 @@ export const SearchPage = (): JSX.Element => {
       toast.error(err.message || 'Gagal memuat produk.');
       setLoading(false);
     }
-  }, [filters, debouncedSearch, isCategoryRoute, isBrandRoute, slug]);
+  }, [filters, debouncedSearch, isCategoryRoute, isBrandRoute, isPromoRoute, slug]);
 
   useEffect(() => {
     fetchProducts();
@@ -138,6 +139,7 @@ export const SearchPage = (): JSX.Element => {
   if (isCategoryRoute) title = `Kategori: ${slug}`;
   if (isBrandRoute) title = `Brand: ${slug}`;
   if (isSearchRoute) title = 'Hasil Pencarian';
+  if (isPromoRoute) title = 'Promo Spesial';
 
   return (
     <div className='container mx-auto px-4 py-8'>

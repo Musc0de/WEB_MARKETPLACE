@@ -3,10 +3,12 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useCart } from '../../cart/api/useCart.ts';
 import { useCheckoutValidation, useCreateOrder } from '../api/useCheckout.ts';
 import { AddressForm } from '../components/AddressForm.tsx';
+import { AddressBookSelector } from '../components/AddressBookSelector.tsx';
 import { ShippingOptions } from '../components/ShippingOptions.tsx';
 import type { ShippingAddress } from '@starsuperscare/contracts';
-import { formatIDR, toast } from '@starsuperscare/ui';
+import { formatIDR, SEO, toast } from '@starsuperscare/ui';
 import { CheckCircle2, Info, Ticket, X } from 'lucide-react';
+import { client } from '../../../lib/api.ts';
 
 type CheckoutStep = 'address' | 'shipping' | 'review';
 
@@ -29,6 +31,49 @@ export function CheckoutPage() {
   const [voucherInput, setVoucherInput] = useState('');
   const [appliedVoucher, setAppliedVoucher] = useState<string | null>(initialVoucher);
   const [isApplyingVoucher, setIsApplyingVoucher] = useState(false);
+
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await client.v1.auth.me.$get();
+        if (res.ok) {
+          const data = await res.json();
+          setUserEmail(data.data.user.email);
+
+          const addrRes = await client.v1.me.addresses.$get();
+          if (addrRes.ok) {
+            const addrData = await addrRes.json();
+            const savedAddresses = addrData.data || [];
+            const primary = savedAddresses.find((a: any) => a.isPrimaryShipping) ||
+              savedAddresses.find((a: any) => a.isPrimaryBilling);
+
+            if (primary) {
+              setAddress({
+                fullName: primary.recipientName,
+                email: data.data.user.email,
+                phoneNumber: primary.phone,
+                streetAddress: primary.addressLine1 +
+                  (primary.addressLine2 ? ', ' + primary.addressLine2 : ''),
+                province: primary.province,
+                city: primary.city,
+                postalCode: primary.postalCode,
+                country: primary.country || 'ID',
+                notes: '',
+              });
+            }
+          }
+        }
+      } catch {
+        // ignore, user is guest
+      } finally {
+        setIsCheckingAuth(false);
+      }
+    };
+    checkAuth();
+  }, []);
 
   // Validate on mount or when shipping/cart changes
   // For direct-buy: pass the directToken so the API uses the fresh isolated cart
@@ -139,6 +184,15 @@ export function CheckoutPage() {
     ? (validationData?.items?.some((i: any) => i.productType === 'physical') ?? false)
     : (cart?.items?.some((i: any) => i.product?.type === 'physical') ?? true);
 
+  useEffect(() => {
+    if (isCheckingAuth) return;
+
+    // Auto-advance logic ONLY for digital products and logged-in users WITH A SAVED PRIMARY ADDRESS
+    if (userEmail && step === 'address' && !requiresShipping && address) {
+      setStep('review');
+    }
+  }, [isCheckingAuth, userEmail, step, address, requiresShipping]);
+
   const steps: { id: CheckoutStep; label: string }[] = requiresShipping
     ? [
       { id: 'address', label: 'Alamat Pengiriman' },
@@ -150,8 +204,18 @@ export function CheckoutPage() {
       { id: 'review', label: 'Pembayaran' },
     ];
 
+  let pageTitle = 'Checkout';
+  if (step === 'address') {
+    pageTitle = requiresShipping ? 'Alamat Pengiriman | Checkout' : 'Informasi Pembeli | Checkout';
+  } else if (step === 'shipping') {
+    pageTitle = 'Opsi Pengiriman | Checkout';
+  } else if (step === 'review') {
+    pageTitle = 'Review Pesanan | Checkout';
+  }
+
   return (
     <div className='max-w-6xl mx-auto px-4 py-8'>
+      <SEO title={pageTitle} />
       <h1 className='text-3xl font-bold mb-8'>Checkout</h1>
 
       {/* Direct Buy Indicator */}
@@ -204,11 +268,27 @@ export function CheckoutPage() {
               <h2 className='text-xl font-bold mb-6'>
                 {requiresShipping ? 'Alamat Pengiriman' : 'Informasi Pembeli'}
               </h2>
-              <AddressForm
-                initialValues={address || {}}
-                onSubmit={handleAddressSubmit}
-                isDigitalOnly={!requiresShipping}
-              />
+              {isCheckingAuth
+                ? (
+                  <div className='flex justify-center py-8'>
+                    <div className='animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full' />
+                  </div>
+                )
+                : (userEmail && requiresShipping)
+                ? (
+                  <AddressBookSelector
+                    userEmail={userEmail}
+                    onSelect={handleAddressSubmit}
+                  />
+                )
+                : (
+                  <AddressForm
+                    initialValues={address || { email: userEmail || '' }}
+                    onSubmit={handleAddressSubmit}
+                    isDigitalOnly={!requiresShipping}
+                    hideEmail={!!userEmail}
+                  />
+                )}
             </div>
           )}
 
@@ -280,6 +360,32 @@ export function CheckoutPage() {
                           <strong>Verifikasi Email</strong>. Jika email belum terverifikasi, Anda
                           tidak akan bisa login maupun mengunduh produk ini.
                         </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {requiresShipping && (
+                    <div className='bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3 items-start'>
+                      <Info className='w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0' />
+                      <div>
+                        <h4 className='text-sm font-bold text-amber-900 mb-1'>
+                          Informasi Pengiriman & Kebijakan Retur
+                        </h4>
+                        <div className='text-xs text-amber-900 leading-relaxed space-y-2'>
+                          <p>
+                            <strong>Status Pengiriman:</strong>{' '}
+                            Pesanan Anda akan diproses dan dikirim sesuai estimasi kurir. Anda dapat
+                            melacak resi dan melihat detail pesanan kapan saja melalui menu
+                            riwayat/lacak pesanan.
+                          </p>
+                          <p>
+                            <strong>Kebijakan Refund & Return:</strong>{' '}
+                            Segala bentuk komplain barang rusak atau kurang{' '}
+                            <strong>WAJIB menyertakan Video Unboxing lengkap</strong>{' '}
+                            (tanpa jeda/edit sejak paket masih tersegel). Pengecekan klaim akan
+                            dilakukan secara manual oleh tim kami sebelum disetujui.
+                          </p>
+                        </div>
                       </div>
                     </div>
                   )}

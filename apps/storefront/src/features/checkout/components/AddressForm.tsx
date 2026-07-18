@@ -2,14 +2,17 @@ import { useState } from 'react';
 import type { ShippingAddress } from '@starsuperscare/contracts';
 
 interface AddressFormProps {
-  initialValues?: Partial<ShippingAddress> & { email?: string };
-  onSubmit: (data: ShippingAddress & { email: string }) => void;
+  initialValues?: Partial<ShippingAddress> & { email?: string; isPrimaryShipping?: boolean };
+  onSubmit: (data: ShippingAddress & { email: string; isPrimaryShipping?: boolean }) => void;
   isLoading?: boolean;
   isDigitalOnly?: boolean;
+  hideEmail?: boolean;
+  showPrimaryOption?: boolean;
 }
 
 export function AddressForm(
-  { initialValues, onSubmit, isLoading, isDigitalOnly }: AddressFormProps,
+  { initialValues, onSubmit, isLoading, isDigitalOnly, hideEmail, showPrimaryOption }:
+    AddressFormProps,
 ) {
   const [formData, setFormData] = useState({
     fullName: initialValues?.fullName || '',
@@ -20,6 +23,7 @@ export function AddressForm(
     city: initialValues?.city || '',
     postalCode: initialValues?.postalCode || '',
     notes: initialValues?.notes || '',
+    isPrimaryShipping: initialValues?.isPrimaryShipping || false,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -27,8 +31,10 @@ export function AddressForm(
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.fullName) newErrors.fullName = 'Nama wajib diisi';
-    if (!formData.email) newErrors.email = 'Email wajib diisi';
-    else if (!/^\S+@\S+\.\S+$/.test(formData.email)) newErrors.email = 'Email tidak valid';
+    if (!hideEmail) {
+      if (!formData.email) newErrors.email = 'Email wajib diisi';
+      else if (!/^\S+@\S+\.\S+$/.test(formData.email)) newErrors.email = 'Email tidak valid';
+    }
     if (!formData.phoneNumber) newErrors.phoneNumber = 'No HP wajib diisi';
 
     if (!isDigitalOnly) {
@@ -50,7 +56,10 @@ export function AddressForm(
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const value = e.target.type === 'checkbox'
+      ? (e.target as HTMLInputElement).checked
+      : e.target.value;
+    setFormData((prev) => ({ ...prev, [e.target.name]: value }));
     if (errors[e.target.name]) {
       setErrors((prev) => ({ ...prev, [e.target.name]: '' }));
     }
@@ -58,7 +67,7 @@ export function AddressForm(
 
   return (
     <form onSubmit={handleSubmit} className='space-y-4'>
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+      <div className={`grid grid-cols-1 gap-4 ${hideEmail ? '' : 'md:grid-cols-2'}`}>
         <div>
           <label className='block text-sm font-medium mb-1'>Nama Lengkap</label>
           <input
@@ -71,19 +80,21 @@ export function AddressForm(
           />
           {errors.fullName && <p className='text-red-500 text-xs mt-1'>{errors.fullName}</p>}
         </div>
-        <div>
-          <label className='block text-sm font-medium mb-1'>Email</label>
-          <input
-            name='email'
-            type='email'
-            value={formData.email}
-            onChange={handleChange}
-            className={`w-full border rounded p-2 ${
-              errors.email ? 'border-red-500' : 'border-gray-300'
-            }`}
-          />
-          {errors.email && <p className='text-red-500 text-xs mt-1'>{errors.email}</p>}
-        </div>
+        {!hideEmail && (
+          <div>
+            <label className='block text-sm font-medium mb-1'>Email</label>
+            <input
+              name='email'
+              type='email'
+              value={formData.email}
+              onChange={handleChange}
+              className={`w-full border rounded p-2 ${
+                errors.email ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.email && <p className='text-red-500 text-xs mt-1'>{errors.email}</p>}
+          </div>
+        )}
       </div>
 
       <div>
@@ -162,6 +173,22 @@ export function AddressForm(
           className='w-full border border-gray-300 rounded p-2'
         />
       </div>
+
+      {showPrimaryOption && (
+        <div className='flex items-center gap-2'>
+          <input
+            type='checkbox'
+            id='isPrimaryShipping'
+            name='isPrimaryShipping'
+            checked={formData.isPrimaryShipping}
+            onChange={handleChange}
+            className='w-4 h-4 text-blue-600 rounded border-gray-300'
+          />
+          <label htmlFor='isPrimaryShipping' className='text-sm text-gray-700'>
+            Jadikan sebagai alamat utama
+          </label>
+        </div>
+      )}
 
       <div className='pt-4 flex justify-end'>
         <button
