@@ -40,7 +40,7 @@ export function CartSummary({ summary, isEmpty, onCheckout }: CartSummaryProps) 
           });
           toast.success('Voucher berhasil digunakan otomatis');
           setVoucherCode('');
-        } catch (e: any) {
+        } catch (_e: any) {
           // If auto-apply fails (e.g. invalid code), remove it from storage so it doesn't try again
           localStorage.removeItem('claimed_voucher');
         } finally {
