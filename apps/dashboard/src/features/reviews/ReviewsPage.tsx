@@ -1,7 +1,16 @@
 import React, { useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { client } from '../../lib/api.ts';
-import { Button, Card, toast } from '@starsuperscare/ui';
+import {
+  Button,
+  Card,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  toast,
+} from '@starsuperscare/ui';
 import {
   CalendarDays,
   CheckCircle2,
@@ -409,7 +418,7 @@ export const ReviewsPage = () => {
       </div>
 
       {(creatingReviewFor || editingReview) && (
-        <ReviewModal
+        <ReviewSheet
           item={creatingReviewFor}
           review={editingReview}
           onClose={() => {
@@ -696,7 +705,7 @@ function RatingStars({
   );
 }
 
-function ReviewModal({
+function ReviewSheet({
   item,
   review,
   onClose,
@@ -714,6 +723,10 @@ function ReviewModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const visibleRating = hoveredRating ?? rating;
+  const target = item ?? review;
+  const productImage = target?.primaryImage ?? target?.product?.primaryImage ?? null;
+  const productName = target?.productName ?? target?.product?.name ?? null;
+  const orderNumber = target?.orderNumber ?? target?.order?.orderNumber ?? null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -758,194 +771,282 @@ function ReviewModal({
   };
 
   return (
-    <div className='fixed inset-0 z-[100] flex items-end justify-center sm:items-center sm:p-4'>
-      <button
-        type='button'
-        aria-label='Tutup modal ulasan'
-        className='absolute inset-0 cursor-default bg-black/60 backdrop-blur-sm animate-in fade-in duration-200'
-        onClick={onClose}
-      />
-
-      <div
-        role='dialog'
-        aria-modal='true'
-        aria-labelledby='review-modal-title'
-        className='relative max-h-[94vh] w-full overflow-y-auto rounded-t-3xl border border-border bg-card shadow-2xl animate-in slide-in-from-bottom-6 duration-300 sm:max-w-xl sm:rounded-3xl sm:zoom-in-95'
+    <Sheet
+      open
+      onOpenChange={(open: boolean) => {
+        if (!open && !isSubmitting) onClose();
+      }}
+    >
+      <SheetContent
+        side='bottom'
+        aria-describedby='review-sheet-description'
+        className='z-[110] flex h-[min(92dvh,760px)] max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-[30px] border-x border-t border-slate-200/80 bg-white p-0 shadow-[0_-24px_80px_-28px_rgba(15,23,42,0.45)] outline-none dark:border-slate-700/80 dark:bg-slate-950 [&>button]:hidden sm:bottom-auto sm:left-1/2 sm:top-1/2 sm:h-auto sm:max-h-[90dvh] sm:w-[min(680px,calc(100vw-2rem))] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-[28px] sm:border sm:data-[state=closed]:slide-out-to-bottom-0 sm:data-[state=open]:slide-in-from-bottom-0'
       >
-        <div className='sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-border/50 bg-card/95 px-5 py-5 backdrop-blur-md sm:px-7'>
-          <div>
-            <p className='text-xs font-semibold uppercase tracking-[0.16em] text-purple-400'>
-              {review ? 'Perbarui pengalaman' : 'Bagikan pengalaman'}
-            </p>
-            <h2 className='mt-1 text-xl font-bold text-foreground sm:text-2xl'>
-              {review ? 'Edit Ulasan' : 'Tulis Ulasan'}
-            </h2>
-          </div>
-          <button
-            type='button'
-            onClick={onClose}
-            className='flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border/60 bg-muted/50 text-muted-foreground transition hover:bg-muted hover:text-foreground'
-            aria-label='Tutup'
-          >
-            <X className='h-5 w-5' />
-          </button>
+        {/* Mobile drag handle */}
+        <div className='flex shrink-0 justify-center bg-white pb-1 pt-2.5 dark:bg-slate-950 sm:hidden'>
+          <div className='h-1.5 w-12 rounded-full bg-slate-300 dark:bg-slate-700' />
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className='space-y-7 px-5 py-6 sm:px-7'>
-            {item && (
-              <div className='flex items-center gap-4 rounded-2xl border border-indigo-500/15 bg-indigo-50/50 p-3.5 dark:bg-indigo-500/10'>
-                <div className='flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/50 bg-background'>
-                  {item.primaryImage
-                    ? (
-                      <img
-                        src={getMediaUrl(item.primaryImage) || ''}
-                        className='h-full w-full object-cover'
-                        alt={item.productName || 'Produk'}
-                      />
-                    )
-                    : <ImageIcon className='h-6 w-6 text-muted-foreground/50' />}
-                </div>
-                <div className='min-w-0'>
-                  <span className='text-xs font-semibold text-purple-400'>
-                    Produk yang diulas
-                  </span>
-                  <p className='mt-1 line-clamp-2 text-sm font-semibold leading-5 text-foreground'>
-                    {item.productName}
-                  </p>
-                  {item.orderNumber && (
-                    <p className='mt-1 text-xs text-muted-foreground'>
-                      Pesanan #{item.orderNumber}
-                    </p>
-                  )}
-                </div>
+        <SheetHeader className='relative shrink-0 border-b border-slate-200/80 bg-gradient-to-br from-violet-50 via-white to-indigo-50 px-5 pb-4 pt-3 text-left dark:border-slate-800 dark:from-violet-950/35 dark:via-slate-950 dark:to-indigo-950/30 sm:px-7 sm:pb-5 sm:pt-6'>
+          <div className='pointer-events-none absolute -right-12 -top-14 h-36 w-36 rounded-full bg-violet-400/15 blur-3xl dark:bg-violet-500/10' />
+
+          <div className='relative flex items-start justify-between gap-4 pr-1'>
+            <div className='min-w-0'>
+              <div className='mb-2 inline-flex items-center gap-1.5 rounded-full border border-violet-200 bg-violet-100/80 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-violet-700 dark:border-violet-800/80 dark:bg-violet-500/10 dark:text-violet-300'>
+                <Sparkles className='h-3 w-3' />
+                {review ? 'Perbarui pengalaman' : 'Bagikan pengalaman'}
               </div>
+
+              <SheetTitle
+                id='review-sheet-title'
+                className='text-xl font-black tracking-tight text-slate-950 dark:text-white sm:text-2xl'
+              >
+                {review ? 'Edit ulasan produk' : 'Tulis ulasan produk'}
+              </SheetTitle>
+
+              <SheetDescription
+                id='review-sheet-description'
+                className='mt-1.5 max-w-lg text-xs font-medium leading-5 text-slate-600 dark:text-slate-300 sm:text-sm'
+              >
+                Nilai produk secara jujur agar pengalaman Anda bermanfaat bagi pembeli lain.
+              </SheetDescription>
+            </div>
+
+            <button
+              type='button'
+              onClick={onClose}
+              disabled={isSubmitting}
+              className='flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-white/90 text-slate-500 shadow-sm transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-500/15 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-violet-800 dark:hover:bg-violet-950/60 dark:hover:text-violet-300'
+              aria-label='Tutup form ulasan'
+            >
+              <X className='h-5 w-5' />
+            </button>
+          </div>
+        </SheetHeader>
+
+        <form
+          onSubmit={handleSubmit}
+          className='flex min-h-0 flex-1 flex-col'
+        >
+          <div className='min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-4 py-5 [scrollbar-width:thin] sm:space-y-6 sm:px-7 sm:py-6'>
+            {productName && (
+              <section className='relative overflow-hidden rounded-2xl border border-indigo-200/80 bg-gradient-to-r from-indigo-50 via-white to-violet-50 p-3.5 shadow-sm dark:border-indigo-900/70 dark:from-indigo-950/45 dark:via-slate-900 dark:to-violet-950/35'>
+                <div className='absolute -right-8 -top-8 h-24 w-24 rounded-full bg-indigo-300/20 blur-2xl dark:bg-indigo-500/10' />
+
+                <div className='relative flex items-center gap-3.5'>
+                  <div className='flex h-[72px] w-[72px] shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800'>
+                    {productImage
+                      ? (
+                        <img
+                          src={getMediaUrl(productImage) || ''}
+                          className='h-full w-full object-cover'
+                          alt={productName || 'Produk'}
+                          loading='lazy'
+                          decoding='async'
+                        />
+                      )
+                      : <ImageIcon className='h-7 w-7 text-slate-400 dark:text-slate-500' />}
+                  </div>
+
+                  <div className='min-w-0 flex-1'>
+                    <div className='flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-indigo-700 dark:text-indigo-300'>
+                      <ShieldCheck className='h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400' />
+                      Pembelian terverifikasi
+                    </div>
+                    <p className='mt-1.5 line-clamp-2 text-sm font-extrabold leading-5 text-slate-950 dark:text-white sm:text-base'>
+                      {productName}
+                    </p>
+                    {orderNumber && (
+                      <p className='mt-1.5 truncate text-[11px] font-semibold text-slate-500 dark:text-slate-400 sm:text-xs'>
+                        Nomor pesanan #{orderNumber}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </section>
             )}
 
-            <div>
-              <div className='flex items-center justify-between gap-3'>
-                <label className='text-sm font-semibold text-foreground'>
-                  Penilaian Anda
-                </label>
-                <span className='text-sm font-semibold text-amber-500'>
-                  {RATING_LABELS[visibleRating]}
+            <section aria-labelledby='rating-heading'>
+              <div className='flex items-end justify-between gap-3'>
+                <div>
+                  <h3
+                    id='rating-heading'
+                    className='text-sm font-extrabold text-slate-900 dark:text-slate-100'
+                  >
+                    Penilaian Anda
+                  </h3>
+                  <p className='mt-0.5 text-xs font-medium text-slate-500 dark:text-slate-400'>
+                    Ketuk bintang untuk memberikan nilai.
+                  </p>
+                </div>
+
+                <span className='shrink-0 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-extrabold text-amber-700 dark:border-amber-800/70 dark:bg-amber-500/10 dark:text-amber-300'>
+                  {visibleRating}/5 · {RATING_LABELS[visibleRating]}
                 </span>
               </div>
 
-              <div className='mt-3 rounded-2xl border border-purple-500/20 bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-pink-500/10 px-3 py-5 shadow-inner'>
+              <div className='mt-3 rounded-2xl border border-amber-200/80 bg-gradient-to-br from-amber-50 via-orange-50/70 to-white px-2 py-4 shadow-inner dark:border-amber-900/60 dark:from-amber-950/35 dark:via-orange-950/20 dark:to-slate-900'>
                 <div
-                  className='flex items-center justify-center gap-1 sm:gap-2'
+                  className='flex items-center justify-center gap-0.5 min-[360px]:gap-1 sm:gap-2'
                   onMouseLeave={() => setHoveredRating(null)}
                 >
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type='button'
-                      onClick={() => setRating(star)}
-                      onMouseEnter={() => setHoveredRating(star)}
-                      className='rounded-xl p-1.5 transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:p-2'
-                      aria-label={`Beri ${star} bintang`}
-                    >
-                      <Star
-                        className={`h-9 w-9 transition-all sm:h-10 sm:w-10 ${
-                          star <= visibleRating
-                            ? 'fill-amber-400 text-amber-400 drop-shadow-sm'
-                            : 'fill-muted text-muted-foreground/25'
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const active = star <= visibleRating;
+
+                    return (
+                      <button
+                        key={star}
+                        type='button'
+                        onClick={() => setRating(star)}
+                        onMouseEnter={() => setHoveredRating(star)}
+                        className={`flex h-11 w-11 items-center justify-center rounded-xl transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-500/20 sm:h-12 sm:w-12 ${
+                          active
+                            ? 'bg-amber-100 text-amber-500 shadow-sm hover:-translate-y-0.5 dark:bg-amber-500/15 dark:text-amber-300'
+                            : 'text-slate-300 hover:bg-white hover:text-amber-400 dark:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-amber-400'
                         }`}
-                      />
-                    </button>
-                  ))}
+                        aria-label={`Beri ${star} bintang`}
+                        aria-pressed={rating === star}
+                      >
+                        <Star
+                          className={`h-7 w-7 transition-transform sm:h-8 sm:w-8 ${
+                            active ? 'fill-current scale-105' : 'fill-transparent'
+                          }`}
+                        />
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
-            </div>
+            </section>
 
-            <div className='space-y-2'>
+            <section className='space-y-2'>
               <div className='flex items-center justify-between gap-3'>
                 <label
                   htmlFor='review-title'
-                  className='text-sm font-semibold text-foreground'
+                  className='text-sm font-extrabold text-slate-900 dark:text-slate-100'
                 >
                   Judul ulasan
                 </label>
-                <span className='text-xs text-muted-foreground/80'>Opsional</span>
+                <span className='rounded-full bg-violet-50 px-2 py-0.5 text-[10px] font-bold text-violet-600 dark:bg-violet-500/10 dark:text-violet-300'>
+                  Opsional
+                </span>
               </div>
+
               <input
                 id='review-title'
-                className='h-12 w-full rounded-xl border border-border/80 bg-background px-4 text-sm text-foreground shadow-sm outline-none transition placeholder:text-muted-foreground/50 focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10'
+                className='h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-950 shadow-sm outline-none transition placeholder:font-medium placeholder:text-slate-400 focus:border-violet-400 focus:bg-white focus:ring-4 focus:ring-violet-500/10 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-violet-500 dark:focus:bg-slate-900'
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder='Contoh: Kualitas sangat memuaskan'
+                placeholder='Contoh: Nyaman dan sesuai deskripsi'
                 maxLength={120}
+                autoComplete='off'
               />
-              <p className='text-right text-xs text-muted-foreground/80'>
-                {title.length}/120
-              </p>
-            </div>
 
-            <div className='space-y-2'>
+              <div className='flex items-center justify-between gap-3'>
+                <p className='text-[11px] font-medium text-slate-500 dark:text-slate-400'>
+                  Buat judul singkat yang mewakili pengalaman Anda.
+                </p>
+                <span
+                  className={`text-[11px] font-bold ${
+                    title.length >= 110
+                      ? 'text-rose-600 dark:text-rose-400'
+                      : 'text-slate-400 dark:text-slate-500'
+                  }`}
+                >
+                  {title.length}/120
+                </span>
+              </div>
+            </section>
+
+            <section className='space-y-2'>
               <div className='flex items-center justify-between gap-3'>
                 <label
                   htmlFor='review-content'
-                  className='text-sm font-semibold text-foreground'
+                  className='text-sm font-extrabold text-slate-900 dark:text-slate-100'
                 >
                   Ceritakan pengalaman Anda
                 </label>
-                <span className='text-xs text-muted-foreground/80'>Opsional</span>
+                <span className='rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-bold text-sky-700 dark:bg-sky-500/10 dark:text-sky-300'>
+                  Opsional
+                </span>
               </div>
+
               <textarea
                 id='review-content'
-                className='min-h-32 w-full resize-none rounded-xl border border-border/80 bg-background px-4 py-3 text-sm leading-6 text-foreground shadow-sm outline-none transition placeholder:text-muted-foreground/50 focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10'
+                className='min-h-32 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium leading-6 text-slate-950 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-sky-400 focus:bg-white focus:ring-4 focus:ring-sky-500/10 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-sky-500 dark:focus:bg-slate-900'
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder='Ceritakan kualitas produk, kesesuaian deskripsi, kemasan, atau pengalaman penggunaan Anda.'
+                placeholder='Ceritakan kualitas produk, ukuran, warna, kemasan, dan pengalaman penggunaan.'
                 rows={5}
                 maxLength={1000}
               />
-              <div className='flex items-center justify-between gap-4 text-xs text-muted-foreground/80'>
-                <span>Berikan informasi yang jujur dan relevan.</span>
-                <span>{content.length}/1000</span>
+
+              <div className='flex items-center justify-between gap-4'>
+                <span className='text-[11px] font-medium text-slate-500 dark:text-slate-400'>
+                  Gunakan bahasa yang jujur, jelas, dan relevan.
+                </span>
+                <span
+                  className={`shrink-0 text-[11px] font-bold ${
+                    content.length >= 950
+                      ? 'text-rose-600 dark:text-rose-400'
+                      : 'text-slate-400 dark:text-slate-500'
+                  }`}
+                >
+                  {content.length}/1000
+                </span>
+              </div>
+            </section>
+
+            <div className='flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-3.5 dark:border-emerald-900/70 dark:bg-emerald-500/10'>
+              <span className='mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300'>
+                <ShieldCheck className='h-4 w-4' />
+              </span>
+              <div>
+                <p className='text-xs font-extrabold text-emerald-900 dark:text-emerald-200'>
+                  Ulasan pembelian terverifikasi
+                </p>
+                <p className='mt-0.5 text-[11px] font-medium leading-5 text-emerald-700 dark:text-emerald-300/90'>
+                  Ulasan akan membantu pelanggan lain memahami kualitas produk secara lebih akurat.
+                </p>
               </div>
             </div>
+          </div>
 
-            <div className='flex items-start gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3.5 text-xs leading-5 text-emerald-600 dark:text-emerald-400'>
-              <ShieldCheck className='mt-0.5 h-4 w-4 shrink-0 text-emerald-500 dark:text-emerald-400' />
-              Ulasan Anda akan ditampilkan sebagai pembelian terverifikasi dan membantu meningkatkan
-              kualitas informasi produk.
+          <div className='shrink-0 border-t border-slate-200/80 bg-white/95 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/95 sm:px-7 sm:pb-5 sm:pt-4'>
+            <div className='grid grid-cols-[0.82fr_1.4fr] gap-2.5 sm:flex sm:justify-end'>
+              <Button
+                variant='outline'
+                type='button'
+                onClick={onClose}
+                className='h-12 rounded-2xl border-slate-300 bg-white px-4 text-sm font-extrabold text-slate-700 shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:text-slate-950 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white sm:min-w-28'
+                disabled={isSubmitting}
+              >
+                Batal
+              </Button>
+
+              <Button
+                type='submit'
+                disabled={isSubmitting}
+                className='h-12 gap-2 rounded-2xl border-0 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 px-5 text-sm font-extrabold text-white shadow-[0_14px_28px_-14px_rgba(109,40,217,0.9)] transition hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 hover:text-white active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-65 sm:min-w-48'
+              >
+                {isSubmitting
+                  ? (
+                    <>
+                      <Loader2 className='h-4 w-4 animate-spin' />
+                      Menyimpan...
+                    </>
+                  )
+                  : (
+                    <>
+                      <MessageSquareText className='h-4 w-4' />
+                      {review ? 'Simpan perubahan' : 'Kirim ulasan'}
+                    </>
+                  )}
+              </Button>
             </div>
           </div>
-
-          <div className='sticky bottom-0 flex flex-col-reverse gap-3 border-t border-border/50 bg-card/95 px-5 py-4 backdrop-blur-md sm:flex-row sm:justify-end sm:px-7'>
-            <Button
-              variant='outline'
-              type='button'
-              onClick={onClose}
-              className='h-11 rounded-xl px-5 border-border text-foreground hover:bg-muted transition-colors'
-              disabled={isSubmitting}
-            >
-              Batal
-            </Button>
-            <Button
-              type='submit'
-              disabled={isSubmitting}
-              className='h-11 min-w-40 gap-2 rounded-xl px-5 shadow-[0_0_20px_-5px_rgba(124,58,237,0.5)] bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white border-0 transition-all hover:scale-[1.02] active:scale-[0.98]'
-            >
-              {isSubmitting
-                ? (
-                  <>
-                    <Loader2 className='h-4 w-4 animate-spin' />
-                    Menyimpan...
-                  </>
-                )
-                : (
-                  <>
-                    <MessageSquareText className='h-4 w-4' />
-                    {review ? 'Simpan Perubahan' : 'Kirim Ulasan'}
-                  </>
-                )}
-            </Button>
-          </div>
         </form>
-      </div>
-    </div>
+      </SheetContent>
+    </Sheet>
   );
 }
