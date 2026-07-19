@@ -50,7 +50,7 @@ app.get('/eligible', async (c) => {
     .where(
       and(
         eq(orders.userId, userId),
-        inArray(orders.status, ['paid', 'processing', 'shipped', 'delivered']),
+        eq(orders.status, 'delivered'),
         isNull(reviews.id),
       ),
     )
@@ -105,6 +105,7 @@ app.post('/', zValidator('json', createReviewRequestSchema), async (c) => {
     .where(
       and(
         eq(orders.userId, userId),
+        eq(orders.status, 'delivered'),
         eq(orderItems.id, payload.orderItemId),
         eq(orderItems.productId, payload.productId),
         isNull(reviews.id),
