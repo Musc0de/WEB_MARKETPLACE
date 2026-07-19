@@ -31,6 +31,7 @@ export function VouchersPage() {
       next.add(code);
       return next;
     });
+    localStorage.setItem('claimed_voucher', code);
     toast.success(`Voucher ${code} berhasil diklaim!`);
   };
 

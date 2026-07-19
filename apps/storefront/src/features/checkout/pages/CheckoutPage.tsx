@@ -17,7 +17,8 @@ export function CheckoutPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const location = useLocation();
-  const initialVoucher = location.state?.appliedVoucherCode || null;
+  const initialVoucher = location.state?.appliedVoucherCode ||
+    localStorage.getItem('claimed_voucher') || null;
 
   const directToken = searchParams.get('directToken');
 
@@ -103,6 +104,7 @@ export function CheckoutPage() {
   const handleRemoveVoucher = () => {
     setAppliedVoucher(null);
     setVoucherInput('');
+    localStorage.removeItem('claimed_voucher');
     toast.success('Voucher dibatalkan');
   };
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { CartSummary as CartSummaryType } from '@starsuperscare/contracts';
 import { Button, formatIDR, toast } from '@starsuperscare/ui';
 import { useCart } from '../api/useCart.ts';
@@ -20,6 +20,37 @@ export function CartSummary({ summary, isEmpty, onCheckout }: CartSummaryProps) 
   );
 
   const { applyVoucher } = useCart();
+
+  useEffect(() => {
+    const savedVoucher = localStorage.getItem('claimed_voucher');
+    if (savedVoucher && !appliedVoucher && !isEmpty && !isApplyingVoucher) {
+      // Automatically attempt to apply it
+      setVoucherCode(savedVoucher);
+
+      const autoApply = async () => {
+        setIsApplyingVoucher(true);
+        try {
+          const data = await applyVoucher(savedVoucher);
+          setAppliedVoucher({
+            code: data.code,
+            amount: data.discountType === 'percentage'
+              ? Math.floor((summary.subtotal * data.discountAmount) / 100)
+              : data.discountAmount,
+            description: data.description,
+          });
+          toast.success('Voucher berhasil digunakan otomatis');
+          setVoucherCode('');
+        } catch (e: any) {
+          // If auto-apply fails (e.g. invalid code), remove it from storage so it doesn't try again
+          localStorage.removeItem('claimed_voucher');
+        } finally {
+          setIsApplyingVoucher(false);
+        }
+      };
+
+      autoApply();
+    }
+  }, [isEmpty, summary.subtotal]); // Run when cart is loaded (not empty)
 
   const handleApplyVoucher = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,6 +79,7 @@ export function CartSummary({ summary, isEmpty, onCheckout }: CartSummaryProps) 
   const handleRemoveVoucher = () => {
     setAppliedVoucher(null);
     setVoucherCode('');
+    localStorage.removeItem('claimed_voucher');
     toast.success('Voucher dibatalkan');
   };
 
