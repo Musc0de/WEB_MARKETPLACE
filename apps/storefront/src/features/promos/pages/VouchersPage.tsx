@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button, H1, Text, toast } from '@starsuperscare/ui';
-import { CheckCircle2, CircleDollarSign, Percent, Ticket, Truck } from 'lucide-react';
+import { CheckCircle2, CircleDollarSign, Percent, Ticket } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function VouchersPage() {
