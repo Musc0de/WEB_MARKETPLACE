@@ -28,8 +28,6 @@ const RATING_LABELS: Record<number, string> = {
   5: 'Luar biasa',
 };
 
-const VALID_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-
 const getMediaUrl = (key: string | null) => {
   if (!key) return null;
   if (key.startsWith('http://') || key.startsWith('https://')) return key;
