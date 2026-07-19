@@ -40,7 +40,10 @@ const routes = signupRouter.post(
 
     // 1. Check password strength
     if (!validatePasswordStrength(password)) {
-      throw new HTTPException(400, { message: 'Password does not meet complexity requirements' });
+      throw new HTTPException(400, {
+        message:
+          'Kata sandi terlalu lemah. Minimal 8 karakter, kombinasi huruf, angka, dan simbol.',
+      });
     }
 
     const emailNormalized = email.toLowerCase().trim();
@@ -56,9 +59,9 @@ const routes = signupRouter.post(
 
     if (existingUser) {
       if (existingUser.emailNormalized === emailNormalized) {
-        throw new HTTPException(409, { message: 'Email is already registered' });
+        throw new HTTPException(409, { message: 'Alamat email ini sudah terdaftar.' });
       } else {
-        throw new HTTPException(409, { message: 'Username is already taken' });
+        throw new HTTPException(409, { message: 'Username ini sudah digunakan oleh orang lain.' });
       }
     }
 
@@ -111,7 +114,7 @@ const routes = signupRouter.post(
           email: newUser.emailDisplay,
           status: newUser.status,
         },
-        message: 'Signup successful. Please check your email to verify your account.',
+        message: 'Pendaftaran berhasil. Silakan cek email Anda untuk verifikasi akun.',
       },
       meta: { request_id: c.get('requestId') },
       error: null,
