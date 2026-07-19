@@ -5,7 +5,7 @@ import './index.css';
 
 // Prevent bfcache in development to avoid Vite HMR WebSocket errors
 if ((import.meta as any).env.DEV) {
-  globalThis.addEventListener('unload', () => {});
+  globalThis.addEventListener('pagehide', () => {});
 }
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
