@@ -580,24 +580,21 @@ function ReviewModal({
         role='dialog'
         aria-modal='true'
         aria-labelledby='review-modal-title'
-        className='relative max-h-[94vh] w-full overflow-y-auto rounded-t-3xl border border-white/10 bg-[#0c0e12]/95 bg-gradient-to-br from-purple-500/10 via-transparent to-blue-500/10 backdrop-blur-2xl shadow-[0_0_50px_-12px_rgba(124,58,237,0.25)] animate-in slide-in-from-bottom-6 duration-300 sm:max-w-xl sm:rounded-3xl sm:zoom-in-95'
+        className='relative max-h-[94vh] w-full overflow-y-auto rounded-t-3xl border border-border/60 bg-card/95 bg-gradient-to-br from-purple-500/10 via-transparent to-blue-500/10 backdrop-blur-2xl shadow-xl animate-in slide-in-from-bottom-6 duration-300 sm:max-w-xl sm:rounded-3xl sm:zoom-in-95'
       >
-        <div className='sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-white/5 bg-[#0c0e12]/80 px-5 py-5 backdrop-blur-md sm:px-7'>
+        <div className='sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-border/60 bg-card/80 px-5 py-5 backdrop-blur-md sm:px-7'>
           <div>
             <p className='text-xs font-semibold uppercase tracking-[0.16em] text-purple-400'>
               {review ? 'Perbarui pengalaman' : 'Bagikan pengalaman'}
             </p>
-            <h2
-              id='review-modal-title'
-              className='mt-1 text-xl font-bold text-white sm:text-2xl'
-            >
+            <h2 className='mt-1 text-xl font-bold text-foreground sm:text-2xl'>
               {review ? 'Edit Ulasan' : 'Tulis Ulasan'}
             </h2>
           </div>
           <button
             type='button'
             onClick={onClose}
-            className='flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-card/5 text-muted-foreground/50 transition hover:bg-card/10 hover:text-white'
+            className='flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border/60 bg-muted/50 text-muted-foreground transition hover:bg-muted hover:text-foreground'
             aria-label='Tutup'
           >
             <X className='h-5 w-5' />
@@ -607,8 +604,8 @@ function ReviewModal({
         <form onSubmit={handleSubmit}>
           <div className='space-y-7 px-5 py-6 sm:px-7'>
             {item && (
-              <div className='flex items-center gap-4 rounded-2xl border border-white/5 bg-gradient-to-r from-white/[0.03] to-transparent p-3.5'>
-                <div className='flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-black/40'>
+              <div className='flex items-center gap-4 rounded-2xl border border-border/60 bg-gradient-to-r from-muted/50 to-transparent p-3.5'>
+                <div className='flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/60 bg-muted'>
                   {item.primaryImage
                     ? (
                       <img
@@ -623,7 +620,7 @@ function ReviewModal({
                   <span className='text-xs font-semibold text-purple-400'>
                     Produk yang diulas
                   </span>
-                  <p className='mt-1 line-clamp-2 text-sm font-semibold leading-5 text-white'>
+                  <p className='mt-1 line-clamp-2 text-sm font-semibold leading-5 text-foreground'>
                     {item.productName}
                   </p>
                   {item.orderNumber && (
@@ -637,7 +634,7 @@ function ReviewModal({
 
             <div>
               <div className='flex items-center justify-between gap-3'>
-                <label className='text-sm font-semibold text-white'>
+                <label className='text-sm font-semibold text-foreground'>
                   Penilaian Anda
                 </label>
                 <span className='text-sm font-semibold text-amber-500'>
@@ -676,7 +673,7 @@ function ReviewModal({
               <div className='flex items-center justify-between gap-3'>
                 <label
                   htmlFor='review-title'
-                  className='text-sm font-semibold text-white'
+                  className='text-sm font-semibold text-foreground'
                 >
                   Judul ulasan
                 </label>
@@ -684,7 +681,7 @@ function ReviewModal({
               </div>
               <input
                 id='review-title'
-                className='h-12 w-full rounded-xl border border-white/10 bg-black/40 px-4 text-sm text-white outline-none transition placeholder:text-muted-foreground/50 focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10'
+                className='h-12 w-full rounded-xl border border-border/60 bg-muted/50 px-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground/50 focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10'
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder='Contoh: Kualitas sangat memuaskan'
@@ -699,7 +696,7 @@ function ReviewModal({
               <div className='flex items-center justify-between gap-3'>
                 <label
                   htmlFor='review-content'
-                  className='text-sm font-semibold text-white'
+                  className='text-sm font-semibold text-foreground'
                 >
                   Ceritakan pengalaman Anda
                 </label>
@@ -707,7 +704,7 @@ function ReviewModal({
               </div>
               <textarea
                 id='review-content'
-                className='min-h-32 w-full resize-none rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-muted-foreground/50 focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10'
+                className='min-h-32 w-full resize-none rounded-xl border border-border/60 bg-muted/50 px-4 py-3 text-sm leading-6 text-foreground outline-none transition placeholder:text-muted-foreground/50 focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10'
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder='Ceritakan kualitas produk, kesesuaian deskripsi, kemasan, atau pengalaman penggunaan Anda.'
@@ -720,19 +717,19 @@ function ReviewModal({
               </div>
             </div>
 
-            <div className='flex items-start gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3.5 text-xs leading-5 text-emerald-200'>
-              <ShieldCheck className='mt-0.5 h-4 w-4 shrink-0 text-emerald-400' />
+            <div className='flex items-start gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3.5 text-xs leading-5 text-emerald-600 dark:text-emerald-400'>
+              <ShieldCheck className='mt-0.5 h-4 w-4 shrink-0 text-emerald-500 dark:text-emerald-400' />
               Ulasan Anda akan ditampilkan sebagai pembelian terverifikasi dan membantu meningkatkan
               kualitas informasi produk.
             </div>
           </div>
 
-          <div className='sticky bottom-0 flex flex-col-reverse gap-3 border-t border-white/5 bg-[#0c0e12]/80 px-5 py-4 backdrop-blur-md sm:flex-row sm:justify-end sm:px-7'>
+          <div className='sticky bottom-0 flex flex-col-reverse gap-3 border-t border-border/60 bg-card/80 px-5 py-4 backdrop-blur-md sm:flex-row sm:justify-end sm:px-7'>
             <Button
               variant='outline'
               type='button'
               onClick={onClose}
-              className='h-11 rounded-xl px-5 border-white/10 text-muted-foreground/50 hover:bg-card/5 hover:text-white transition-colors'
+              className='h-11 rounded-xl px-5 border-border/60 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors'
               disabled={isSubmitting}
             >
               Batal

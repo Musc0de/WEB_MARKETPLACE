@@ -20,6 +20,7 @@ import {
   userProfiles,
 } from '@starsuperscare/database';
 import { authMiddleware, requirePermission } from '../../../middleware/auth.ts';
+import { sendNotification } from '../../notifications/index.ts';
 import { desc, eq, inArray, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
@@ -244,6 +245,17 @@ adminOrdersRouter.post(
         }
       }
     });
+
+    const order = orderResult[0];
+    if (order.userId) {
+      await sendNotification(
+        order.userId,
+        'order_update',
+        `Update Status Pesanan #${order.orderNumber || order.id.slice(0, 8)}`,
+        `Status pesanan Anda telah diperbarui menjadi ${status}.`,
+        `/dashboard/orders/${order.id}`,
+      );
+    }
 
     return c.json({ data: { success: true, status } });
   },

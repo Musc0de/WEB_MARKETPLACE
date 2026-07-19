@@ -43,7 +43,7 @@ export const ReturnsPage = () => {
               <button
                 type='button'
                 onClick={() => navigate('/orders')}
-                className='px-6 py-2 bg-orange-500 text-white rounded-full font-bold hover:bg-orange-600 transition'
+                className='px-6 py-2.5 bg-indigo-600 dark:bg-indigo-500 text-white rounded-full font-bold shadow-sm hover:bg-indigo-700 dark:hover:bg-indigo-600 hover:shadow-md transition-all active:scale-95'
               >
                 Lihat Pesanan Saya
               </button>
@@ -65,7 +65,7 @@ export const ReturnsPage = () => {
                     </p>
                   </div>
                   <div className='text-right'>
-                    <span className='inline-block px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-muted text-foreground'>
+                    <span className='inline-block px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-500/20'>
                       {ret.status.replace(/_/g, ' ')}
                     </span>
                   </div>
@@ -86,7 +86,7 @@ export const ReturnsPage = () => {
                   </div>
                   <div className='flex-1 border-l border-border/40 pl-4'>
                     <p className='text-sm text-muted-foreground mb-1'>Nominal Diajukan:</p>
-                    <p className='font-bold text-orange-600'>
+                    <p className='font-bold text-orange-600 dark:text-orange-400'>
                       Rp {ret.requestedAmount?.toLocaleString('id-ID') || 0}
                     </p>
                   </div>

@@ -51,6 +51,7 @@ export function AddressesPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   const resetForm = () => {
+    const isFirst = !addresses || addresses.length === 0;
     setFormData({
       type: 'shipping',
       label: '',
@@ -63,11 +64,33 @@ export function AddressesPage() {
       province: '',
       postalCode: '',
       country: 'ID',
-      isPrimaryShipping: false,
-      isPrimaryBilling: false,
+      isPrimaryShipping: isFirst,
+      isPrimaryBilling: isFirst,
     });
     setEditingId(null);
     setIsFormOpen(false);
+  };
+
+  const handleAddNew = () => {
+    const isFirst = !addresses || addresses.length === 0;
+    setFormData({
+      type: 'shipping',
+      label: '',
+      recipientName: '',
+      phone: '',
+      addressLine1: '',
+      addressLine2: '',
+      district: '',
+      city: '',
+      province: '',
+      postalCode: '',
+      country: 'ID',
+      isPrimaryShipping: isFirst,
+      isPrimaryBilling: isFirst,
+    });
+    setEditingId(null);
+    setIsFormOpen(true);
+    globalThis.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleEdit = (address: any) => {
@@ -142,7 +165,7 @@ export function AddressesPage() {
           </div>
           {!isFormOpen && (
             <Button
-              onClick={() => setIsFormOpen(true)}
+              onClick={handleAddNew}
               className='rounded-xl shadow-lg shadow-sky-500/20 bg-sky-500 hover:bg-sky-600 text-white font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]'
             >
               <Plus className='w-5 h-5 mr-2' />
@@ -405,7 +428,7 @@ export function AddressesPage() {
                     untuk mempercepat proses belanja.
                   </p>
                   <Button
-                    onClick={() => setIsFormOpen(true)}
+                    onClick={handleAddNew}
                     variant='outline'
                     className='mt-6 rounded-xl border-sky-200 text-sky-600 hover:bg-sky-50 dark:border-sky-900/50 dark:hover:bg-sky-950/30'
                   >
@@ -427,7 +450,9 @@ export function AddressesPage() {
                             <Home className='w-5 h-5 text-blue-600 dark:text-blue-400' />
                           </div>
                           <h3 className='font-bold text-foreground text-lg'>
-                            {addr.label || 'Utama'}
+                            {addr.label
+                              ? addr.label
+                              : (addr.isPrimaryShipping ? 'Alamat Utama' : 'Alamat Lainnya')}
                           </h3>
                         </div>
 

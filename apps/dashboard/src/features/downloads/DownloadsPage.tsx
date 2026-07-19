@@ -162,7 +162,7 @@ export const DownloadsPage = () => {
           )
           : error
           ? (
-            <div className='text-center py-10 bg-red-500/10 text-red-400 rounded-lg border border-red-500/20'>
+            <div className='text-center py-10 bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg border border-red-500/20'>
               <p>Gagal memuat unduhan. Silakan coba lagi.</p>
             </div>
           )
@@ -289,12 +289,12 @@ export const DownloadsPage = () => {
               size='icon'
               disabled={page === 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className='border-white/20 hover:bg-card/10'
+              className='border-border/60 dark:border-white/20 hover:bg-muted/50 dark:hover:bg-card/10'
             >
               <ChevronLeft className='w-4 h-4' />
             </Button>
             <span className='text-sm text-muted-foreground'>
-              Halaman <span className='text-white font-medium'>{page}</span> dari{' '}
+              Halaman <span className='text-foreground font-medium'>{page}</span> dari{' '}
               {data?.pagination?.totalPages}
             </span>
             <Button
@@ -302,7 +302,7 @@ export const DownloadsPage = () => {
               size='icon'
               disabled={page === data?.pagination?.totalPages}
               onClick={() => setPage((p) => Math.min(data?.pagination?.totalPages || 1, p + 1))}
-              className='border-white/20 hover:bg-card/10'
+              className='border-border/60 dark:border-white/20 hover:bg-muted/50 dark:hover:bg-card/10'
             >
               <ChevronRight className='w-4 h-4' />
             </Button>

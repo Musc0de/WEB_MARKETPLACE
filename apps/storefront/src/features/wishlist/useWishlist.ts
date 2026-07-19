@@ -29,38 +29,26 @@ export const useWishlist = create<WishlistState>()(
           },
         });
 
-        const hasSession = typeof document !== 'undefined' &&
-          document.cookie.includes('sss_session');
-
-        if (!hasSession) {
-          if (!isWished) {
-            toast.info('Disimpan lokal. Login untuk sinkronisasi antar perangkat.');
-          }
-          return;
-        }
-
         if (isWished) {
           // Remove from server
           try {
             await client.v1.wishlist.remove.$post({ json: { productId } });
           } catch (_e) {
-            // Ignore errors
+            // Ignore errors (likely not logged in)
           }
         } else {
           // Add to server
           try {
-            await client.v1.wishlist.add.$post({ json: { productId } });
+            const res = await client.v1.wishlist.add.$post({ json: { productId } });
+            if (!res.ok) {
+              toast.info('Disimpan lokal. Login untuk sinkronisasi antar perangkat.');
+            }
           } catch (_e) {
-            // Ignore errors
+            toast.info('Disimpan lokal. Login untuk sinkronisasi antar perangkat.');
           }
         }
       },
       syncWithServer: async () => {
-        // Only sync if user is likely logged in
-        if (typeof document !== 'undefined' && !document.cookie.includes('sss_session')) {
-          return;
-        }
-
         try {
           const { items } = get();
           const localIds = Object.keys(items).filter((id) => items[id]);

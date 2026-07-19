@@ -6,6 +6,14 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { session, isLoading, isError } = useSession();
 
   useEffect(() => {
+    // Normalisasi origin: ubah 127.0.0.1 menjadi localhost untuk mencegah masalah cross-origin cookie
+    if (globalThis.location.hostname === '127.0.0.1') {
+      const newUrl = new URL(globalThis.location.href);
+      newUrl.hostname = 'localhost';
+      globalThis.location.href = newUrl.toString();
+      return;
+    }
+
     if (!isLoading && (!session || isError)) {
       // Redirect to auth if not logged in
       const currentUrl = encodeURIComponent(globalThis.location.href);

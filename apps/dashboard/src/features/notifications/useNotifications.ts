@@ -1,5 +1,7 @@
-import useSWR from 'swr';
-import { client } from '../../lib/api.ts';
+import { useEffect } from 'react';
+import useSWR, { mutate as globalMutate } from 'swr';
+import { API_URL, client } from '../../lib/api.ts';
+import { toast } from '@starsuperscare/ui';
 
 export function useNotifications() {
   const { data, error, mutate, isLoading } = useSWR(
@@ -10,7 +12,6 @@ export function useNotifications() {
       return json.data || [];
     },
     {
-      refreshInterval: 30000, // Poll every 30s (Scalable for marketplace, avoids SSE connection limits)
       revalidateOnFocus: true,
       dedupingInterval: 10000,
     },
@@ -24,11 +25,49 @@ export function useNotifications() {
       return (json as any).data?.count || 0;
     },
     {
-      refreshInterval: 30000, // Poll every 30s
       revalidateOnFocus: true,
       dedupingInterval: 10000,
     },
   );
+
+  useEffect(() => {
+    // Connect to SSE stream
+    const baseUrl = API_URL.replace(/\/$/, '');
+    const eventSource = new EventSource(`${baseUrl}/v1/notifications/stream`, {
+      withCredentials: true,
+    });
+
+    eventSource.addEventListener('notification', (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        toast.info(data.title, { description: data.body });
+
+        // Refetch notifications
+        globalMutate('/api/notifications');
+        globalMutate('/api/notifications/unread-count');
+      } catch (e) {
+        console.error('Error parsing notification', e);
+      }
+    });
+
+    eventSource.addEventListener('broadcast', (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        toast.info(data.title, { description: data.body });
+      } catch (e) {
+        console.error('Error parsing broadcast', e);
+      }
+    });
+
+    eventSource.onerror = (error) => {
+      console.error('SSE Error:', error);
+      // EventSource auto-reconnects, but we can close and recreate if needed
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, []);
 
   const markAsRead = async (id: string) => {
     await (client.v1 as any).notifications[':id'].read.$post({ param: { id } });

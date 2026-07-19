@@ -4,6 +4,7 @@ import { AuthContext, authMiddleware, requirePermission } from '../../../middlew
 import { z } from 'zod';
 import { attachments, db, faqs, supportMessages, supportTickets } from '@starsuperscare/database';
 import { desc, eq } from 'drizzle-orm';
+import { sendNotification } from '../../notifications/index.ts';
 import {
   createMessageRequestSchema,
   updateTicketStatusRequestSchema,
@@ -64,8 +65,8 @@ app.get('/tickets/:id', async (c) => {
 
   // Reconstruct publicUrl per attachment
   const r2PubUrl = (Deno.env.get('R2_SUPPORT_PUBLIC_URL') ?? '').replace(/\/$/, '');
-  const port = Deno.env.get('PORT') ?? '8000';
-  const localBase = `http://localhost:${port}/storage`;
+  const apiUrl = Deno.env.get('VITE_API_URL') ?? '';
+  const localBase = `${apiUrl}/storage`;
 
   const messagesWithAttachments = messages.map((msg) => ({
     ...msg,
@@ -153,6 +154,15 @@ app.post('/tickets/:id/messages', zValidator('json', createMessageRequestSchema)
   }
 
   // NOTE: A notification outbox entry should be inserted here to email the customer
+  if (!payload.isInternal) {
+    await sendNotification(
+      ticket.userId,
+      'support_reply',
+      'Balasan Tiket Support',
+      `Admin membalas tiket Anda: "${ticket.subject}"`,
+      `/dashboard/support/${ticket.id}`,
+    );
+  }
 
   return c.json({
     data: message,

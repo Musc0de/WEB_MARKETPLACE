@@ -19,6 +19,7 @@ import {
 } from '@starsuperscare/contracts';
 import { AuthContext, authMiddleware, requirePermission } from '../../../middleware/auth.ts';
 import { logAudit } from '../../../utils/audit.ts';
+import { broadcastNotification } from '../../notifications/index.ts';
 import { and, asc, desc, eq, isNull, sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 import { storageAdapter } from '../../../adapters/storage.ts';
@@ -305,6 +306,13 @@ const routes = app
         });
         return newProduct;
       });
+
+      broadcastNotification(
+        'new_product',
+        'Produk Baru Telah Dirilis!',
+        `${product.name} sekarang tersedia di toko.`,
+        `/products/${product.slug}`,
+      );
 
       return c.json({ data: product, meta: { request_id: c.get('requestId') }, error: null }, 201);
     },

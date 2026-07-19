@@ -570,7 +570,11 @@ const Footer = () => {
   );
 };
 
+import { useSSE } from '../../lib/useSSE.ts';
+
 export const StorefrontLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  useSSE();
+
   return (
     <div className='min-h-screen flex flex-col font-sans bg-background text-foreground pb-14 md:pb-0'>
       <SEO appId='storefront' />

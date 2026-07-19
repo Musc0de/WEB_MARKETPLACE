@@ -47,8 +47,8 @@ export default function HomePage() {
       {/* Hero Section */}
       <StorefrontHero />
 
-      {/* Quick Links (Mobile & Desktop) */}
-      <div className='grid grid-cols-4 gap-3 lg:gap-6 px-1 lg:px-0 mt-6 lg:mt-8'>
+      {/* Quick Links (Mobile Only) */}
+      <div className='grid md:hidden grid-cols-4 gap-3 px-1 mt-6'>
         {QUICK_LINKS.map((link) => (
           <button
             key={link.name}

@@ -10,12 +10,12 @@ const app = new Hono<AuthContext>();
 
 const AddressSchema = z.object({
   type: z.enum(['shipping', 'billing', 'both']),
-  label: z.string().optional(),
+  label: z.string().nullish(),
   recipientName: z.string().min(1),
   phone: z.string().min(1),
   addressLine1: z.string().min(1),
-  addressLine2: z.string().optional(),
-  district: z.string().optional(),
+  addressLine2: z.string().nullish(),
+  district: z.string().nullish(),
   city: z.string().min(1),
   province: z.string().min(1),
   postalCode: z.string().min(1),
