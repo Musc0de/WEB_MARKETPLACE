@@ -608,8 +608,8 @@ function TabButton({
       onClick={onClick}
       className={`flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 text-sm font-semibold transition-all sm:px-5 ${
         active
-          ? 'bg-primary text-primary-foreground shadow-sm'
-          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+          ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md ring-1 ring-black/5 dark:ring-white/10'
+          : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/80 dark:hover:text-white'
       }`}
     >
       {icon}
@@ -617,8 +617,8 @@ function TabButton({
       <span
         className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${
           active
-            ? 'bg-primary-foreground/15 text-primary-foreground'
-            : 'bg-muted text-muted-foreground'
+            ? 'bg-white/20 text-white'
+            : 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300'
         }`}
       >
         {count}
