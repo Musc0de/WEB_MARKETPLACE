@@ -8,6 +8,7 @@ const fetchSession = async () => {
     throw new Error('Gagal memuat sesi');
   }
   const result = await res.json();
+  if (!result.data || !result.data.user) return null;
   return result.data;
 };
 
