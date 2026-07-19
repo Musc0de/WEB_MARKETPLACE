@@ -4,7 +4,7 @@ import { AuthContext, authMiddleware } from '../../middleware/auth.ts';
 import { db } from '@starsuperscare/database';
 // @ts-ignore - DB exports not fully typed yet
 import { vouchers } from '@starsuperscare/database';
-import { eq } from 'drizzle-orm';
+import { and, desc, eq, gt, isNull, or } from 'drizzle-orm';
 import { VoucherValidationRequestSchema } from '@starsuperscare/contracts';
 
 type AppContext = {
@@ -15,7 +15,26 @@ type AppContext = {
 
 const router = new Hono<AppContext>();
 
-router.use('*', authMiddleware);
+// PUBLIC ENDPOINT: Get active vouchers
+router.get('/', async (c) => {
+  const now = new Date().toISOString();
+
+  const activeVouchers = await db.select().from(vouchers).where(
+    and(
+      eq(vouchers.isActive, 1),
+      eq(vouchers.status, 'active'),
+      or(isNull(vouchers.validTo), gt(vouchers.validTo, now)),
+    ),
+  ).orderBy(desc(vouchers.createdAt));
+
+  return c.json({
+    data: activeVouchers,
+    meta: { request_id: c.get('requestId') },
+    error: null,
+  });
+});
+
+router.use('/validate', authMiddleware);
 
 const routes = router.post(
   '/validate',
