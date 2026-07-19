@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import useSWR from 'swr';
-import { API_URL, client } from '../../lib/api.ts';
+import { client } from '../../lib/api.ts';
 import { Button, Card, toast } from '@starsuperscare/ui';
 import {
   CalendarDays,
@@ -26,6 +26,16 @@ const RATING_LABELS: Record<number, string> = {
   3: 'Cukup baik',
   4: 'Sangat baik',
   5: 'Luar biasa',
+};
+
+const VALID_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+const getMediaUrl = (key: string | null) => {
+  if (!key) return null;
+  if (key.startsWith('http://') || key.startsWith('https://')) return key;
+  const r2Url = (import.meta as any).env?.VITE_R2_PUBLIC_URL;
+  if (r2Url) return `${r2Url.replace(/\/$/, '')}/${key.replace(/^\//, '')}`;
+  return key;
 };
 
 export const ReviewsPage = () => {
@@ -69,14 +79,6 @@ export const ReviewsPage = () => {
     } catch (_e) {
       toast.error('Gagal menghapus');
     }
-  };
-
-  const getMediaUrl = (key: string | null) => {
-    if (!key) return null;
-    if (key.startsWith('http://') || key.startsWith('https://')) return key;
-    const r2Url = (import.meta as any).env?.VITE_R2_PUBLIC_URL;
-    if (r2Url) return `${r2Url.replace(/\/$/, '')}/${key.replace(/^\//, '')}`;
-    return key;
   };
 
   const eligibleCount = eligibleItems?.length ?? 0;
