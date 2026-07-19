@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { CartSummary as CartSummaryType } from '@starsuperscare/contracts';
 import { Button, formatIDR, toast } from '@starsuperscare/ui';
 import { useCart } from '../api/useCart.ts';
@@ -19,11 +19,16 @@ export function CartSummary({ summary, isEmpty, onCheckout }: CartSummaryProps) 
     null,
   );
 
+  const hasAutoApplied = useRef(false);
+
   const { applyVoucher } = useCart();
 
   useEffect(() => {
+    if (hasAutoApplied.current) return;
+
     const savedVoucher = localStorage.getItem('claimed_voucher');
     if (savedVoucher && !appliedVoucher && !isEmpty && !isApplyingVoucher) {
+      hasAutoApplied.current = true;
       // Automatically attempt to apply it
       setVoucherCode(savedVoucher);
 
