@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { client } from '../../lib/api.ts';
 import { Button, Card, toast } from '@starsuperscare/ui';
 import {
   CalendarDays,
   CheckCircle2,
+  ChevronDown,
   ChevronRight,
+  ChevronUp,
   Clock3,
   History,
   Image as ImageIcon,
@@ -13,6 +15,7 @@ import {
   MessageSquareText,
   PackageCheck,
   Pencil,
+  Search,
   ShieldCheck,
   Sparkles,
   Star,
@@ -28,6 +31,8 @@ const RATING_LABELS: Record<number, string> = {
   5: 'Luar biasa',
 };
 
+const ELIGIBLE_BATCH_SIZE = 6;
+
 const getMediaUrl = (key: string | null) => {
   if (!key) return null;
   if (key.startsWith('http://') || key.startsWith('https://')) return key;
@@ -40,6 +45,8 @@ export const ReviewsPage = () => {
   const [activeTab, setActiveTab] = useState<'eligible' | 'mine'>('eligible');
   const [editingReview, setEditingReview] = useState<any | null>(null);
   const [creatingReviewFor, setCreatingReviewFor] = useState<any | null>(null);
+  const [eligibleQuery, setEligibleQuery] = useState('');
+  const [eligibleLimit, setEligibleLimit] = useState(ELIGIBLE_BATCH_SIZE);
 
   const {
     data: eligibleItems,
@@ -81,6 +88,35 @@ export const ReviewsPage = () => {
 
   const eligibleCount = eligibleItems?.length ?? 0;
   const reviewCount = myReviews?.length ?? 0;
+
+  const filteredEligibleItems = useMemo(() => {
+    const query = eligibleQuery.trim().toLocaleLowerCase('id-ID');
+    const items = eligibleItems ?? [];
+
+    if (!query) return items;
+
+    return items.filter((item: any) => {
+      const searchableValue = [
+        item.productName,
+        item.orderNumber,
+        item.variantSku,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLocaleLowerCase('id-ID');
+
+      return searchableValue.includes(query);
+    });
+  }, [eligibleItems, eligibleQuery]);
+
+  const visibleEligibleItems = filteredEligibleItems.slice(0, eligibleLimit);
+  const filteredEligibleCount = filteredEligibleItems.length;
+  const hasMoreEligible = visibleEligibleItems.length < filteredEligibleCount;
+  const canCollapseEligible = eligibleLimit > ELIGIBLE_BATCH_SIZE;
+  const nextEligibleBatch = Math.min(
+    ELIGIBLE_BATCH_SIZE,
+    Math.max(0, filteredEligibleCount - visibleEligibleItems.length),
+  );
 
   return (
     <div className='mx-auto w-full max-w-6xl pb-28 md:pb-12'>
@@ -166,66 +202,112 @@ export const ReviewsPage = () => {
                   />
                 )
                 : (
-                  <div className='grid gap-4'>
-                    {eligibleItems?.map((item: any) => (
-                      <Card
-                        key={item.orderItemId}
-                        className='group overflow-hidden border-border/70 bg-card p-0 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md'
-                      >
-                        <div className='flex flex-row items-stretch sm:items-center'>
-                          <div className='relative w-[110px] shrink-0 overflow-hidden bg-muted sm:w-36 lg:w-40 sm:aspect-square'>
-                            {item.primaryImage
-                              ? (
-                                <img
-                                  src={getMediaUrl(item.primaryImage) || ''}
-                                  alt={item.productName}
-                                  className='absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105'
-                                />
-                              )
-                              : (
-                                <div className='absolute inset-0 flex items-center justify-center'>
-                                  <ImageIcon className='h-8 w-8 text-muted-foreground/45' />
-                                </div>
-                              )}
-                            <div className='absolute left-1.5 top-1.5 sm:left-3 sm:top-3 inline-flex items-center gap-1 rounded-full border border-white/20 bg-background/90 px-1.5 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-[11px] font-semibold text-foreground shadow-sm backdrop-blur'>
-                              <ShieldCheck className='h-3 w-3 sm:h-3.5 sm:w-3.5 text-emerald-500' />
-                              <span className='hidden sm:inline'>Pembelian terverifikasi</span>
-                            </div>
+                  <>
+                    <div className='mb-3 rounded-2xl border border-border/70 bg-card p-2.5 shadow-sm sm:mb-4 sm:p-3'>
+                      <div className='relative'>
+                        <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+                        <input
+                          type='search'
+                          value={eligibleQuery}
+                          onChange={(event) => {
+                            setEligibleQuery(event.target.value);
+                            setEligibleLimit(ELIGIBLE_BATCH_SIZE);
+                          }}
+                          placeholder='Cari nama produk, nomor pesanan, atau SKU'
+                          aria-label='Cari produk yang menunggu ulasan'
+                          className='h-11 w-full rounded-xl border border-border/70 bg-background pl-10 pr-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground/70 focus:border-primary/50 focus:ring-4 focus:ring-primary/10'
+                        />
+                      </div>
+                    </div>
+
+                    {filteredEligibleCount === 0
+                      ? (
+                        <div className='rounded-2xl border border-dashed border-border bg-card px-5 py-10 text-center shadow-sm'>
+                          <div className='mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-muted text-muted-foreground'>
+                            <Search className='h-5 w-5' />
                           </div>
-
-                          <div className='flex flex-1 flex-col justify-between p-3.5 sm:flex-row sm:items-center sm:gap-5 sm:p-6'>
-                            <div className='mb-3 min-w-0 sm:mb-0'>
-                              <p className='mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-primary sm:mb-1.5 sm:text-xs'>
-                                Siap untuk dinilai
-                              </p>
-                              <h3 className='line-clamp-2 text-sm font-semibold leading-5 text-foreground sm:text-base sm:leading-6'>
-                                {item.productName}
-                              </h3>
-
-                              <div className='mt-2 flex flex-wrap items-center gap-1.5 text-[10px] text-muted-foreground sm:mt-3 sm:gap-2 sm:text-xs'>
-                                <span className='rounded-md border border-border bg-muted/50 px-1.5 py-1 font-medium sm:rounded-lg sm:px-2.5 sm:py-1.5'>
-                                  #{item.orderNumber?.slice(-6) || ''}
-                                </span>
-                                {item.variantSku && (
-                                  <span className='rounded-md border border-border bg-muted/50 px-1.5 py-1 font-medium sm:rounded-lg sm:px-2.5 sm:py-1.5'>
-                                    {item.variantSku}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-
-                            <Button
-                              className='h-9 w-full shrink-0 gap-1.5 rounded-lg px-3 text-xs shadow-sm sm:h-11 sm:w-auto sm:gap-2 sm:rounded-xl sm:px-5 sm:text-sm'
-                              onClick={() => setCreatingReviewFor(item)}
-                            >
-                              Tulis Ulasan
-                              <ChevronRight className='h-3 w-3 sm:h-4 sm:w-4' />
-                            </Button>
-                          </div>
+                          <h3 className='mt-4 text-sm font-semibold text-foreground'>
+                            Produk tidak ditemukan
+                          </h3>
+                          <p className='mx-auto mt-1 max-w-sm text-xs leading-5 text-muted-foreground'>
+                            Coba gunakan nama produk, nomor pesanan, atau SKU yang berbeda.
+                          </p>
+                          <Button
+                            type='button'
+                            variant='outline'
+                            size='sm'
+                            className='mt-4 h-9 rounded-xl px-4'
+                            onClick={() => {
+                              setEligibleQuery('');
+                              setEligibleLimit(ELIGIBLE_BATCH_SIZE);
+                            }}
+                          >
+                            Hapus pencarian
+                          </Button>
                         </div>
-                      </Card>
-                    ))}
-                  </div>
+                      )
+                      : (
+                        <>
+                          <div
+                            className='grid gap-3 sm:gap-4'
+                            aria-live='polite'
+                            aria-label='Daftar produk yang dapat diulas'
+                          >
+                            {visibleEligibleItems.map((item: any) => (
+                              <EligibleReviewCard
+                                key={item.orderItemId}
+                                item={item}
+                                onReview={setCreatingReviewFor}
+                              />
+                            ))}
+                          </div>
+
+                          <div className='mt-4 flex flex-col items-center gap-3'>
+                            <p className='text-center text-xs text-muted-foreground'>
+                              Menampilkan {visibleEligibleItems.length} dari {filteredEligibleCount}
+                              {' '}
+                              produk
+                              {eligibleQuery ? ' hasil pencarian' : ''}.
+                            </p>
+
+                            <div className='flex w-full flex-col gap-2 sm:w-auto sm:flex-row'>
+                              {hasMoreEligible && (
+                                <Button
+                                  type='button'
+                                  variant='outline'
+                                  className='h-11 w-full gap-2 rounded-xl border-primary/25 bg-card px-5 text-sm font-semibold text-primary shadow-sm hover:bg-primary/5 sm:w-auto'
+                                  onClick={() => {
+                                    setEligibleLimit((current) => current + ELIGIBLE_BATCH_SIZE);
+                                  }}
+                                >
+                                  Tampilkan {nextEligibleBatch} produk lagi
+                                  <ChevronDown className='h-4 w-4' />
+                                </Button>
+                              )}
+
+                              {canCollapseEligible && (
+                                <Button
+                                  type='button'
+                                  variant='ghost'
+                                  className='h-11 w-full gap-2 rounded-xl px-5 text-sm text-muted-foreground sm:w-auto'
+                                  onClick={() => {
+                                    setEligibleLimit(ELIGIBLE_BATCH_SIZE);
+                                    document
+                                      .querySelector(
+                                        '[aria-label="Daftar produk yang dapat diulas"]',
+                                      )
+                                      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                  }}
+                                >
+                                  Tampilkan lebih sedikit
+                                  <ChevronUp className='h-4 w-4' />
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        </>
+                      )}
+                  </>
                 )}
             </div>
           </section>
@@ -347,6 +429,109 @@ export const ReviewsPage = () => {
   );
 };
 
+type EligibleReviewItem = {
+  orderItemId: string;
+  productName?: string | null;
+  primaryImage?: string | null;
+  orderNumber?: string | null;
+  variantSku?: string | null;
+};
+
+function EligibleReviewCard({
+  item,
+  onReview,
+}: {
+  item: EligibleReviewItem;
+  onReview: (item: EligibleReviewItem) => void;
+}) {
+  return (
+    <Card className='group overflow-hidden rounded-2xl border-border/70 bg-card p-0 shadow-sm transition-[border-color,box-shadow] duration-200 [content-visibility:auto] [contain-intrinsic-size:164px] sm:hover:border-primary/30 sm:hover:shadow-md'>
+      <div className='p-3 sm:flex sm:items-center sm:gap-4 sm:p-4'>
+        <div className='flex min-w-0 items-start gap-3 sm:flex-1 sm:items-center sm:gap-4'>
+          <ProductThumbnail
+            src={item.primaryImage}
+            alt={item.productName || 'Gambar produk'}
+          />
+
+          <div className='min-w-0 flex-1 py-0.5'>
+            <div className='flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.13em] text-primary sm:text-xs'>
+              <span className='flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'>
+                <ShieldCheck className='h-3 w-3' />
+              </span>
+              <span className='truncate'>Siap untuk dinilai</span>
+            </div>
+
+            <h3 className='mt-1.5 line-clamp-2 break-words text-sm font-bold leading-5 text-foreground sm:text-base sm:leading-6'>
+              {item.productName || 'Produk tanpa nama'}
+            </h3>
+
+            <div className='mt-2 flex min-w-0 flex-wrap items-center gap-1.5 text-[10px] text-muted-foreground sm:text-xs'>
+              {item.orderNumber && (
+                <span className='max-w-full truncate rounded-lg border border-border/80 bg-muted/50 px-2 py-1 font-semibold'>
+                  Pesanan #{item.orderNumber.slice(-6)}
+                </span>
+              )}
+              {item.variantSku && (
+                <span className='max-w-full truncate rounded-lg border border-border/80 bg-muted/50 px-2 py-1 font-semibold'>
+                  {item.variantSku}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <Button
+          type='button'
+          className='mt-3 h-11 w-full shrink-0 justify-center gap-2 rounded-xl px-4 text-sm font-bold shadow-sm transition-transform active:scale-[0.99] sm:mt-0 sm:w-auto sm:min-w-36 sm:px-5'
+          onClick={() => onReview(item)}
+          aria-label={`Tulis ulasan untuk ${item.productName || 'produk'}`}
+        >
+          <MessageSquareText className='h-4 w-4' />
+          Tulis Ulasan
+          <ChevronRight className='h-4 w-4' />
+        </Button>
+      </div>
+    </Card>
+  );
+}
+
+function ProductThumbnail({
+  src,
+  alt,
+}: {
+  src?: string | null | undefined;
+  alt: string;
+}) {
+  const [hasError, setHasError] = useState(false);
+  const imageUrl = getMediaUrl(src ?? null);
+
+  return (
+    <div className='relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-border/70 bg-muted sm:h-28 sm:w-28 sm:rounded-2xl'>
+      {imageUrl && !hasError
+        ? (
+          <img
+            src={imageUrl}
+            alt={alt}
+            loading='lazy'
+            decoding='async'
+            onError={() => setHasError(true)}
+            className='h-full w-full object-cover transition-transform duration-300 sm:group-hover:scale-[1.03]'
+          />
+        )
+        : (
+          <div className='flex h-full w-full flex-col items-center justify-center gap-1.5 text-muted-foreground/60'>
+            <ImageIcon className='h-7 w-7' />
+            <span className='text-[9px] font-semibold uppercase tracking-wide'>Tanpa gambar</span>
+          </div>
+        )}
+
+      <span className='absolute bottom-1.5 left-1.5 flex h-6 w-6 items-center justify-center rounded-full border border-white/40 bg-background/90 text-emerald-600 shadow-sm backdrop-blur dark:text-emerald-400'>
+        <ShieldCheck className='h-3.5 w-3.5' />
+      </span>
+    </div>
+  );
+}
+
 function SummaryCard({
   icon,
   label,
@@ -462,20 +647,22 @@ function EmptyState({
 
 function ReviewListSkeleton() {
   return (
-    <div className='grid gap-4' aria-label='Memuat data ulasan'>
+    <div className='grid gap-3 sm:gap-4' aria-label='Memuat data ulasan'>
       {[1, 2, 3].map((item) => (
         <div
           key={item}
-          className='overflow-hidden rounded-2xl border border-border/70 bg-card p-5 shadow-sm'
+          className='overflow-hidden rounded-2xl border border-border/70 bg-card p-3 shadow-sm sm:p-4'
         >
-          <div className='flex animate-pulse items-center gap-4'>
-            <div className='h-20 w-20 shrink-0 rounded-xl bg-muted' />
-            <div className='flex-1 space-y-3'>
-              <div className='h-3 w-24 rounded bg-muted' />
-              <div className='h-5 w-2/3 rounded bg-muted' />
-              <div className='h-3 w-1/3 rounded bg-muted' />
+          <div className='animate-pulse sm:flex sm:items-center sm:gap-4'>
+            <div className='flex items-center gap-3 sm:flex-1 sm:gap-4'>
+              <div className='h-24 w-24 shrink-0 rounded-xl bg-muted sm:h-28 sm:w-28 sm:rounded-2xl' />
+              <div className='min-w-0 flex-1 space-y-3'>
+                <div className='h-3 w-24 rounded bg-muted' />
+                <div className='h-5 w-4/5 rounded bg-muted' />
+                <div className='h-7 w-2/3 rounded-lg bg-muted' />
+              </div>
             </div>
-            <div className='hidden h-10 w-32 rounded-xl bg-muted sm:block' />
+            <div className='mt-3 h-11 w-full rounded-xl bg-muted sm:mt-0 sm:w-36' />
           </div>
         </div>
       ))}
@@ -583,9 +770,9 @@ function ReviewModal({
         role='dialog'
         aria-modal='true'
         aria-labelledby='review-modal-title'
-        className='relative max-h-[94vh] w-full overflow-y-auto rounded-t-3xl border border-border/60 bg-card/95 bg-gradient-to-br from-purple-500/10 via-transparent to-blue-500/10 backdrop-blur-2xl shadow-xl animate-in slide-in-from-bottom-6 duration-300 sm:max-w-xl sm:rounded-3xl sm:zoom-in-95'
+        className='relative max-h-[94vh] w-full overflow-y-auto rounded-t-3xl border border-border bg-card shadow-2xl animate-in slide-in-from-bottom-6 duration-300 sm:max-w-xl sm:rounded-3xl sm:zoom-in-95'
       >
-        <div className='sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-border/60 bg-card/80 px-5 py-5 backdrop-blur-md sm:px-7'>
+        <div className='sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-border/50 bg-card/95 px-5 py-5 backdrop-blur-md sm:px-7'>
           <div>
             <p className='text-xs font-semibold uppercase tracking-[0.16em] text-purple-400'>
               {review ? 'Perbarui pengalaman' : 'Bagikan pengalaman'}
@@ -607,8 +794,8 @@ function ReviewModal({
         <form onSubmit={handleSubmit}>
           <div className='space-y-7 px-5 py-6 sm:px-7'>
             {item && (
-              <div className='flex items-center gap-4 rounded-2xl border border-border/60 bg-gradient-to-r from-muted/50 to-transparent p-3.5'>
-                <div className='flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/60 bg-muted'>
+              <div className='flex items-center gap-4 rounded-2xl border border-indigo-500/15 bg-indigo-50/50 p-3.5 dark:bg-indigo-500/10'>
+                <div className='flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/50 bg-background'>
                   {item.primaryImage
                     ? (
                       <img
@@ -684,7 +871,7 @@ function ReviewModal({
               </div>
               <input
                 id='review-title'
-                className='h-12 w-full rounded-xl border border-border/60 bg-muted/50 px-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground/50 focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10'
+                className='h-12 w-full rounded-xl border border-border/80 bg-background px-4 text-sm text-foreground shadow-sm outline-none transition placeholder:text-muted-foreground/50 focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10'
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder='Contoh: Kualitas sangat memuaskan'
@@ -707,7 +894,7 @@ function ReviewModal({
               </div>
               <textarea
                 id='review-content'
-                className='min-h-32 w-full resize-none rounded-xl border border-border/60 bg-muted/50 px-4 py-3 text-sm leading-6 text-foreground outline-none transition placeholder:text-muted-foreground/50 focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10'
+                className='min-h-32 w-full resize-none rounded-xl border border-border/80 bg-background px-4 py-3 text-sm leading-6 text-foreground shadow-sm outline-none transition placeholder:text-muted-foreground/50 focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10'
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder='Ceritakan kualitas produk, kesesuaian deskripsi, kemasan, atau pengalaman penggunaan Anda.'
@@ -727,12 +914,12 @@ function ReviewModal({
             </div>
           </div>
 
-          <div className='sticky bottom-0 flex flex-col-reverse gap-3 border-t border-border/60 bg-card/80 px-5 py-4 backdrop-blur-md sm:flex-row sm:justify-end sm:px-7'>
+          <div className='sticky bottom-0 flex flex-col-reverse gap-3 border-t border-border/50 bg-card/95 px-5 py-4 backdrop-blur-md sm:flex-row sm:justify-end sm:px-7'>
             <Button
               variant='outline'
               type='button'
               onClick={onClose}
-              className='h-11 rounded-xl px-5 border-border/60 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors'
+              className='h-11 rounded-xl px-5 border-border text-foreground hover:bg-muted transition-colors'
               disabled={isSubmitting}
             >
               Batal
