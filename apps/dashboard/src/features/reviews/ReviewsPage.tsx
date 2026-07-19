@@ -83,7 +83,7 @@ export const ReviewsPage = () => {
   const reviewCount = myReviews?.length ?? 0;
 
   return (
-    <div className='mx-auto w-full max-w-6xl pb-20'>
+    <div className='mx-auto w-full max-w-6xl pb-28 md:pb-12'>
       <div className='space-y-7 animate-in fade-in slide-in-from-bottom-3 duration-500'>
         {/* Page header */}
         <section className='relative overflow-hidden rounded-3xl border border-border/70 bg-card shadow-sm'>
@@ -172,54 +172,54 @@ export const ReviewsPage = () => {
                         key={item.orderItemId}
                         className='group overflow-hidden border-border/70 bg-card p-0 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md'
                       >
-                        <div className='flex flex-col sm:flex-row sm:items-center'>
-                          <div className='relative aspect-[16/10] w-full overflow-hidden bg-muted sm:aspect-square sm:w-36 lg:w-40'>
+                        <div className='flex flex-row items-stretch sm:items-center'>
+                          <div className='relative w-[110px] shrink-0 overflow-hidden bg-muted sm:w-36 lg:w-40 sm:aspect-square'>
                             {item.primaryImage
                               ? (
                                 <img
                                   src={getMediaUrl(item.primaryImage) || ''}
                                   alt={item.productName}
-                                  className='h-full w-full object-cover transition-transform duration-500 group-hover:scale-105'
+                                  className='absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105'
                                 />
                               )
                               : (
-                                <div className='flex h-full w-full items-center justify-center'>
-                                  <ImageIcon className='h-9 w-9 text-muted-foreground/45' />
+                                <div className='absolute inset-0 flex items-center justify-center'>
+                                  <ImageIcon className='h-8 w-8 text-muted-foreground/45' />
                                 </div>
                               )}
-                            <div className='absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-background/90 px-2.5 py-1 text-[11px] font-semibold text-foreground shadow-sm backdrop-blur'>
-                              <ShieldCheck className='h-3.5 w-3.5 text-emerald-500' />
-                              Pembelian terverifikasi
+                            <div className='absolute left-1.5 top-1.5 sm:left-3 sm:top-3 inline-flex items-center gap-1 rounded-full border border-white/20 bg-background/90 px-1.5 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-[11px] font-semibold text-foreground shadow-sm backdrop-blur'>
+                              <ShieldCheck className='h-3 w-3 sm:h-3.5 sm:w-3.5 text-emerald-500' />
+                              <span className='hidden sm:inline'>Pembelian terverifikasi</span>
                             </div>
                           </div>
 
-                          <div className='flex flex-1 flex-col gap-5 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6'>
-                            <div className='min-w-0'>
-                              <p className='mb-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary'>
+                          <div className='flex flex-1 flex-col justify-between p-3.5 sm:flex-row sm:items-center sm:gap-5 sm:p-6'>
+                            <div className='mb-3 min-w-0 sm:mb-0'>
+                              <p className='mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-primary sm:mb-1.5 sm:text-xs'>
                                 Siap untuk dinilai
                               </p>
-                              <h3 className='line-clamp-2 text-base font-semibold leading-6 text-foreground sm:text-lg'>
+                              <h3 className='line-clamp-2 text-sm font-semibold leading-5 text-foreground sm:text-base sm:leading-6'>
                                 {item.productName}
                               </h3>
 
-                              <div className='mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground'>
-                                <span className='rounded-lg border border-border bg-muted/50 px-2.5 py-1.5 font-medium'>
-                                  Pesanan #{item.orderNumber}
+                              <div className='mt-2 flex flex-wrap items-center gap-1.5 text-[10px] text-muted-foreground sm:mt-3 sm:gap-2 sm:text-xs'>
+                                <span className='rounded-md border border-border bg-muted/50 px-1.5 py-1 font-medium sm:rounded-lg sm:px-2.5 sm:py-1.5'>
+                                  #{item.orderNumber?.slice(-6) || ''}
                                 </span>
                                 {item.variantSku && (
-                                  <span className='rounded-lg border border-border bg-muted/50 px-2.5 py-1.5 font-medium'>
-                                    SKU {item.variantSku}
+                                  <span className='rounded-md border border-border bg-muted/50 px-1.5 py-1 font-medium sm:rounded-lg sm:px-2.5 sm:py-1.5'>
+                                    {item.variantSku}
                                   </span>
                                 )}
                               </div>
                             </div>
 
                             <Button
-                              className='h-11 w-full shrink-0 gap-2 rounded-xl px-5 shadow-sm sm:w-auto'
+                              className='h-9 w-full shrink-0 gap-1.5 rounded-lg px-3 text-xs shadow-sm sm:h-11 sm:w-auto sm:gap-2 sm:rounded-xl sm:px-5 sm:text-sm'
                               onClick={() => setCreatingReviewFor(item)}
                             >
                               Tulis Ulasan
-                              <ChevronRight className='h-4 w-4' />
+                              <ChevronRight className='h-3 w-3 sm:h-4 sm:w-4' />
                             </Button>
                           </div>
                         </div>
