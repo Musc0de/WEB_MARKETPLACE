@@ -12,6 +12,7 @@ import {
   toast,
 } from '@starsuperscare/ui';
 import {
+  AlertTriangle,
   CalendarDays,
   CheckCircle2,
   ChevronDown,
@@ -77,12 +78,19 @@ export const ReviewsPage = () => {
     return json.data || [];
   });
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Hapus ulasan ini?')) return;
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
+  const handleDelete = (id: string) => {
+    setDeleteConfirmId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteConfirmId) return;
+    setIsDeleting(true);
     try {
       const res = await (client.v1 as any).reviews[':id'].$delete({
-        param: { id },
+        param: { id: deleteConfirmId },
       });
 
       if (res.ok) {
@@ -92,6 +100,9 @@ export const ReviewsPage = () => {
       }
     } catch (_e) {
       toast.error('Gagal menghapus');
+    } finally {
+      setIsDeleting(false);
+      setDeleteConfirmId(null);
     }
   };
 
@@ -432,6 +443,14 @@ export const ReviewsPage = () => {
             setEditingReview(null);
             setActiveTab('mine');
           }}
+        />
+      )}
+
+      {deleteConfirmId && (
+        <ConfirmDeleteDialog
+          onConfirm={confirmDelete}
+          onCancel={() => setDeleteConfirmId(null)}
+          isDeleting={isDeleting}
         />
       )}
     </div>
@@ -1048,5 +1067,58 @@ function ReviewSheet({
         </form>
       </SheetContent>
     </Sheet>
+  );
+}
+
+function ConfirmDeleteDialog({
+  onConfirm,
+  onCancel,
+  isDeleting,
+}: {
+  onConfirm: () => void;
+  onCancel: () => void;
+  isDeleting: boolean;
+}) {
+  return (
+    <div className='fixed inset-0 z-[120] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200'>
+      <div className='bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4 animate-in zoom-in-95 duration-200'>
+        <div className='flex items-center gap-3 mb-4'>
+          <div className='w-10 h-10 rounded-full bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center flex-shrink-0'>
+            <AlertTriangle className='w-5 h-5 text-rose-600 dark:text-rose-400' />
+          </div>
+          <div>
+            <p className='text-sm font-semibold text-slate-900 dark:text-white'>Hapus Ulasan?</p>
+            <p className='text-xs text-slate-500 dark:text-slate-400 mt-0.5'>
+              Aksi ini tidak dapat dibatalkan.
+            </p>
+          </div>
+        </div>
+        <div className='flex gap-2 mt-4'>
+          <button
+            type='button'
+            onClick={onCancel}
+            disabled={isDeleting}
+            className='flex-1 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-all'
+          >
+            Batal
+          </button>
+          <button
+            type='button'
+            onClick={onConfirm}
+            disabled={isDeleting}
+            className='flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-rose-600 rounded-lg hover:bg-rose-700 transition-all disabled:opacity-60'
+          >
+            {isDeleting
+              ? (
+                <>
+                  <Loader2 className='h-4 w-4 animate-spin' />
+                  Menghapus...
+                </>
+              )
+              : 'Ya, Hapus'}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
