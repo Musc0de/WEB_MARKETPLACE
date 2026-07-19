@@ -73,7 +73,10 @@ export const ReviewsPage = () => {
 
   const getMediaUrl = (key: string | null) => {
     if (!key) return null;
-    return `${API_URL}/v1/admin/assets/${key}`;
+    if (key.startsWith('http://') || key.startsWith('https://')) return key;
+    const r2Url = (import.meta as any).env?.VITE_R2_PUBLIC_URL;
+    if (r2Url) return `${r2Url.replace(/\/$/, '')}/${key.replace(/^\//, '')}`;
+    return key;
   };
 
   const eligibleCount = eligibleItems?.length ?? 0;
@@ -609,7 +612,7 @@ function ReviewModal({
                   {item.primaryImage
                     ? (
                       <img
-                        src={`${API_URL}/v1/admin/assets/${item.primaryImage}`}
+                        src={getMediaUrl(item.primaryImage) || ''}
                         className='h-full w-full object-cover'
                         alt={item.productName || 'Produk'}
                       />
