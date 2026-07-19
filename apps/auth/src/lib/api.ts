@@ -32,7 +32,11 @@ export async function parseApiError(response: Response): Promise<string> {
     if (data && data.error && typeof data.error.message === 'string') {
       return data.error.message;
     }
-    return response.statusText || 'An unknown error occurred';
+    // Handle RFC 7807 Problem Details format
+    if (data && typeof data.detail === 'string') {
+      return data.detail;
+    }
+    return response.statusText || 'Terjadi kesalahan sistem';
   } catch (_e) {
     return response.statusText || 'Failed to parse error response';
   }
