@@ -10,6 +10,25 @@ yarn-debug.log*
 yarn-error.log*
 package-lock.json
 
+.github/workflows/deploy-main-cf-prod-appapi.yml
+.github/workflows/deploy-main-cf-prod-appdashboard.yml
+.github/workflows/deploy-main-cf-prod-appdocs.yml
+.github/workflows/deploy-main-cf-prod-appworker-s.yml
+.github/workflows/deploy-main-cf-prod-appweb.yml
+.github/workflows/ci.yml
+.github/workflows/deploy-staging-*.yml
+
+.github/workflows/deploy-main-cf-staging-appapi.yml
+.github/workflows/deploy-main-cf-staging-appdashboard.yml
+.github/workflows/deploy-main-cf-staging-appdocs.yml
+.github/workflows/deploy-main-cf-staging-appworker-s.yml
+.github/workflows/deploy-main-cf-staging-appweb.yml
+.github/workflows/ci.yml
+.github/workflows/deploy-staging-*.yml
+
+.vscode/settings.json
+.vscode/extensions.json
+
 # Builds
 dist/
 build/
