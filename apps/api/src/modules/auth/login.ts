@@ -59,7 +59,7 @@ const routes = loginRouter.post(
         isSuccess: false,
       }).catch(console.error);
 
-      throw new HTTPException(401, { message: 'Invalid credentials' });
+      throw new HTTPException(401, { message: 'Email/Username atau Kata Sandi salah' });
     }
 
     if (userRecord.status === 'suspended' || userRecord.status === 'banned') {
@@ -77,7 +77,7 @@ const routes = loginRouter.post(
         isSuccess: false,
       }).catch(console.error);
 
-      throw new HTTPException(401, { message: 'Invalid credentials' });
+      throw new HTTPException(401, { message: 'Email/Username atau Kata Sandi salah' });
     }
 
     // 3. Create session
