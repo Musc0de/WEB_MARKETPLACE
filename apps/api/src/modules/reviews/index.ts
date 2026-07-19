@@ -9,7 +9,7 @@ import {
   productRatingStats,
   reviews,
 } from '@starsuperscare/database';
-import { and, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
+import { and, desc, eq, isNull, sql } from 'drizzle-orm';
 import { createReviewRequestSchema, updateReviewRequestSchema } from '@starsuperscare/contracts';
 import { storageAdapter } from '../../adapters/storage.ts';
 
