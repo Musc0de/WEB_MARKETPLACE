@@ -4,7 +4,7 @@ import { StorefrontPromoCard } from '../config/campaign-banner.types.ts';
 import { SIDE_PROMOS } from '../config/heroCampaigns.ts';
 import { CampaignHeroCarousel } from './CampaignHeroCarousel.tsx';
 import { CampaignPromoCard } from './CampaignPromoCard.tsx';
-import { HeroFallback } from './HeroFallback.tsx';
+
 import { Skeleton } from '@starsuperscare/ui';
 
 export function StorefrontHero() {
