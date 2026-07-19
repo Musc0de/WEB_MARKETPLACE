@@ -4,6 +4,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { client } from '../../lib/api.ts';
 import { useCart } from '../../features/cart/api/useCart.ts';
 import { SEO } from '@starsuperscare/ui';
+import { Heart, Search, ShoppingCart, User } from 'lucide-react';
 
 /** Animated cart badge — bounces every time itemCount changes */
 const CartBadge = ({ count }: { count: number }) => {
@@ -123,80 +124,55 @@ const Header = () => {
   };
 
   return (
-    <header className='sticky top-0 z-50 w-full border-b bg-white shadow-sm'>
+    <header className='sticky top-0 z-50 w-full border-b border-gray-200/80 bg-white/85 backdrop-blur-xl shadow-sm'>
       {/* Top Utility Bar (Desktop only) */}
-      <div className='hidden md:block bg-gray-900 text-white py-1 px-4 text-xs text-center'>
+      <div className='hidden md:block bg-gradient-to-r from-indigo-900 to-indigo-700 text-white py-1.5 px-4 text-xs text-center font-medium'>
         <p>Gratis ongkir untuk pesanan di atas Rp 500.000!</p>
       </div>
 
-      <div className='max-w-[1360px] mx-auto flex flex-col md:flex-row md:h-16 items-center justify-between px-4 py-3 md:py-0 gap-3 md:gap-6'>
-        <div className='flex items-center justify-between w-full md:w-auto'>
-          <a href='/' className='font-bold text-2xl tracking-tight text-blue-600'>
+      <div className='max-w-[1360px] mx-auto flex flex-col md:flex-row md:h-[72px] items-center justify-between px-4 sm:px-6 py-3 md:py-0 gap-3 md:gap-8'>
+        {/* Logo & Mobile Action (Left) */}
+        <div className='flex items-center justify-between w-full md:w-auto shrink-0'>
+          <a
+            href='/'
+            className='font-black text-2xl tracking-tight text-indigo-600 hover:text-indigo-700 transition-colors'
+          >
             StarSuperScare
           </a>
-          <div className='flex md:hidden gap-3 items-center'>
+          <div className='flex md:hidden gap-4 items-center'>
             {/* Mobile Cart Icon */}
             <a
               href='/cart'
-              className='p-2 text-gray-600 hover:text-blue-600 transition-colors relative'
+              className='p-1.5 text-gray-500 hover:text-indigo-600 transition-colors relative'
             >
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                width='22'
-                height='22'
-                viewBox='0 0 24 24'
-                fill='none'
-                stroke='currentColor'
-                strokeWidth='2'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-              >
-                <circle cx='8' cy='21' r='1' />
-                <circle cx='19' cy='21' r='1' />
-                <path d='M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12' />
-              </svg>
+              <ShoppingCart strokeWidth={2.5} className='w-5 h-5' />
               <CartBadge count={cartItemCount} />
             </a>
           </div>
         </div>
 
-        {/* Mega Menu Placeholder (Desktop) */}
-        <nav className='hidden md:flex gap-6 shrink-0'>
-          <a
-            href='/products'
-            className='text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors'
-          >
-            Semua Produk
-          </a>
-          <a
-            href='/categories'
-            className='text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors'
-          >
-            Kategori
-          </a>
-          <a
-            href='/brands'
-            className='text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors'
-          >
-            Brand
-          </a>
-          <a
-            href='/promo'
-            className='text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors'
-          >
-            Promo
-          </a>
-          <a
-            href={(import.meta as any).env?.VITE_TRACKING_URL || ''}
-            className='text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors'
-          >
-            Lacak Pesanan
-          </a>
+        {/* Mega Menu (Desktop) */}
+        <nav className='hidden lg:flex gap-7 shrink-0'>
+          {[
+            { label: 'Semua Produk', href: '/products' },
+            { label: 'Kategori', href: '/categories' },
+            { label: 'Brand', href: '/brands' },
+            { label: 'Promo', href: '/promo' },
+            { label: 'Lacak Pesanan', href: (import.meta as any).env?.VITE_TRACKING_URL || '' },
+          ].map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              className='text-[15px] font-semibold text-gray-700 hover:text-indigo-600 transition-colors'
+            >
+              {link.label}
+            </a>
+          ))}
         </nav>
 
         {/* Dominant Search Bar */}
-        <div className='flex flex-1 w-full justify-center'>
-          <form onSubmit={handleSearch} className='w-full max-w-2xl relative'>
+        <div className='flex flex-1 w-full justify-end lg:justify-center min-w-0'>
+          <form onSubmit={handleSearch} className='w-full max-w-xl relative'>
             <input
               type='search'
               placeholder='Cari produk, kategori, atau brand...'
@@ -204,48 +180,36 @@ const Header = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setShowSuggestions(true)}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-              className='w-full h-11 pl-4 pr-10 rounded-full border border-gray-300 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-all'
+              className='w-full h-11 pl-4 pr-11 rounded-full border border-gray-200 bg-gray-100/50 hover:bg-gray-100 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-sm transition-all shadow-inner'
             />
             <button
               type='submit'
-              className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600'
+              className='absolute right-1 top-1 bottom-1 px-3 text-gray-400 hover:text-indigo-600 bg-transparent rounded-r-full transition-colors flex items-center justify-center'
             >
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                width='18'
-                height='18'
-                viewBox='0 0 24 24'
-                fill='none'
-                stroke='currentColor'
-                strokeWidth='2'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-              >
-                <circle cx='11' cy='11' r='8' />
-                <path d='m21 21-4.3-4.3' />
-              </svg>
+              <Search className='w-[18px] h-[18px]' strokeWidth={2.5} />
             </button>
 
             {/* Auto-complete Dropdown */}
             {showSuggestions && searchQuery.trim().length >= 2 && (
-              <div className='absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2'>
+              <div className='absolute top-[calc(100%+8px)] left-0 right-0 bg-white/95 backdrop-blur-md border border-gray-200/60 rounded-2xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2'>
                 {isSuggestionsLoading
                   ? (
-                    <div className='p-4 text-center text-sm text-gray-500'>
+                    <div className='p-6 text-center text-sm font-medium text-gray-500 flex items-center justify-center gap-2'>
+                      <div className='w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin' />
                       Mencari...
                     </div>
                   )
                   : suggestions.length > 0
                   ? (
-                    <ul>
+                    <ul className='py-2'>
                       {suggestions.map((product) => (
                         <li key={product.id}>
                           <a
                             href={`/products/${product.slug}`}
-                            className='flex items-center gap-3 p-3 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors'
+                            className='flex items-center gap-4 px-4 py-3 hover:bg-indigo-50/50 transition-colors'
                             onClick={() => setShowSuggestions(false)}
                           >
-                            <div className='w-10 h-10 rounded-md bg-gray-100 overflow-hidden shrink-0 flex items-center justify-center'>
+                            <div className='w-12 h-12 rounded-xl bg-gray-100 overflow-hidden shrink-0 flex items-center justify-center border border-gray-200/50 shadow-sm'>
                               {product.primaryImage
                                 ? (
                                   <img
@@ -254,13 +218,17 @@ const Header = () => {
                                     className='w-full h-full object-cover'
                                   />
                                 )
-                                : <span className='text-[8px] text-gray-400'>No Img</span>}
+                                : (
+                                  <span className='text-[9px] font-medium text-gray-400'>
+                                    No Img
+                                  </span>
+                                )}
                             </div>
                             <div className='flex flex-col min-w-0'>
-                              <span className='text-sm font-medium text-gray-800 truncate'>
+                              <span className='text-[15px] font-semibold text-gray-900 truncate'>
                                 {product.name}
                               </span>
-                              <span className='text-xs text-blue-600 font-bold'>
+                              <span className='text-[13px] text-indigo-600 font-bold mt-0.5'>
                                 Rp{' '}
                                 {(product.variantsSummary?.minPrice || 0).toLocaleString('id-ID')}
                               </span>
@@ -268,11 +236,11 @@ const Header = () => {
                           </a>
                         </li>
                       ))}
-                      <li>
+                      <li className='px-4 pt-2 pb-1 border-t border-gray-100 mt-2'>
                         <button
                           type='button'
                           onClick={handleSearch}
-                          className='w-full p-3 text-sm text-center text-blue-600 font-medium hover:bg-gray-50 transition-colors'
+                          className='w-full py-2.5 text-[13px] rounded-xl bg-indigo-50 text-indigo-700 font-bold hover:bg-indigo-100 transition-colors'
                         >
                           Lihat semua hasil untuk "{searchQuery}"
                         </button>
@@ -280,8 +248,10 @@ const Header = () => {
                     </ul>
                   )
                   : (
-                    <div className='p-4 text-center text-sm text-gray-500'>
-                      Tidak ada produk ditemukan.
+                    <div className='p-8 text-center flex flex-col items-center justify-center gap-2'>
+                      <Search className='w-8 h-8 text-gray-300' strokeWidth={1.5} />
+                      <p className='text-[15px] font-medium text-gray-900 mt-2'>Tidak ada hasil</p>
+                      <p className='text-[13px] text-gray-500'>Coba gunakan kata kunci lain.</p>
                     </div>
                   )}
               </div>
@@ -290,65 +260,38 @@ const Header = () => {
         </div>
 
         {/* Action Icons (Desktop) */}
-        <div className='hidden md:flex items-center gap-2 shrink-0'>
+        <div className='hidden md:flex items-center gap-1.5 shrink-0'>
           <a
             href={wishlistUrl}
-            className='p-2 text-gray-600 hover:bg-gray-100 hover:text-blue-600 rounded-full transition-colors'
+            className='p-2.5 text-gray-500 hover:bg-indigo-50 hover:text-indigo-600 rounded-full transition-colors group'
+            title='Wishlist'
           >
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              width='22'
-              height='22'
-              viewBox='0 0 24 24'
-              fill='none'
-              stroke='currentColor'
-              strokeWidth='2'
-              strokeLinecap='round'
-              strokeLinejoin='round'
-            >
-              <path d='M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z' />
-            </svg>
+            <Heart
+              strokeWidth={2}
+              className='w-[22px] h-[22px] group-hover:scale-110 transition-transform'
+            />
           </a>
           <a
             href='/cart'
-            className='p-2 text-gray-600 hover:bg-gray-100 hover:text-blue-600 rounded-full transition-colors relative'
+            className='p-2.5 text-gray-500 hover:bg-indigo-50 hover:text-indigo-600 rounded-full transition-colors relative group'
+            title='Keranjang'
           >
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              width='22'
-              height='22'
-              viewBox='0 0 24 24'
-              fill='none'
-              stroke='currentColor'
-              strokeWidth='2'
-              strokeLinecap='round'
-              strokeLinejoin='round'
-            >
-              <circle cx='8' cy='21' r='1' />
-              <circle cx='19' cy='21' r='1' />
-              <path d='M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12' />
-            </svg>
+            <ShoppingCart
+              strokeWidth={2}
+              className='w-[22px] h-[22px] group-hover:scale-110 transition-transform'
+            />
             <CartBadge count={cartItemCount} />
           </a>
-          <div className='w-px h-6 bg-gray-300 mx-2' />
+          <div className='w-[1px] h-6 bg-gray-200 mx-1.5' />
           <a
             href={accountUrl}
-            className='p-2 text-gray-600 hover:bg-gray-100 hover:text-blue-600 rounded-full transition-colors'
+            className='p-2.5 text-gray-500 hover:bg-indigo-50 hover:text-indigo-600 rounded-full transition-colors group'
+            title='Akun'
           >
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              width='22'
-              height='22'
-              viewBox='0 0 24 24'
-              fill='none'
-              stroke='currentColor'
-              strokeWidth='2'
-              strokeLinecap='round'
-              strokeLinejoin='round'
-            >
-              <path d='M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2' />
-              <circle cx='12' cy='7' r='4' />
-            </svg>
+            <User
+              strokeWidth={2}
+              className='w-[22px] h-[22px] group-hover:scale-110 transition-transform'
+            />
           </a>
         </div>
       </div>
