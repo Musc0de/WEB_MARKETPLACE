@@ -18,6 +18,7 @@ import { PrivacyPage } from './features/legal/pages/PrivacyPage.tsx';
 import { HelpPage } from './features/legal/pages/HelpPage.tsx';
 import { ReturnsPage } from './features/legal/pages/ReturnsPage.tsx';
 import { AboutPage } from './features/legal/pages/AboutPage.tsx';
+import { VouchersPage } from './features/promos/pages/VouchersPage.tsx';
 
 const Fallback = ({ error }: { error: Error }) => (
   <div role='alert' className='p-6'>
@@ -61,6 +62,7 @@ export default function App() {
             <Route path='/help' element={<HelpPage />} />
             <Route path='/returns' element={<ReturnsPage />} />
             <Route path='/about' element={<AboutPage />} />
+            <Route path='/vouchers' element={<VouchersPage />} />
             <Route path='*' element={<NotFound />} />
           </Routes>
         </StorefrontLayout>
