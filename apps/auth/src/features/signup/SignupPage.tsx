@@ -23,25 +23,28 @@ export function SignupPage() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await apiClient.v1.me.profile.$get();
+        const res = await apiClient.v1.auth.me.$get();
         if (res.ok) {
-          const returnTo = searchParams.get('return_to');
-          const dashboardUrl = (import.meta as any).env?.VITE_DASHBOARD_URL;
+          const result = await res.json();
+          if (result.data && result.data.user) {
+            const returnTo = searchParams.get('return_to');
+            const dashboardUrl = (import.meta as any).env?.VITE_DASHBOARD_URL;
 
-          if (returnTo) {
-            if (returnTo.startsWith('/') && !returnTo.startsWith('//')) {
-              if (dashboardUrl) {
-                globalThis.location.href = `${dashboardUrl}${returnTo}`;
+            if (returnTo) {
+              if (returnTo.startsWith('/') && !returnTo.startsWith('//')) {
+                if (dashboardUrl) {
+                  globalThis.location.href = `${dashboardUrl}${returnTo}`;
+                }
+              } else {
+                globalThis.location.href = returnTo;
               }
-            } else {
-              globalThis.location.href = returnTo;
+            } else if (dashboardUrl) {
+              globalThis.location.href = dashboardUrl;
             }
-          } else if (dashboardUrl) {
-            globalThis.location.href = dashboardUrl;
           }
         }
       } catch (_e) {
-        // Not logged in or network error
+        // Not logged in or network error, stay on signup page
       }
     };
     checkAuth();
