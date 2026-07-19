@@ -1,5 +1,5 @@
-import { db } from '../db';
-import { faqs } from '../schema/aftercare';
+import { db } from '../db.ts';
+import { faqs } from '../schema/aftercare.ts';
 
 async function seedFaqs() {
   const newFaqs = [

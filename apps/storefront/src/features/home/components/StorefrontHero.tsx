@@ -44,11 +44,7 @@ export function StorefrontHero() {
   }
 
   if (campaigns.length === 0) {
-    return (
-      <div className='mb-12 h-[340px]'>
-        <HeroFallback />
-      </div>
-    );
+    return null;
   }
 
   const hasSidePromos = sidePromos.length > 0;
