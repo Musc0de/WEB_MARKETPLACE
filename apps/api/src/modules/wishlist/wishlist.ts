@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { zValidator } from '../../middleware/validator.ts';
-import { AuthContext, authMiddleware } from '../../middleware/auth.ts';
+import { AuthContext, optionalAuthMiddleware } from '../../middleware/auth.ts';
 import {
   db,
   inventoryLevels,
@@ -27,12 +27,14 @@ type AppContext = {
 
 const router = new Hono<AppContext>();
 
-router.use('*', authMiddleware);
+router.use('*', optionalAuthMiddleware);
 
 const routes = router
   .get('/', async (c) => {
     const session = c.get('session');
-    if (!session?.userId) return c.json({ error: 'Unauthorized' }, 401);
+    if (!session?.userId) {
+      return c.json({ data: [], meta: { request_id: c.get('requestId') }, error: null });
+    }
 
     const items = await db.select({
       id: wishlists.id,
@@ -110,7 +112,7 @@ const routes = router
   })
   .post('/add', zValidator('json', AddWishlistRequestSchema), async (c) => {
     const session = c.get('session');
-    if (!session?.userId) return c.json({ error: 'Unauthorized' }, 401);
+    if (!session?.userId) return c.json({ error: 'Unauthorized', success: false }, 200);
 
     const { productId } = c.req.valid('json');
 
@@ -125,7 +127,7 @@ const routes = router
   })
   .post('/remove', zValidator('json', RemoveWishlistRequestSchema), async (c) => {
     const session = c.get('session');
-    if (!session?.userId) return c.json({ error: 'Unauthorized' }, 401);
+    if (!session?.userId) return c.json({ error: 'Unauthorized', success: false }, 200);
 
     const { productId } = c.req.valid('json');
 
@@ -136,7 +138,9 @@ const routes = router
   })
   .post('/merge', zValidator('json', MergeWishlistRequestSchema), async (c) => {
     const session = c.get('session');
-    if (!session?.userId) return c.json({ error: 'Unauthorized' }, 401);
+    if (!session?.userId) {
+      return c.json({ success: true, meta: { request_id: c.get('requestId') } }, 200);
+    }
 
     const { productIds } = c.req.valid('json');
 

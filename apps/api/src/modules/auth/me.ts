@@ -1,12 +1,19 @@
 import { Hono } from 'hono';
-import { AuthContext, authMiddleware } from '../../middleware/auth.ts';
+import { AuthContext, optionalAuthMiddleware } from '../../middleware/auth.ts';
 
 const app = new Hono<AuthContext>();
 
-const routes = app.get('/me', authMiddleware, (c) => {
+const routes = app.get('/me', optionalAuthMiddleware, (c) => {
   const user = c.get('user');
   const session = c.get('session');
-  const permissions = c.get('permissions');
+  const permissions = c.get('permissions') || [];
+
+  if (!user || !session) {
+    return c.json({
+      data: { user: null, session: null, permissions: [] },
+      error: null,
+    });
+  }
 
   return c.json({
     data: {
