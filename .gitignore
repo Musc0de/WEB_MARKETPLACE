@@ -28,6 +28,13 @@ package-lock.json
 
 .vscode/settings.json
 .vscode/extensions.json
+docs/deploy-*.md
+docs/release-*.md
+docs/ui-*.md
+.vite/*
+.deno/*
+
+
 
 # Builds
 dist/
