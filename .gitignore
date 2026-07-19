@@ -40,9 +40,23 @@ scripts/
 quality/
 packages/database/migrations/*
 
+# Datastores
+*.sqlite
+*.sqlite3
+*.db
+*.db3
+*.db-journal
 
+# Tests and Scripts
+*.test.ts
+*.spec.ts
+*.test.tsx
+*.spec.tsx
+test_script.ts
 
-
+# Markdown files (exclude README.md)
+*.md
+!README.md
 
 
 
