@@ -46,7 +46,13 @@ app.get('/eligible', async (c) => {
   })
     .from(orderItems)
     .innerJoin(orders, eq(orders.id, orderItems.orderId))
-    .leftJoin(reviews, eq(reviews.orderItemId, orderItems.id))
+    .leftJoin(
+      reviews,
+      and(
+        eq(reviews.productId, orderItems.productId),
+        eq(reviews.userId, userId),
+      ),
+    )
     .where(
       and(
         eq(orders.userId, userId),
@@ -56,7 +62,15 @@ app.get('/eligible', async (c) => {
     )
     .orderBy(desc(orders.createdAt));
 
-  const formattedItems = await Promise.all(items.map(async (item) => {
+  const uniqueItemsMap = new Map();
+  for (const item of items) {
+    if (!uniqueItemsMap.has(item.productId)) {
+      uniqueItemsMap.set(item.productId, item);
+    }
+  }
+  const deduplicatedItems = Array.from(uniqueItemsMap.values());
+
+  const formattedItems = await Promise.all(deduplicatedItems.map(async (item) => {
     let primaryImage = null;
     if (item.primaryImage) {
       primaryImage = await storageAdapter.generatePresignedDownloadUrl(item.primaryImage);
@@ -101,7 +115,13 @@ app.post('/', zValidator('json', createReviewRequestSchema), async (c) => {
   const [eligibleItem] = await db.select({ id: orderItems.id })
     .from(orderItems)
     .innerJoin(orders, eq(orders.id, orderItems.orderId))
-    .leftJoin(reviews, eq(reviews.orderItemId, orderItems.id))
+    .leftJoin(
+      reviews,
+      and(
+        eq(reviews.productId, orderItems.productId),
+        eq(reviews.userId, userId),
+      ),
+    )
     .where(
       and(
         eq(orders.userId, userId),
