@@ -73,6 +73,9 @@ export class CloudflareR2Adapter implements StoragePort {
   }
 
   async generatePresignedDownloadUrl(objectKey: string): Promise<string> {
+    if (this.publicUrlBase) {
+      return `${this.publicUrlBase}/${objectKey}`;
+    }
     const command = new GetObjectCommand({
       Bucket: this.bucketName,
       Key: objectKey,
