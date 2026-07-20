@@ -10,7 +10,20 @@ export const globalSettings = pgTable('sss_global_settings', {
   paymentGatewayConfigs: jsonb('payment_gateway_configs').$type<
     Record<string, { mode: 'sandbox' | 'production'; config?: any }>
   >().default({}),
-  updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
+  activeShippingGateway: text('active_shipping_gateway').default('none').notNull(),
+  shippingGatewayConfigs: jsonb('shipping_gateway_configs').$type<
+    Record<string, { mode: 'sandbox' | 'production'; config?: any }>
+  >().default({}),
+  storeOriginAddress: jsonb('store_origin_address').$type<{
+    provinceId?: string;
+    cityId?: string;
+    districtId?: string;
+    postalCode?: string;
+    fullAddress?: string;
+    latitude?: number;
+    longitude?: number;
+  }>().default({}),
+  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });
 
 export const campaignBanners = pgTable('sss_campaign_banners', {
@@ -29,6 +42,6 @@ export const campaignBanners = pgTable('sss_campaign_banners', {
   mobileImageUrl: text('mobile_image_url'),
   isActive: boolean('is_active').default(true).notNull(),
   priority: integer('priority').default(0).notNull(),
-  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });

@@ -5,10 +5,10 @@ import { useNotifications } from '../../features/notifications/useNotifications.
 export function MobileNav() {
   const { pathname } = useLocation();
   const { unreadCount } = useNotifications();
-  const storefrontUrl = (import.meta as any).env?.VITE_STOREFRONT_URL || 'http://localhost:5173';
+  const storefrontUrl = (import.meta as any).env?.VITE_STOREFRONT_URL || '';
 
   return (
-    <nav className='fixed bottom-0 left-0 right-0 z-50 flex h-14 items-center justify-between border-t border-border/60 bg-card px-6 pb-safe md:hidden'>
+    <nav className='fixed bottom-0 left-0 right-0 z-50 flex h-14 items-center justify-between border-t border-border/60 bg-background/70 backdrop-blur-xl px-6 pb-safe shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)] md:hidden'>
       <Link
         to='/'
         className={`flex flex-col items-center gap-1 transition-colors ${

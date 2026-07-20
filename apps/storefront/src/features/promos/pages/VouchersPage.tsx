@@ -71,27 +71,27 @@ export function VouchersPage() {
                 return (
                   <div
                     key={voucher.id}
-                    className='relative overflow-hidden rounded-3xl border border-emerald-100 bg-white shadow-sm transition-all hover:shadow-md dark:border-emerald-900/30 dark:bg-slate-900'
+                    className='relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-white/60 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:shadow-md dark:border-emerald-500/20 dark:bg-slate-900/60'
                   >
                     <div className='absolute -right-12 -top-12 h-32 w-32 rounded-full bg-emerald-500/10 blur-2xl' />
 
-                    <div className='flex h-full flex-col p-6 sm:p-8'>
+                    <div className='flex h-full flex-col p-6 sm:p-8 relative z-10'>
                       <div className='mb-6 flex items-center gap-4'>
-                        <div className='flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400'>
+                        <div className='flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-100/80 backdrop-blur-sm text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400'>
                           <Icon className='h-6 w-6' />
                         </div>
-                        <div>
-                          <h3 className='text-xl font-bold text-slate-900 dark:text-white uppercase'>
+                        <div className='min-w-0 flex-1'>
+                          <h3 className='text-xl font-bold text-slate-900 dark:text-white uppercase break-words'>
                             {voucher.code}
                           </h3>
-                          <div className='mt-1 inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400'>
+                          <div className='mt-1 inline-flex items-center rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400'>
                             Terbatas
                           </div>
                         </div>
                       </div>
 
                       <div className='mb-8 flex-1'>
-                        <p className='text-base leading-relaxed text-slate-600 dark:text-slate-400'>
+                        <p className='text-base leading-relaxed text-slate-600 dark:text-slate-300'>
                           {voucher.description || 'Voucher Spesial Untuk Anda.'}
                         </p>
                         <p className='mt-2 text-xl font-black text-slate-900 dark:text-white'>
@@ -99,11 +99,38 @@ export function VouchersPage() {
                             ? `${voucher.discountAmount}%`
                             : `Rp ${Number(voucher.discountAmount).toLocaleString('id-ID')}`}
                         </p>
+
+                        {(voucher.minOrderValue > 0 || voucher.isNewUserOnly === 1 ||
+                          voucher.isShippingPromo === 1 || voucher.maxDiscountValue > 0) && (
+                          <div className='mt-3 flex flex-wrap gap-2'>
+                            {voucher.isShippingPromo === 1 && (
+                              <span className='inline-flex items-center rounded bg-blue-500/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-blue-700 dark:text-blue-400'>
+                                Gratis Ongkir
+                              </span>
+                            )}
+                            {voucher.isNewUserOnly === 1 && (
+                              <span className='inline-flex items-center rounded bg-purple-500/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-purple-700 dark:text-purple-400'>
+                                Pengguna Baru
+                              </span>
+                            )}
+                            {Number(voucher.minOrderValue) > 0 && (
+                              <span className='inline-flex items-center rounded bg-slate-500/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300'>
+                                Min. Belanja Rp{' '}
+                                {Number(voucher.minOrderValue).toLocaleString('id-ID')}
+                              </span>
+                            )}
+                            {Number(voucher.maxDiscountValue) > 0 && (
+                              <span className='inline-flex items-center rounded bg-orange-500/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-orange-700 dark:text-orange-400'>
+                                Maks. Rp {Number(voucher.maxDiscountValue).toLocaleString('id-ID')}
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
 
                       {isClaimed
                         ? (
-                          <div className='flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-50 text-sm font-bold text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400'>
+                          <div className='flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-500/10 text-sm font-bold text-emerald-600 dark:text-emerald-400'>
                             <CheckCircle2 className='h-5 w-5' />
                             Sudah Diklaim
                           </div>
@@ -111,7 +138,7 @@ export function VouchersPage() {
                         : (
                           <Button
                             onClick={() => handleClaim(voucher.code)}
-                            className='h-12 w-full rounded-xl bg-emerald-600 text-sm font-bold text-white shadow-sm hover:bg-emerald-700 active:scale-[0.98]'
+                            className='h-12 w-full rounded-xl bg-emerald-600/90 backdrop-blur-sm text-sm font-bold text-white shadow-sm hover:bg-emerald-600 active:scale-[0.98]'
                           >
                             Klaim Sekarang
                           </Button>
@@ -119,9 +146,9 @@ export function VouchersPage() {
                     </div>
 
                     {/* Divider styling (ticket notch effect) */}
-                    <div className='absolute -left-3 bottom-24 h-6 w-6 rounded-full border-r border-emerald-100 bg-slate-50 dark:border-emerald-900/30 dark:bg-slate-950' />
-                    <div className='absolute -right-3 bottom-24 h-6 w-6 rounded-full border-l border-emerald-100 bg-slate-50 dark:border-emerald-900/30 dark:bg-slate-950' />
-                    <div className='absolute bottom-[108px] left-0 right-0 border-t-2 border-dashed border-emerald-100/60 dark:border-emerald-900/30' />
+                    <div className='absolute -left-3 bottom-24 h-6 w-6 rounded-full border-r border-emerald-500/20 bg-slate-50/50 backdrop-blur-sm dark:bg-slate-950/50 z-20' />
+                    <div className='absolute -right-3 bottom-24 h-6 w-6 rounded-full border-l border-emerald-500/20 bg-slate-50/50 backdrop-blur-sm dark:bg-slate-950/50 z-20' />
+                    <div className='absolute bottom-[108px] left-0 right-0 border-t-2 border-dashed border-emerald-500/20 z-0' />
                   </div>
                 );
               })}

@@ -93,6 +93,10 @@ const vouchers = pgTable('sss_vouchers', {
   code: text('code').notNull().unique(),
   discountType: text('discount_type').notNull(), // 'percentage', 'fixed'
   discountAmount: bigint('discount_amount', { mode: 'number' }).notNull(),
+  minOrderValue: bigint('min_order_value', { mode: 'number' }).default(0),
+  maxDiscountValue: bigint('max_discount_value', { mode: 'number' }),
+  isShippingPromo: integer('is_shipping_promo').notNull().default(0),
+  isNewUserOnly: integer('is_new_user_only').notNull().default(0),
   maxUses: integer('max_uses'),
   currentUses: integer('current_uses').notNull().default(0),
   validFrom: timestamp('valid_from', { withTimezone: true, mode: 'string' }),

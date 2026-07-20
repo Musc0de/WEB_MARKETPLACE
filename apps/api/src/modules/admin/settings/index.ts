@@ -48,6 +48,23 @@ app.put(
           config: z.any().optional(),
         }),
       ).optional(),
+      activeShippingGateway: z.string().optional(),
+      shippingGatewayConfigs: z.record(
+        z.string(),
+        z.object({
+          mode: z.enum(['sandbox', 'production']),
+          config: z.any().optional(),
+        }),
+      ).optional(),
+      storeOriginAddress: z.object({
+        provinceId: z.string().optional(),
+        cityId: z.string().optional(),
+        districtId: z.string().optional(),
+        postalCode: z.string().optional(),
+        fullAddress: z.string().optional(),
+        latitude: z.number().optional(),
+        longitude: z.number().optional(),
+      }).optional(),
     }),
   ),
   async (c) => {
@@ -67,6 +84,15 @@ app.put(
     }
     if (payload.paymentGatewayConfigs !== undefined) {
       updatePayload.paymentGatewayConfigs = payload.paymentGatewayConfigs;
+    }
+    if (payload.activeShippingGateway !== undefined) {
+      updatePayload.activeShippingGateway = payload.activeShippingGateway;
+    }
+    if (payload.shippingGatewayConfigs !== undefined) {
+      updatePayload.shippingGatewayConfigs = payload.shippingGatewayConfigs;
+    }
+    if (payload.storeOriginAddress !== undefined) {
+      updatePayload.storeOriginAddress = payload.storeOriginAddress;
     }
 
     let result;

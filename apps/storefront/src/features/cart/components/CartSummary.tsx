@@ -38,9 +38,7 @@ export function CartSummary({ summary, isEmpty, onCheckout }: CartSummaryProps) 
           const data = await applyVoucher(savedVoucher);
           setAppliedVoucher({
             code: data.code,
-            amount: data.discountType === 'percentage'
-              ? Math.floor((summary.subtotal * data.discountAmount) / 100)
-              : data.discountAmount,
+            amount: data.totalDiscount,
             description: data.description,
           });
           toast.success('Voucher berhasil digunakan otomatis');
@@ -66,10 +64,7 @@ export function CartSummary({ summary, isEmpty, onCheckout }: CartSummaryProps) 
       const data = await applyVoucher(voucherCode);
       setAppliedVoucher({
         code: data.code,
-        // Basic projection logic, proper logic will be in checkout
-        amount: data.discountType === 'percentage'
-          ? Math.floor((summary.subtotal * data.discountAmount) / 100)
-          : data.discountAmount,
+        amount: data.totalDiscount,
         description: data.description,
       });
       toast.success('Voucher berhasil digunakan');

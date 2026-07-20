@@ -15,6 +15,11 @@ export function GenerateVoucherModal({ onClose }: { onClose: () => void }) {
   const [description, setDescription] = useState('');
   const [maxUses, setMaxUses] = useState<number | ''>('');
 
+  const [minOrderValue, setMinOrderValue] = useState<number | ''>('');
+  const [maxDiscountValue, setMaxDiscountValue] = useState<number | ''>('');
+  const [isShippingPromo, setIsShippingPromo] = useState(false);
+  const [isNewUserOnly, setIsNewUserOnly] = useState(false);
+
   const generateMutation = useMutation({
     mutationFn: async () => {
       await api.post('/admin/vouchers/generate', {
@@ -24,6 +29,10 @@ export function GenerateVoucherModal({ onClose }: { onClose: () => void }) {
         discountAmount: Number(rawDiscountAmount),
         description: description || undefined,
         maxUses: maxUses ? Number(maxUses) : undefined,
+        minOrderValue: minOrderValue ? Number(minOrderValue) : undefined,
+        maxDiscountValue: maxDiscountValue ? Number(maxDiscountValue) : undefined,
+        isShippingPromo: isShippingPromo ? 1 : 0,
+        isNewUserOnly: isNewUserOnly ? 1 : 0,
       });
     },
     onSuccess: () => {
@@ -171,6 +180,62 @@ export function GenerateVoucherModal({ onClose }: { onClose: () => void }) {
                   onChange={(e) => setDescription(e.target.value)}
                   className='w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white'
                 />
+              </div>
+            </div>
+
+            {/* Section: Syarat & Ketentuan Ekstra */}
+            <div className='pt-4 border-t border-gray-100'>
+              <h3 className='text-sm font-bold text-gray-900 mb-3'>Syarat & Ketentuan Lanjutan</h3>
+              <div className='grid grid-cols-2 gap-4 mb-4'>
+                <div>
+                  <label className='block text-xs font-semibold text-gray-700 mb-1.5'>
+                    Minimal Belanja (Rp)
+                  </label>
+                  <input
+                    type='number'
+                    min='0'
+                    placeholder='Tanpa Min. Belanja'
+                    value={minOrderValue}
+                    onChange={(e) =>
+                      setMinOrderValue(e.target.value === '' ? '' : Number(e.target.value))}
+                    className='w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white'
+                  />
+                </div>
+                <div>
+                  <label className='block text-xs font-semibold text-gray-700 mb-1.5'>
+                    Maksimal Potongan (Rp)
+                  </label>
+                  <input
+                    type='number'
+                    min='0'
+                    placeholder='Tanpa Maks. Potongan'
+                    value={maxDiscountValue}
+                    onChange={(e) =>
+                      setMaxDiscountValue(e.target.value === '' ? '' : Number(e.target.value))}
+                    disabled={discountType === 'fixed'}
+                    className='w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 bg-gray-50 disabled:opacity-50'
+                  />
+                </div>
+              </div>
+              <div className='flex gap-6'>
+                <label className='flex items-center gap-2 cursor-pointer'>
+                  <input
+                    type='checkbox'
+                    checked={isShippingPromo}
+                    onChange={(e) => setIsShippingPromo(e.target.checked)}
+                    className='w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500'
+                  />
+                  <span className='text-sm text-gray-700 font-medium'>Promo Gratis Ongkir</span>
+                </label>
+                <label className='flex items-center gap-2 cursor-pointer'>
+                  <input
+                    type='checkbox'
+                    checked={isNewUserOnly}
+                    onChange={(e) => setIsNewUserOnly(e.target.checked)}
+                    className='w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500'
+                  />
+                  <span className='text-sm text-gray-700 font-medium'>Khusus Pengguna Baru</span>
+                </label>
               </div>
             </div>
           </div>

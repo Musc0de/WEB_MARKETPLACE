@@ -44,6 +44,8 @@ const navItems = [
     children: [
       { name: 'General & SEO', href: '/settings/general' },
       { name: 'Payment Gateways', href: '/settings/payment-gateways' },
+      { name: 'Shipping Gateways', href: '/settings/shipping-gateways' },
+      { name: 'Store Location', href: '/settings/location' },
       { name: 'Hero Banner', href: '/settings/banners' },
     ],
   },

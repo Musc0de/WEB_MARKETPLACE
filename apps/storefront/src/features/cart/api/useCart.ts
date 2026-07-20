@@ -106,15 +106,32 @@ export function useCart() {
   };
 
   const applyVoucher = async (code: string) => {
-    const res = await client.v1.vouchers.validate.$post({
-      json: { code },
+    let cartToken = null;
+    if (typeof window !== 'undefined') {
+      cartToken = localStorage.getItem('guestToken');
+    }
+    const res = await (client.v1 as any).checkout.validate.$post({
+      json: { voucherCode: code, _cartToken: cartToken },
     });
     if (!res.ok) {
-      const errorData = await res.json() as any;
-      throw new Error(errorData.error || 'Voucher tidak valid');
+      const errorData = await res.json().catch(() => ({})) as any;
+      throw new Error(errorData.error?.message || 'Voucher tidak valid');
     }
-    const result = await res.json();
-    return result.data;
+    const result = await res.json() as any;
+
+    if (!result.data?.appliedVoucher) {
+      const voucherError = result.data?.errors?.find((e: string) =>
+        e.toLowerCase().includes('voucher') || e.toLowerCase().includes('minimal') ||
+        e.toLowerCase().includes('pengiriman')
+      ) || 'Voucher tidak valid untuk pesanan ini';
+      throw new Error(voucherError);
+    }
+
+    return {
+      code: result.data.appliedVoucher.code,
+      totalDiscount: result.data.summary?.totalDiscount || 0,
+      description: result.data.appliedVoucher.description,
+    };
   };
 
   return {

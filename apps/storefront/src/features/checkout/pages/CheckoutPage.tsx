@@ -67,8 +67,17 @@ export function CheckoutPage() {
         shippingOptionId,
         voucherCode: appliedVoucher,
         _cartToken: directToken ?? null,
-      } as any).catch(() => {
-        if (appliedVoucher) handleRemoveVoucher();
+      } as any).then((res) => {
+        if (appliedVoucher && !res.appliedVoucher) {
+          const voucherError = res.errors?.find((e: string) =>
+            e.toLowerCase().includes('voucher') || e.toLowerCase().includes('minimal') ||
+            e.toLowerCase().includes('pengiriman')
+          );
+          toast.error(voucherError || 'Voucher tidak valid untuk pesanan ini');
+          handleRemoveVoucher(true);
+        }
+      }).catch(() => {
+        if (appliedVoucher) handleRemoveVoucher(true);
       });
     }
   }, [cartHash, shippingOptionId, directToken, appliedVoucher, validateCheckout]);
@@ -87,7 +96,8 @@ export function CheckoutPage() {
 
       if (!result.appliedVoucher) {
         const voucherError = result.errors?.find((e: string) =>
-          e.toLowerCase().includes('voucher')
+          e.toLowerCase().includes('voucher') || e.toLowerCase().includes('minimal') ||
+          e.toLowerCase().includes('pengiriman')
         ) || 'Voucher tidak valid';
         throw new Error(voucherError);
       }
@@ -96,16 +106,17 @@ export function CheckoutPage() {
       toast.success('Voucher berhasil digunakan');
     } catch (err: any) {
       toast.error(err.message || 'Voucher tidak valid');
+      handleRemoveVoucher(true);
     } finally {
       setIsApplyingVoucher(false);
     }
   };
 
-  const handleRemoveVoucher = () => {
+  const handleRemoveVoucher = (suppressToast = false) => {
     setAppliedVoucher(null);
     setVoucherInput('');
     localStorage.removeItem('claimed_voucher');
-    toast.success('Voucher dibatalkan');
+    if (!suppressToast) toast.success('Voucher dibatalkan');
   };
 
   const requiresShipping = directToken
@@ -478,7 +489,7 @@ export function CheckoutPage() {
                         </div>
                         <button
                           type='button'
-                          onClick={handleRemoveVoucher}
+                          onClick={() => handleRemoveVoucher()}
                           className='p-2 hover:bg-emerald-500/20 rounded-xl transition-colors shrink-0'
                           title='Batalkan Voucher'
                         >

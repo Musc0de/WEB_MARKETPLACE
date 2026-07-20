@@ -1,5 +1,5 @@
 import { ErrorBoundary } from 'react-error-boundary';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Link, Navigate, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './features/auth/AuthContext.tsx';
 import { AuthGuard } from './features/auth/AuthGuard.tsx';
@@ -31,6 +31,8 @@ import { ReportsPage } from './features/reports/ReportsPage.tsx';
 import { SettingsLayout } from './features/settings/SettingsLayout.tsx';
 import { GeneralSettingsForm } from './features/settings/GeneralSettingsForm.tsx';
 import { PaymentGatewaysForm } from './features/settings/PaymentGatewaysForm.tsx';
+import { ShippingGatewaysForm } from './features/settings/ShippingGatewaysForm.tsx';
+import { StoreLocationForm } from './features/settings/StoreLocationForm.tsx';
 import { CampaignBannersForm } from './features/settings/CampaignBannersForm.tsx';
 import 'goey-toast/styles.css';
 
@@ -48,8 +50,8 @@ const Fallback = ({ error }: { error: unknown }) => {
       <h2 style={{ color: '#dc2626', marginBottom: '1rem' }}>Application Error</h2>
       <pre
         style={{
-          background: '#fef2f2',
-          border: '1px solid #fecaca',
+          background: '#fff1f1ff',
+          border: '1px solid #ffe1e1ff',
           padding: '1rem',
           borderRadius: '8px',
           overflow: 'auto',
@@ -87,8 +89,14 @@ const Dashboard = () => (
 
 const NotFound = () => (
   <div>
-    <h1>404 - Not Found</h1>
-    <p>The page you are looking for does not exist.</p>
+    <h1>404 - Halaman Tidak Ditemukan</h1>
+    <p>Maaf, halaman yang Anda cari tidak ditemukan.</p>
+    <Link
+      to='/'
+      className='inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 transition mt-4'
+    >
+      Kembali ke Halaman Utama
+    </Link>
   </div>
 );
 
@@ -150,6 +158,8 @@ export default function App() {
                   <Route index element={<Navigate to='general' replace />} />
                   <Route path='general' element={<GeneralSettingsForm />} />
                   <Route path='payment-gateways' element={<PaymentGatewaysForm />} />
+                  <Route path='shipping-gateways' element={<ShippingGatewaysForm />} />
+                  <Route path='location' element={<StoreLocationForm />} />
                   <Route path='banners' element={<CampaignBannersForm />} />
                 </Route>
 

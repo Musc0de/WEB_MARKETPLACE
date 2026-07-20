@@ -4,7 +4,7 @@ import { AuthContext, authMiddleware } from '../../middleware/auth.ts';
 import { db } from '@starsuperscare/database';
 // @ts-ignore - DB exports not fully typed yet
 import { vouchers } from '@starsuperscare/database';
-import { and, desc, eq, gt, isNull, or } from 'drizzle-orm';
+import { and, desc, eq, gt, isNull, or, sql } from 'drizzle-orm';
 import { VoucherValidationRequestSchema } from '@starsuperscare/contracts';
 
 type AppContext = {
@@ -24,6 +24,8 @@ router.get('/', async (c) => {
       eq(vouchers.isActive, 1),
       eq(vouchers.status, 'active'),
       or(isNull(vouchers.validTo), gt(vouchers.validTo, now)),
+      or(isNull(vouchers.validFrom), sql`${vouchers.validFrom} <= ${now}`),
+      or(isNull(vouchers.maxUses), sql`${vouchers.currentUses} < ${vouchers.maxUses}`),
     ),
   ).orderBy(desc(vouchers.createdAt));
 

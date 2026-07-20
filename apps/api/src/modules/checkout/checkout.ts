@@ -140,6 +140,18 @@ checkoutRouter.post('/validate', zValidator('json', CheckoutValidateRequestSchem
     });
   }
 
+  // Handle Shipping
+  let shippingCost = 0;
+  if (req.shippingOptionId) {
+    const shipping = MOCK_SHIPPING_OPTIONS.find((s) => s.id === req.shippingOptionId);
+    if (!shipping) {
+      isValid = false;
+      errors.push('Opsi pengiriman tidak valid');
+    } else {
+      shippingCost = shipping.cost;
+    }
+  }
+
   // Handle Voucher
   let appliedVoucherInfo = null;
   if (req.voucherCode) {
@@ -155,6 +167,15 @@ checkoutRouter.post('/validate', zValidator('json', CheckoutValidateRequestSchem
       } else {
         const voucher = voucherList[0];
         const now = new Date();
+
+        let hasPreviousOrders = false;
+        if (voucher.isNewUserOnly === 1) {
+          const pastOrders = await db.select({ id: orders.id }).from(orders).where(
+            and(eq(orders.userId, session.userId), eq(orders.status, 'completed')),
+          ).limit(1);
+          hasPreviousOrders = pastOrders.length > 0;
+        }
+
         if (voucher.isActive !== 1 || voucher.status !== 'active') {
           isValid = false;
           errors.push('Voucher tidak aktif');
@@ -167,15 +188,32 @@ checkoutRouter.post('/validate', zValidator('json', CheckoutValidateRequestSchem
         } else if (voucher.maxUses !== null && voucher.currentUses >= voucher.maxUses) {
           isValid = false;
           errors.push('Voucher sudah mencapai batas maksimal penggunaan');
+        } else if (voucher.minOrderValue && subtotal < Number(voucher.minOrderValue)) {
+          isValid = false;
+          errors.push(
+            `Minimal belanja Rp ${
+              Number(voucher.minOrderValue).toLocaleString('id-ID')
+            } untuk menggunakan voucher ini`,
+          );
+        } else if (voucher.isNewUserOnly === 1 && hasPreviousOrders) {
+          isValid = false;
+          errors.push('Voucher ini khusus untuk pengguna baru');
         } else {
           // Calculate discount
+          const baseAmount = voucher.isShippingPromo === 1 ? shippingCost : subtotal;
+
           if (voucher.discountType === 'percentage') {
-            totalDiscount = Math.floor((subtotal * voucher.discountAmount) / 100);
+            totalDiscount = Math.floor((baseAmount * Number(voucher.discountAmount)) / 100);
+            if (voucher.maxDiscountValue && totalDiscount > Number(voucher.maxDiscountValue)) {
+              totalDiscount = Number(voucher.maxDiscountValue);
+            }
           } else {
-            totalDiscount = voucher.discountAmount;
+            totalDiscount = Number(voucher.discountAmount);
           }
-          // Cap discount at subtotal
-          if (totalDiscount > subtotal) totalDiscount = subtotal;
+
+          // Cap discount
+          if (totalDiscount > baseAmount) totalDiscount = baseAmount;
+
           appliedVoucherInfo = {
             code: voucher.code,
             description: voucher.description,
@@ -185,20 +223,8 @@ checkoutRouter.post('/validate', zValidator('json', CheckoutValidateRequestSchem
     }
   }
 
-  // Handle Shipping
-  let shippingCost = 0;
-  if (req.shippingOptionId) {
-    const shipping = MOCK_SHIPPING_OPTIONS.find((s) => s.id === req.shippingOptionId);
-    if (!shipping) {
-      isValid = false;
-      errors.push('Opsi pengiriman tidak valid');
-    } else {
-      shippingCost = shipping.cost;
-    }
-  }
-
   const taxAmount = 0; // Simplified
-  const grandTotal = Math.max(0, subtotal - totalDiscount) + shippingCost + taxAmount;
+  const grandTotal = Math.max(0, subtotal + shippingCost - totalDiscount) + taxAmount;
 
   return c.json({
     data: {

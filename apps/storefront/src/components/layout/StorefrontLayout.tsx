@@ -332,7 +332,7 @@ const MobileBottomNav = () => {
   }, []);
 
   return (
-    <nav className='md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border/60 pb-safe'>
+    <nav className='md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-xl border-t border-border/60 pb-safe shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]'>
       <div className='flex justify-around items-center h-14'>
         <a
           href='/'
@@ -519,7 +519,7 @@ export const StorefrontLayout: React.FC<{ children: React.ReactNode }> = ({ chil
   useSSE();
 
   return (
-    <div className='min-h-screen flex flex-col font-sans bg-background text-foreground pb-14 md:pb-0'>
+    <div className='min-h-screen flex flex-col font-sans bg-background text-foreground pb-24 md:pb-0'>
       <SEO appId='storefront' />
       <Header />
       <main className='flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-8 py-6'>

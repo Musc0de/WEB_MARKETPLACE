@@ -82,7 +82,7 @@ export const refunds = pgTable('sss_refunds', {
   status: text('status').notNull().default('pending'), // 'pending', 'processing', 'completed', 'failed', 'manual_review_required'
   providerReference: text('provider_reference'), // to map to payment gateway
   gatewayRefundId: text('gateway_refund_id'),
-  idempotencyKey: text('idempotency_key').unique(),
+  idempotencyKey: text('idempotency_key'),
   failureReason: text('failure_reason'),
   proofImageUrl: text('proof_image_url'),
   requestedAt: timestamp('requested_at', { withTimezone: true, mode: 'string' }),

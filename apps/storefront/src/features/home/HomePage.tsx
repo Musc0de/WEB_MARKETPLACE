@@ -3,6 +3,7 @@ import { Button } from '@starsuperscare/ui';
 import { Gift, Grid, PackageSearch, Tag } from 'lucide-react';
 import { ProductCarousel } from '../catalog/components/ProductCarousel.tsx';
 import { StorefrontHero } from './components/StorefrontHero.tsx';
+import { TicketPercent } from 'lucide-react';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -39,6 +40,14 @@ export default function HomePage() {
       color: 'text-rose-500',
       bg: 'bg-rose-500/10',
       hover: 'group-hover:bg-rose-500',
+    },
+    {
+      name: 'Voucher',
+      icon: TicketPercent,
+      href: '/vouchers',
+      color: 'text-emerald-500',
+      bg: 'bg-emerald-500/10',
+      hover: 'group-hover:bg-emerald-500',
     },
   ];
 

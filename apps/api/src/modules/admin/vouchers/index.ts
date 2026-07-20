@@ -74,6 +74,10 @@ adminVouchersRouter.post(
       discountAmount: z.number().min(0),
       description: z.string().optional(),
       maxUses: z.number().optional(),
+      minOrderValue: z.number().optional(),
+      maxDiscountValue: z.number().optional(),
+      isShippingPromo: z.number().optional(),
+      isNewUserOnly: z.number().optional(),
     }),
   ),
   async (c) => {
@@ -119,6 +123,10 @@ adminVouchersRouter.post(
         discountAmount: body.discountAmount,
         description: body.description || null,
         maxUses: body.maxUses || null,
+        minOrderValue: body.minOrderValue || 0,
+        maxDiscountValue: body.maxDiscountValue || null,
+        isShippingPromo: body.isShippingPromo || 0,
+        isNewUserOnly: body.isNewUserOnly || 0,
         status: 'active',
       });
     }
