@@ -4,10 +4,11 @@ import { and, count, desc, eq } from 'drizzle-orm';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { HTTPException } from 'hono/http-exception';
-import { requirePermission } from '../../../middleware/auth.ts';
+import { authMiddleware, requirePermission } from '../../../middleware/auth.ts';
 import { encryptCredential } from '../../../utils/crypto.ts';
 
 const app = new Hono()
+  .use('*', authMiddleware)
   .use('*', requirePermission('catalog.read'))
   .get(
     '/',

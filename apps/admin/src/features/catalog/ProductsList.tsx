@@ -3,17 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api.ts';
 import { formatDate } from '@starsuperscare/ui';
-import {
-  AlertTriangle,
-  ChevronRight,
-  Edit2,
-  FileText,
-  Globe,
-  Package,
-  Plus,
-  Search,
-  Trash2,
-} from 'lucide-react';
+import { AlertTriangle, Edit2, FileText, Globe, Package, Plus, Search, Trash2 } from 'lucide-react';
 import { Pagination } from '../../components/Pagination.tsx';
 
 // ─── Type ─────────────────────────────────────────────────────────────────────
@@ -116,7 +106,9 @@ export function ProductsList() {
 
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft' | 'archived'>(
+    'all',
+  );
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showConfirm, setShowConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -127,7 +119,7 @@ export function ProductsList() {
     queryKey: ['admin', 'products'],
     // limit=200 ensures we get all products for client-side pagination
     // The admin API now supports pagination + statusCounts
-    queryFn: () => api.get('/admin/catalog/products?limit=200'),
+    queryFn: () => api.get('/admin/catalog/products?limit=200&includeDeleted=true'),
   });
 
   // API now returns: { data: Product[], total, statusCounts, ... }
@@ -142,6 +134,8 @@ export function ProductsList() {
       allProducts.filter((p) => p.status?.toLowerCase() === 'published').length,
     draft: apiStatusCounts['draft'] ??
       allProducts.filter((p) => p.status?.toLowerCase() === 'draft').length,
+    archived: apiStatusCounts['archived'] ??
+      allProducts.filter((p) => p.status?.toLowerCase() === 'archived').length,
   }), [apiStatusCounts, allProducts]);
 
   // ── Filters ─────────────────────────────────────────────────────────────────
@@ -194,7 +188,13 @@ export function ProductsList() {
   const handleBulkDelete = async () => {
     setIsDeleting(true);
     try {
-      await Promise.all([...selectedIds].map((id) => api.delete(`/admin/catalog/products/${id}`)));
+      await Promise.all(
+        [...selectedIds].map((id) =>
+          api.delete(
+            `/admin/catalog/products/${id}${statusFilter === 'archived' ? '?hard=true' : ''}`,
+          )
+        ),
+      );
       setSelectedIds(new Set());
       setShowConfirm(false);
       queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
@@ -278,6 +278,18 @@ export function ProductsList() {
           </div>
         </div>
 
+        {/* Archived */}
+        <div className='bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-4'>
+          <div className='text-red-600 opacity-70'>
+            <Trash2 className='w-5 h-5' />
+          </div>
+          <div className='min-w-0'>
+            <p className='text-xs font-medium text-gray-500 leading-tight'>Total Produk Dihapus</p>
+            <p className='text-2xl font-bold text-red-700'>{stats.archived}</p>
+            <p className='text-[10px] text-gray-400 mt-0.5'>diarsipkan (soft delete)</p>
+          </div>
+        </div>
+
         {/* Total Keseluruhan */}
         <div className='bg-gray-50 border border-gray-200 rounded-xl p-4 flex items-center gap-4'>
           <div className='text-gray-500 opacity-70'>
@@ -299,19 +311,18 @@ export function ProductsList() {
             <span className='text-red-400'>·</span>
             <button
               type='button'
-              onClick={() => setSelectedIds(new Set())}
-              className='text-xs text-red-500 hover:underline'
+              onClick={() => setShowConfirm(true)}
+              className='px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium'
             >
-              Batalkan pilihan
+              {statusFilter === 'archived' ? 'Hapus Permanen' : 'Hapus Produk'}
             </button>
           </div>
           <button
             type='button'
-            onClick={() => setShowConfirm(true)}
-            className='inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 transition-all shadow-sm'
+            onClick={() => setSelectedIds(new Set())}
+            className='text-xs text-red-500 hover:underline'
           >
-            <Trash2 className='w-4 h-4' />
-            Hapus {selectedIds.size} Produk
+            Batalkan pilihan
           </button>
         </div>
       )}
@@ -328,23 +339,19 @@ export function ProductsList() {
             className='w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400'
           />
         </div>
-        <div className='flex gap-1.5'>
-          {(['all', 'published', 'draft'] as const).map((s) => (
+        <div className='flex gap-1 p-1 bg-gray-100/80 rounded-xl'>
+          {(['all', 'published', 'draft', 'archived'] as const).map((s) => (
             <button
               key={s}
               type='button'
               onClick={() => handleFilterChange(s)}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+              className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${
                 statusFilter === s
-                  ? s === 'published'
-                    ? 'bg-emerald-600 text-white'
-                    : s === 'draft'
-                    ? 'bg-amber-500 text-white'
-                    : 'bg-gray-900 text-white'
-                  : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+                  ? 'bg-white text-gray-900 shadow-sm ring-1 ring-gray-200/50'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50'
               }`}
             >
-              {s === 'all' ? 'Semua' : s === 'published' ? 'Published' : 'Draft'}
+              {s.charAt(0).toUpperCase() + s.slice(1)}
             </button>
           ))}
         </div>
@@ -472,15 +479,36 @@ export function ProductsList() {
                     {/* Actions */}
                     <td className='px-4 py-3.5'>
                       <div className='flex items-center gap-2'>
-                        <button
-                          type='button'
-                          onClick={() => navigate(`/catalog/${product.id}/edit`)}
-                          className='inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all group-hover:shadow-sm'
-                        >
-                          <Edit2 className='w-3.5 h-3.5' />
-                          Edit
-                          <ChevronRight className='w-3 h-3 opacity-50' />
-                        </button>
+                        {statusFilter === 'archived'
+                          ? (
+                            <button
+                              type='button'
+                              onClick={async () => {
+                                if (confirm('Yakin ingin menghapus permanen?')) {
+                                  await api.delete(
+                                    `/admin/catalog/products/${product.id}?hard=true`,
+                                  );
+                                  queryClient.invalidateQueries({
+                                    queryKey: ['admin', 'products'],
+                                  });
+                                }
+                              }}
+                              className='inline-flex items-center gap-1 text-xs font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-2.5 py-1.5 rounded-lg transition-colors'
+                            >
+                              <Trash2 className='w-3.5 h-3.5' />
+                              Hapus Permanen
+                            </button>
+                          )
+                          : (
+                            <button
+                              type='button'
+                              onClick={() => navigate(`/catalog/${product.id}`)}
+                              className='inline-flex items-center gap-1 text-xs font-medium text-gray-600 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 px-2.5 py-1.5 rounded-lg transition-colors border border-gray-200'
+                            >
+                              <Edit2 className='w-3.5 h-3.5' />
+                              Edit
+                            </button>
+                          )}
                       </div>
                     </td>
                   </tr>

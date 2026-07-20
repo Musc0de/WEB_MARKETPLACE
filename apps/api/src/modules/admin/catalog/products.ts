@@ -20,7 +20,7 @@ import {
 import { AuthContext, authMiddleware, requirePermission } from '../../../middleware/auth.ts';
 import { logAudit } from '../../../utils/audit.ts';
 import { broadcastNotification } from '../../notifications/index.ts';
-import { and, asc, desc, eq, isNull, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 import { storageAdapter } from '../../../adapters/storage.ts';
 
@@ -36,19 +36,22 @@ const routes = app
     const limit = Math.min(200, Math.max(1, Number(c.req.query('limit') ?? 50)));
     const offset = (page - 1) * limit;
 
-    // Exclude soft-deleted products
+    const includeDeleted = c.req.query('includeDeleted') === 'true';
+
+    // Exclude soft-deleted products unless includeDeleted is true
     const [countRow] = await db
       .select({ total: sql<number>`COUNT(*)` })
       .from(products)
-      .where(isNull(products.deletedAt));
+      .where(includeDeleted ? undefined : isNull(products.deletedAt));
 
     const total = Number(countRow?.total ?? 0);
 
-    // Status counts for admin stats cards (excludes soft-deleted)
+    // Status counts for admin stats cards
+    // When includeDeleted is true, we group by all statuses including archived
     const statusCountsRaw = await db
       .select({ status: products.status, count: sql<number>`COUNT(*)` })
       .from(products)
-      .where(isNull(products.deletedAt))
+      .where(includeDeleted ? undefined : isNull(products.deletedAt))
       .groupBy(products.status);
 
     const statusCounts = Object.fromEntries(
@@ -58,7 +61,7 @@ const routes = app
     const list = await db
       .select()
       .from(products)
-      .where(isNull(products.deletedAt))
+      .where(includeDeleted ? undefined : isNull(products.deletedAt))
       .limit(limit)
       .offset(offset);
 
@@ -262,11 +265,13 @@ const routes = app
       const user = c.get('user');
 
       // generate slug from name
-      const slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      let slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      if (!slug) slug = 'product';
 
       const existing = await db.select().from(products).where(eq(products.slug, slug)).limit(1);
       if (existing.length > 0) {
-        throw new HTTPException(409, { message: 'Product slug conflict' });
+        // Append a random 5-character string to make it unique
+        slug = `${slug}-${Math.random().toString(36).substring(2, 7)}`;
       }
 
       let storeId = data.storeId;
@@ -384,15 +389,57 @@ const routes = app
     const [existing] = await db.select().from(products).where(eq(products.id, id)).limit(1);
     if (!existing) throw new HTTPException(404, { message: 'Product not found' });
 
-    await db.transaction(async (tx) => {
-      await tx.update(products).set({
-        status: 'archived',
-        deletedAt: new Date().toISOString(),
-      }).where(eq(products.id, id));
+    const hard = c.req.query('hard') === 'true';
 
-      await tx.update(productVariants).set({
-        deletedAt: new Date().toISOString(),
-      }).where(eq(productVariants.productId, id));
+    await db.transaction(async (tx) => {
+      if (hard) {
+        try {
+          const variants = await tx.select({ id: productVariants.id }).from(productVariants).where(
+            eq(productVariants.productId, id),
+          );
+          const variantIds = variants.map((v) => v.id);
+
+          if (variantIds.length > 0) {
+            // we have to delete inventoryMovements (no cascade)
+            await tx.delete(inventoryMovements).where(
+              inArray(inventoryMovements.variantId, variantIds),
+            );
+            // cartItems doesn't have cascade
+            try {
+              const { cartItems } = await import('@starsuperscare/database');
+              await tx.delete(cartItems).where(inArray(cartItems.variantId, variantIds));
+            } catch (_e) {
+              _e;
+            }
+          }
+
+          await tx.delete(productVariants).where(eq(productVariants.productId, id));
+          await tx.delete(products).where(eq(products.id, id));
+        } catch (err: any) {
+          if (
+            err.code === '23503' || err.message?.includes('foreign key') ||
+            err.message?.includes('violates')
+          ) {
+            throw new HTTPException(400, {
+              message:
+                'Produk tidak bisa dihapus permanen karena masih terkait dengan Pesanan (Order).',
+            });
+          }
+          throw new HTTPException(400, {
+            message:
+              'Gagal menghapus produk permanen karena terikat dengan data lain (Order/Cart).',
+          });
+        }
+      } else {
+        await tx.update(products).set({
+          status: 'archived',
+          deletedAt: new Date().toISOString(),
+        }).where(eq(products.id, id));
+
+        await tx.update(productVariants).set({
+          deletedAt: new Date().toISOString(),
+        }).where(eq(productVariants.productId, id));
+      }
 
       await logAudit(tx, {
         actorId: user.id,

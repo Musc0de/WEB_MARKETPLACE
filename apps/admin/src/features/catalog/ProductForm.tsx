@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { client } from '../../lib/rpc.ts';
 import { goeyToast as toast } from 'goey-toast';
-import { AdminProductCreateSchema } from '@starsuperscare/contracts';
+import { AdminProductCreateSchema, AdminProductUpdateSchema } from '@starsuperscare/contracts';
 import { ImageUploader } from './ImageUploader.tsx';
 import { VariantsForm } from './VariantsForm.tsx';
 import { DigitalCredentialsForm } from './DigitalCredentialsForm.tsx';
@@ -53,10 +53,11 @@ function SectionCard({ title, icon, children, description }: {
 }
 
 // ─── Form Field ────────────────────────────────────────────────────────────────
-function Field({ label, required, hint, children }: {
+function Field({ label, required, hint, error, children }: {
   label: string;
   required?: boolean;
   hint?: string;
+  error?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -65,14 +66,19 @@ function Field({ label, required, hint, children }: {
         {label} {required && <span className='text-red-500 normal-case tracking-normal'>*</span>}
       </label>
       {children}
-      {hint && <p className='text-xs text-gray-400'>{hint}</p>}
+      {error && <p className='text-xs text-amber-500 font-medium'>{error}</p>}
+      {!error && hint && <p className='text-xs text-gray-400'>{hint}</p>}
     </div>
   );
 }
 
 // ─── Input class ───────────────────────────────────────────────────────────────
-const inputCls =
-  'w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent bg-white transition placeholder-gray-300';
+const getInputCls = (hasError?: boolean) =>
+  `w-full px-3.5 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 transition placeholder-gray-300 ${
+    hasError
+      ? 'border-amber-400 focus:ring-amber-300 bg-amber-50/30'
+      : 'border-gray-200 focus:ring-blue-300 focus:border-transparent bg-white'
+  }`;
 
 export function ProductForm() {
   const { id } = useParams();
@@ -92,6 +98,7 @@ export function ProductForm() {
     seoTitle: '',
     seoDescription: '',
   });
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<string | undefined>(undefined);
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -140,6 +147,7 @@ export function ProductForm() {
     if (!isEditing) return;
     const fetchProduct = async () => {
       setIsLoadingProduct(true);
+      setFormErrors({});
       try {
         const res = await client.v1.admin.catalog.products[':id'].$get({ param: { id } });
         if (res.ok) {
@@ -168,16 +176,10 @@ export function ProductForm() {
     fetchProduct();
   }, [id, isEditing]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
-  ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setIsDirty(true);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
+    setFormErrors({});
     try {
       if (isEditing) {
         const payload = {
@@ -192,9 +194,21 @@ export function ProductForm() {
           seoTitle: formData.seoTitle || undefined,
           seoDescription: formData.seoDescription || undefined,
         };
+        const parsed = AdminProductUpdateSchema.safeParse(payload);
+        if (!parsed.success) {
+          const errors: Record<string, string> = {};
+          parsed.error.issues.forEach((issue: any) => {
+            errors[issue.path[0] as string] = issue.message;
+          });
+          setFormErrors(errors);
+          toast.error('Gagal menyimpan: Periksa kembali form yang di-highlight kuning');
+          setIsSaving(false);
+          return;
+        }
+
         const res = await client.v1.admin.catalog.products[':id'].$put({
           param: { id },
-          json: payload,
+          json: parsed.data,
         });
         if (!res.ok) throw new Error('Gagal memperbarui produk');
         toast.success('Produk berhasil disimpan!');
@@ -214,9 +228,16 @@ export function ProductForm() {
         };
         const parsed = AdminProductCreateSchema.safeParse(payload);
         if (!parsed.success) {
-          toast.error(parsed.error.issues[0].message);
+          const errors: Record<string, string> = {};
+          parsed.error.issues.forEach((issue: any) => {
+            errors[issue.path[0] as string] = issue.message;
+          });
+          setFormErrors(errors);
+          toast.error('Gagal membuat produk: Periksa kembali form yang di-highlight kuning');
+          setIsSaving(false);
           return;
         }
+
         const res = await client.v1.admin.catalog.products.$post({ json: parsed.data });
         if (!res.ok) throw new Error('Gagal membuat produk');
         toast.success('Produk berhasil dibuat!');
@@ -462,21 +483,28 @@ export function ProductForm() {
                 <input
                   name='storeId'
                   value={formData.storeId}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    setFormData((prev) => ({ ...prev, storeId: e.target.value }));
+                    setIsDirty(true);
+                  }}
                   placeholder='UUID toko (otomatis jika kosong)'
-                  className={inputCls}
+                  className={getInputCls()}
                 />
               </Field>
             )}
 
             {/* Name */}
-            <Field label='Nama Produk' required>
+            <Field label='Nama Produk' required error={formErrors.name}>
               <input
-                name='name'
-                value={formData.name}
-                onChange={handleChange}
+                type='text'
                 placeholder='cth: Kemeja Batik Premium Lengan Panjang'
-                className={inputCls}
+                value={formData.name}
+                onChange={(e) => {
+                  setFormData((prev) => ({ ...prev, name: e.target.value }));
+                  setIsDirty(true);
+                  if (formErrors.name) setFormErrors((prev) => ({ ...prev, name: '' }));
+                }}
+                className={getInputCls(!!formErrors.name)}
                 required
               />
             </Field>
@@ -485,13 +513,20 @@ export function ProductForm() {
             <Field
               label='Kode Produk (Opsional)'
               hint='Kode unik atau SKU untuk referensi internal produk'
+              error={formErrors.productCode}
             >
               <input
-                name='productCode'
-                value={formData.productCode}
-                onChange={handleChange}
+                type='text'
                 placeholder='cth: BTK-001'
-                className={inputCls}
+                value={formData.productCode}
+                onChange={(e) => {
+                  setFormData((prev) => ({ ...prev, productCode: e.target.value }));
+                  setIsDirty(true);
+                  if (formErrors.productCode) {
+                    setFormErrors((prev) => ({ ...prev, productCode: '' }));
+                  }
+                }}
+                className={getInputCls(!!formErrors.productCode)}
               />
             </Field>
 
@@ -500,12 +535,16 @@ export function ProductForm() {
               label='Tipe Produk'
               required
               hint='Menentukan apakah produk perlu pengiriman fisik atau tidak'
+              error={formErrors.type}
             >
               <select
-                name='type'
                 value={formData.type}
-                onChange={handleChange}
-                className={inputCls}
+                onChange={(e) => {
+                  setFormData((prev) => ({ ...prev, type: e.target.value }));
+                  setIsDirty(true);
+                  if (formErrors.type) setFormErrors((prev) => ({ ...prev, type: '' }));
+                }}
+                className={getInputCls(!!formErrors.type)}
               >
                 <option value='physical'>🏪 Produk Fisik — Memerlukan pengiriman</option>
                 <option value='digital'>💾 Produk Digital — File / unduhan</option>
@@ -515,30 +554,38 @@ export function ProductForm() {
 
             {/* Category & Brand */}
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <Field label='Kategori' hint='Pilih kategori produk'>
+              <Field label='Kategori' hint='Pilih kategori produk' error={formErrors.categoryIds}>
                 <select
-                  name='categoryIds'
                   value={formData.categoryIds[0] || ''}
                   onChange={(e) => {
-                    setFormData({
-                      ...formData,
+                    setFormData((prev) => ({
+                      ...prev,
                       categoryIds: e.target.value ? [e.target.value] : [],
-                    });
+                    }));
                     setIsDirty(true);
+                    if (formErrors.categoryIds) {
+                      setFormErrors((prev) => ({
+                        ...prev,
+                        categoryIds: '',
+                      }));
+                    }
                   }}
-                  className={inputCls}
+                  className={getInputCls(!!formErrors.categoryIds)}
                 >
                   <option value=''>-- Pilih Kategori --</option>
                   {categoriesList.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </Field>
 
-              <Field label='Brand' hint='Pilih brand produk (opsional)'>
+              <Field label='Brand' hint='Pilih brand produk (opsional)' error={formErrors.brandId}>
                 <select
-                  name='brandId'
-                  value={formData.brandId}
-                  onChange={handleChange}
-                  className={inputCls}
+                  value={formData.brandId || ''}
+                  onChange={(e) => {
+                    setFormData((prev) => ({ ...prev, brandId: e.target.value }));
+                    setIsDirty(true);
+                    if (formErrors.brandId) setFormErrors((prev) => ({ ...prev, brandId: '' }));
+                  }}
+                  className={getInputCls(!!formErrors.brandId)}
                 >
                   <option value=''>-- Tidak Ada Brand --</option>
                   {brandsList.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
@@ -547,14 +594,23 @@ export function ProductForm() {
             </div>
 
             {/* Description */}
-            <Field label='Deskripsi Produk' hint='Jelaskan detail produk Anda kepada calon pembeli'>
+            <Field
+              label='Deskripsi Produk'
+              hint='Jelaskan detail produk Anda kepada calon pembeli'
+              error={formErrors.description}
+            >
               <textarea
-                name='description'
                 value={formData.description}
-                onChange={handleChange}
+                onChange={(e) => {
+                  setFormData((prev) => ({ ...prev, description: e.target.value }));
+                  setIsDirty(true);
+                  if (formErrors.description) {
+                    setFormErrors((prev) => ({ ...prev, description: '' }));
+                  }
+                }}
                 rows={5}
                 placeholder='Deskripsikan produk Anda: bahan, ukuran, keunggulan, cara penggunaan, dll.'
-                className={`${inputCls} resize-none leading-relaxed`}
+                className={`${getInputCls(!!formErrors.description)} resize-none leading-relaxed`}
               />
             </Field>
 
@@ -562,19 +618,25 @@ export function ProductForm() {
             <Field
               label='Batas Pembelian per Pelanggan'
               hint='Isi 0 untuk tidak membatasi jumlah pembelian'
+              error={formErrors.purchaseLimit}
             >
               <div className='flex items-center gap-3'>
                 <input
                   type='number'
-                  name='purchaseLimit'
                   value={formData.purchaseLimit}
                   onChange={(e) => {
-                    setFormData({ ...formData, purchaseLimit: Number(e.target.value) });
+                    setFormData((prev) => ({ ...prev, purchaseLimit: Number(e.target.value) }));
                     setIsDirty(true);
+                    if (formErrors.purchaseLimit) {
+                      setFormErrors((prev) => ({
+                        ...prev,
+                        purchaseLimit: '',
+                      }));
+                    }
                   }}
                   min={0}
                   max={9999}
-                  className={`${inputCls} w-40`}
+                  className={`${getInputCls(!!formErrors.purchaseLimit)} w-40`}
                 />
                 {formData.purchaseLimit === 0 && (
                   <span className='text-xs text-emerald-600 font-medium'>✓ Tidak dibatasi</span>
@@ -652,28 +714,44 @@ export function ProductForm() {
           }
         >
           <div className='space-y-5'>
-            <Field label='SEO Title' hint='Opsional. Judul halaman untuk mesin pencari.'>
+            <Field
+              label='SEO Title'
+              hint='Opsional. Judul halaman untuk mesin pencari.'
+              error={formErrors.seoTitle}
+            >
               <input
                 type='text'
-                name='seoTitle'
                 value={formData.seoTitle}
-                onChange={handleChange}
+                onChange={(e) => {
+                  setFormData((prev) => ({ ...prev, seoTitle: e.target.value }));
+                  setIsDirty(true);
+                  if (formErrors.seoTitle) setFormErrors((prev) => ({ ...prev, seoTitle: '' }));
+                }}
                 placeholder='Contoh: Jual Kemeja Pria Batik Kualitas Premium'
-                className={inputCls}
+                className={getInputCls(!!formErrors.seoTitle)}
               />
             </Field>
 
             <Field
               label='SEO Description'
               hint='Opsional. Deskripsi singkat untuk hasil pencarian Google.'
+              error={formErrors.seoDescription}
             >
               <textarea
-                name='seoDescription'
                 value={formData.seoDescription}
-                onChange={handleChange}
+                onChange={(e) => {
+                  setFormData((prev) => ({ ...prev, seoDescription: e.target.value }));
+                  setIsDirty(true);
+                  if (formErrors.seoDescription) {
+                    setFormErrors((prev) => ({
+                      ...prev,
+                      seoDescription: '',
+                    }));
+                  }
+                }}
                 placeholder='Tuliskan deskripsi SEO maksimal 160 karakter...'
                 rows={2}
-                className={`${inputCls} resize-none`}
+                className={`${getInputCls(!!formErrors.seoDescription)} resize-none`}
               />
             </Field>
           </div>

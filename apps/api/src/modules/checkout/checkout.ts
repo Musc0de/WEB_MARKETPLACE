@@ -6,6 +6,7 @@ import {
   addresses,
   cartItems,
   db,
+  globalSettings,
   inventoryLevels,
   inventoryMovements,
   orderAddresses,
@@ -35,24 +36,6 @@ type AppContext = {
 export const checkoutRouter = new Hono<AppContext>();
 
 checkoutRouter.use('*', optionalAuthMiddleware);
-
-// Mock shipping options
-const MOCK_SHIPPING_OPTIONS = [
-  {
-    id: 'ship_reguler',
-    name: 'Reguler',
-    description: 'Pengiriman standar',
-    cost: 15000,
-    estimatedDays: '2-4 Hari',
-  },
-  {
-    id: 'ship_express',
-    name: 'Express',
-    description: 'Pengiriman cepat (besok sampai)',
-    cost: 35000,
-    estimatedDays: '1-2 Hari',
-  },
-];
 
 checkoutRouter.post(
   '/shipping-options',
@@ -103,13 +86,22 @@ checkoutRouter.post(
       quantity: item.quantity,
     }));
 
-    // Fetch origin postal code from settings (simulated or env for now, ideally from DB).
-    // Wait, let's fetch it from store_settings table if it exists, or just fallback to env if we need.
-    // Let's assume the store origin postal code is hardcoded or fetched. I will fetch it from env or default to something to avoid breaking,
-    // actually, let's try to query store settings.
+    // Fetch global settings for shipping gateway configuration
+    const [settings] = await db.select().from(globalSettings).where(eq(globalSettings.id, 'global'))
+      .limit(1);
 
-    // For now, I'll put a default fallback because store settings might not be easily queryable if it's dynamic JSON.
-    const originPostalCode = process.env.STORE_ORIGIN_POSTAL_CODE || 51118; // Default to user's Pekalongan postal code from previous tests
+    const activeGateway = settings?.activeShippingGateway;
+    if (activeGateway !== 'biteship') {
+      return c.json({
+        data: { options: [] }, // No active integration or not biteship
+        meta: { request_id: c.get('requestId') },
+        error: null,
+      });
+    }
+
+    // Attempt to get origin postal code from settings, fallback to env or default
+    const originPostalCode = settings?.storeOriginAddress?.postalCode ||
+      process.env.STORE_ORIGIN_POSTAL_CODE;
 
     const biteshipApiKey = process.env.BITESHIP_API_KEY;
     if (!biteshipApiKey) {
@@ -244,12 +236,12 @@ checkoutRouter.post('/validate', zValidator('json', CheckoutValidateRequestSchem
   // Handle Shipping
   let shippingCost = 0;
   if (req.shippingOptionId) {
-    const shipping = MOCK_SHIPPING_OPTIONS.find((s) => s.id === req.shippingOptionId);
-    if (!shipping) {
+    const parts = req.shippingOptionId.split('|');
+    if (parts.length >= 2) {
+      shippingCost = parseInt(parts[parts.length - 1], 10) || 0;
+    } else {
       isValid = false;
       errors.push('Opsi pengiriman tidak valid');
-    } else {
-      shippingCost = shipping.cost;
     }
   }
 
@@ -460,14 +452,16 @@ checkoutRouter.post('/orders', zValidator('json', CreateOrderRequestSchema), asy
         error: { code: 'BAD_REQUEST', message: 'Alamat dan opsi pengiriman wajib diisi' },
       }, 400);
     }
-    const shipping = MOCK_SHIPPING_OPTIONS.find((s) => s.id === req.shippingOptionId);
-    if (!shipping) {
+
+    const parts = req.shippingOptionId.split('|');
+    if (parts.length >= 2) {
+      shippingCost = parseInt(parts[parts.length - 1], 10) || 0;
+    } else {
       return c.json(
         { error: { code: 'BAD_REQUEST', message: 'Opsi pengiriman tidak valid' } },
         400,
       );
     }
-    shippingCost = shipping.cost;
   }
 
   const grandTotal = Math.max(0, subtotal - totalDiscount) + shippingCost;
