@@ -30,6 +30,7 @@ export type ShippingOption = z.infer<typeof ShippingOptionSchema>;
 export const GetShippingOptionsRequestSchema = z.object({
   destinationProvince: z.string().optional(),
   destinationCity: z.string().optional(),
+  destinationPostalCode: z.string().optional(),
 });
 
 export const GetShippingOptionsResponseSchema = z.object({

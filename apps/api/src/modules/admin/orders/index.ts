@@ -297,6 +297,104 @@ adminOrdersRouter.post(
 );
 
 adminOrdersRouter.post(
+  '/:id/biteship-pickup',
+  requirePermission('orders.write'),
+  async (c) => {
+    const id = c.req.param('id') as string;
+
+    const [order] = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
+    if (!order) return c.json({ error: 'Order not found' }, 404);
+
+    const [address] = await db.select().from(orderAddresses).where(eq(orderAddresses.orderId, id))
+      .limit(1);
+    if (!address || !address.shippingSnapshot) {
+      return c.json({ error: 'Order address not found' }, 400);
+    }
+
+    const items = await db.select({
+      name: orderItems.productNameSnapshot,
+      value: orderItems.priceSnapshot,
+      quantity: orderItems.quantity,
+      weight: sql<number>`COALESCE(${productVariants.weight}, 1000)`.mapWith(Number),
+    })
+      .from(orderItems)
+      .leftJoin(productVariants, eq(orderItems.variantId, productVariants.id))
+      .where(eq(orderItems.orderId, id));
+
+    const ship = address.shippingSnapshot as any;
+
+    // Fallback store setting
+    const storeOriginPostalCode = process.env.STORE_ORIGIN_POSTAL_CODE;
+    const biteshipApiKey = process.env.BITESHIP_API_KEY;
+
+    if (!biteshipApiKey) {
+      return c.json({ error: 'Biteship API Key not configured' }, 500);
+    }
+
+    try {
+      const payload = {
+        shipper_contact_name: 'Admin Store',
+        shipper_contact_phone: '081234567890',
+        origin_postal_code: Number(storeOriginPostalCode),
+        destination_contact_name: ship.fullName,
+        destination_contact_phone: ship.phoneNumber,
+        destination_postal_code: Number(ship.postalCode),
+        destination_address: `${ship.streetAddress}, ${ship.city}, ${ship.province}`,
+        courier_company: 'jne', // Ideally we store the chosen carrier during checkout!
+        courier_type: 'reg',
+        delivery_type: 'later',
+        items: items.map((item) => ({
+          name: item.name,
+          value: item.value,
+          weight: item.weight,
+          quantity: item.quantity,
+        })),
+      };
+
+      const response = await fetch('https://api.biteship.com/v1/orders', {
+        method: 'POST',
+        headers: {
+          'Authorization': biteshipApiKey,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        return c.json({ error: result.error || 'Failed to create Biteship order' }, 400);
+      }
+
+      const biteshipOrderId = result.id;
+      const waybillId = result.courier?.waybill_id || biteshipOrderId;
+      const carrier = result.courier?.company || 'Biteship';
+
+      await db.transaction(async (tx) => {
+        await tx.insert(shipments).values({
+          orderId: id,
+          carrier: carrier,
+          trackingNumber: waybillId,
+          status: 'in_transit',
+        });
+        await tx.insert(orderStatusHistory).values({
+          orderId: id,
+          status: 'shipped',
+          note: `[BITESHIP PICKUP] Kurir: ${carrier} | Resi/Order ID: ${waybillId}`,
+        });
+        await tx.update(orders).set({
+          status: 'shipped',
+          updatedAt: new Date().toISOString(),
+        }).where(eq(orders.id, id));
+      });
+
+      return c.json({ success: true, biteship_order_id: biteshipOrderId });
+    } catch (e: any) {
+      return c.json({ error: e.message || 'Internal error' }, 500);
+    }
+  },
+);
+
+adminOrdersRouter.post(
   '/:id/tracking-token',
   requirePermission('orders.write'),
   async (c) => {

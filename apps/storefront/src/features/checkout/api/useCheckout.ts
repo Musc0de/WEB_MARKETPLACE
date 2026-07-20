@@ -88,14 +88,24 @@ export function useCheckoutValidation() {
   return useSWRMutation(CHECKOUT_API, validateCheckout);
 }
 
-export function useShippingOptions(province?: string | null, city?: string | null) {
+export function useShippingOptions(
+  province?: string | null,
+  city?: string | null,
+  postalCode?: string | null,
+) {
   return useSWR<{ options: ShippingOption[] }>(
-    province && city ? [`${CHECKOUT_API}/shipping-options`, province, city] : null,
-    async ([url, p, c]) => {
+    province && city && postalCode
+      ? [`${CHECKOUT_API}/shipping-options`, province, city, postalCode]
+      : null,
+    async ([url, p, c, pc]) => {
       const res = await fetcher(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ destinationProvince: p, destinationCity: c }),
+        body: JSON.stringify({
+          destinationProvince: p,
+          destinationCity: c,
+          destinationPostalCode: pc,
+        }),
       });
       return res.data;
     },

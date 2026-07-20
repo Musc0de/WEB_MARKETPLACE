@@ -123,6 +123,16 @@ export function OrderDetail() {
     onError: () => toast.error('Gagal menambahkan shipment'),
   });
 
+  const requestBiteshipPickup = useMutation({
+    mutationFn: () => api.post(`/admin/orders/${id}/biteship-pickup`, {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'orders', id] });
+      toast.success('Berhasil request pickup ke Biteship');
+    },
+    onError: (err: any) =>
+      toast.error(err.response?.data?.error || 'Gagal request pickup Biteship'),
+  });
+
   // ── Loading / error states ─────────────────────────────────────────────────
   if (isLoading) {
     return (
@@ -575,6 +585,26 @@ export function OrderDetail() {
                     </>
                   )
                   : 'Terapkan Perubahan'}
+              </button>
+
+              <div className='relative flex items-center py-2'>
+                <div className='flex-grow border-t border-gray-200'></div>
+                <span className='flex-shrink-0 mx-4 text-gray-400 text-xs uppercase font-bold tracking-wider'>
+                  ATAU
+                </span>
+                <div className='flex-grow border-t border-gray-200'></div>
+              </div>
+
+              <button
+                type='button'
+                disabled={requestBiteshipPickup.isPending || !canUpdate}
+                onClick={() => requestBiteshipPickup.mutate()}
+                className='w-full py-2 rounded-lg text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2'
+              >
+                {requestBiteshipPickup.isPending
+                  ? <Loader2 className='w-4 h-4 animate-spin' />
+                  : <Truck className='w-4 h-4' />}
+                Request Pickup (Biteship)
               </button>
             </div>
           </SectionCard>

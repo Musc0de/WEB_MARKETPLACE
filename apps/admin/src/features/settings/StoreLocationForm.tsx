@@ -2,16 +2,19 @@ import { useEffect, useState } from 'react';
 import { client } from '../../lib/rpc.ts';
 import { goeyToast as toast } from 'goey-toast';
 import { Loader2, MapPin, Save } from 'lucide-react';
+import { VillageSearchModal } from './VillageSearchModal.tsx';
 
 export function StoreLocationForm() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const [isVillageSearchOpen, setIsVillageSearchOpen] = useState(false);
 
   const [address, setAddress] = useState({
     provinceId: '',
     cityId: '',
     districtId: '',
+    villageCode: '',
     postalCode: '',
     fullAddress: '',
   });
@@ -27,6 +30,7 @@ export function StoreLocationForm() {
             provinceId: json.data.storeOriginAddress.provinceId || '',
             cityId: json.data.storeOriginAddress.cityId || '',
             districtId: json.data.storeOriginAddress.districtId || '',
+            villageCode: json.data.storeOriginAddress.villageCode || '',
             postalCode: json.data.storeOriginAddress.postalCode || '',
             fullAddress: json.data.storeOriginAddress.fullAddress || '',
           });
@@ -150,6 +154,28 @@ export function StoreLocationForm() {
             />
           </div>
           <div>
+            <div className='flex justify-between items-center mb-1'>
+              <label className='block text-sm font-medium text-gray-700'>
+                Kode Desa/Kelurahan (10 Digit)
+              </label>
+              <button
+                type='button'
+                onClick={() => setIsVillageSearchOpen(true)}
+                className='text-[11px] font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 bg-indigo-50 px-2 py-0.5 rounded-md'
+              >
+                Cari Kode Desa
+              </button>
+            </div>
+            <input
+              type='text'
+              name='villageCode'
+              value={address.villageCode || ''}
+              onChange={handleChange}
+              placeholder='Contoh: 3172051003'
+              className={inputCls}
+            />
+          </div>
+          <div>
             <label className='block text-sm font-medium text-gray-700'>
               Kode Pos
             </label>
@@ -181,6 +207,19 @@ export function StoreLocationForm() {
           </div>
         </div>
       </div>
+
+      {isVillageSearchOpen && (
+        <VillageSearchModal
+          onClose={() => setIsVillageSearchOpen(false)}
+          onSelect={(code, name) => {
+            setAddress((prev) => ({ ...prev, villageCode: code }));
+            setIsDirty(true);
+            if (name) {
+              toast.success(`Kode desa berhasil diatur untuk: ${name}`);
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

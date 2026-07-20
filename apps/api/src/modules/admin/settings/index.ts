@@ -60,6 +60,7 @@ app.put(
         provinceId: z.string().optional(),
         cityId: z.string().optional(),
         districtId: z.string().optional(),
+        villageCode: z.string().optional(),
         postalCode: z.string().optional(),
         fullAddress: z.string().optional(),
         latitude: z.number().optional(),
@@ -115,6 +116,113 @@ app.put(
       meta: { request_id: c.get('requestId') },
       error: null,
     });
+  },
+);
+
+// Proxy endpoints for api.co.id (Cek Ongkir & Regional)
+app.get(
+  '/shipping/villages',
+  zValidator('query', z.object({ search: z.string() })),
+  async (c) => {
+    const { search } = c.req.valid('query');
+    const apiKey = Deno.env.get('APICOID_API_KEY');
+    const baseUrl = Deno.env.get('APICOID_API_URL');
+
+    if (!apiKey) {
+      return c.json({
+        error: { message: 'API Key not configured in environment' },
+        meta: { request_id: c.get('requestId') },
+        data: null,
+      }, 500);
+    }
+
+    try {
+      // 1. Coba cari berdasarkan nama Kelurahan/Desa terlebih dahulu
+      const villageRes = await fetch(
+        `${baseUrl}/regional/indonesia/villages?name=${encodeURIComponent(search)}`,
+        { headers: { 'x-api-co-id': apiKey } },
+      );
+      const villageData = await villageRes.json();
+      let results = villageData.data || villageData.result || [];
+
+      // 2. Jika tidak ada Kelurahan yang cocok, coba cari berdasarkan nama Kecamatan (District)
+      if (results.length === 0) {
+        const districtRes = await fetch(
+          `${baseUrl}/regional/indonesia/districts?name=${encodeURIComponent(search)}`,
+          { headers: { 'x-api-co-id': apiKey } },
+        );
+        const districtData = await districtRes.json();
+        const districts = districtData.data || districtData.result || [];
+
+        // 3. Jika ketemu kecamatannya, ambil daftar kelurahan/desa di kecamatan tersebut
+        if (districts.length > 0) {
+          const firstDistrict = districts[0];
+          const distVillagesRes = await fetch(
+            `${baseUrl}/regional/indonesia/districts/${firstDistrict.code}/villages`,
+            { headers: { 'x-api-co-id': apiKey } },
+          );
+          const distVillagesData = await distVillagesRes.json();
+          results = distVillagesData.data || distVillagesData.result || [];
+        }
+      }
+
+      return c.json({
+        data: {
+          is_success: true,
+          status: 'success',
+          result: results,
+        },
+        meta: { request_id: c.get('requestId') },
+        error: null,
+      });
+    } catch (e: any) {
+      return c.json({
+        error: { message: 'Failed to fetch regional data', details: e.message },
+        meta: { request_id: c.get('requestId') },
+        data: null,
+      }, 500);
+    }
+  },
+);
+
+app.get(
+  '/shipping/cost',
+  zValidator(
+    'query',
+    z.object({
+      origin_village_code: z.string(),
+      destination_village_code: z.string(),
+      weight: z.string(),
+    }),
+  ),
+  async (c) => {
+    const query = c.req.valid('query');
+    const apiKey = Deno.env.get('APICOID_API_KEY');
+    const baseUrl = Deno.env.get('APICOID_API_URL');
+
+    if (!apiKey) {
+      return c.json({
+        error: { message: 'API Key not configured in environment' },
+        meta: { request_id: c.get('requestId') },
+        data: null,
+      }, 500);
+    }
+
+    try {
+      const url =
+        `${baseUrl}/expedition/shipping-cost?origin_village_code=${query.origin_village_code}&destination_village_code=${query.destination_village_code}&weight=${query.weight}`;
+      const response = await fetch(url, {
+        headers: { 'x-api-co-id': apiKey },
+      });
+      const data = await response.json();
+      return c.json({ data, meta: { request_id: c.get('requestId') }, error: null });
+    } catch (e: any) {
+      return c.json({
+        error: { message: 'Failed to fetch shipping cost', details: e.message },
+        meta: { request_id: c.get('requestId') },
+        data: null,
+      }, 500);
+    }
   },
 );
 

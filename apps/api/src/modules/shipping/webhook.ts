@@ -1,89 +1,143 @@
 import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
-import { z } from 'zod';
 import { eq } from 'drizzle-orm';
-import { db, notifications, orders, shipmentEvents, shipments } from '@starsuperscare/database';
+import {
+  db,
+  notifications,
+  orders,
+  orderStatusHistory,
+  shipmentEvents,
+  shipments,
+} from '@starsuperscare/database';
 
 const app = new Hono();
 
-const WebhookSchema = z.object({
-  trackingNumber: z.string(),
-  eventId: z.string(),
-  status: z.enum(['in_transit', 'out_for_delivery', 'delivered', 'failed']),
-  location: z.string().optional(),
-  description: z.string(),
-  timestamp: z.string(), // ISO string
-});
+app.post('/:courier', async (c) => {
+  // Signature Validation (Biteship Dashboard: Headers Signature Key)
+  const signatureKey = process.env.COURIER_WEBHOOK_HEADER || 'x-biteship-signature';
+  const signature = c.req.header(signatureKey);
+  const secret = process.env.COURIER_WEBHOOK_SECRET;
 
-app.post('/:courier', zValidator('json', WebhookSchema), async (c) => {
-  const { courier } = c.req.param();
-  const payload = c.req.valid('json');
-
-  // VERY BASIC auth for webhook endpoint in a real scenario
-  // e.g., checking a shared secret header from the courier.
-  const signature = c.req.header('x-courier-signature');
-  if (
-    Deno.env.get('COURIER_WEBHOOK_SECRET') && signature !== Deno.env.get('COURIER_WEBHOOK_SECRET')
-  ) {
+  if (secret && signature !== secret) {
     return c.json({ error: { code: 'UNAUTHORIZED', message: 'Invalid signature' } }, 401);
+  }
+
+  let payload: any;
+  try {
+    payload = await c.req.json();
+  } catch (_e) {
+    return c.json({ error: 'Invalid JSON payload' }, 400);
   }
 
   try {
     await db.transaction(async (tx) => {
-      // Find shipment
-      const [shipment] = await tx
-        .select()
-        .from(shipments)
-        .where(eq(shipments.trackingNumber, payload.trackingNumber));
+      // 1. ORDER.WAYBILL_ID EVENT
+      if (payload.event === 'order.waybill_id') {
+        const orderId = payload.order_id;
+        const tracking = payload.courier_waybill_id || payload.courier_tracking_id;
 
-      if (!shipment || shipment.carrier !== courier) {
-        return; // Ignore silently to avoid leaking shipment existence
-      }
+        // Update shipments trackingNumber where trackingNumber was Biteship Order ID
+        const [shipment] = await tx.select().from(shipments).where(
+          eq(shipments.trackingNumber, orderId),
+        ).limit(1);
+        if (shipment) {
+          await tx.update(shipments).set({
+            trackingNumber: tracking,
+            updatedAt: new Date().toISOString(),
+          }).where(eq(shipments.id, shipment.id));
+        }
+      } // 2. ORDER.STATUS EVENT
+      else if (payload.event === 'order.status') {
+        const trackingId = payload.courier_waybill_id || payload.courier_tracking_id ||
+          payload.order_id;
+        let [shipment] = await tx.select().from(shipments).where(
+          eq(shipments.trackingNumber, trackingId),
+        ).limit(1);
 
-      // Idempotency check via externalEventId unique constraint handling,
-      // but let's check it manually just to be safe and avoid throwing constraint error
-      const [existingEvent] = await tx
-        .select({ id: shipmentEvents.id })
-        .from(shipmentEvents)
-        .where(eq(shipmentEvents.externalEventId, payload.eventId));
+        // Fallback: If waybill hasn't synced yet, try to find by Biteship order_id
+        if (!shipment && payload.order_id) {
+          [shipment] = await tx.select().from(shipments).where(
+            eq(shipments.trackingNumber, payload.order_id),
+          ).limit(1);
+        }
 
-      if (existingEvent) {
-        return; // Already processed
-      }
+        if (shipment) {
+          const statusMap: Record<string, string> = {
+            'confirmed': 'processing',
+            'allocated': 'processing',
+            'picking_up': 'processing',
+            'picked': 'shipped',
+            'dropping_off': 'in_transit',
+            'delivered': 'delivered',
+            'rejected': 'failed',
+            'cancelled': 'cancelled',
+          };
 
-      // Insert event
-      await tx.insert(shipmentEvents).values({
-        shipmentId: shipment.id,
-        externalEventId: payload.eventId,
-        status: payload.status,
-        location: payload.location || null,
-        description: payload.description,
-        eventTime: payload.timestamp,
-      });
+          const mappedStatus = statusMap[payload.status] || 'in_transit';
 
-      // Update shipment status if needed (very simplistic status hierarchy)
-      if (shipment.status !== 'delivered' && shipment.status !== 'failed') {
-        await tx.update(shipments)
-          .set({ status: payload.status, updatedAt: new Date().toISOString() })
-          .where(eq(shipments.id, shipment.id));
+          await tx.insert(shipmentEvents).values({
+            shipmentId: shipment.id,
+            externalEventId: `${payload.event}_${payload.status}_${Date.now()}`,
+            status: payload.status,
+            description: `Driver: ${payload.courier_driver_name || '-'} | Phone: ${
+              payload.courier_driver_phone || '-'
+            }`,
+            eventTime: new Date().toISOString(),
+          });
 
-        // If delivered, update order status and send notification
-        if (payload.status === 'delivered') {
-          await tx.update(orders)
-            .set({ status: 'delivered', updatedAt: new Date().toISOString() })
-            .where(eq(orders.id, shipment.orderId));
+          await tx.update(shipments).set({
+            status: mappedStatus,
+            updatedAt: new Date().toISOString(),
+          }).where(eq(shipments.id, shipment.id));
 
-          const [order] = await tx.select({ userId: orders.userId }).from(orders).where(
-            eq(orders.id, shipment.orderId),
-          );
+          if (mappedStatus !== 'in_transit' && mappedStatus !== 'processing') {
+            await tx.update(orders).set({
+              status: mappedStatus,
+              updatedAt: new Date().toISOString(),
+            }).where(eq(orders.id, shipment.orderId));
 
-          if (order.userId) {
-            await tx.insert(notifications).values({
-              userId: order.userId,
-              type: 'order_delivered',
-              title: 'Your order has been delivered!',
-              body: 'Your shipment has reached its destination.',
-              dataJson: { orderId: shipment.orderId },
+            await tx.insert(orderStatusHistory).values({
+              orderId: shipment.orderId,
+              status: mappedStatus,
+              note: `Status resi: ${payload.status} (via Biteship)`,
+            });
+
+            if (mappedStatus === 'delivered') {
+              const [order] = await tx.select({ userId: orders.userId }).from(orders).where(
+                eq(orders.id, shipment.orderId),
+              );
+              if (order.userId) {
+                await tx.insert(notifications).values({
+                  userId: order.userId,
+                  type: 'order_delivered',
+                  title: 'Paket telah sampai!',
+                  body: 'Pesanan Anda telah berhasil dikirimkan oleh kurir.',
+                  dataJson: { orderId: shipment.orderId },
+                });
+              }
+            }
+          }
+        }
+      } // 3. ORDER.PRICE EVENT
+      else if (payload.event === 'order.price') {
+        // Find order by trackingNumber which holds order_id initially
+        const [shipment] = await tx.select().from(shipments).where(
+          eq(shipments.trackingNumber, payload.order_id),
+        ).limit(1);
+        if (shipment) {
+          const [order] = await tx.select().from(orders).where(eq(orders.id, shipment.orderId))
+            .limit(1);
+          if (order) {
+            await tx.update(orders).set({
+              shippingAmount: payload.price,
+              totalAmount: order.subtotalAmount + payload.price - order.discountAmount +
+                order.taxAmount + order.serviceFeeAmount,
+              updatedAt: new Date().toISOString(),
+            }).where(eq(orders.id, order.id));
+
+            await tx.insert(orderStatusHistory).values({
+              orderId: order.id,
+              status: order.status,
+              note: `Perubahan ongkir aktual dari kurir: Rp${payload.price}`,
             });
           }
         }

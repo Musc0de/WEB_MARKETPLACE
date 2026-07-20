@@ -315,6 +315,7 @@ export function CheckoutPage() {
                 <ShippingOptions
                   province={address.province}
                   city={address.city}
+                  postalCode={address.postalCode}
                   selectedOptionId={shippingOptionId}
                   onSelect={setShippingOptionId}
                   onNext={() => setStep('review')}

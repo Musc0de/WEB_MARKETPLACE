@@ -5,15 +5,16 @@ import { Loader2 } from 'lucide-react';
 interface ShippingOptionsProps {
   province: string;
   city: string;
+  postalCode: string;
   selectedOptionId: string | null;
   onSelect: (optionId: string) => void;
   onNext: () => void;
 }
 
 export function ShippingOptions(
-  { province, city, selectedOptionId, onSelect, onNext }: ShippingOptionsProps,
+  { province, city, postalCode, selectedOptionId, onSelect, onNext }: ShippingOptionsProps,
 ) {
-  const { data, isLoading } = useShippingOptions(province, city);
+  const { data, isLoading } = useShippingOptions(province, city, postalCode);
 
   if (isLoading) {
     return (

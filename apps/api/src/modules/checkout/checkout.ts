@@ -57,14 +57,115 @@ const MOCK_SHIPPING_OPTIONS = [
 checkoutRouter.post(
   '/shipping-options',
   zValidator('json', GetShippingOptionsRequestSchema),
-  (c) => {
-    // In a real app, this would call an external logistics API (e.g. RajaOngkir)
-    // based on the provided destinationProvince/destinationCity.
-    return c.json({
-      data: { options: MOCK_SHIPPING_OPTIONS },
-      meta: { request_id: c.get('requestId') },
-      error: null,
-    });
+  async (c) => {
+    const { destinationPostalCode } = c.req.valid('json');
+    if (!destinationPostalCode) {
+      return c.json({
+        data: { options: [] },
+        meta: { request_id: c.get('requestId') },
+        error: null,
+      });
+    }
+
+    const { cartId } = await resolveActiveCart(c, false);
+    if (!cartId) {
+      return c.json({
+        data: { options: [] },
+        meta: { request_id: c.get('requestId') },
+        error: null,
+      });
+    }
+
+    // Fetch items to calculate weight
+    const items = await db.select({
+      quantity: cartItems.quantity,
+      price: productVariants.price,
+      productName: products.name,
+      weight: sql<number>`COALESCE(${productVariants.weight}, 1000)`.mapWith(Number),
+    })
+      .from(cartItems)
+      .innerJoin(productVariants, eq(cartItems.variantId, productVariants.id))
+      .innerJoin(products, eq(productVariants.productId, products.id))
+      .where(and(eq(cartItems.cartId, cartId), eq(cartItems.saveForLater, 0)));
+
+    if (items.length === 0) {
+      return c.json({
+        data: { options: [] },
+        meta: { request_id: c.get('requestId') },
+        error: null,
+      });
+    }
+
+    const biteshipItems = items.map((item) => ({
+      name: item.productName,
+      value: item.price,
+      weight: item.weight,
+      quantity: item.quantity,
+    }));
+
+    // Fetch origin postal code from settings (simulated or env for now, ideally from DB).
+    // Wait, let's fetch it from store_settings table if it exists, or just fallback to env if we need.
+    // Let's assume the store origin postal code is hardcoded or fetched. I will fetch it from env or default to something to avoid breaking,
+    // actually, let's try to query store settings.
+
+    // For now, I'll put a default fallback because store settings might not be easily queryable if it's dynamic JSON.
+    const originPostalCode = process.env.STORE_ORIGIN_POSTAL_CODE || 51118; // Default to user's Pekalongan postal code from previous tests
+
+    const biteshipApiKey = process.env.BITESHIP_API_KEY;
+    if (!biteshipApiKey) {
+      return c.json({
+        data: { options: [] },
+        meta: { request_id: c.get('requestId') },
+        error: null,
+      });
+    }
+
+    try {
+      const response = await fetch('https://api.biteship.com/v1/rates/couriers', {
+        method: 'POST',
+        headers: {
+          'Authorization': biteshipApiKey,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          origin_postal_code: Number(originPostalCode),
+          destination_postal_code: Number(destinationPostalCode),
+          couriers: 'jne,sicepat,jnt,pos',
+          items: biteshipItems,
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        console.error('Biteship error:', result);
+        return c.json({
+          data: { options: [] },
+          meta: { request_id: c.get('requestId') },
+          error: null,
+        });
+      }
+
+      const options = result.pricing.map((p: any) => ({
+        id: `${p.company}_${p.type}`,
+        name: `${p.courier_name} ${p.courier_service_name}`,
+        description: p.description,
+        cost: p.price,
+        estimatedDays: p.shipment_duration_range || p.shipment_duration_time,
+      }));
+
+      return c.json({
+        data: { options },
+        meta: { request_id: c.get('requestId') },
+        error: null,
+      });
+    } catch (e) {
+      console.error('Failed to fetch shipping rates', e);
+      return c.json({
+        data: { options: [] },
+        meta: { request_id: c.get('requestId') },
+        error: null,
+      });
+    }
   },
 );
 

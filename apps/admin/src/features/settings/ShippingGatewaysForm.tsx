@@ -2,18 +2,22 @@ import { useEffect, useState } from 'react';
 import { client } from '../../lib/rpc.ts';
 import { goeyToast as toast } from 'goey-toast';
 import { Box, Loader2, Save } from 'lucide-react';
+import { ApiCoidTestWidget } from './ApiCoidTestWidget.tsx';
 
 const PROVIDERS = [
   { id: 'biteship', name: 'Biteship (Rekomendasi - Resi & Pickup Otomatis)' },
   { id: 'rajaongkir', name: 'RajaOngkir (Cek Tarif Saja)' },
   { id: 'shipper', name: 'Shipper (Biteship Alternative)' },
+  { id: 'apicoid', name: 'Api Cek Ongkos Kirim (api.co.id)' },
 ];
 
 export function ShippingGatewaysForm() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [activeGateway, setActiveGateway] = useState<string>('none');
-  const [configs, setConfigs] = useState<Record<string, { mode: 'sandbox' | 'production' }>>({});
+  const [configs, setConfigs] = useState<
+    Record<string, { mode: 'sandbox' | 'production'; config?: any }>
+  >({});
   const [isDirty, setIsDirty] = useState(false);
 
   const loadSettings = async () => {
@@ -218,6 +222,8 @@ export function ShippingGatewaysForm() {
           );
         })}
       </div>
+
+      {activeGateway === 'apicoid' && <ApiCoidTestWidget />}
     </div>
   );
 }

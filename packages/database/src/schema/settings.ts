@@ -18,6 +18,7 @@ export const globalSettings = pgTable('sss_global_settings', {
     provinceId?: string;
     cityId?: string;
     districtId?: string;
+    villageCode?: string;
     postalCode?: string;
     fullAddress?: string;
     latitude?: number;
