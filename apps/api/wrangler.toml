@@ -1,0 +1,14 @@
+name = "web-marketplace-api"
+main = "src/main.ts"
+compatibility_date = "2024-03-20"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# Variabel yang aman (TIDAK BERSIFAT RAHASIA) bisa ditulis langsung di sini:
+# PORT = "8000"
+# VITE_STOREFRONT_URL = "https://starsuperscare.net"
+
+# PERHATIAN: JANGAN PERNAH menaruh secret (seperti DATABASE_URL, JWT_SECRET, dll) di file ini!
+# Untuk secret, gunakan perintah CLI Cloudflare:
+# npx wrangler secret put DATABASE_URL
+# npx wrangler secret put JWT_SECRET
