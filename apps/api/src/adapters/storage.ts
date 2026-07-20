@@ -31,7 +31,7 @@ export class CloudflareR2Adapter implements StoragePort {
     this.bucketName =
       (typeof Deno !== 'undefined'
         ? Deno.env.get('R2_BUCKET_NAME')
-        : process?.env?.['R2_BUCKET_NAME']) || 'imagesprivate';
+        : process?.env?.['R2_BUCKET_NAME']) || '';
     this.publicUrlBase =
       (typeof Deno !== 'undefined'
         ? Deno.env.get('R2_PUBLIC_URL')
