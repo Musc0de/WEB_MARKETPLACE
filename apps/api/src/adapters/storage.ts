@@ -19,11 +19,23 @@ export class CloudflareR2Adapter implements StoragePort {
   private publicUrlBase: string;
 
   constructor() {
-    const accountId = Deno.env.get('R2_ACCOUNT_ID');
-    const accessKeyId = Deno.env.get('R2_ACCESS_KEY_ID');
-    const secretAccessKey = Deno.env.get('R2_SECRET_ACCESS_KEY');
-    this.bucketName = Deno.env.get('R2_BUCKET_NAME') || 'imagesprivate';
-    this.publicUrlBase = Deno.env.get('R2_PUBLIC_URL') || '';
+    const accountId = typeof Deno !== 'undefined'
+      ? Deno.env.get('R2_ACCOUNT_ID')
+      : process?.env?.['R2_ACCOUNT_ID'];
+    const accessKeyId = typeof Deno !== 'undefined'
+      ? Deno.env.get('R2_ACCESS_KEY_ID')
+      : process?.env?.['R2_ACCESS_KEY_ID'];
+    const secretAccessKey = typeof Deno !== 'undefined'
+      ? Deno.env.get('R2_SECRET_ACCESS_KEY')
+      : process?.env?.['R2_SECRET_ACCESS_KEY'];
+    this.bucketName =
+      (typeof Deno !== 'undefined'
+        ? Deno.env.get('R2_BUCKET_NAME')
+        : process?.env?.['R2_BUCKET_NAME']) || 'imagesprivate';
+    this.publicUrlBase =
+      (typeof Deno !== 'undefined'
+        ? Deno.env.get('R2_PUBLIC_URL')
+        : process?.env?.['R2_PUBLIC_URL']) || '';
 
     if (!accountId || !accessKeyId || !secretAccessKey) {
       throw new Error('Cloudflare R2 credentials missing in environment variables');

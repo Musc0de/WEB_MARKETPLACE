@@ -44,7 +44,9 @@ function isExempt(path: string): boolean {
   return false;
 }
 
-const storefrontUrl = Deno.env.get('VITE_STOREFRONT_URL');
+const storefrontUrl = typeof Deno !== 'undefined'
+  ? Deno.env.get('VITE_STOREFRONT_URL')
+  : process?.env?.['VITE_STOREFRONT_URL'];
 
 const GENERIC_404_HTML = `<!DOCTYPE html>
 <html lang="id">

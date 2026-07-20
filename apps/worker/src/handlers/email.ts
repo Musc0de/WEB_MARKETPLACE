@@ -93,7 +93,9 @@ export async function handleEmailSend(payload: any, eventId: string) {
 
 export async function handleEmailVerificationRequested(payload: any, _eventId: string) {
   const { email, token, customerName } = payload;
-  const authUrl = Deno.env.get('VITE_AUTH_URL');
+  const authUrl = typeof Deno !== 'undefined'
+    ? Deno.env.get('VITE_AUTH_URL')
+    : process?.env?.['VITE_AUTH_URL'];
   if (!authUrl) throw new Error('VITE_AUTH_URL is missing in environment variables');
 
   const verificationUrl = `${authUrl}/verify-email?token=${encodeURIComponent(token)}`;
@@ -103,7 +105,9 @@ export async function handleEmailVerificationRequested(payload: any, _eventId: s
     customerName,
   });
 
-  const from = Deno.env.get('SMTP_FROM');
+  const from = typeof Deno !== 'undefined'
+    ? Deno.env.get('SMTP_FROM')
+    : process?.env?.['SMTP_FROM'];
   if (!from) throw new Error('SMTP_FROM is missing in environment variables');
 
   await emailProvider.send({
@@ -117,14 +121,18 @@ export async function handleEmailVerificationRequested(payload: any, _eventId: s
 
 export async function handlePasswordResetRequested(payload: any, _eventId: string) {
   const { email, token } = payload;
-  const authUrl = Deno.env.get('VITE_AUTH_URL');
+  const authUrl = typeof Deno !== 'undefined'
+    ? Deno.env.get('VITE_AUTH_URL')
+    : process?.env?.['VITE_AUTH_URL'];
   if (!authUrl) throw new Error('VITE_AUTH_URL is missing in environment variables');
 
   const resetUrl = `${authUrl}/reset-password?token=${encodeURIComponent(token)}`;
 
   const rendered = templates.resetPassword(resetUrl);
 
-  const from = Deno.env.get('SMTP_FROM');
+  const from = typeof Deno !== 'undefined'
+    ? Deno.env.get('SMTP_FROM')
+    : process?.env?.['SMTP_FROM'];
   if (!from) throw new Error('SMTP_FROM is missing in environment variables');
 
   await emailProvider.send({

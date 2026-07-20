@@ -5,7 +5,7 @@ import * as schema from './schema/index.ts';
 
 const connectionString =
   (typeof Deno !== 'undefined'
-    ? Deno.env.get('DATABASE_URL')
+    ? (typeof Deno !== 'undefined' ? Deno.env.get('DATABASE_URL') : process?.env?.['DATABASE_URL'])
     : process?.env?.DATABASE_URL) as string;
 
 if (!connectionString) {

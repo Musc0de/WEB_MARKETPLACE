@@ -8,11 +8,23 @@ export class R2StorageProvider implements ObjectStorageProvider {
   private publicUrl: string;
 
   constructor() {
-    const accountId = Deno.env.get('R2_ACCOUNT_ID_3');
-    const accessKeyId = Deno.env.get('R2_ACCESS_KEY_ID_3');
-    const secretAccessKey = Deno.env.get('R2_SECRET_ACCESS_KEY_3');
-    this.bucket = Deno.env.get('R2_BUCKET_NAME_3') || 'bannerimgcampaign';
-    this.publicUrl = Deno.env.get('R2_PUBLIC_URL_3') || 'https://pub-.r2.dev';
+    const accountId = typeof Deno !== 'undefined'
+      ? Deno.env.get('R2_ACCOUNT_ID_3')
+      : process?.env?.['R2_ACCOUNT_ID_3'];
+    const accessKeyId = typeof Deno !== 'undefined'
+      ? Deno.env.get('R2_ACCESS_KEY_ID_3')
+      : process?.env?.['R2_ACCESS_KEY_ID_3'];
+    const secretAccessKey = typeof Deno !== 'undefined'
+      ? Deno.env.get('R2_SECRET_ACCESS_KEY_3')
+      : process?.env?.['R2_SECRET_ACCESS_KEY_3'];
+    this.bucket =
+      (typeof Deno !== 'undefined'
+        ? Deno.env.get('R2_BUCKET_NAME_3')
+        : process?.env?.['R2_BUCKET_NAME_3']) || 'bannerimgcampaign';
+    this.publicUrl =
+      (typeof Deno !== 'undefined'
+        ? Deno.env.get('R2_PUBLIC_URL_3')
+        : process?.env?.['R2_PUBLIC_URL_3']) || 'https://pub-.r2.dev';
 
     if (!accountId || !accessKeyId || !secretAccessKey) {
       console.warn('R2 credentials not fully provided. Storage might fail.');

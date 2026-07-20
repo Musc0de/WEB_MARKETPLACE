@@ -5,7 +5,9 @@ const RedisClass = RedisNamed || RedisDefault;
 const getRedisUrl = (): string => {
   try {
     if (typeof Deno !== 'undefined' && Deno.env) {
-      return Deno.env.get('REDIS_URL') || '';
+      return (typeof Deno !== 'undefined'
+        ? Deno.env.get('REDIS_URL')
+        : process?.env?.['REDIS_URL']) || '';
     }
   } catch (_e) {
     // Ignore error

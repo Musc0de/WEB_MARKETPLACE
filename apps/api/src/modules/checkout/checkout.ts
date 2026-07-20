@@ -465,7 +465,9 @@ checkoutRouter.post('/orders', zValidator('json', CreateOrderRequestSchema), asy
   }
 
   const grandTotal = Math.max(0, subtotal - totalDiscount) + shippingCost;
-  const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const randomStr = Math.random().toString(10).substring(2, 7).toUpperCase();
+  const orderNumber = `ORD-IN-CO-${dateStr}-${randomStr}`;
 
   // Start Transaction for Reservation & Order Creation
   try {

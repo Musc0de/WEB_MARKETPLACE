@@ -31,7 +31,9 @@ export async function withTransaction<T>(
   }
 
   // Fallback if transaction is not supported by current neon HTTP driver
-  if (Deno.env.get('NODE_ENV') !== 'test') {
+  if (
+    (typeof Deno !== 'undefined' ? Deno.env.get('NODE_ENV') : process?.env?.['NODE_ENV']) !== 'test'
+  ) {
     console.warn(
       '⚠️ Warning: Transactions might not be strictly ACID with Neon HTTP driver without WebSocket pool.',
     );

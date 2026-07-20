@@ -17,7 +17,11 @@ export async function computeSha256(input: string): Promise<string> {
 import * as nodeCrypto from 'node:crypto';
 
 // Use JWT_SECRET or fallback key for encryption if ENCRYPTION_KEY is not defined
-const ENCRYPTION_KEY = Deno.env.get('ENCRYPTION_KEY') || Deno.env.get('JWT_SECRET') || '';
+const ENCRYPTION_KEY =
+  (typeof Deno !== 'undefined'
+    ? Deno.env.get('ENCRYPTION_KEY')
+    : process?.env?.['ENCRYPTION_KEY']) ||
+  (typeof Deno !== 'undefined' ? Deno.env.get('JWT_SECRET') : process?.env?.['JWT_SECRET']) || '';
 
 // Ensure the key is exactly 32 bytes for AES-256
 function getEncryptionKey(): Buffer {

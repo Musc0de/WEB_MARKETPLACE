@@ -137,7 +137,9 @@ adminOrdersRouter.get('/:id', async (c) => {
 
   // Fetch primary image for each unique product
   const uniqueProductIds = [...new Set(rawItems.map((i) => i.productId))];
-  const r2Base = Deno.env.get('R2_PUBLIC_URL') || '';
+  const r2Base = (typeof Deno !== 'undefined'
+    ? Deno.env.get('R2_PUBLIC_URL')
+    : process?.env?.['R2_PUBLIC_URL']) || '';
   const imageRows = uniqueProductIds.length > 0
     ? await db
       .select({

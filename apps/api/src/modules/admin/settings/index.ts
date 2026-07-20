@@ -125,8 +125,12 @@ app.get(
   zValidator('query', z.object({ search: z.string() })),
   async (c) => {
     const { search } = c.req.valid('query');
-    const apiKey = Deno.env.get('APICOID_API_KEY');
-    const baseUrl = Deno.env.get('APICOID_API_URL');
+    const apiKey = typeof Deno !== 'undefined'
+      ? Deno.env.get('APICOID_API_KEY')
+      : process?.env?.['APICOID_API_KEY'];
+    const baseUrl = typeof Deno !== 'undefined'
+      ? Deno.env.get('APICOID_API_URL')
+      : process?.env?.['APICOID_API_URL'];
 
     if (!apiKey) {
       return c.json({
@@ -197,8 +201,12 @@ app.get(
   ),
   async (c) => {
     const query = c.req.valid('query');
-    const apiKey = Deno.env.get('APICOID_API_KEY');
-    const baseUrl = Deno.env.get('APICOID_API_URL');
+    const apiKey = typeof Deno !== 'undefined'
+      ? Deno.env.get('APICOID_API_KEY')
+      : process?.env?.['APICOID_API_KEY'];
+    const baseUrl = typeof Deno !== 'undefined'
+      ? Deno.env.get('APICOID_API_URL')
+      : process?.env?.['APICOID_API_URL'];
 
     if (!apiKey) {
       return c.json({

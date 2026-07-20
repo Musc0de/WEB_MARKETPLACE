@@ -88,7 +88,9 @@ app.get('/:token', async (c) => {
   }
 
   const externalApiUrl = process.env.EXTERNAL_TRACKING_API_URL ||
-    Deno.env.get('EXTERNAL_TRACKING_API_URL');
+    (typeof Deno !== 'undefined'
+      ? Deno.env.get('EXTERNAL_TRACKING_API_URL')
+      : process?.env?.['EXTERNAL_TRACKING_API_URL']);
   let events: any[] = [];
 
   let externalEvents = false;

@@ -64,8 +64,12 @@ app.get('/tickets/:id', async (c) => {
     : [];
 
   // Reconstruct publicUrl per attachment
-  const r2PubUrl = (Deno.env.get('R2_SUPPORT_PUBLIC_URL') ?? '').replace(/\/$/, '');
-  const apiUrl = Deno.env.get('VITE_API_URL') ?? '';
+  const r2PubUrl = ((typeof Deno !== 'undefined'
+    ? Deno.env.get('R2_SUPPORT_PUBLIC_URL')
+    : process?.env?.['R2_SUPPORT_PUBLIC_URL']) ?? '').replace(/\/$/, '');
+  const apiUrl =
+    (typeof Deno !== 'undefined' ? Deno.env.get('VITE_API_URL') : process?.env?.['VITE_API_URL']) ??
+      '';
   const localBase = `${apiUrl}/storage`;
 
   const messagesWithAttachments = messages.map((msg) => ({
@@ -77,7 +81,9 @@ app.get('/tickets/:id', async (c) => {
       ? 'admin'
       : 'user',
     attachments: attachmentsList
-      .filter((a) => a.referenceId === msg.id)
+      .filter((a) =>
+        a.referenceId === msg.id
+      )
       .map((a) => ({
         ...a,
         publicUrl: (r2PubUrl && a.objectKey?.startsWith('img/'))

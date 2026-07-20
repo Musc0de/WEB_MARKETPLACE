@@ -66,14 +66,19 @@ const __dirname = import.meta.dirname || '';
 // __dirname is packages/storage/src
 const WORKSPACE_ROOT = path.resolve(__dirname, '../../..');
 const MOCK_STORAGE_DIR = path.join(WORKSPACE_ROOT, 'data', 'storage');
-const API_BASE_URL = Deno.env.get('VITE_API_URL') || Deno.env.get('API_URL');
+const API_BASE_URL =
+  (typeof Deno !== 'undefined' ? Deno.env.get('VITE_API_URL') : process?.env?.['VITE_API_URL']) ||
+  (typeof Deno !== 'undefined' ? Deno.env.get('API_URL') : process?.env?.['API_URL']);
 if (!API_BASE_URL) throw new Error('VITE_API_URL is missing in environment variables');
 
 import { R2StorageProvider } from './r2.ts';
 
 /** Default storage instance */
-export const storage: ObjectStorageProvider = Deno.env.get('R2_ACCOUNT_ID_3')
-  ? new R2StorageProvider()
-  : new LocalStorageProvider(MOCK_STORAGE_DIR, API_BASE_URL);
+export const storage: ObjectStorageProvider =
+  (typeof Deno !== 'undefined'
+      ? Deno.env.get('R2_ACCOUNT_ID_3')
+      : process?.env?.['R2_ACCOUNT_ID_3'])
+    ? new R2StorageProvider()
+    : new LocalStorageProvider(MOCK_STORAGE_DIR, API_BASE_URL);
 
 export { R2StorageProvider };

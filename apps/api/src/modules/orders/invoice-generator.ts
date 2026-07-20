@@ -11,9 +11,15 @@ import { PDFDocument, rgb, StandardFonts } from 'npm:pdf-lib@1.17.1';
 // Uses the SECOND R2 account dedicated for invoice PDFs.
 
 function buildInvoiceR2Client(): S3Client {
-  const accountId = Deno.env.get('R2_ACCOUNT_ID_2');
-  const accessKeyId = Deno.env.get('R2_ACCESS_KEY_ID_2');
-  const secretAccessKey = Deno.env.get('R2_SECRET_ACCESS_KEY_2');
+  const accountId = typeof Deno !== 'undefined'
+    ? Deno.env.get('R2_ACCOUNT_ID_2')
+    : process?.env?.['R2_ACCOUNT_ID_2'];
+  const accessKeyId = typeof Deno !== 'undefined'
+    ? Deno.env.get('R2_ACCESS_KEY_ID_2')
+    : process?.env?.['R2_ACCESS_KEY_ID_2'];
+  const secretAccessKey = typeof Deno !== 'undefined'
+    ? Deno.env.get('R2_SECRET_ACCESS_KEY_2')
+    : process?.env?.['R2_SECRET_ACCESS_KEY_2'];
   if (!accountId || !accessKeyId || !secretAccessKey) {
     throw new Error(
       'R2 Invoice credentials (R2_ACCOUNT_ID_2 / R2_ACCESS_KEY_ID_2 / R2_SECRET_ACCESS_KEY_2) not configured',
@@ -630,7 +636,10 @@ export async function uploadInvoicePDF(
   objectKey: string,
 ): Promise<void> {
   const client = buildInvoiceR2Client();
-  const bucket = Deno.env.get('R2_BUCKET_NAME_2') ?? '';
+  const bucket =
+    (typeof Deno !== 'undefined'
+      ? Deno.env.get('R2_BUCKET_NAME_2')
+      : process?.env?.['R2_BUCKET_NAME_2']) ?? '';
 
   const cmd = new PutObjectCommand({
     Bucket: bucket,
@@ -647,7 +656,10 @@ export async function uploadInvoicePDF(
 
 export async function getInvoiceSignedUrl(objectKey: string): Promise<string> {
   const client = buildInvoiceR2Client();
-  const bucket = Deno.env.get('R2_BUCKET_NAME_2') ?? '';
+  const bucket =
+    (typeof Deno !== 'undefined'
+      ? Deno.env.get('R2_BUCKET_NAME_2')
+      : process?.env?.['R2_BUCKET_NAME_2']) ?? '';
 
   const command = new GetObjectCommand({
     Bucket: bucket,
@@ -662,7 +674,10 @@ export async function getInvoiceSignedUrl(objectKey: string): Promise<string> {
 
 export async function deleteInvoicePDF(objectKey: string): Promise<void> {
   const client = buildInvoiceR2Client();
-  const bucket = Deno.env.get('R2_BUCKET_NAME_2') ?? '';
+  const bucket =
+    (typeof Deno !== 'undefined'
+      ? Deno.env.get('R2_BUCKET_NAME_2')
+      : process?.env?.['R2_BUCKET_NAME_2']) ?? '';
 
   const cmd = new DeleteObjectCommand({
     Bucket: bucket,

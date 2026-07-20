@@ -56,8 +56,12 @@ const routes = app.post(
     const objectKey = `refunds/${uniqueName}`;
 
     // Read directly from env as requested without hardcoded fallback
-    const bucket = Deno.env.get('R2_PROFF_IMAGE');
-    const publicUrlBase = Deno.env.get('R2_PROFF_IMAGE_PUBLIC_URL');
+    const bucket = typeof Deno !== 'undefined'
+      ? Deno.env.get('R2_PROFF_IMAGE')
+      : process?.env?.['R2_PROFF_IMAGE'];
+    const publicUrlBase = typeof Deno !== 'undefined'
+      ? Deno.env.get('R2_PROFF_IMAGE_PUBLIC_URL')
+      : process?.env?.['R2_PROFF_IMAGE_PUBLIC_URL'];
 
     if (!bucket || !publicUrlBase) {
       return c.json({ error: 'R2 proof bucket config missing in environment' }, 500);

@@ -56,12 +56,27 @@ type AppContext = {
 /** Read R2 support config from env at call-time (not module init) */
 function getR2Config() {
   return {
-    accountId: Deno.env.get('R2_ACCOUNT_ID') ?? '',
-    accessKeyId: Deno.env.get('R2_ACCESS_KEY_ID') ?? '',
-    secretAccessKey: Deno.env.get('R2_SECRET_ACCESS_KEY') ?? '',
-    bucket: Deno.env.get('R2_SUPPORT_BUCKET_NAME') ?? 'supportclient',
+    accountId:
+      (typeof Deno !== 'undefined'
+        ? Deno.env.get('R2_ACCOUNT_ID')
+        : process?.env?.['R2_ACCOUNT_ID']) ?? '',
+    accessKeyId:
+      (typeof Deno !== 'undefined'
+        ? Deno.env.get('R2_ACCESS_KEY_ID')
+        : process?.env?.['R2_ACCESS_KEY_ID']) ?? '',
+    secretAccessKey:
+      (typeof Deno !== 'undefined'
+        ? Deno.env.get('R2_SECRET_ACCESS_KEY')
+        : process?.env?.['R2_SECRET_ACCESS_KEY']) ?? '',
+    bucket:
+      (typeof Deno !== 'undefined'
+        ? Deno.env.get('R2_SUPPORT_BUCKET_NAME')
+        : process?.env?.['R2_SUPPORT_BUCKET_NAME']) ?? 'supportclient',
     /** Set to pub-xxx.r2.dev if bucket is public CDN. Leave empty → use API proxy. */
-    publicCdnUrl: (Deno.env.get('R2_SUPPORT_PUBLIC_URL') ?? '').replace(/\/$/, ''),
+    publicCdnUrl:
+      ((typeof Deno !== 'undefined'
+        ? Deno.env.get('R2_SUPPORT_PUBLIC_URL')
+        : process?.env?.['R2_SUPPORT_PUBLIC_URL']) ?? '').replace(/\/$/, ''),
   };
 }
 
@@ -137,7 +152,10 @@ async function buildSigV4Headers(
  * - Otherwise → /v1/support/images/* (API proxy, authenticated via SigV4).
  */
 function buildPublicUrl(objectKey: string): string {
-  const cdn = (Deno.env.get('R2_SUPPORT_PUBLIC_URL') ?? '').replace(/\/$/, '');
+  const cdn =
+    ((typeof Deno !== 'undefined'
+      ? Deno.env.get('R2_SUPPORT_PUBLIC_URL')
+      : process?.env?.['R2_SUPPORT_PUBLIC_URL']) ?? '').replace(/\/$/, '');
   if (cdn && !cdn.includes('r2.cloudflarestorage.com')) {
     return `${cdn}/${objectKey}`;
   }

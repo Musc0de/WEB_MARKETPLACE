@@ -143,10 +143,14 @@ const routes = app
 
         // Build full public URLs using server-side R2_PUBLIC_URL env var
         // This is built on the server so the frontend never needs R2 config
-        const r2BaseUrl = Deno.env.get('R2_PUBLIC_URL') || '';
+        const r2BaseUrl = (typeof Deno !== 'undefined'
+          ? Deno.env.get('R2_PUBLIC_URL')
+          : process?.env?.['R2_PUBLIC_URL']) || '';
         const imageMap: Record<string, string[]> = {};
         for (const img of imageRows) {
-          if (!imageMap[img.productId]) imageMap[img.productId] = [];
+          if (!imageMap[img.productId]) {
+            imageMap[img.productId] = [];
+          }
           // Build the full CDN URL on the server side
           imageMap[img.productId].push(`${r2BaseUrl}/${img.objectKey}`);
         }
@@ -316,7 +320,9 @@ const routes = app
 
     // Fetch primary image for each unique product
     const uniqueProductIds = [...new Set(rawItems.map((i) => i.productId))];
-    const r2Base = Deno.env.get('R2_PUBLIC_URL') || '';
+    const r2Base = (typeof Deno !== 'undefined'
+      ? Deno.env.get('R2_PUBLIC_URL')
+      : process?.env?.['R2_PUBLIC_URL']) || '';
     const imageRows = uniqueProductIds.length > 0
       ? await db
         .select({
@@ -433,7 +439,9 @@ const routes = app
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
-    const activeReturn = orderReturns.find((r) => r.orderId === order.id);
+    const activeReturn = orderReturns.find((r) =>
+      r.orderId === order.id
+    );
     if (activeReturn) {
       order.status = activeReturn.status === 'resolved'
         ? 'refunded'
@@ -526,7 +534,9 @@ const routes = app
         }
         await db.delete(invoices).where(eq(invoices.id, existingInvoice.id));
       } else {
-        const publicUrlBase = Deno.env.get('R2_PUBLIC_URL_2') || '';
+        const publicUrlBase = (typeof Deno !== 'undefined'
+          ? Deno.env.get('R2_PUBLIC_URL_2')
+          : process?.env?.['R2_PUBLIC_URL_2']) || '';
         const publicUrl = `${publicUrlBase}/${existingInvoice.pdfObjectKey}`;
         return c.redirect(publicUrl, 302);
       }
@@ -659,7 +669,9 @@ const routes = app
 
     // 9. Upload ke R2 invoice bucket (private)
     await uploadInvoicePDF(pdfBytes, objectKey);
-    const publicUrlBase = Deno.env.get('R2_PUBLIC_URL_2') || '';
+    const publicUrlBase = (typeof Deno !== 'undefined'
+      ? Deno.env.get('R2_PUBLIC_URL_2')
+      : process?.env?.['R2_PUBLIC_URL_2']) || '';
     const publicUrl = `${publicUrlBase}/${objectKey}`;
 
     // 10. Simpan record ke tabel invoices (untuk idempoten: generate sekali)

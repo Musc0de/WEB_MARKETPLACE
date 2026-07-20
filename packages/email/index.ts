@@ -53,23 +53,36 @@ export class MockEmailProvider implements EmailProvider {
 /** Default Email Provider instance */
 export let emailProvider: EmailProvider;
 
-if (Deno.env.get('SMTP_HOST')) {
+if ((typeof Deno !== 'undefined' ? Deno.env.get('SMTP_HOST') : process?.env?.['SMTP_HOST'])) {
   class SmtpEmailProvider implements EmailProvider {
     private transporter: nodemailer.Transporter;
     private from: string;
 
     constructor() {
       this.transporter = nodemailer.createTransport({
-        host: Deno.env.get('SMTP_HOST'),
-        port: parseInt(Deno.env.get('SMTP_PORT') || '587'),
-        secure: Deno.env.get('SMTP_SECURE') === 'true',
+        host: typeof Deno !== 'undefined' ? Deno.env.get('SMTP_HOST') : process?.env?.['SMTP_HOST'],
+        port: parseInt(
+          (typeof Deno !== 'undefined' ? Deno.env.get('SMTP_PORT') : process?.env?.['SMTP_PORT']) ||
+            '587',
+        ),
+        secure: (typeof Deno !== 'undefined'
+          ? Deno.env.get('SMTP_SECURE')
+          : process?.env?.['SMTP_SECURE']) === 'true',
         auth: {
-          user: Deno.env.get('SMTP_USER'),
-          pass: Deno.env.get('SMTP_PASS'),
+          user: typeof Deno !== 'undefined'
+            ? Deno.env.get('SMTP_USER')
+            : process?.env?.['SMTP_USER'],
+          pass: typeof Deno !== 'undefined'
+            ? Deno.env.get('SMTP_PASS')
+            : process?.env?.['SMTP_PASS'],
         },
       });
-      this.from = Deno.env.get('SMTP_FROM') as string;
-      if (!this.from) throw new Error('SMTP_FROM environment variable is required');
+      this.from = (typeof Deno !== 'undefined'
+        ? Deno.env.get('SMTP_FROM')
+        : process?.env?.['SMTP_FROM']) as string;
+      if (!this.from) {
+        throw new Error('SMTP_FROM environment variable is required');
+      }
     }
 
     async send(options: SendEmailOptions): Promise<string> {

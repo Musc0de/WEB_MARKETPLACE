@@ -10,7 +10,11 @@ import {
 } from '@starsuperscare/database';
 import { storageAdapter } from '../../../adapters/storage.ts';
 
-const RETURN_WINDOW_DAYS = Number(Deno.env.get('RETURN_WINDOW_DAYS') ?? 7);
+const RETURN_WINDOW_DAYS = Number(
+  (typeof Deno !== 'undefined'
+    ? Deno.env.get('RETURN_WINDOW_DAYS')
+    : process?.env?.['RETURN_WINDOW_DAYS']) ?? 7,
+);
 
 export interface EligibleReturnItem {
   orderItemId: string;

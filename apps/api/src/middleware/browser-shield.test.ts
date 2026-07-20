@@ -2,7 +2,7 @@ import { assertEquals } from '@std/assert';
 import { Hono } from 'hono';
 import { browserNavigationShield } from './browser-shield.ts';
 
-const apiUrl = Deno.env.get('VITE_API_URL') || '';
+const apiUrl = (typeof Deno !== 'undefined' ? Deno.env.get('VITE_API_URL') : process?.env?.['VITE_API_URL']) || '';
 
 Deno.test('Browser Navigation Shield Middleware', async (t) => {
   const app = new Hono();

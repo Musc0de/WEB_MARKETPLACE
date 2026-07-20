@@ -57,7 +57,10 @@ const app = new Hono<AppContext>();
 
 // Global Middlewares
 // Parse ALLOWED_ORIGINS
-const allowedOriginsStr = Deno.env.get('ALLOWED_ORIGINS') || '';
+const allowedOriginsStr =
+  (typeof Deno !== 'undefined'
+    ? Deno.env.get('ALLOWED_ORIGINS')
+    : process?.env?.['ALLOWED_ORIGINS']) || '';
 const allowedOrigins = allowedOriginsStr.split(',').map((o) => o.trim()).filter(Boolean);
 
 // Custom static file handler for /storage
