@@ -12,6 +12,21 @@ import {
 const app = new Hono();
 
 app.post('/:courier', async (c) => {
+  let payload: any = {};
+  try {
+    const text = await c.req.text();
+    if (text) {
+      payload = JSON.parse(text);
+    }
+  } catch (_e) {
+    // Ignore JSON parse errors for empty bodies
+  }
+
+  // Biteship verification ping sends empty body. We must return 200 OK.
+  if (Object.keys(payload).length === 0 || payload.event === 'ping') {
+    return c.json({ success: true, message: 'Webhook verified' }, 200);
+  }
+
   // Signature Validation (Biteship Dashboard: Headers Signature Key)
   const signatureKey = process.env.COURIER_WEBHOOK_HEADER || 'x-biteship-signature';
   const signature = c.req.header(signatureKey);
@@ -19,13 +34,6 @@ app.post('/:courier', async (c) => {
 
   if (secret && signature !== secret) {
     return c.json({ error: { code: 'UNAUTHORIZED', message: 'Invalid signature' } }, 401);
-  }
-
-  let payload: any;
-  try {
-    payload = await c.req.json();
-  } catch (_e) {
-    return c.json({ error: 'Invalid JSON payload' }, 400);
   }
 
   try {
