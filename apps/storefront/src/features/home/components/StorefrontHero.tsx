@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react';
-import { type CampaignBannerDTO } from '@starsuperscare/contracts';
-import { StorefrontPromoCard } from '../config/campaign-banner.types.ts';
+import useSWR from 'swr';
 import { SIDE_PROMOS } from '../config/heroCampaigns.ts';
 import { CampaignHeroCarousel } from './CampaignHeroCarousel.tsx';
 import { CampaignPromoCard } from './CampaignPromoCard.tsx';
@@ -8,26 +6,18 @@ import { CampaignPromoCard } from './CampaignPromoCard.tsx';
 import { Skeleton } from '@starsuperscare/ui';
 
 export function StorefrontHero() {
-  const [campaigns, setCampaigns] = useState<CampaignBannerDTO[]>([]);
-  const [sidePromos, setSidePromos] = useState<StorefrontPromoCard[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data, isLoading } = useSWR(
+    'campaigns-hero',
+    async () => {
+      const res = await fetch(`${(import.meta as any).env.VITE_API_URL}/v1/settings/campaigns`);
+      const json = await res.json();
+      return json.data || [];
+    },
+    { dedupingInterval: 30000, revalidateOnFocus: false },
+  );
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch(`${(import.meta as any).env.VITE_API_URL}/v1/settings/campaigns`);
-        const json = await res.json();
-        setCampaigns(json.data || []);
-      } catch (err) {
-        console.error('Failed to load campaigns:', err);
-        // Fallback to empty if fails
-      } finally {
-        setSidePromos(SIDE_PROMOS.slice(0, 2));
-        setIsLoading(false);
-      }
-    }
-    load();
-  }, []);
+  const campaigns = data || [];
+  const sidePromos = SIDE_PROMOS.slice(0, 2);
 
   if (isLoading) {
     return (

@@ -6,24 +6,30 @@ interface SEOProps {
   appId?: string;
 }
 
+let globalSettingsCache: Promise<any> | null = null;
+
 export function SEO({ title, description, appId }: SEOProps) {
   const [globalSettings, setGlobalSettings] = useState<any>(null);
 
   useEffect(() => {
-    // Fetch global settings directly without SWR to avoid extra dependencies in UI library
+    // Fetch global settings manually but deduplicate using a module-level cache
     const apiUrl = (import.meta as any).env?.VITE_API_URL || '';
     if (!apiUrl) return;
 
-    fetch(`${apiUrl}/v1/settings?app=${appId || ''}`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Network response was not ok');
-        return res.json();
-      })
+    if (!globalSettingsCache) {
+      globalSettingsCache = fetch(`${apiUrl}/v1/settings?app=${appId || ''}`)
+        .then((res) => {
+          if (!res.ok) throw new Error('Network response was not ok');
+          return res.json();
+        });
+    }
+
+    globalSettingsCache
       .then((json) => {
         if (json.data) setGlobalSettings(json.data);
       })
       .catch(() => {
-        // Silently ignore error on client
+        globalSettingsCache = null; // Clear cache on failure so it can retry
       });
   }, []);
 

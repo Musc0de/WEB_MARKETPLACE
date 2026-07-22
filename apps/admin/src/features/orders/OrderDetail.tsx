@@ -291,31 +291,45 @@ export function OrderDetail() {
                   </div>
                 )}
 
-                <div className='flex justify-between text-base font-bold pt-3 mt-3 border-t border-gray-200'>
-                  <span className='text-gray-900'>Total</span>
-                  <span className='text-orange-600'>{formatIDR(order.totalAmount)}</span>
-                </div>
-
                 {(() => {
+                  const gatewayFee = order.payment?.customerPaymentAmount
+                    ? order.payment.customerPaymentAmount - order.totalAmount
+                    : 0;
+                  const finalTotal = order.totalAmount + Math.max(0, gatewayFee);
+
                   const isPaid = ['paid', 'processing', 'shipped', 'delivered'].includes(
                     order.status,
                   );
-                  const paidAmount = isPaid ? order.totalAmount : 0;
-                  const remaining = order.totalAmount - paidAmount;
+                  const paidAmount = isPaid ? finalTotal : 0;
+                  const remaining = finalTotal - paidAmount;
 
                   return (
-                    <div className='pt-1 space-y-1.5'>
-                      <div className='flex justify-between text-sm font-semibold'>
-                        <span className='text-gray-700'>Jumlah dibayar</span>
-                        <span className='text-green-600'>{formatIDR(paidAmount)}</span>
+                    <>
+                      {gatewayFee > 0 && (
+                        <div className='flex justify-between text-sm text-gray-500'>
+                          <span>Biaya Layanan / Kode Unik</span>
+                          <span>{formatIDR(gatewayFee)}</span>
+                        </div>
+                      )}
+
+                      <div className='flex justify-between text-base font-bold pt-3 mt-3 border-t border-gray-200'>
+                        <span className='text-gray-900'>Total</span>
+                        <span className='text-orange-600'>{formatIDR(finalTotal)}</span>
                       </div>
-                      <div className='flex justify-between text-sm font-semibold'>
-                        <span className='text-gray-700'>Sisa pembayaran</span>
-                        <span className={remaining > 0 ? 'text-red-500' : 'text-green-600'}>
-                          {formatIDR(remaining)}
-                        </span>
+
+                      <div className='pt-1 space-y-1.5'>
+                        <div className='flex justify-between text-sm font-semibold'>
+                          <span className='text-gray-700'>Jumlah dibayar</span>
+                          <span className='text-green-600'>{formatIDR(paidAmount)}</span>
+                        </div>
+                        <div className='flex justify-between text-sm font-semibold'>
+                          <span className='text-gray-700'>Sisa pembayaran</span>
+                          <span className={remaining > 0 ? 'text-red-500' : 'text-green-600'}>
+                            {formatIDR(remaining)}
+                          </span>
+                        </div>
                       </div>
-                    </div>
+                    </>
                   );
                 })()}
               </div>

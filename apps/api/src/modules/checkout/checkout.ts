@@ -16,6 +16,7 @@ import {
   productImages,
   products,
   productVariants,
+  users,
   voucherRedemptions,
   vouchers,
 } from '@starsuperscare/database';
@@ -493,11 +494,24 @@ checkoutRouter.post('/orders', zValidator('json', CreateOrderRequestSchema), asy
         }
       }
 
+      // 1.5. Resolve Guest UserId if Email matches existing user
+      let finalUserId = session?.userId || null;
+      if (!finalUserId && req.emailSnapshot) {
+        const normalizedEmail = req.emailSnapshot.trim().toLowerCase();
+        const existingUserList = await tx.select({ id: users.id })
+          .from(users)
+          .where(eq(users.emailNormalized, normalizedEmail))
+          .limit(1);
+        if (existingUserList.length > 0) {
+          finalUserId = existingUserList[0].id;
+        }
+      }
+
       // 2. Create Order
       const [newOrder] = await tx.insert(orders).values({
         orderNumber,
         idempotencyKey: req.idempotencyKey,
-        userId: session?.userId || null,
+        userId: finalUserId,
         emailSnapshot: req.emailSnapshot,
         totalAmount: grandTotal,
         subtotalAmount: subtotal,

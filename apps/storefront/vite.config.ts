@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 
 export default defineConfig({
   envDir: '../../',
+  envPrefix: ['VITE_', 'MERCHANT_TOKEN', 'BOT_PROTECTION_KEY'],
   plugins: [react(), tailwindcss() as any],
   server: {
     port: 5173,

@@ -34,7 +34,7 @@ docs/ui-*.md
 .vite/*
 .deno/*
 
-
+infrastructure/deploy/staging.env.example
 
 # Builds
 dist/
@@ -43,6 +43,7 @@ build/
 # Environment Variables
 .env
 .env.example
+.env.staging
 .env.local
 .env.development.local
 .env.test.local

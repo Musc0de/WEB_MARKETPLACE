@@ -5,10 +5,11 @@ import { CreditCard, Loader2, Save } from 'lucide-react';
 
 const PROVIDERS = [
   { id: 'louvin', name: 'Louvin Payment Gateway' },
+  { id: 'saweria', name: 'Saweria Payment' },
   { id: 'xendit', name: 'Xendit' },
   { id: 'duid', name: 'DUID' },
   { id: 'midtrans', name: 'Midtrans' },
-  { id: 'qris_official', name: 'QRIS Official (qris.interactive.co.id)' },
+  { id: 'qris_interactive', name: 'QRIS Official (qris.interactive.co.id)' },
   { id: 'dompetx', name: 'DompetX (dompetx.com)' },
   { id: 'tripay', name: 'Tripay' },
 ];
@@ -17,7 +18,9 @@ export function PaymentGatewaysForm() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [activeGateway, setActiveGateway] = useState<string>('sandbox');
-  const [configs, setConfigs] = useState<Record<string, { mode: 'sandbox' | 'production' }>>({});
+  const [configs, setConfigs] = useState<
+    Record<string, { mode: 'sandbox' | 'production'; config?: any }>
+  >({});
   const [isDirty, setIsDirty] = useState(false);
 
   const loadSettings = async () => {
@@ -201,6 +204,31 @@ export function PaymentGatewaysForm() {
                   </button>
                 </div>
               </div>
+
+              {provider.id === 'saweria' && (
+                <div className='mt-4 pt-4 border-t border-gray-100'>
+                  <label className='block text-xs font-semibold text-gray-700 mb-2'>
+                    Saweria URL (Checkout Destination)
+                  </label>
+                  <input
+                    type='url'
+                    placeholder='https://saweria.co/ownertmail'
+                    className='w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                    value={configs[provider.id]?.config?.supportPageUrl || ''}
+                    onChange={(e) => {
+                      setConfigs((prev) => ({
+                        ...prev,
+                        [provider.id]: {
+                          ...prev[provider.id],
+                          mode: prev[provider.id]?.mode || 'production',
+                          config: { ...prev[provider.id]?.config, supportPageUrl: e.target.value },
+                        } as any,
+                      }));
+                      setIsDirty(true);
+                    }}
+                  />
+                </div>
+              )}
 
               {!isActiveGateway && (
                 <div className='mt-5'>

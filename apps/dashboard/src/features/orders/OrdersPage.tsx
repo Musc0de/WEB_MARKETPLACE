@@ -143,12 +143,18 @@ function BuyAgainButton({ orderId }: { orderId: string }) {
 /** Single order card */
 function OrderCard({ order, onNavigate }: { order: any; onNavigate: (id: string) => void }) {
   const [expanded, setExpanded] = useState(false);
+  const itemCount = order.items.length;
+
+  const gatewayFee = order.payment?.customerPaymentAmount
+    ? order.payment.customerPaymentAmount - order.totalAmount
+    : 0;
+  const finalTotal = order.totalAmount + Math.max(0, gatewayFee);
+
   const cfg = STATUS_CONFIG[order.status] ??
     { style: 'text-muted-foreground bg-muted border-border', label: order.status };
-  const itemCount = order.items?.length ?? 0;
 
   return (
-    <div className='bg-card border border-border/60 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:border-border transition-all duration-200'>
+    <div className='bg-card border-2 border-border/40 rounded-xl overflow-hidden hover:border-border transition-colors duration-200'>
       {/* ── Header bar ── */}
       <div className='px-4 py-3 flex items-center justify-between bg-muted/30 border-b border-border/40'>
         <div className='flex items-center gap-2 min-w-0'>
@@ -322,7 +328,7 @@ function OrderCard({ order, onNavigate }: { order: any; onNavigate: (id: string)
             Total ({itemCount} brg)
           </span>
           <span className='text-sm sm:text-base font-black text-foreground tabular-nums mt-0.5'>
-            {fmt(order.totalAmount)}
+            {fmt(finalTotal)}
           </span>
         </div>
         <div className='flex items-center gap-2 shrink-0'>

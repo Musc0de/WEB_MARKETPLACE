@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ErrorBoundary } from 'react-error-boundary';
 import { client } from '../../lib/api.ts';
 import { useCart } from '../../features/cart/api/useCart.ts';
+import { useAuth } from '../../features/auth/api/useAuth.ts';
 import { SEO } from '@starsuperscare/ui';
 import { Heart, Search, ShoppingCart, User } from 'lucide-react';
 
@@ -41,6 +42,8 @@ const Header = () => {
   const [isSuggestionsLoading, setIsSuggestionsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
+  const { session } = useAuth();
+
   const authUrl = (import.meta as any).env?.VITE_AUTH_URL || '';
   const dashboardUrl = (import.meta as any).env?.VITE_DASHBOARD_URL || '';
   const [accountUrl, setAccountUrl] = useState(`${authUrl}/login`);
@@ -48,27 +51,22 @@ const Header = () => {
     `${authUrl}/login?returnUrl=${encodeURIComponent(`${dashboardUrl}/wishlist`)}`,
   );
   const { cart } = useCart();
-  // Use TOTAL QUANTITY (sum of all item quantities) so the badge animates
-  // every time any item is added — even if it's a quantity increment.
   const cartItemCount = cart?.items?.reduce(
     (sum: number, item: any) => sum + (item.quantity || 1),
     0,
   ) || 0;
 
   useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const res = await client.v1.auth.me.$get();
-        if (res.ok) {
-          setAccountUrl(dashboardUrl);
-          setWishlistUrl(`${dashboardUrl}/wishlist`);
-        }
-      } catch (_err) {
-        // ignore error, default to login url
-      }
-    };
-    checkSession();
-  }, []);
+    if (session) {
+      setAccountUrl(dashboardUrl);
+      setWishlistUrl(`${dashboardUrl}/wishlist`);
+    } else {
+      setAccountUrl(`${authUrl}/login`);
+      setWishlistUrl(
+        `${authUrl}/login?returnUrl=${encodeURIComponent(`${dashboardUrl}/wishlist`)}`,
+      );
+    }
+  }, [session, dashboardUrl, authUrl]);
 
   // Sync global search bar with URL parameter if on /search
   useEffect(() => {
@@ -301,6 +299,7 @@ const Header = () => {
 
 const MobileBottomNav = () => {
   const location = useLocation();
+  const { session } = useAuth();
   const authUrl = (import.meta as any).env?.VITE_AUTH_URL || '';
   const dashboardUrl = (import.meta as any).env?.VITE_DASHBOARD_URL || '';
   const [accountUrl, setAccountUrl] = useState(
@@ -311,25 +310,18 @@ const MobileBottomNav = () => {
   );
 
   useEffect(() => {
-    setAccountUrl(
-      `${authUrl}/login?return_to=${encodeURIComponent(globalThis.location?.href || '')}`,
-    );
-  }, [location]);
-
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const res = await client.v1.auth.me.$get();
-        if (res.ok) {
-          setAccountUrl(dashboardUrl);
-          setWishlistUrl(`${dashboardUrl}/wishlist`);
-        }
-      } catch (_err) {
-        // ignore error, default to login url
-      }
-    };
-    checkSession();
-  }, []);
+    if (session) {
+      setAccountUrl(dashboardUrl);
+      setWishlistUrl(`${dashboardUrl}/wishlist`);
+    } else {
+      setAccountUrl(
+        `${authUrl}/login?return_to=${encodeURIComponent(globalThis.location?.href || '')}`,
+      );
+      setWishlistUrl(
+        `${authUrl}/login?returnUrl=${encodeURIComponent(`${dashboardUrl}/wishlist`)}`,
+      );
+    }
+  }, [session, dashboardUrl, authUrl, location]);
 
   return (
     <nav className='md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-xl border-t border-border/60 pb-safe shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]'>
@@ -522,10 +514,10 @@ export const StorefrontLayout: React.FC<{ children: React.ReactNode }> = ({ chil
     <div className='min-h-screen flex flex-col font-sans bg-background text-foreground pb-24 md:pb-0'>
       <SEO appId='storefront' />
       <Header />
-      <main className='flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-8 py-6'>
+      <main className='flex-1 flex flex-col w-full max-w-[1360px] mx-auto px-4 sm:px-8 py-6'>
         <ErrorBoundary
           fallback={
-            <div className='p-6 bg-destructive/10 text-destructive rounded-xl border border-destructive/20 shadow-sm'>
+            <div className='p-6 bg-destructive/10 text-destructive rounded-xl border border-destructive/20 shadow-sm flex-1'>
               <h3 className='font-bold mb-2'>Terjadi Kesalahan</h3>
               <p className='text-sm font-medium'>
                 Gagal memuat komponen. Silakan muat ulang halaman.

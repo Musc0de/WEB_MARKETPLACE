@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { CheckCircle2, Loader2, XCircle } from 'lucide-react';
+import { CheckCircle2, XCircle } from 'lucide-react';
 import { checkOrderStatus } from '../api/useCheckout.ts';
 
 export function PaymentStatusPage() {
@@ -20,7 +20,10 @@ export function PaymentStatusPage() {
     const pollStatus = async () => {
       try {
         const currentStatus = await checkOrderStatus(orderId);
-        if (currentStatus === 'paid') {
+        if (
+          currentStatus === 'paid' || currentStatus === 'processing' ||
+          currentStatus === 'shipped' || currentStatus === 'completed'
+        ) {
           setStatus('success');
           setIsPolling(false);
           return true; // indicates we should stop polling
@@ -63,62 +66,107 @@ export function PaymentStatusPage() {
   }, [orderId, navigate, status]);
 
   return (
-    <div className='min-h-screen bg-gray-50 flex items-center justify-center p-4'>
-      <div className='bg-white rounded-3xl p-8 shadow-sm border border-gray-100 max-w-md w-full text-center'>
-        {isPolling
-          ? (
-            <>
-              <div className='w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6'>
-                <Loader2 className='w-8 h-8 animate-spin' />
-              </div>
-              <h1 className='text-2xl font-bold mb-2'>Memproses Pembayaran</h1>
-              <p className='text-gray-500'>
-                Mohon tunggu, kami sedang memverifikasi pembayaran Anda...
+    <div
+      className='flex-1 flex flex-col w-full h-full md:items-center md:justify-center'
+      role='main'
+      aria-label='Status Pembayaran'
+    >
+      {isPolling
+        ? (
+          <section className='flex flex-col items-center justify-center w-full md:max-w-2xl md:h-auto md:min-h-[500px] bg-slate-950 text-white md:rounded-[2.5rem] md:shadow-2xl overflow-hidden p-8 sm:p-12 md:p-16 relative'>
+            {/* Optimized Ambient Background (No Heavy Blurs) */}
+            <div className='absolute inset-0 bg-gradient-to-br from-indigo-900/40 via-slate-950 to-slate-950 opacity-50' />
+
+            <div className='relative z-10 text-center flex flex-col items-center w-full'>
+              <div className='mb-8 w-24 h-24 sm:w-32 sm:h-32 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin flex-shrink-0' />
+              <h1 className='text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-4 break-words w-full'>
+                MEMPROSES<br />
+                <span className='text-indigo-400'>STATUS.</span>
+              </h1>
+              <p className='text-base sm:text-lg text-slate-400 font-medium max-w-sm mx-auto'>
+                Sedang memverifikasi pembayaran Anda secara aman. Mohon tunggu sebentar.
               </p>
-            </>
-          )
-          : status === 'success'
-          ? (
-            <>
-              <div className='w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6'>
-                <CheckCircle2 className='w-8 h-8' />
+            </div>
+          </section>
+        )
+        : status === 'success'
+        ? (
+          <section className='flex flex-col items-center justify-center w-full md:max-w-2xl md:h-auto md:min-h-[500px] bg-emerald-950 text-white md:rounded-[2.5rem] md:shadow-2xl overflow-hidden p-8 sm:p-12 md:p-16 relative animate-in zoom-in-95 duration-500'>
+            <div className='absolute inset-0 bg-gradient-to-br from-emerald-900/40 via-emerald-950 to-emerald-950 opacity-50' />
+
+            <div className='relative z-10 text-center flex flex-col items-center w-full'>
+              <div className='mb-8 inline-flex items-center justify-center w-24 h-24 sm:w-28 sm:h-28 bg-emerald-500 text-white rounded-full shadow-lg shadow-emerald-500/30 ring-8 ring-emerald-500/20'>
+                <CheckCircle2 className='w-12 h-12 sm:w-16 sm:h-16' strokeWidth={2.5} />
               </div>
-              <h1 className='text-2xl font-bold mb-2 text-green-600'>Pembayaran Berhasil</h1>
-              <p className='text-gray-500 mb-8'>
-                Pesanan Anda sedang diproses dan akan segera dikirim.
+              <h1 className='text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-4 break-words w-full'>
+                PEMBAYARAN<br />
+                <span className='text-emerald-400'>BERHASIL.</span>
+              </h1>
+              <p className='text-base sm:text-lg text-emerald-200/80 font-medium max-w-md mx-auto mb-10'>
+                Pesanan Anda telah dikonfirmasi dan segera diproses untuk pengiriman. Terima kasih!
               </p>
               <button
                 type='button'
                 onClick={() => navigate('/')}
-                className='w-full bg-black text-white px-6 py-4 rounded-xl font-bold hover:bg-gray-800'
+                className='group flex items-center justify-center gap-3 w-full max-w-sm mx-auto px-6 py-4 bg-white text-emerald-950 text-lg font-bold rounded-2xl hover:bg-emerald-400 hover:text-emerald-950 transition-all duration-300 shadow-xl'
               >
-                Kembali ke Beranda
+                <span>KEMBALI KE BERANDA</span>
+                <svg
+                  className='w-5 h-5 group-hover:translate-x-1 transition-transform'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  stroke='currentColor'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2.5}
+                    d='M14 5l7 7m0 0l-7 7m7-7H3'
+                  />
+                </svg>
               </button>
-            </>
-          )
-          : (
-            <>
-              <div className='w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6'>
-                <XCircle className='w-8 h-8' />
+            </div>
+          </section>
+        )
+        : (
+          <section className='flex flex-col items-center justify-center w-full md:max-w-2xl md:h-auto md:min-h-[500px] bg-slate-950 text-white md:rounded-[2.5rem] md:shadow-2xl overflow-hidden p-8 sm:p-12 md:p-16 relative animate-in zoom-in-95 duration-500'>
+            <div className='absolute inset-0 bg-gradient-to-br from-red-900/30 via-slate-950 to-slate-950 opacity-50' />
+
+            <div className='relative z-10 text-center flex flex-col items-center w-full'>
+              <div className='mb-8 inline-flex items-center justify-center w-24 h-24 sm:w-28 sm:h-28 bg-red-500/10 text-red-500 rounded-full ring-8 ring-red-500/5'>
+                <XCircle className='w-12 h-12 sm:w-16 sm:h-16' strokeWidth={2.5} />
               </div>
-              <h1 className='text-2xl font-bold mb-2 text-red-600'>
-                {status === 'timeout' ? 'Waktu Habis' : 'Pembayaran Gagal'}
+              <h1 className='text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-4 break-words w-full'>
+                {status === 'timeout' ? 'WAKTU HABIS.' : 'GAGAL.'}
               </h1>
-              <p className='text-gray-500 mb-8'>
+              <p className='text-base sm:text-lg text-slate-400 font-medium max-w-md mx-auto mb-10'>
                 {status === 'timeout'
-                  ? 'Sistem kami belum menerima konfirmasi pembayaran. Silakan periksa status pesanan Anda nanti.'
-                  : 'Pembayaran Anda tidak dapat diproses. Pesanan dibatalkan otomatis.'}
+                  ? 'Sistem belum menerima konfirmasi. Jika sudah membayar, status akan diperbarui otomatis.'
+                  : 'Mohon maaf, pembayaran Anda tidak dapat diproses dan pesanan dibatalkan.'}
               </p>
               <button
                 type='button'
                 onClick={() => navigate('/products')}
-                className='w-full bg-black text-white px-6 py-4 rounded-xl font-bold hover:bg-gray-800'
+                className='group flex items-center justify-center gap-3 w-full max-w-sm mx-auto px-6 py-4 bg-white text-slate-900 text-lg font-bold rounded-2xl hover:bg-red-500 hover:text-white transition-all duration-300 shadow-xl'
               >
-                Belanja Kembali
+                <span>BELANJA KEMBALI</span>
+                <svg
+                  className='w-5 h-5 group-hover:translate-x-1 transition-transform'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  stroke='currentColor'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2.5}
+                    d='M14 5l7 7m0 0l-7 7m7-7H3'
+                  />
+                </svg>
               </button>
-            </>
-          )}
-      </div>
+            </div>
+          </section>
+        )}
     </div>
   );
 }

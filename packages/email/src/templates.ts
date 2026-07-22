@@ -27,6 +27,24 @@ export const templates = {
     `,
     text: `Silakan akses tautan ini untuk mereset kata sandi Anda: ${url}`,
   }),
+  orderDelivered: (data: { orderNumber: string; productNames: string; actionUrl: string }) => ({
+    subject: `Pesanan Terkirim: ${data.orderNumber} - StarSuperScare`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; border-radius: 8px;">
+        <h2 style="color: #111827; text-align: center;">Pesanan Anda Telah Terkirim!</h2>
+        <div style="background-color: white; padding: 24px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <p style="color: #4b5563; font-size: 16px;">Pesanan Anda dengan nomor <strong>${data.orderNumber}</strong> untuk produk berikut telah berhasil dikirim:</p>
+          <div style="font-size: 16px; font-weight: bold; color: #4f46e5; margin: 20px 0;">${data.productNames}</div>
+          <p style="color: #4b5563; font-size: 16px;">Silakan cek menu Detail Pesanan untuk melihat instruksi atau link akses pesanan Anda.</p>
+          <div style="text-align: center;">
+            <a href="${data.actionUrl}" style="display: inline-block; margin: 20px 0; padding: 12px 24px; background-color: #4f46e5; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">Lihat Detail Pesanan</a>
+          </div>
+        </div>
+      </div>
+    `,
+    text:
+      `Pesanan Anda (${data.orderNumber}) untuk produk: ${data.productNames} telah berhasil dikirim! Buka tautan berikut untuk melihat detailnya: ${data.actionUrl}`,
+  }),
   invoice: (data: {
     orderNumber: string;
     customerName?: string;

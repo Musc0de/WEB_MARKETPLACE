@@ -19,8 +19,8 @@ export function useCart() {
   const { data, error, isLoading, mutate } = useSWR('/api/v1/cart', fetcher, {
     // Revalidate on focus so the cart badge stays fresh when user returns to tab
     revalidateOnFocus: true,
-    // Don't dedupe too aggressively — we want fresh data after addItem
-    dedupingInterval: 500,
+    // Deduplicate concurrent mount requests within 2 seconds
+    dedupingInterval: 2000,
   });
 
   /**

@@ -50,6 +50,11 @@ export async function handleEmailSend(payload: any, eventId: string) {
     subject = rendered.subject;
     html = rendered.html;
     text = rendered.text;
+  } else if (template === 'order-delivered') {
+    const rendered = templates.orderDelivered(data);
+    subject = rendered.subject;
+    html = rendered.html;
+    text = rendered.text;
   } else {
     throw new Error(`Unknown email template: ${template}`);
   }

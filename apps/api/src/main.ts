@@ -1,5 +1,6 @@
 /// <reference lib="deno.ns" />
 import app from './app.ts';
+import './cron/payment-expiry.ts';
 
 // 1. Jalankan server secara native jika berada di environment Deno (Local / Deno Deploy)
 if (typeof Deno !== 'undefined') {

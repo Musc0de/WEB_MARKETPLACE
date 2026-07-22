@@ -11,7 +11,7 @@ import {
   products,
   productVariants,
 } from '@starsuperscare/database';
-import { and, eq, gt, inArray, sql } from 'drizzle-orm';
+import { and, count, eq, gt, inArray, sql } from 'drizzle-orm';
 import {
   AddCartItemRequestSchema,
   CartItemStatus,
@@ -347,12 +347,17 @@ const routes = router
         } else {
           const newQty = Math.min(guestItem.quantity, maxStock);
           if (newQty > 0) {
-            await tx.insert(cartItems).values({
-              cartId: userCartId,
-              variantId: guestItem.variantId,
-              quantity: newQty,
-              priceObservation: guestItem.priceObservation,
-            });
+            const cartItemCount = await tx.select({ count: count() }).from(cartItems).where(
+              eq(cartItems.cartId, userCartId),
+            );
+            if (cartItemCount[0].count < 50) {
+              await tx.insert(cartItems).values({
+                cartId: userCartId,
+                variantId: guestItem.variantId,
+                quantity: newQty,
+                priceObservation: guestItem.priceObservation,
+              });
+            }
           }
         }
       }
@@ -386,6 +391,17 @@ const routes = router
           .set({ quantity: existing[0].quantity + quantity })
           .where(eq(cartItems.id, existing[0].id));
       } else {
+        const cartItemCount = await db.select({ count: count() }).from(cartItems).where(
+          eq(cartItems.cartId, cartId),
+        );
+        if (cartItemCount[0].count >= 50) {
+          return c.json({
+            data: null,
+            meta: { request_id: c.get('requestId') },
+            error: { code: 'CART_FULL', message: 'Maksimal 50 jenis item di dalam keranjang.' },
+          }, 400);
+        }
+
         const inserted = await db.insert(cartItems).values({
           cartId,
           variantId,

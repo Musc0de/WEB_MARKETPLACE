@@ -14,6 +14,7 @@ export function serializeCustomerOrderListItem(order: any) {
     cancellationStatus: order.cancellationStatus,
     cancellationId: order.cancellationId,
     resolutionEligibility: order.resolutionEligibility,
+    payment: order.payment || null,
     items: (order.items || []).map((item: any) => ({
       productId: item.productId,
       productName: item.productName,

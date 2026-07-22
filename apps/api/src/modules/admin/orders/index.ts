@@ -12,6 +12,7 @@ import {
   orderItems,
   orders,
   orderStatusHistory,
+  payments,
   productImages,
   products,
   productVariants,
@@ -168,6 +169,7 @@ adminOrdersRouter.get('/:id', async (c) => {
   const shipmentList = await db.select().from(shipments).where(eq(shipments.orderId, id));
   const addressList = await db.select().from(orderAddresses).where(eq(orderAddresses.orderId, id))
     .limit(1);
+  const paymentList = await db.select().from(payments).where(eq(payments.orderId, id)).limit(1);
 
   return c.json({
     id: order.id,
@@ -190,6 +192,7 @@ adminOrdersRouter.get('/:id', async (c) => {
 
     shippingSnapshot: addressList[0]?.shippingSnapshot || null,
     billingSnapshot: addressList[0]?.billingSnapshot || null,
+    payment: paymentList[0] || null,
   });
 });
 

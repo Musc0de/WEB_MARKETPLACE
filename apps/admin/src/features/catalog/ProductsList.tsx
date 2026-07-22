@@ -502,7 +502,7 @@ export function ProductsList() {
                           : (
                             <button
                               type='button'
-                              onClick={() => navigate(`/catalog/${product.id}`)}
+                              onClick={() => navigate(`/catalog/${product.id}/edit`)}
                               className='inline-flex items-center gap-1 text-xs font-medium text-gray-600 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 px-2.5 py-1.5 rounded-lg transition-colors border border-gray-200'
                             >
                               <Edit2 className='w-3.5 h-3.5' />

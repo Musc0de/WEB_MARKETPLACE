@@ -4,6 +4,7 @@ import {
   digitalCredentials,
   inventoryLevels,
   inventoryMovements,
+  notifications,
   orderItems,
   orders,
   orderStatusHistory,
@@ -11,10 +12,12 @@ import {
   paymentEvents,
   payments,
   products,
+  productVariants,
 } from '@starsuperscare/database';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, inArray, sql } from 'drizzle-orm';
 import { WebhookPayloadSchema } from '@starsuperscare/contracts';
 import { louvinPaymentProvider, paymentProvider } from '../../modules/payments/provider.ts';
+import { sseManager } from '../../modules/notifications/sse.ts';
 
 type AppContext = {
   Variables: {
@@ -143,6 +146,13 @@ webhooksRouter.post('/', async (c) => {
         createdAt: now.toISOString(),
       });
 
+      // Broadcast SSE so active clients (PaymentPage) update immediately
+      sseManager.broadcast('payment.success', {
+        orderId: payment.orderId,
+        paymentId: payment.id,
+        status: 'success',
+      });
+
       // ── AUTO-TRANSITION: paid → processing ──────────────────────────────
       // Immediately advance to 'processing' so admin sees order ready to fulfill
       await tx.update(orders).set({
@@ -176,6 +186,7 @@ webhooksRouter.post('/', async (c) => {
         productId: orderItems.productId,
         variantId: orderItems.variantId,
         quantity: orderItems.quantity,
+        productName: orderItems.productNameSnapshot,
         type: products.type,
       }).from(orderItems)
         .innerJoin(products, eq(orderItems.productId, products.id))
@@ -208,9 +219,58 @@ webhooksRouter.post('/', async (c) => {
                 userId: fullOrder.userId,
                 updatedAt: new Date().toISOString(),
               })
-              .where(sql`${digitalCredentials.id} IN ${credIds}`);
+              .where(inArray(digitalCredentials.id, credIds));
           }
         }
+      }
+
+      // Auto-advance to delivered if all items are digital/service
+      const allDigitalOrService = items.length > 0 &&
+        items.every((item) => item.type === 'digital' || item.type === 'service');
+      if (allDigitalOrService) {
+        await tx.update(orders).set({
+          status: 'delivered',
+          updatedAt: new Date(now.getTime() + 200).toISOString(),
+        }).where(eq(orders.id, payment.orderId));
+
+        await tx.insert(orderStatusHistory).values({
+          orderId: payment.orderId,
+          status: 'delivered',
+          note: 'Auto-advanced to delivered because all items are digital/service products',
+          createdAt: new Date(now.getTime() + 200).toISOString(),
+        });
+
+        const productNames = items.map((i) => i.productName || 'Produk').join(', ');
+        const actionUrl = `/orders/${fullOrder.id}`;
+
+        if (fullOrder.userId) {
+          await tx.insert(notifications).values({
+            userId: fullOrder.userId,
+            title: 'Pesanan Terkirim',
+            body:
+              `Pesanan Anda untuk ${productNames} telah berhasil dikirim! Silakan cek menu Detail Pesanan untuk instruksi atau link akses.`,
+            type: 'order_update',
+            actionUrl,
+            createdAt: new Date(now.getTime() + 200).toISOString(),
+          });
+        }
+
+        // Send email via outbox
+        await tx.insert(outboxEvents).values({
+          type: 'email.send',
+          payload: {
+            template: 'order-delivered',
+            to: fullOrder.emailSnapshot,
+            data: {
+              orderNumber: fullOrder.orderNumber,
+              productNames,
+              actionUrl: `${
+                typeof process !== 'undefined' ? (process.env.VITE_DASHBOARD_URL || '') : ''
+              }${actionUrl}`,
+            },
+          },
+          state: 'pending',
+        });
       }
     } else if (
       (data.type === 'payment_failed' || data.type === 'payment.failed' ||
@@ -267,6 +327,178 @@ webhooksRouter.post('/', async (c) => {
       }
     }
   });
+
+  return c.json({ received: true }, 200);
+});
+
+webhooksRouter.post('/saweria', async (c) => {
+  let payload: any;
+  try {
+    payload = await c.req.json();
+  } catch {
+    return c.json({ error: { code: 'BAD_REQUEST', message: 'Invalid JSON' } }, 400);
+  }
+
+  // Saweria webhook payload format is roughly:
+  // { version, created_at, id, type: 'donation', amount_raw, donator_name, donator_email, message }
+
+  if (payload.type === 'donation' || payload.type === 'tip') {
+    const message = payload.message || '';
+
+    // Attempt 1: Extract orderId from the message
+    const match = message.match(/Pembayaran Pesanan ([\w-]+)/);
+    let orderId = match ? match[1] : null;
+
+    // Find payment record
+    // We will look up either by providerTransactionId OR by orderId
+    let paymentList: any[] = [];
+    if (payload.id) {
+      paymentList = await db.select().from(payments).where(
+        eq(payments.providerTransactionId, payload.id),
+      ).limit(1);
+    }
+
+    if (paymentList.length === 0 && orderId) {
+      paymentList = await db.select().from(payments).where(
+        and(
+          eq(payments.orderId, orderId),
+          eq(payments.provider, 'saweria'),
+          eq(payments.status, 'pending'),
+        ),
+      ).limit(1);
+    }
+
+    if (paymentList.length > 0) {
+      const payment = paymentList[0];
+      orderId = payment.orderId;
+
+      if (payment.status === 'pending') {
+        await db.transaction(async (tx) => {
+          // Record event
+          await tx.insert(paymentEvents).values({
+            paymentId: payment.id,
+            providerEventId: payload.id || ('saweria-' + Date.now()),
+            eventType: 'payment_success',
+            payload: payload,
+          });
+
+          // Mark success
+          await tx.update(payments).set({ status: 'success', paidAt: new Date().toISOString() })
+            .where(eq(payments.id, payment.id));
+          await tx.update(orders).set({ status: 'paid', updatedAt: new Date().toISOString() })
+            .where(eq(orders.id, orderId!));
+          await tx.insert(orderStatusHistory).values({
+            orderId: orderId!,
+            status: 'paid',
+            note: 'Payment received via Saweria webhook',
+            createdAt: new Date().toISOString(),
+          });
+
+          // Auto-advance to processing
+          const now = new Date();
+          await tx.update(orders).set({
+            status: 'processing',
+            updatedAt: new Date(now.getTime() + 100).toISOString(),
+          }).where(eq(orders.id, orderId!));
+          await tx.insert(orderStatusHistory).values({
+            orderId: orderId!,
+            status: 'processing',
+            note: 'Auto-advanced to processing after payment confirmed',
+            createdAt: new Date(now.getTime() + 100).toISOString(),
+          });
+
+          // Distribute digital credentials if any
+          const fullOrderList = await tx.select().from(orders).where(eq(orders.id, orderId!)).limit(
+            1,
+          );
+          if (fullOrderList.length > 0) {
+            const fullOrder = fullOrderList[0];
+            const items = await tx.select({
+              id: orderItems.id,
+              productId: products.id,
+              variantId: productVariants.id,
+              quantity: orderItems.quantity,
+              productName: orderItems.productNameSnapshot,
+              productType: products.type,
+            }).from(orderItems)
+              .innerJoin(productVariants, eq(orderItems.variantId, productVariants.id))
+              .innerJoin(products, eq(productVariants.productId, products.id))
+              .where(eq(orderItems.orderId, orderId!));
+
+            for (const item of items) {
+              if (item.productType === 'digital' || item.productType === 'service') {
+                const availableCreds = await tx.select().from(digitalCredentials).where(
+                  and(
+                    eq(digitalCredentials.productId, item.productId),
+                    eq(digitalCredentials.status, 'available'),
+                  ),
+                ).limit(item.quantity);
+                if (availableCreds.length > 0) {
+                  const credIds = availableCreds.map((c) => c.id);
+                  await tx.update(digitalCredentials).set({
+                    status: 'assigned',
+                    orderItemId: item.id,
+                    userId: fullOrder.userId,
+                    updatedAt: new Date().toISOString(),
+                  }).where(inArray(digitalCredentials.id, credIds));
+                }
+              }
+            }
+
+            // Auto-advance to delivered if all items are digital/service
+            const allDigitalOrService = items.length > 0 &&
+              items.every((item) =>
+                item.productType === 'digital' || item.productType === 'service'
+              );
+            if (allDigitalOrService) {
+              await tx.update(orders).set({
+                status: 'delivered',
+                updatedAt: new Date(now.getTime() + 200).toISOString(),
+              }).where(eq(orders.id, orderId!));
+
+              await tx.insert(orderStatusHistory).values({
+                orderId: orderId!,
+                status: 'delivered',
+                note: 'Auto-advanced to delivered because all items are digital/service products',
+                createdAt: new Date(now.getTime() + 200).toISOString(),
+              });
+
+              const productNames = items.map((i) => i.productName || 'Produk').join(', ');
+              const actionUrl = `/orders/${fullOrder.id}`;
+
+              if (fullOrder.userId) {
+                await tx.insert(notifications).values({
+                  userId: fullOrder.userId,
+                  title: 'Pesanan Terkirim',
+                  body:
+                    `Pesanan Anda untuk ${productNames} telah berhasil dikirim! Silakan cek menu Detail Pesanan untuk instruksi atau link akses.`,
+                  type: 'order_update',
+                  actionUrl,
+                  createdAt: new Date(now.getTime() + 200).toISOString(),
+                });
+              }
+
+              await tx.insert(outboxEvents).values({
+                type: 'email.send',
+                payload: {
+                  template: 'order-delivered',
+                  to: fullOrder.emailSnapshot,
+                  data: {
+                    orderNumber: fullOrder.orderNumber,
+                    productNames,
+                    actionUrl: `${
+                      typeof process !== 'undefined' ? (process.env.VITE_DASHBOARD_URL || '') : ''
+                    }${actionUrl}`,
+                  },
+                },
+                state: 'pending',
+              });
+            }
+          }
+        });
+      }
+    }
+  }
 
   return c.json({ received: true }, 200);
 });

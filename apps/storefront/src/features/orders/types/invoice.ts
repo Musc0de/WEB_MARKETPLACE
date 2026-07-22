@@ -27,6 +27,7 @@ export interface InvoiceData {
     provider: string;
     providerTransactionId: string | null;
     amount: number;
+    customerPaymentAmount?: number;
     status: string;
     createdAt: string;
   } | null;

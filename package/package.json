@@ -1,0 +1,34 @@
+{
+  "name": "qris-saweria",
+  "version": "1.0.2",
+  "description": "saweria.co unofficial api that can create qris and check it automatically",
+  "main": "saweria-qris.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "saweria",
+    "qris",
+    "payment",
+    "donation",
+    "dana",
+    "indonesia"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AutoFTbot/saweria-qris.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AutoFTbot/saweria-qris/issues"
+  },
+  "homepage": "https://github.com/AutoFTbot/saweria-qris#readme",
+  "author": "AutoFTbot",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.7",
+    "cheerio": "^1.0.0-rc.12",
+    "qrcode": "^1.5.3",
+    "canvas": "^2.11.2",
+    "random-username-generator": "^1.0.4"
+  }
+}

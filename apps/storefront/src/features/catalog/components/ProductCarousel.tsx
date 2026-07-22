@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useSWR from 'swr';
 import type { ProductListItem } from '@starsuperscare/contracts';
 import { H2, toast } from '@starsuperscare/ui';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -16,14 +17,34 @@ export function ProductCarousel(
     layout?: 'slider' | 'grid';
   },
 ) {
-  const [products, setProducts] = useState<ProductListItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const navigate = useNavigate();
   const { addItem } = useCart();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const { data: fetchedProducts, isLoading } = useSWR(
+    ['product-carousel', type, limit],
+    async () => {
+      let res;
+      if (type === 'smart_recommendation') {
+        res = await client.v1.catalog.products.recommendations.$get();
+      } else {
+        res = await client.v1.catalog.products.$get({
+          query: { page: '1', per_page: String(limit), sort: type, in_stock: 'false' } as any,
+        });
+      }
+      if (res.ok) {
+        const data: any = await res.json();
+        return data.data.items || data.data;
+      }
+      return [];
+    },
+    { dedupingInterval: 30000, revalidateOnFocus: false },
+  );
+
+  const products: ProductListItem[] = fetchedProducts || [];
 
   const checkScroll = useCallback(() => {
     if (scrollRef.current) {
@@ -46,31 +67,6 @@ export function ProductCarousel(
   const scrollRight = () => {
     if (scrollRef.current) scrollRef.current.scrollBy({ left: 400, behavior: 'smooth' });
   };
-
-  useEffect(() => {
-    async function fetchProducts() {
-      try {
-        setIsLoading(true);
-        let res;
-        if (type === 'smart_recommendation') {
-          res = await client.v1.catalog.products.recommendations.$get();
-        } else {
-          res = await client.v1.catalog.products.$get({
-            query: { page: '1', per_page: String(limit), sort: type, in_stock: 'false' } as any,
-          });
-        }
-        if (res.ok) {
-          const data: any = await res.json();
-          setProducts(data.data.items || data.data);
-        }
-      } catch (error) {
-        console.error('Failed to fetch products:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchProducts();
-  }, [limit, type]);
 
   const handleAction = async (p: ProductListItem, isBuyNow: boolean) => {
     if (actionLoading) return;

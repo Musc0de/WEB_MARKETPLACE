@@ -180,8 +180,12 @@ const routes = app
         const orderCancellations = await db.query.cancellationRequests.findMany({
           where: inArray(cancellationRequests.orderId, orderIds),
         });
+        const orderPayments = await db.select().from(payments).where(
+          inArray(payments.orderId, orderIds),
+        );
 
         for (const order of enrichedOrders) {
+          (order as any).payment = orderPayments.find((p) => p.orderId === order.id);
           const ret = orderReturns.find((r) => r.orderId === order.id);
           if (ret) {
             order.status = ret.status === 'resolved'
@@ -478,6 +482,12 @@ const routes = app
       }
       : null;
 
+    const [payment] = await db
+      .select()
+      .from(payments)
+      .where(eq(payments.orderId, id))
+      .limit(1);
+
     c.header('Cache-Control', 'private, no-store');
     return c.json({
       data: {
@@ -485,6 +495,7 @@ const routes = app
         items,
         addresses: sanitizedAddresses,
         history,
+        payment: payment || null,
       },
       meta: { request_id: c.get('requestId') },
       error: null,
@@ -538,7 +549,11 @@ const routes = app
           ? Deno.env.get('R2_PUBLIC_URL_2')
           : process?.env?.['R2_PUBLIC_URL_2']) || '';
         const publicUrl = `${publicUrlBase}/${existingInvoice.pdfObjectKey}`;
-        return c.redirect(publicUrl, 302);
+        return c.json({
+          data: { url: publicUrl },
+          error: null,
+          meta: { request_id: c.get('requestId') },
+        });
       }
     }
 
@@ -686,8 +701,12 @@ const routes = app
       // Abaikan jika sudah ada
     }
 
-    // 11. Redirect ke CDN PDF URL
-    return c.redirect(publicUrl, 302);
+    // 11. Return JSON instead of redirect
+    return c.json({
+      data: { url: publicUrl },
+      error: null,
+      meta: { request_id: c.get('requestId') },
+    });
   })
   // ─── DELETE /:id/invoice — hapus PDF dari R2 dan record dari DB ──────────────
   .delete('/:id/invoice', async (c) => {

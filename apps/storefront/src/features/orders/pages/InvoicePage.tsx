@@ -398,20 +398,37 @@ export const InvoicePage = () => {
                 <span>Tax</span>
                 <span>{formatCurrency(data.order.taxAmount)}</span>
               </div>
-              <div className='border-t border-gray-200 pt-3 mt-3 flex justify-between items-center'>
-                <span className='text-base font-bold text-gray-900'>Grand Total</span>
-                <span className='text-xl font-extrabold text-blue-700'>
-                  {formatCurrency(data.order.totalAmount)}
-                </span>
-              </div>
-              {data.payment?.status === 'paid' && (
-                <div className='flex justify-between items-center mt-2 text-sm'>
-                  <span className='font-semibold text-green-700'>Amount Paid</span>
-                  <span className='font-semibold text-green-700'>
-                    {formatCurrency(data.payment.amount)}
-                  </span>
-                </div>
-              )}
+              {(() => {
+                const gatewayFee = (data.payment as any)?.customerPaymentAmount
+                  ? (data.payment as any).customerPaymentAmount - data.order.totalAmount
+                  : 0;
+                const finalTotal = data.order.totalAmount + Math.max(0, gatewayFee);
+
+                return (
+                  <>
+                    {gatewayFee > 0 && (
+                      <div className='flex justify-between text-sm text-gray-600'>
+                        <span>Biaya Layanan / Kode Unik</span>
+                        <span>{formatCurrency(gatewayFee)}</span>
+                      </div>
+                    )}
+                    <div className='border-t border-gray-200 pt-3 mt-3 flex justify-between items-center'>
+                      <span className='text-base font-bold text-gray-900'>Grand Total</span>
+                      <span className='text-xl font-extrabold text-blue-700'>
+                        {formatCurrency(finalTotal)}
+                      </span>
+                    </div>
+                    {data.payment?.status === 'paid' && (
+                      <div className='flex justify-between items-center mt-2 text-sm'>
+                        <span className='font-semibold text-green-700'>Amount Paid</span>
+                        <span className='font-semibold text-green-700'>
+                          {formatCurrency(finalTotal)}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           </div>
 
@@ -425,7 +442,7 @@ export const InvoicePage = () => {
               support@starsuperscare.com
             </p>
             <p className='text-xs text-gray-400 italic'>
-              This invoice was generated automatically by StarSuperScare Marketplace system.
+              This invoice was generated automatically by StarSuperScare Marketplace.
             </p>
           </div>
         </div>

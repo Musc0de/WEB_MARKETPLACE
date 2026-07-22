@@ -122,7 +122,13 @@ export function usePaymentIntent() {
     async (url, { arg }) => {
       const res = await fetcher(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'Idempotency-Key': crypto.randomUUID(),
+          'TOKEN_AUTH_MERCHANTS': (import.meta as any).env.MERCHANT_TOKEN || '',
+          'AUTH_PAYMENT_BOT': (import.meta as any).env.BOT_PROTECTION_KEY || '',
+        },
         body: JSON.stringify(arg),
       });
       return res.data;

@@ -204,11 +204,23 @@ export const OrderDetailPage = () => {
       // API akan konversi ke format Indonesia 24 jam (WIB/WITA/WIT auto)
       const clientTime = new Date().toISOString();
 
-      // Step 3: Generate baru + redirect ke PDF
-      const invoiceUrl = `/api/v1/orders/${id}/invoice?clientTime=${
-        encodeURIComponent(clientTime)
-      }`;
-      globalThis.open(invoiceUrl, '_blank');
+      // Step 3: Fetch menggunakan RPC client (membawa anti-bot headers & auth cookie)
+      const res = await client.v1.orders[':id'].invoice.$get({
+        param: { id },
+        query: { clientTime },
+      } as any);
+
+      if (!res.ok) {
+        throw new Error('Gagal memuat invoice dari server');
+      }
+
+      // Backend sekarang mengembalikan JSON { data: { url: "cdn_url" } }
+      const json = await res.json();
+      if (json?.data?.url) {
+        globalThis.open(json.data.url, '_blank');
+      } else {
+        throw new Error('URL Invoice tidak ditemukan');
+      }
     } catch {
       toast.error('Gagal membuat invoice. Coba lagi.');
     } finally {
@@ -668,45 +680,64 @@ export const OrderDetailPage = () => {
                 </div>
               )}
 
-              {/* Total */}
-              <div className='pt-4 mt-3 border-t-2 border-dashed border-border/60'>
-                <div className='flex justify-between items-center'>
-                  <span className='font-black text-foreground text-sm uppercase tracking-widest'>
-                    Total Belanja
-                  </span>
-                  <span className='font-black text-xl text-indigo-600 dark:text-indigo-400 tabular-nums'>
-                    {fmt(order.totalAmount)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Payment Details */}
               {(() => {
+                const gatewayFee = data?.payment?.customerPaymentAmount
+                  ? data.payment.customerPaymentAmount - order.totalAmount
+                  : 0;
+                const finalTotal = order.totalAmount + Math.max(0, gatewayFee);
+
                 const isPaid = ['paid', 'processing', 'shipped', 'delivered'].includes(
                   order.status,
                 );
-                const paidAmount = isPaid ? order.totalAmount : 0;
-                const remaining = order.totalAmount - paidAmount;
+                const paidAmount = isPaid ? finalTotal : 0;
+                const remaining = finalTotal - paidAmount;
 
                 return (
-                  <div className='pt-3 space-y-2 border-t border-border/40 mt-1'>
-                    <div className='flex justify-between text-[13px] font-bold'>
-                      <span className='text-muted-foreground'>Jumlah dibayar</span>
-                      <span className='text-emerald-600 dark:text-emerald-400'>
-                        {fmt(paidAmount)}
-                      </span>
+                  <>
+                    {/* Gateway Fee */}
+                    {gatewayFee > 0 && (
+                      <div className='flex justify-between items-center text-sm'>
+                        <span className='text-muted-foreground font-medium'>
+                          Biaya Layanan / Kode Unik
+                        </span>
+                        <span className='text-foreground font-semibold tabular-nums'>
+                          {fmt(gatewayFee)}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Total */}
+                    <div className='pt-4 mt-3 border-t-2 border-dashed border-border/60'>
+                      <div className='flex justify-between items-center'>
+                        <span className='font-black text-foreground text-sm uppercase tracking-widest'>
+                          Total Belanja
+                        </span>
+                        <span className='font-black text-xl text-indigo-600 dark:text-indigo-400 tabular-nums'>
+                          {fmt(finalTotal)}
+                        </span>
+                      </div>
                     </div>
-                    <div className='flex justify-between text-[13px] font-bold'>
-                      <span className='text-muted-foreground'>Sisa pembayaran</span>
-                      <span
-                        className={remaining > 0
-                          ? 'text-rose-500 dark:text-rose-400'
-                          : 'text-emerald-600 dark:text-emerald-400'}
-                      >
-                        {fmt(remaining)}
-                      </span>
+
+                    {/* Payment Details */}
+                    <div className='pt-3 space-y-2 border-t border-border/40 mt-1'>
+                      <div className='flex justify-between text-[13px] font-bold'>
+                        <span className='text-muted-foreground'>Jumlah dibayar</span>
+                        <span className='text-emerald-600 dark:text-emerald-400'>
+                          {fmt(paidAmount)}
+                        </span>
+                      </div>
+                      <div className='flex justify-between text-[13px] font-bold'>
+                        <span className='text-muted-foreground'>Sisa pembayaran</span>
+                        <span
+                          className={remaining > 0
+                            ? 'text-rose-500 dark:text-rose-400'
+                            : 'text-emerald-600 dark:text-emerald-400'}
+                        >
+                          {fmt(remaining)}
+                        </span>
+                      </div>
                     </div>
-                  </div>
+                  </>
                 );
               })()}
             </div>
