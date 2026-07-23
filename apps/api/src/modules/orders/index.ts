@@ -26,6 +26,7 @@ import { AuthContext, authMiddleware } from '../../middleware/auth.ts';
 import { deleteInvoicePDF, generateInvoicePDF, uploadInvoicePDF } from './invoice-generator.ts';
 import { EligibilityService } from '../returns/services/eligibility.service.ts';
 import { serializeCustomerOrderListItem } from './dto.ts';
+import { computeSha256 } from '../../utils/crypto.ts';
 
 /**
  * Parse optionValues JSON → human-readable string, e.g. "Merah · XL"
@@ -143,9 +144,9 @@ const routes = app
 
         // Build full public URLs using server-side R2_PUBLIC_URL env var
         // This is built on the server so the frontend never needs R2 config
-        const r2BaseUrl = (typeof Deno !== 'undefined'
+        const r2BaseUrl = typeof Deno !== 'undefined'
           ? Deno.env.get('R2_PUBLIC_URL')
-          : process?.env?.['R2_PUBLIC_URL']) || '';
+          : process?.env?.['R2_PUBLIC_URL'];
         const imageMap: Record<string, string[]> = {};
         for (const img of imageRows) {
           if (!imageMap[img.productId]) {
@@ -324,9 +325,9 @@ const routes = app
 
     // Fetch primary image for each unique product
     const uniqueProductIds = [...new Set(rawItems.map((i) => i.productId))];
-    const r2Base = (typeof Deno !== 'undefined'
+    const r2Base = typeof Deno !== 'undefined'
       ? Deno.env.get('R2_PUBLIC_URL')
-      : process?.env?.['R2_PUBLIC_URL']) || '';
+      : process?.env?.['R2_PUBLIC_URL'];
     const imageRows = uniqueProductIds.length > 0
       ? await db
         .select({
@@ -443,9 +444,7 @@ const routes = app
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
-    const activeReturn = orderReturns.find((r) =>
-      r.orderId === order.id
-    );
+    const activeReturn = orderReturns.find((r) => r.orderId === order.id);
     if (activeReturn) {
       order.status = activeReturn.status === 'resolved'
         ? 'refunded'
@@ -545,9 +544,9 @@ const routes = app
         }
         await db.delete(invoices).where(eq(invoices.id, existingInvoice.id));
       } else {
-        const publicUrlBase = (typeof Deno !== 'undefined'
+        const publicUrlBase = typeof Deno !== 'undefined'
           ? Deno.env.get('R2_PUBLIC_URL_2')
-          : process?.env?.['R2_PUBLIC_URL_2']) || '';
+          : process?.env?.['R2_PUBLIC_URL_2'];
         const publicUrl = `${publicUrlBase}/${existingInvoice.pdfObjectKey}`;
         return c.json({
           data: { url: publicUrl },
@@ -684,9 +683,9 @@ const routes = app
 
     // 9. Upload ke R2 invoice bucket (private)
     await uploadInvoicePDF(pdfBytes, objectKey);
-    const publicUrlBase = (typeof Deno !== 'undefined'
+    const publicUrlBase = typeof Deno !== 'undefined'
       ? Deno.env.get('R2_PUBLIC_URL_2')
-      : process?.env?.['R2_PUBLIC_URL_2']) || '';
+      : process?.env?.['R2_PUBLIC_URL_2'];
     const publicUrl = `${publicUrlBase}/${objectKey}`;
 
     // 10. Simpan record ke tabel invoices (untuk idempoten: generate sekali)
@@ -829,26 +828,19 @@ const routes = app
       throw new HTTPException(404, { message: 'Order not found' });
     }
 
-    // 2. Resolve or create user's active cart
-    const activeCarts = await db
-      .select({ id: carts.id })
-      .from(carts)
-      .where(and(eq(carts.userId, user.id), eq(carts.status, 'active')))
-      .limit(1);
+    // 2. Create a temporary guest cart for direct buy
+    const newGuestToken = crypto.randomUUID();
+    const digest = await computeSha256(newGuestToken);
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 1);
 
-    let cartId;
-    if (activeCarts.length > 0) {
-      cartId = activeCarts[0].id;
-    } else {
-      const expiresAt = new Date();
-      expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-      const [newCart] = await db.insert(carts).values({
-        userId: user.id,
-        status: 'active',
-        expiresAt: expiresAt.toISOString(),
-      }).returning({ id: carts.id });
-      cartId = newCart.id;
-    }
+    const [newCart] = await db.insert(carts).values({
+      userId: null,
+      guestTokenHash: digest,
+      status: 'active',
+      expiresAt: expiresAt.toISOString(),
+    }).returning({ id: carts.id });
+    const cartId = newCart.id;
 
     // 3. Fetch order items to re-buy
     const items = await db
@@ -916,6 +908,7 @@ const routes = app
         addedCount: addedItems.length,
         addedItems,
         outOfStockItems,
+        directToken: newGuestToken,
       },
       meta: { request_id: c.get('requestId') },
       error: null,

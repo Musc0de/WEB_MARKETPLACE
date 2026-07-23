@@ -6,6 +6,7 @@ import {
 } from '@starsuperscare/contracts';
 import {
   db,
+  digitalCredentials,
   inventoryLevels,
   inventoryMovements,
   orderAddresses,
@@ -22,7 +23,7 @@ import {
 } from '@starsuperscare/database';
 import { authMiddleware, requirePermission } from '../../../middleware/auth.ts';
 import { sendNotification } from '../../notifications/index.ts';
-import { desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
 const adminOrdersRouter = new Hono();
@@ -138,9 +139,9 @@ adminOrdersRouter.get('/:id', async (c) => {
 
   // Fetch primary image for each unique product
   const uniqueProductIds = [...new Set(rawItems.map((i) => i.productId))];
-  const r2Base = (typeof Deno !== 'undefined'
+  const r2Base = typeof Deno !== 'undefined'
     ? Deno.env.get('R2_PUBLIC_URL')
-    : process?.env?.['R2_PUBLIC_URL']) || '';
+    : process?.env?.['R2_PUBLIC_URL'];
   const imageRows = uniqueProductIds.length > 0
     ? await db
       .select({
@@ -249,6 +250,41 @@ adminOrdersRouter.post(
           }
         }
       }
+
+      // Assign digital credentials if delivered
+      if (status === 'delivered') {
+        const items = await tx.select({
+          id: orderItems.id,
+          productId: products.id,
+          variantId: productVariants.id,
+          quantity: orderItems.quantity,
+          productType: products.type,
+        }).from(orderItems)
+          .innerJoin(productVariants, eq(orderItems.variantId, productVariants.id))
+          .innerJoin(products, eq(productVariants.productId, products.id))
+          .where(eq(orderItems.orderId, id));
+
+        for (const item of items) {
+          if (item.productType === 'digital' || item.productType === 'service') {
+            const availableCreds = await tx.select().from(digitalCredentials).where(
+              and(
+                eq(digitalCredentials.productId, item.productId),
+                eq(digitalCredentials.status, 'available'),
+              ),
+            ).limit(item.quantity);
+
+            if (availableCreds.length > 0) {
+              const credIds = availableCreds.map((c) => c.id);
+              await tx.update(digitalCredentials).set({
+                status: 'assigned',
+                orderItemId: item.id,
+                userId: orderResult[0].userId,
+                updatedAt: new Date().toISOString(),
+              }).where(inArray(digitalCredentials.id, credIds));
+            }
+          }
+        }
+      }
     });
 
     const order = orderResult[0];
@@ -258,7 +294,7 @@ adminOrdersRouter.post(
         'order_update',
         `Update Status Pesanan #${order.orderNumber || order.id.slice(0, 8)}`,
         `Status pesanan Anda telah diperbarui menjadi ${status}.`,
-        `/dashboard/orders/${order.id}`,
+        `/orders/${order.id}`,
       );
     }
 
@@ -338,8 +374,8 @@ adminOrdersRouter.post(
 
     try {
       const payload = {
-        shipper_contact_name: 'Admin Store',
-        shipper_contact_phone: '081234567890',
+        shipper_contact_name: '',
+        shipper_contact_phone: '',
         origin_postal_code: Number(storeOriginPostalCode),
         destination_contact_name: ship.fullName,
         destination_contact_phone: ship.phoneNumber,

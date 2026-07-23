@@ -357,7 +357,7 @@ export function CheckoutPage() {
                         Anda dapat melihat dan mengunduh produk digital/layanan pesanan Anda melalui
                         halaman{' '}
                         <a
-                          href='/downloads'
+                          href={`${(import.meta as any).env?.VITE_DASHBOARD_URL}/downloads`}
                           target='_blank'
                           rel='noopener noreferrer'
                           className='font-bold underline hover:text-indigo-600 dark:hover:text-indigo-400'

@@ -175,8 +175,15 @@ export const OrderDetailPage = () => {
         if ((result.data.outOfStockItems?.length ?? 0) > 0) {
           toast.warning(`Item habis: ${result.data.outOfStockItems.join(', ')}`);
         }
-        if (result.data.addedCount > 0) toast.success('Item ditambahkan ke keranjang!');
-        else toast.error('Tidak ada item yang bisa dibeli lagi.');
+        if (result.data.addedCount > 0) {
+          const storefrontUrl = (import.meta as any).env?.VITE_STOREFRONT_URL;
+          const tokenParams = result.data.directToken
+            ? `?directToken=${encodeURIComponent(result.data.directToken)}`
+            : '';
+          globalThis.location.href = `${storefrontUrl}/checkout${tokenParams}`;
+        } else {
+          toast.error('Tidak ada item yang bisa dibeli lagi.');
+        }
       } else {
         toast.error('Gagal memproses beli lagi.');
       }

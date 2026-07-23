@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Sidebar } from './Sidebar.tsx';
 import { MobileNav } from './MobileNav.tsx';
 import { ProtectedRoute } from '../../features/auth/ProtectedRoute.tsx';
@@ -40,24 +41,24 @@ const Topbar = () => {
         >
           Kembali Belanja
         </a>
-        <button
-          type='button'
-          className='relative p-2 text-muted-foreground hover:bg-muted/50 rounded-full transition-colors'
+        <Link
+          to='/notifications'
+          className='relative p-2 text-muted-foreground hover:bg-muted/50 rounded-full transition-colors cursor-pointer'
         >
           <Bell className='h-5 w-5' />
           {(unreadCount ?? 0) > 0 && (
             <span className='absolute top-1.5 right-1.5 flex h-2 w-2 rounded-full bg-red-500'>
             </span>
           )}
-        </button>
-        <button
-          type='button'
-          className='flex items-center gap-2 p-1.5 hover:bg-muted/50 rounded-full transition-colors'
+        </Link>
+        <Link
+          to='/settings'
+          className='flex items-center gap-2 p-1.5 hover:bg-muted/50 rounded-full transition-colors cursor-pointer'
         >
           <div className='h-8 w-8 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-500/20'>
             {session?.user?.username?.charAt(0).toUpperCase() || <User className='h-4 w-4' />}
           </div>
-        </button>
+        </Link>
       </div>
     </header>
   );
